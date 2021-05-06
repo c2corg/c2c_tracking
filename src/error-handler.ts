@@ -2,7 +2,7 @@ import { Context } from 'koa';
 import { IMiddleware } from 'koa-router';
 
 export function defaultErrorHandler(): IMiddleware {
-  return async (ctx: Context, next: () => Promise<any>) => {
+  return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
     try {
       await next();
     } catch (err) {

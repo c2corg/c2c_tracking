@@ -2,9 +2,10 @@
   "name": "tracker-connect",
   "version": "1.0.0",
   "description": "Tiny server to handle connection with activity trackers such as Strava, Garmin or Suunto",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/server.ts | pino-pretty\"",
+    "start": "ts-node src/index.ts | pino-pretty",
+    "start:dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts | pino-pretty\"",
     "build": "tsc",
     "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint src/**",
     "prepare": "husky install"
@@ -20,17 +21,24 @@
   },
   "homepage": "https://github.com/brunobesson/tracker-connect#readme",
   "dependencies": {
+    "async": "3.2.0",
+    "dayjs": "1.10.4",
+    "dotenv": "9.0.0",
+    "knex": "0.95.4",
     "koa": "2.13.1",
     "koa-helmet": "6.1.0",
     "koa-pino-logger": "3.0.0",
-    "koa-router": "10.0.0"
+    "koa-router": "10.0.0",
+    "pg": "8.6.0"
   },
   "devDependencies": {
     "@tsconfig/node14": "1.0.0",
+    "@types/async": "3.2.6",
     "@types/koa": "2.13.1",
     "@types/koa-pino-logger": "3.0.0",
     "@types/koa-router": "7.4.2",
     "@types/node": "14.14.43",
+    "@types/pg": "7.14.11",
     "@typescript-eslint/eslint-plugin": "4.22.1",
     "@typescript-eslint/parser": "4.22.1",
     "eslint": "7.25.0",
