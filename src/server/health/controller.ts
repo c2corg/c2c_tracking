@@ -1,5 +1,6 @@
 import { Context } from 'koa';
-import { HealthService } from '../health.service';
+
+import { HealthService } from '../../health.service';
 
 export default class HealthController {
   constructor(private readonly health: HealthService) {}

@@ -1,14 +1,20 @@
 import { Context } from 'koa';
 import { IMiddleware } from 'koa-router';
 
+import { AppError } from '../errors';
+
 export function defaultErrorHandler(): IMiddleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
     try {
       await next();
     } catch (err) {
-      ctx.log.error('Error handler:', err);
-      ctx.body = 'Internal Server Error';
-      ctx.status = 500;
+      if (err instanceof AppError) {
+        ctx.body = err.message;
+        ctx.status = err.code ?? 500;
+      } else {
+        ctx.body = 'Internal Server Error';
+        ctx.status = 500;
+      }
     }
   };
 }

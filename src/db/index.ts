@@ -1,6 +1,7 @@
+import path from 'path';
+
 import { AsyncResultCallback, retry } from 'async';
 import knex, { Knex } from 'knex';
-import path from 'path';
 
 export interface Configuration {
   host: string;
@@ -118,3 +119,12 @@ export class Database {
     return this.retryDbConnectionPromise;
   }
 }
+
+export const database = new Database({
+  database: process.env.DB_NAME || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: Number(process.env.DB_PORT) || 5432,
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  debug: process.env.ENV !== 'production',
+});

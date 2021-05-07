@@ -1,26 +1,32 @@
-import { ErrorCallback, retry } from 'async';
-import dotenv from 'dotenv';
-import Koa from 'koa';
-import helmet from 'koa-helmet';
-import logger from 'koa-pino-logger';
-import Router from 'koa-router';
-import { Server } from 'node:http';
-import pino from 'pino';
+import dotenv from 'dotenv'; // eslint-disable-line import/order
 
-import { defaultErrorHandler } from './error-handler';
-import { logRequest } from './log-request';
-import health from './health';
-import strava from './strava';
-import { healthService } from './health.service';
-import { Database } from './db';
-
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'PRODUCTION') {
   dotenv.config();
 }
 
-const PORT = Number(process.env.PORT) ?? 80;
+import { ErrorCallback, retry } from 'async'; // eslint-disable-line import/order
+
+import { Server } from 'http'; // eslint-disable-line import/order
+
+import Koa from 'koa';
+import bodyParser from 'koa-bodyparser';
+import helmet from 'koa-helmet';
+import logger from 'koa-pino-logger';
+import Router from 'koa-router';
+import pino from 'pino';
+
+import { database as db } from './db';
+import { healthService } from './health.service';
+import { defaultErrorHandler } from './server/error-handler';
+import health from './server/health';
+import { logRequest } from './server/log-request';
+import strava from './server/strava';
+
+const PORT = Number(process.env.PORT) || 80;
 
 const log = pino();
+
+log.info(process.env);
 
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
@@ -46,7 +52,7 @@ async function closeServer(server: Server): Promise<void> {
   });
 }
 
-function registerProcessEvents(server: Server, db: Database): void {
+function registerProcessEvents(server: Server): void {
   process.on('uncaughtException', (error: Error) => {
     log.error('UncaughtException', error);
   });
@@ -78,15 +84,6 @@ function registerProcessEvents(server: Server, db: Database): void {
 
 export async function start(): Promise<void> {
   try {
-    const db = new Database({
-      database: process.env.DB_NAME ?? 'postgres',
-      host: process.env.DB_HOST ?? 'localhost',
-      port: Number(process.env.DB_PORT) ?? 5432,
-      user: process.env.DB_USER ?? 'postgres',
-      password: process.env.DB_PASSWORD ?? 'postgres',
-      debug: process.env.ENV !== 'production',
-    });
-
     log.info('Apply database migration');
     await db.schemaMigration();
 
@@ -97,6 +94,7 @@ export async function start(): Promise<void> {
     router.use('/strava', strava.routes(), strava.allowedMethods());
 
     app
+      .use(bodyParser())
       .use(helmet())
       .use(logger())
       .use(logRequest())
@@ -107,7 +105,7 @@ export async function start(): Promise<void> {
       console.log(`Server is running on port ${PORT}`);
     });
 
-    registerProcessEvents(server, db);
+    registerProcessEvents(server);
   } catch (err) {
     log.error(err, 'An error occurred while initializing application.');
   }

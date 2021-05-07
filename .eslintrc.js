@@ -3,6 +3,8 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     'prettier', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
+    'plugin:import/recommended',
+    'plugin:import/typescript',
     'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
@@ -12,5 +14,15 @@ module.exports = {
   rules: {
     '@typescript-eslint/explicit-function-return-type': 2,
     '@typescript-eslint/camelcase': 0,
+    'import/order': [
+      'error',
+      {
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: false,
+        },
+      },
+    ],
   },
 };

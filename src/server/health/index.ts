@@ -1,7 +1,8 @@
 import Router from 'koa-router';
 
-import { healthService } from '../health.service';
-import HealthController from './health.controller';
+import { healthService } from '../../health.service';
+
+import HealthController from './controller';
 
 const healthController = new HealthController(healthService);
 const router = new Router();
