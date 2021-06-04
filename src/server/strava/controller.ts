@@ -1,8 +1,9 @@
 import { Context } from 'koa';
 
-import { stravaService as service } from './service';
+import { WebhookEvent, WebhookSubscription } from './api';
+import { stravaService as service, stravaService } from './service';
 
-export class StravaController {
+class StravaController {
   public async exchangeTokens(ctx: Context): Promise<void> {
     const authorizationCode = ctx.query.code as string;
     const scopes: string[] = (ctx.query.scope as string).split(',');
@@ -22,4 +23,23 @@ export class StravaController {
       ctx.redirect(service.subscriptionErrorUrl);
     }
   }
+
+  public async webhookSubscription(ctx: Context): Promise<void> {
+    const body = <WebhookSubscription>ctx.request.body;
+    if (body['hub.verify_token'] !== stravaService.stravaWebhookSubscriptionVerifyToken) {
+      ctx.status = 403;
+      return;
+    }
+    ctx.status = 200;
+    ctx.body = {
+      'hub.challenge': body['hub.challenge'],
+    };
+  }
+
+  public async webhook(ctx: Context): Promise<void> {
+    service.handleWebhookEvent(<WebhookEvent>ctx.request.body); // async handling
+    ctx.status = 200; // acknowledge event
+  }
 }
+
+export const controller = new StravaController();

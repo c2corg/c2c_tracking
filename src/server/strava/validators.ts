@@ -11,3 +11,23 @@ export const exchangeTokens: Schema = {
     state: number().required().positive().min(1).max(99999999),
   }),
 };
+
+export const webhookSubscription: Schema = {
+  query: object({
+    'hub.mode': string().required().equal('subscribe'),
+    'hub.challenge': string().required(),
+    'hub.verify_token': string().required(),
+  }),
+};
+
+export const webhook: Schema = {
+  body: object({
+    object_type: string().required().equal('activity', 'athlete'),
+    object_id: string().required(),
+    aspect_type: string().equal('create', 'update', 'delete'),
+    updates: object().required().pattern(string(), string()),
+    owner_id: string().required(),
+    subscription_id: string().required(),
+    event_time: number().required(),
+  }),
+};

@@ -17,16 +17,15 @@ import pino from 'pino';
 
 import { database as db } from './db';
 import { healthService } from './health.service';
+import activities from './server/activities';
 import { defaultErrorHandler } from './server/error-handler';
 import health from './server/health';
 import { logRequest } from './server/log-request';
 import strava from './server/strava';
 
-const PORT = Number(process.env.PORT) || 80;
+const PORT = Number(process.env.PORT) ?? 80;
 
 const log = pino();
-
-log.info(process.env);
 
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
@@ -92,6 +91,7 @@ export async function start(): Promise<void> {
 
     router.use('/health', health.routes(), health.allowedMethods());
     router.use('/strava', strava.routes(), strava.allowedMethods());
+    router.use('/toto', activities.routes(), activities.allowedMethods());
 
     app
       .use(bodyParser())

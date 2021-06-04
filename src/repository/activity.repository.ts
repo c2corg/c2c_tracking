@@ -18,9 +18,29 @@ export class ActivityRepository {
         return [];
       }
 
-      return rows.map((row) => this.rowToActivity(row));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return rows.map((row: any) => this.rowToActivity(row));
     } catch (err) {
       return [];
+    }
+  }
+
+  public async findByUserAndId(userId: number, activityId: number): Promise<Activity | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      const rows = await conn?.table(this.#TABLE).where({ user_id: userId, id: activityId });
+
+      if (!rows) {
+        return undefined;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return this.rowToActivity(rows[0]);
+    } catch (err) {
+      return undefined;
     }
   }
 

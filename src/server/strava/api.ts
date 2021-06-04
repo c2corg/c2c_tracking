@@ -1,9 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
-import pino from 'pino';
 
 import { AppError } from '../../errors';
-
-const log = pino();
 
 export interface Athlete {
   id: number;
@@ -15,6 +12,8 @@ export interface StravaAuth {
   expires_in: number;
   athlete: Athlete;
 }
+
+export type StravaRefreshAuth = Omit<StravaAuth, 'athlete'>;
 
 export type ActivityType =
   | 'AlpineSki'
@@ -56,8 +55,8 @@ export type ActivityType =
   | 'Yoga';
 
 export interface PolylineMap {
-  polyline: string;
-  summary_polyline?: string;
+  polyline?: string;
+  summary_polyline: string;
 }
 
 export interface Activity {
@@ -78,15 +77,35 @@ export interface Subscription {
   updated_at: string;
 }
 
+export interface WebhookSubscription {
+  'hub.mode': 'subscribe';
+  'hub.challenge': string;
+  'hub.verify_token': string;
+}
+
+export interface WebhookEvent {
+  object_type: 'activity' | 'athlete';
+  object_id: string;
+  aspect_type: 'create' | 'update' | 'delete';
+  updates: Record<string, string>;
+  owner_id: string;
+  subscription_id: string;
+  event_time: number;
+}
+
 export class StravaApi {
   private readonly baseUrl = 'https://www.strava.com/api/v3/';
   readonly #clientId: string;
   readonly #clientSecret: string;
 
   constructor() {
-    log.warn(process.env);
-    this.#clientId = process.env.STRAVA_CLIENT_ID || '';
-    this.#clientSecret = process.env.STRAVA_CLIENT_SECRET || '';
+    ['STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET'].forEach((envvar) => {
+      if (!process.env[envvar]) {
+        throw new Error(`Missing configuration variable: ${envvar}`);
+      }
+    });
+    this.#clientId = process.env.STRAVA_CLIENT_ID!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#clientSecret = process.env.STRAVA_CLIENT_SECRET!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public async exchangeTokens(code: string): Promise<StravaAuth> {
@@ -108,7 +127,29 @@ export class StravaApi {
     }
   }
 
-  // TODO only retrieve 30 first
+  public async refreshAuth(token: string): Promise<StravaRefreshAuth> {
+    try {
+      const response: AxiosResponse<StravaRefreshAuth> = await axios.post<StravaRefreshAuth>(
+        `${this.baseUrl}oauth/token`,
+        null,
+        {
+          params: {
+            client_id: this.#clientId,
+            client_secret: this.#clientSecret,
+            refresh_token: token,
+            grant_type: 'refresh_token',
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new AppError(502, 'Error on Strava refresh token request', error);
+      }
+      throw new AppError(500, 'Error on Strava refresh token request', error);
+    }
+  }
+
   public async getAthleteActivities(token: string): Promise<Activity[]> {
     try {
       const response = await axios.get<Activity[]>(`${this.baseUrl}athlete/activities`, {

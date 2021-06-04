@@ -53,9 +53,9 @@ export class UserRepository {
       c2cId: row.c2c_id,
       strava: {
         id: row.strava_id,
-        access_token: row.acess_token,
-        expires_at: row.expires_at,
-        refresh_token: row.refresh_token,
+        access_token: row.strava_access_token,
+        expires_at: row.strava_expires_at,
+        refresh_token: row.strava_refresh_token,
       },
     };
   }

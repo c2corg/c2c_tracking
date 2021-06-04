@@ -1,8 +1,9 @@
+import { NotFoundError } from './errors';
 import { Activity } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
-import { User } from './repository/user';
+import { StravaInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
-import { StravaAuth } from './server/strava/api';
+import { StravaAuth, StravaRefreshAuth } from './server/strava/api';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -41,6 +42,31 @@ export class UserService {
     }
   }
 
+  async updateStravaAuth(c2cId: number, auth: StravaRefreshAuth): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError('User not found'); // TODO enhance
+    }
+    if (!user.strava || !user.strava.id) {
+      throw new NotFoundError('User not configured for strava'); // !FIXME use another error
+    }
+    user = {
+      ...user,
+      strava: {
+        id: user.strava?.id,
+        access_token: auth.access_token,
+        expires_at: auth.expires_at,
+        refresh_token: auth.refresh_token,
+      },
+    };
+    await userRepository.update(user);
+  }
+
+  async getStravaInfo(c2cId: number): Promise<StravaInfo | undefined> {
+    const user = await userRepository.findById(c2cId);
+    return user?.strava;
+  }
+
   async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {
     let userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
@@ -62,6 +88,14 @@ export class UserService {
     for (const { id } of activitiesToDelete) {
       await activityRepository.delete(id);
     }
+  }
+
+  async getActivities(c2cId: number): Promise<Activity[]> {
+    return await activityRepository.findByUser(c2cId);
+  }
+
+  async getActivity(c2cId: number, activityId: number): Promise<Activity | undefined> {
+    return await activityRepository.findByUserAndId(c2cId, activityId);
   }
 }
 

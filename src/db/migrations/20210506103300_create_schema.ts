@@ -18,6 +18,11 @@ export async function up(db: Knex): Promise<void> {
     table.string('type');
     table.string('date').notNullable();
   });
+
+  await db.schema.createTable('strava', (table) => {
+    table.increments('id').primary();
+    table.string('subscription_id');
+  });
 }
 
 export function down(db: Knex): Knex.SchemaBuilder {
