@@ -23,7 +23,7 @@
   "dependencies": {
     "@types/koa-bodyparser": "4.3.0",
     "async": "3.2.0",
-    "dayjs": "1.10.4",
+    "dayjs": "1.10.5",
     "dotenv": "9.0.0",
     "joi": "17.4.0",
     "knex": "0.95.4",
