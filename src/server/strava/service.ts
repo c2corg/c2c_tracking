@@ -3,10 +3,12 @@ import dayjs from 'dayjs';
 import pino from 'pino';
 
 import { Activity } from '../../repository/activity';
+import { activityRepository } from '../../repository/activity.repository';
 import { stravaRepository } from '../../repository/strava.repository';
+import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { Activity as StravaActivity, StravaAuth, stravaApi as api, stravaApi, WebhookEvent } from './api';
+import { Activity as StravaActivity, StravaAuth, stravaApi as api, stravaApi, WebhookEvent, Subscription } from './api';
 
 const log = pino();
 
@@ -101,39 +103,162 @@ export class StravaService {
         (subscription) => subscription.id === subscriptionId && subscription.callback_url === webhookCallbackUrl,
       );
     } catch (error) {
-      // TODO log / report?
-      return false; // subscription could not be checked, assume it is not set
+      log.warn(
+        `Strava webhook subscription status couldn't be checked: unable to retrieve current subscription. Assuming not set`,
+      );
+      return false;
     }
   }
 
   private async requestWebhookSubscription(): Promise<void> {
-    const subscription = await stravaApi.requestSubscriptionCreation(
-      webhookCallbackUrl,
-      this.stravaWebhookSubscriptionVerifyToken,
-    );
-    stravaRepository.setSubscription(subscription.id); // async call
+    let subscription: Subscription;
+    try {
+      subscription = await stravaApi.requestSubscriptionCreation(
+        webhookCallbackUrl,
+        this.stravaWebhookSubscriptionVerifyToken,
+      );
+    } catch (error) {
+      log.warn(`Strava subscription couldn't be requested`);
+      return;
+    }
+    try {
+      stravaRepository.setSubscription(subscription.id); // async call
+    } catch (error) {
+      log.warn(`Strava subscription couldn't stored in DB`);
+    }
   }
 
   async handleWebhookEvent(event: WebhookEvent): Promise<void> {
     switch (event.object_type) {
       case 'athlete':
-        if (event.aspect_type == 'delete') {
-          // TODO clear user data
-        }
+        event.aspect_type === 'delete' && (await this.handleAthleteDeleteEvent(event.owner_id));
         break;
       case 'activity':
         switch (event.aspect_type) {
           case 'create':
-            // TODO retrieve activity, add
+            await this.handleActivityCreateEvent(event.owner_id, event.object_id.toLocaleString());
             break;
           case 'update':
-            // TODO update of title / type / private
+            await this.handleActivityUpdateEvent(event.owner_id, event.object_id.toLocaleString());
             break;
           case 'delete':
-            // TODO
+            await this.handleActivityDeleteEvent(event.object_id.toLocaleString());
             break;
         }
         break;
+    }
+  }
+
+  /*
+   * On athlete delete event received, it means our app isn't authorized anymore. We should thus clean up all
+   * Strava-related data from our DB.
+   */
+  private async handleAthleteDeleteEvent(userStravaId: number): Promise<void> {
+    const user = await userRepository.findByStravaId(userStravaId);
+    if (!user) {
+      return;
+    }
+    // clear user Strava activities
+    (await activityRepository.findByUser(user.c2cId))
+      .filter((activity) => activity.vendor === 'strava')
+      .forEach((activity) => activityRepository.delete(activity.id));
+    // clear user Strava data
+    await userRepository.update({ ...user, strava: undefined });
+  }
+
+  /*
+   * On activity creation, retrieve data, then add activity to user's activity (sorting and triaging is handled through
+   * user service).
+   */
+  private async handleActivityCreateEvent(userStravaId: number, activityId: string): Promise<void> {
+    const user = await userRepository.findByStravaId(userStravaId);
+    if (!user) {
+      log.warn(
+        `Strava activity creation webhook event for Strava user ${userStravaId} couldn't be processed: unable to find matching user in DB`,
+      );
+      return;
+    }
+    const token = await this.getToken(user.c2cId);
+    if (!token) {
+      log.warn(
+        `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to acquire valid token`,
+      );
+      return;
+    }
+    let activity: StravaActivity;
+    try {
+      activity = await stravaApi.getActivity(token, activityId);
+    } catch (error) {
+      log.warn(
+        `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
+      );
+      return;
+    }
+    try {
+      await userService.addActivities(user.c2cId, {
+        vendor: 'strava',
+        vendorId: activityId,
+        date: activity.start_date_local,
+        name: activity.name,
+        type: activity.type,
+      });
+    } catch (error) {
+      log.warn(
+        `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
+      );
+    }
+  }
+
+  /*
+   * On activity update, retrieve activity data and update DB.
+   */
+  private async handleActivityUpdateEvent(userStravaId: number, activityId: string): Promise<void> {
+    // retrieve activity
+    const user = await userRepository.findByStravaId(userStravaId);
+    if (!user) {
+      log.warn(
+        `Strava activity update webhook event for Strava user ${userStravaId} couldn't be processed: unable to find matching user in DB`,
+      );
+      return;
+    }
+    const token = await this.getToken(user.c2cId);
+    if (!token) {
+      log.warn(
+        `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to acquire valid token`,
+      );
+      return;
+    }
+    let activity: StravaActivity;
+    try {
+      activity = await stravaApi.getActivity(token, activityId);
+    } catch (error) {
+      log.warn(
+        `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
+      );
+      return;
+    }
+    try {
+      await userService.updateActivity(user.c2cId, {
+        vendor: 'strava',
+        vendorId: activityId,
+        date: activity.start_date_local,
+        name: activity.name,
+        type: activity.type,
+      });
+    } catch (error) {
+      log.warn(
+        `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to update activity data in DB`,
+      );
+    }
+  }
+
+  private async handleActivityDeleteEvent(activityId: string): Promise<void> {
+    try {
+      await userService.deleteActivity('strava', activityId);
+    } catch (error) {
+      log.warn(
+        `Strava activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
+      );
     }
   }
 }

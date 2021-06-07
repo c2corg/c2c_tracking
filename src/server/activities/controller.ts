@@ -11,9 +11,11 @@ class ActivityController {
   }
 
   public async getUserActivity(ctx: Context): Promise<void> {
+    const userId: number = Number.parseInt(ctx.params.userId, 10);
+    const activityId: number = Number.parseInt(ctx.params.activityId, 10);
     // TODO check rights & all
     // retrieve activity id and vendor
-    const activity = await userService.getActivity(ctx.params.userId, ctx.params.activityId);
+    const activity = await userService.getActivity(userId, activityId);
     if (!activity) {
       ctx.status = 404;
       return;
@@ -21,10 +23,9 @@ class ActivityController {
 
     switch (activity.vendor) {
       case 'strava':
-        const token = await stravaService.getToken(ctx.params.userId);
+        const token = await stravaService.getToken(userId);
         if (!token) {
-          // token could not be renewed
-          // TODO what to do exactly?
+          ctx.log.warn(`Error: unable to acquire valid token`);
           ctx.status = 503;
           return;
         }
@@ -32,7 +33,7 @@ class ActivityController {
         ctx.status = 200;
         break;
       default:
-        throw new AppError(400, 'TODO'); // TODO
+        throw new AppError(400, `Vendor not handled: ${activity.vendor}`);
     }
   }
 }

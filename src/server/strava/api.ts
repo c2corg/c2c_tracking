@@ -85,11 +85,11 @@ export interface WebhookSubscription {
 
 export interface WebhookEvent {
   object_type: 'activity' | 'athlete';
-  object_id: string;
+  object_id: number;
   aspect_type: 'create' | 'update' | 'delete';
   updates: Record<string, string>;
-  owner_id: string;
-  subscription_id: string;
+  owner_id: number;
+  subscription_id: number;
   event_time: number;
 }
 

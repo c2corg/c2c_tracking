@@ -90,6 +90,24 @@ export class UserService {
     }
   }
 
+  async updateActivity(c2cId: number, activity: Omit<Activity, 'id' | 'userId'>): Promise<void> {
+    const savedActivity = (await activityRepository.findByUser(c2cId)).find(
+      (act) => act.vendorId === activity.vendor && act.vendorId === activity.vendorId,
+    );
+    if (savedActivity) {
+      await activityRepository.update({
+        ...savedActivity,
+        date: activity.date,
+        name: activity.name,
+        type: activity.type,
+      });
+    }
+  }
+
+  async deleteActivity(vendor: string, vendorId: string): Promise<void> {
+    await activityRepository.deleteByVendorId(vendor, vendorId);
+  }
+
   async getActivities(c2cId: number): Promise<Activity[]> {
     return await activityRepository.findByUser(c2cId);
   }

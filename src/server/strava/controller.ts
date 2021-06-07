@@ -37,7 +37,8 @@ class StravaController {
   }
 
   public async webhook(ctx: Context): Promise<void> {
-    service.handleWebhookEvent(<WebhookEvent>ctx.request.body); // async handling
+    const event: WebhookEvent = ctx.request.body;
+    service.handleWebhookEvent(event); // async handling
     ctx.status = 200; // acknowledge event
   }
 }

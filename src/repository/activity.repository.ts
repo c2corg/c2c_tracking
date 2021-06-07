@@ -3,7 +3,7 @@ import { IOError, NotFoundError } from '../errors';
 
 import { Activity } from './activity';
 
-export class ActivityRepository {
+class ActivityRepository {
   readonly #TABLE = 'activities';
 
   public async findByUser(userId: number): Promise<Activity[]> {
@@ -72,6 +72,22 @@ export class ActivityRepository {
       .from(this.#TABLE)
       .delete()
       .where({ id });
+
+    if (result === 0) {
+      throw new NotFoundError('Activity does not exist');
+    }
+  }
+
+  public async deleteByVendorId(vendor: string, vendorId: string): Promise<void> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+
+    const result = await conn
+      .from(this.#TABLE)
+      .delete()
+      .where({ vendor, vendorId });
 
     if (result === 0) {
       throw new NotFoundError('Activity does not exist');

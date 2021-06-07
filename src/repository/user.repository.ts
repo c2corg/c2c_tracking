@@ -29,6 +29,25 @@ export class UserRepository {
     }
   }
 
+  public async findByStravaId(stravaId: number): Promise<User | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      const row = await conn
+        ?.table(this.#TABLE)
+        .where({ strava_id: stravaId })
+        .first();
+      if (!row) {
+        return undefined;
+      }
+      return this.rowToUser(row);
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   public async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {

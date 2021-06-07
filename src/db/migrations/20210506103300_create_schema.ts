@@ -11,7 +11,7 @@ export async function up(db: Knex): Promise<void> {
 
   await db.schema.createTable('activities', (table) => {
     table.increments('id').primary();
-    table.integer('user_id').notNullable().unsigned().references('c2c_id').inTable('users');
+    table.integer('user_id').notNullable().unsigned().references('c2c_id').inTable('users').onDelete('CASCADE');
     table.string('vendor').notNullable();
     table.string('vendor_id').notNullable();
     table.string('name').notNullable();
