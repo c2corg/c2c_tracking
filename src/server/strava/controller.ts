@@ -25,19 +25,19 @@ class StravaController {
   }
 
   public async webhookSubscription(ctx: Context): Promise<void> {
-    const body = <WebhookSubscription>ctx.request.body;
-    if (body['hub.verify_token'] !== stravaService.stravaWebhookSubscriptionVerifyToken) {
+    const query = <WebhookSubscription>(ctx.request.query as unknown);
+    if (query['hub.verify_token'] !== stravaService.stravaWebhookSubscriptionVerifyToken) {
       ctx.status = 403;
       return;
     }
     ctx.status = 200;
     ctx.body = {
-      'hub.challenge': body['hub.challenge'],
+      'hub.challenge': query['hub.challenge'],
     };
   }
 
   public async webhook(ctx: Context): Promise<void> {
-    const event: WebhookEvent = ctx.request.body;
+    const event = <WebhookEvent>(ctx.request.body as unknown);
     service.handleWebhookEvent(event); // async handling
     ctx.status = 200; // acknowledge event
   }

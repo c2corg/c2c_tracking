@@ -23,11 +23,11 @@ export const webhookSubscription: Schema = {
 export const webhook: Schema = {
   body: object({
     object_type: string().required().equal('activity', 'athlete'),
-    object_id: string().required(),
+    object_id: number().required(),
     aspect_type: string().equal('create', 'update', 'delete'),
-    updates: object().required().pattern(string(), string()),
-    owner_id: string().required(),
-    subscription_id: string().required(),
+    updates: object().pattern(string(), string()),
+    owner_id: number().required(),
+    subscription_id: number().required(),
     event_time: number().required(),
   }),
 };

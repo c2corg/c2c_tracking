@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
+import FormData from 'form-data';
 
 import { AppError } from '../../errors';
 
@@ -70,8 +71,8 @@ export interface Activity {
 }
 
 export interface Subscription {
-  id: string;
-  application_id: string;
+  id: number;
+  application_id: number;
   callback_url: string;
   created_at: string;
   updated_at: string;
@@ -87,7 +88,7 @@ export interface WebhookEvent {
   object_type: 'activity' | 'athlete';
   object_id: number;
   aspect_type: 'create' | 'update' | 'delete';
-  updates: Record<string, string>;
+  updates?: Record<string, string>;
   owner_id: number;
   subscription_id: number;
   event_time: number;
@@ -180,13 +181,13 @@ export class StravaApi {
 
   public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
     try {
-      const response = await axios.post<Subscription>(`${this.baseUrl}push_subscriptions`, null, {
-        params: {
-          client_id: this.#clientId,
-          client_secret: this.#clientSecret,
-          callback_url: callbackUrl,
-          verify_token: verifyToken,
-        },
+      const formData = new FormData();
+      formData.append('client_id', this.#clientId);
+      formData.append('client_secret', this.#clientSecret);
+      formData.append('callback_url', callbackUrl);
+      formData.append('verify_token', verifyToken);
+      const response = await axios.post<Subscription>(`${this.baseUrl}push_subscriptions`, formData, {
+        headers: formData.getHeaders(),
       });
       return response.data;
     } catch (error) {

@@ -22,6 +22,7 @@ import { defaultErrorHandler } from './server/error-handler';
 import health from './server/health';
 import { logRequest } from './server/log-request';
 import strava from './server/strava';
+import { stravaService } from './server/strava/service';
 
 const PORT = Number(process.env.PORT) ?? 80;
 
@@ -103,6 +104,7 @@ export async function start(): Promise<void> {
       .use(router.allowedMethods());
     const server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      stravaService.setupWebhook();
     });
 
     registerProcessEvents(server);

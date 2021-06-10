@@ -14,9 +14,9 @@ const log = pino();
 
 const webhookCallbackUrl = `${process.env.SERVER_BASE_URL}/strava/webhook`;
 export class StravaService {
-  readonly subscriptionErrorUrl;
-  readonly subscriptionSuccessUrl;
-  readonly stravaWebhookSubscriptionVerifyToken;
+  readonly subscriptionErrorUrl: string;
+  readonly subscriptionSuccessUrl: string;
+  readonly stravaWebhookSubscriptionVerifyToken: string;
 
   constructor() {
     [
@@ -34,7 +34,6 @@ export class StravaService {
     this.subscriptionSuccessUrl = `${process.env.FRONTEND_BASE_URL}/${process.env.SUBSCRIPTION_SUCCESS_URL}`;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.stravaWebhookSubscriptionVerifyToken = process.env.STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN!;
-    this.setupWebhook();
   }
 
   containsRequiredScopes(scopes: string[]): boolean {
@@ -100,7 +99,8 @@ export class StravaService {
     try {
       const subscriptions = await stravaApi.getSubscriptions();
       return subscriptions.some(
-        (subscription) => subscription.id === subscriptionId && subscription.callback_url === webhookCallbackUrl,
+        (subscription) =>
+          subscription.id.toString() === subscriptionId && subscription.callback_url === webhookCallbackUrl,
       );
     } catch (error) {
       log.warn(
@@ -122,7 +122,7 @@ export class StravaService {
       return;
     }
     try {
-      stravaRepository.setSubscription(subscription.id); // async call
+      stravaRepository.setSubscription(subscription.id.toString()); // async call
     } catch (error) {
       log.warn(`Strava subscription couldn't stored in DB`);
     }
@@ -136,13 +136,13 @@ export class StravaService {
       case 'activity':
         switch (event.aspect_type) {
           case 'create':
-            await this.handleActivityCreateEvent(event.owner_id, event.object_id.toLocaleString());
+            await this.handleActivityCreateEvent(event.owner_id, event.object_id.toString());
             break;
           case 'update':
-            await this.handleActivityUpdateEvent(event.owner_id, event.object_id.toLocaleString());
+            await this.handleActivityUpdateEvent(event.owner_id, event.object_id.toString());
             break;
           case 'delete':
-            await this.handleActivityDeleteEvent(event.object_id.toLocaleString());
+            await this.handleActivityDeleteEvent(event.object_id.toString());
             break;
         }
         break;
