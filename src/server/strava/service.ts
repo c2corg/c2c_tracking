@@ -2,7 +2,7 @@ import { toGeoJSON } from '@mapbox/polyline';
 import dayjs from 'dayjs';
 import pino from 'pino';
 
-import { Activity } from '../../repository/activity';
+import { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
@@ -53,16 +53,13 @@ export class StravaService {
       await userService.configureStrava(c2cId, auth);
       await userService.addActivities(
         c2cId,
-        ...activities.map(
-          (activity) =>
-            ({
-              vendor: 'strava',
-              vendorId: activity.id,
-              date: activity.start_date_local,
-              name: activity.name,
-              type: activity.type,
-            } as Activity),
-        ),
+        ...activities.map((activity) => ({
+          vendor: 'strava' as Vendor,
+          vendorId: activity.id,
+          date: activity.start_date_local,
+          name: activity.name,
+          type: activity.type,
+        })),
       );
     } catch (err) {
       log.error(err);
@@ -99,8 +96,7 @@ export class StravaService {
     try {
       const subscriptions = await stravaApi.getSubscriptions();
       return subscriptions.some(
-        (subscription) =>
-          subscription.id.toString() === subscriptionId && subscription.callback_url === webhookCallbackUrl,
+        (subscription) => subscription.id === subscriptionId && subscription.callback_url === webhookCallbackUrl,
       );
     } catch (error) {
       log.warn(
@@ -122,13 +118,16 @@ export class StravaService {
       return;
     }
     try {
-      stravaRepository.setSubscription(subscription.id.toString()); // async call
+      stravaRepository.setSubscription(subscription.id); // async call
     } catch (error) {
       log.warn(`Strava subscription couldn't stored in DB`);
     }
   }
 
   async handleWebhookEvent(event: WebhookEvent): Promise<void> {
+    if (await !this.isWebhookEventvalid(event)) {
+      return;
+    }
     switch (event.object_type) {
       case 'athlete':
         event.aspect_type === 'delete' && (await this.handleAthleteDeleteEvent(event.owner_id));
@@ -147,6 +146,11 @@ export class StravaService {
         }
         break;
     }
+  }
+
+  private async isWebhookEventvalid(event: WebhookEvent): Promise<boolean> {
+    const subscriptionId = await stravaRepository.findSubscription();
+    return subscriptionId === event.subscription_id;
   }
 
   /*

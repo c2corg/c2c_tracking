@@ -4,7 +4,7 @@ import { IOError } from '../errors';
 export class StravaRepository {
   readonly #TABLE = 'strava';
 
-  public async findSubscription(): Promise<string | undefined> {
+  public async findSubscription(): Promise<number | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -22,7 +22,7 @@ export class StravaRepository {
     }
   }
 
-  public async setSubscription(subscriptionId: string): Promise<void> {
+  public async setSubscription(subscriptionId: number): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');

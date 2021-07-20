@@ -64,7 +64,7 @@ export interface Activity {
   id: string;
   name: string;
   type: ActivityType;
-  start_date_local: string;
+  start_date_local: string; // ISO 8601 format
   timezone: string;
   start_latlng: number[];
   map: PolylineMap;

@@ -21,10 +21,10 @@ export async function up(db: Knex): Promise<void> {
 
   await db.schema.createTable('strava', (table) => {
     table.increments('id').primary();
-    table.string('subscription_id');
+    table.integer('subscription_id');
   });
 }
 
 export function down(db: Knex): Knex.SchemaBuilder {
-  return db.schema.dropTable('users').dropTable('activities');
+  return db.schema.dropTable('users').dropTable('activities').dropTable('strava');
 }

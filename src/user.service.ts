@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 import { NotFoundError } from './errors';
 import { Activity } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
@@ -9,8 +11,8 @@ type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 const MAX_ACTIVITIES_PER_USER = 30;
 
-//! FIXME correctly handle dates
-const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number => a1.date.localeCompare(a2.date);
+const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number =>
+  dayjs(a1.date).isBefore(dayjs(a2.date)) ? -1 : 1;
 
 const isInDb = (activity: Optional<Activity, 'id'>): activity is Activity => !!activity.id;
 
