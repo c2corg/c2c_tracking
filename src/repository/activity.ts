@@ -1,7 +1,8 @@
+export type Vendor = 'strava';
 export interface Activity {
   id: number;
   userId: number;
-  vendor: 'strava';
+  vendor: Vendor;
   vendorId: string;
   date: string;
   name: string;
