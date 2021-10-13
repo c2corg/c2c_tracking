@@ -61,8 +61,10 @@ export class StravaService {
           type: activity.type,
         })),
       );
-    } catch (err) {
-      log.error(err);
+    } catch (err: unknown) {
+      if (err instanceof Object) {
+        log.error(err);
+      }
     }
   }
 
