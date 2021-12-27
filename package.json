@@ -28,7 +28,7 @@
     "dotenv": "10.0.0",
     "form-data": "4.0.0",
     "joi": "17.5.0",
-    "knex": "0.95.14",
+    "knex": "0.95.15",
     "koa": "2.13.4",
     "koa-bodyparser": "4.3.0",
     "koa-helmet": "6.1.0",
