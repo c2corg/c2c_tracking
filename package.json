@@ -54,7 +54,7 @@
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-prettier": "4.0.0",
     "husky": "7.0.4",
-    "lint-staged": "12.2.1",
+    "lint-staged": "12.2.2",
     "nodemon": "2.0.15",
     "pino-pretty": "7.4.0",
     "prettier": "2.5.1",
