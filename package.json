@@ -25,7 +25,7 @@
     "@types/koa-bodyparser": "4.3.5",
     "async": "3.2.3",
     "dayjs": "1.10.7",
-    "dotenv": "14.2.0",
+    "dotenv": "14.3.0",
     "form-data": "4.0.0",
     "joi": "17.5.0",
     "knex": "1.0.1",
