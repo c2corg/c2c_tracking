@@ -22,7 +22,7 @@
   "homepage": "https://github.com/brunobesson/tracker-connect#readme",
   "dependencies": {
     "@mapbox/polyline": "1.1.1",
-    "@types/koa-bodyparser": "4.3.6",
+    "@types/koa-bodyparser": "4.3.7",
     "async": "3.2.3",
     "dayjs": "1.11.0",
     "dotenv": "16.0.0",
