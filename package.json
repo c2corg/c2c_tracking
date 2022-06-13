@@ -37,7 +37,7 @@
     "pg": "8.7.3"
   },
   "devDependencies": {
-    "@tsconfig/node14": "1.0.1",
+    "@tsconfig/node14": "1.0.2",
     "@types/async": "3.2.13",
     "@types/joi": "17.2.3",
     "@types/koa": "2.13.4",
