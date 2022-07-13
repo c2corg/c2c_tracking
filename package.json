@@ -40,7 +40,7 @@
     "@tsconfig/node16": "1.0.3",
     "@types/async": "3.2.15",
     "@types/joi": "17.2.3",
-    "@types/koa": "2.13.4",
+    "@types/koa": "2.13.5",
     "@types/koa-pino-logger": "3.0.1",
     "@types/koa-router": "7.4.4",
     "@types/mapbox__polyline": "1.0.2",
