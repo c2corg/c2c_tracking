@@ -1,12 +1,8 @@
-import dotenv from 'dotenv'; // eslint-disable-line import/order
-
-if (process.env.NODE_ENV !== 'PRODUCTION') {
-  dotenv.config();
-}
+import './dotenv'; // eslint-disable-line import/order
 
 import { ErrorCallback, retry } from 'async'; // eslint-disable-line import/order
 
-import { Server } from 'http'; // eslint-disable-line import/order
+import type { Server } from 'http'; // eslint-disable-line import/order
 
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
@@ -24,7 +20,7 @@ import { logRequest } from './server/log-request';
 import strava from './server/strava';
 import { stravaService } from './server/strava/service';
 
-const PORT = Number(process.env.PORT) ?? 80;
+const PORT = Number(process.env['PORT']) || 80;
 
 const log = pino();
 

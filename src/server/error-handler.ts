@@ -1,5 +1,5 @@
-import { Context } from 'koa';
-import { IMiddleware } from 'koa-router';
+import type { Context } from 'koa';
+import type { IMiddleware } from 'koa-router';
 
 import { AppError } from '../errors';
 

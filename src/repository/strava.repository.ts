@@ -27,11 +27,7 @@ export class StravaRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn
-      ?.table(this.#TABLE)
-      .insert({ id: 1, subscription_id: subscriptionId })
-      .onConflict('id')
-      .merge();
+    await conn?.table(this.#TABLE).insert({ id: 1, subscription_id: subscriptionId }).onConflict('id').merge();
   }
 }
 

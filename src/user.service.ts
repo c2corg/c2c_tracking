@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 
 import { NotFoundError } from './errors';
-import { Activity } from './repository/activity';
+import type { Activity } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
-import { StravaInfo, User } from './repository/user';
+import type { StravaInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
-import { StravaAuth, StravaRefreshAuth } from './server/strava/api';
+import type { StravaAuth, StravaRefreshAuth } from './server/strava/api';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -99,9 +99,11 @@ export class UserService {
     if (savedActivity) {
       await activityRepository.update({
         ...savedActivity,
-        date: activity.date,
-        name: activity.name,
-        type: activity.type,
+        ...{
+          date: activity.date,
+          name: activity.name,
+        },
+        ...(activity.type && { type: activity.type }),
       });
     }
   }

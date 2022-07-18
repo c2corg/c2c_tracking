@@ -1,6 +1,6 @@
-import { ArraySchema, ObjectSchema, ValidationOptions } from 'joi';
-import { Context } from 'koa';
-import { IMiddleware } from 'koa-router';
+import type { ArraySchema, ObjectSchema, ValidationOptions } from 'joi';
+import type { Context } from 'koa';
+import type { IMiddleware } from 'koa-router';
 
 import { FieldValidationError } from '../errors';
 

@@ -1,5 +1,5 @@
-import { Context } from 'koa';
-import { IMiddleware } from 'koa-router';
+import type { Context } from 'koa';
+import type { IMiddleware } from 'koa-router';
 
 export function logRequest(): IMiddleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
