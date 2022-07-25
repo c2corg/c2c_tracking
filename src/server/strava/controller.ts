@@ -1,13 +1,13 @@
-import { Context } from 'koa';
+import type { Context } from 'koa';
 
-import { WebhookEvent, WebhookSubscription } from './api';
-import { stravaService as service, stravaService } from './service';
+import type { WebhookEvent, WebhookSubscription } from './api';
+import { stravaService as service } from './service';
 
 class StravaController {
   public async exchangeTokens(ctx: Context): Promise<void> {
-    const authorizationCode = ctx.query.code as string;
-    const scopes: string[] = (ctx.query.scope as string).split(',');
-    const c2cId = Number(ctx.query.state);
+    const authorizationCode = ctx.query['code'] as string;
+    const scopes: string[] = (ctx.query['scope'] as string).split(',');
+    const c2cId = Number(ctx.query['state']);
 
     if (!service.containsRequiredScopes(scopes)) {
       ctx.log.info('Auth failed, missing required scopes');
@@ -26,7 +26,7 @@ class StravaController {
 
   public async webhookSubscription(ctx: Context): Promise<void> {
     const query = <WebhookSubscription>(ctx.request.query as unknown);
-    if (query['hub.verify_token'] !== stravaService.stravaWebhookSubscriptionVerifyToken) {
+    if (query['hub.verify_token'] !== service.stravaWebhookSubscriptionVerifyToken) {
       ctx.status = 403;
       return;
     }

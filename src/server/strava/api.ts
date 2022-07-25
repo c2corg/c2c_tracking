@@ -102,11 +102,12 @@ export class StravaApi {
   constructor() {
     ['STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET'].forEach((envvar) => {
       if (!process.env[envvar]) {
+        console.log(process.env);
         throw new Error(`Missing configuration variable: ${envvar}`);
       }
     });
-    this.#clientId = process.env.STRAVA_CLIENT_ID!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.#clientSecret = process.env.STRAVA_CLIENT_SECRET!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#clientId = process.env['STRAVA_CLIENT_ID']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#clientSecret = process.env['STRAVA_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public async exchangeTokens(code: string): Promise<StravaAuth> {
@@ -120,11 +121,8 @@ export class StravaApi {
         },
       });
       return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava token exchange request', error);
-      }
-      throw new AppError(500, 'Error on Strava token exchange request', error);
+    } catch (error: unknown) {
+      throw this.handleAppError(502, 'Error on Strava token exchange request', error);
     }
   }
 
@@ -143,11 +141,8 @@ export class StravaApi {
         },
       );
       return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava refresh token request', error);
-      }
-      throw new AppError(500, 'Error on Strava refresh token request', error);
+    } catch (error: unknown) {
+      throw this.handleAppError(502, 'Error on Strava refresh token request', error);
     }
   }
 
@@ -158,10 +153,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava getAthleteActivities request', error);
-      }
-      throw new AppError(500, 'Error on Strava getAthleteActivities request', error);
+      throw this.handleAppError(502, 'Error on Strava getAthleteActivities request', error);
     }
   }
 
@@ -172,10 +164,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava getActivity request', error);
-      }
-      throw new AppError(500, 'Error on Strava getActivity request', error);
+      throw this.handleAppError(502, 'Error on Strava getActivity request', error);
     }
   }
 
@@ -191,10 +180,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava requestSubscriptionCreation request', error);
-      }
-      throw new AppError(500, 'Error on Strava requestSubscriptionCreation request', error);
+      throw this.handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
     }
   }
 
@@ -205,10 +191,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava getSubscriptions request', error);
-      }
-      throw new AppError(500, 'Error on Strava getSubscriptions request', error);
+      throw this.handleAppError(502, 'Error on Strava getSubscriptions request', error);
     }
   }
 
@@ -218,11 +201,21 @@ export class StravaApi {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new AppError(502, 'Error on Strava deleteSubscription request', error);
-      }
-      throw new AppError(500, 'Error on Strava deleteSubscription request', error);
+      throw this.handleAppError(502, 'Error on Strava deleteSubscription request', error);
     }
+  }
+
+  private handleAppError(code: number, message: string, error: unknown): AppError {
+    if (axios.isAxiosError(error)) {
+      throw new AppError(code, message, error);
+    }
+    if (error instanceof Error) {
+      throw new AppError(500, message, error);
+    }
+    if (typeof error === 'string') {
+      throw new AppError(500, message, new Error(error));
+    }
+    throw new AppError(500, message);
   }
 }
 

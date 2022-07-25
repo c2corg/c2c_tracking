@@ -1,4 +1,5 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import { AsyncResultCallback, retry } from 'async';
 import knex, { Knex } from 'knex';
@@ -11,6 +12,8 @@ export interface Configuration {
   database: string;
   debug: boolean;
 }
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export class Database {
   private config: Configuration;
@@ -121,10 +124,10 @@ export class Database {
 }
 
 export const database = new Database({
-  database: process.env.DB_NAME ?? 'postgres',
-  host: process.env.DB_HOST ?? 'localhost',
-  port: Number(process.env.DB_PORT) ?? 5432,
-  user: process.env.DB_USER ?? 'postgres',
-  password: process.env.DB_PASSWORD ?? 'postgres',
-  debug: process.env.ENV !== 'production',
+  database: process.env['DB_NAME'] ?? 'postgres',
+  host: process.env['DB_HOST'] ?? 'localhost',
+  port: Number(process.env['DB_PORT']) ?? 5432,
+  user: process.env['DB_USER'] ?? 'postgres',
+  password: process.env['DB_PASSWORD'] ?? 'postgres',
+  debug: process.env['ENV'] !== 'production',
 });

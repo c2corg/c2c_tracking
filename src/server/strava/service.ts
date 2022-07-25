@@ -1,8 +1,9 @@
-import { toGeoJSON } from '@mapbox/polyline';
+import polyline from '@mapbox/polyline';
+const { toGeoJSON } = polyline;
 import dayjs from 'dayjs';
 import pino from 'pino';
 
-import { Vendor } from '../../repository/activity';
+import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
@@ -12,7 +13,7 @@ import { Activity as StravaActivity, StravaAuth, stravaApi as api, stravaApi, We
 
 const log = pino();
 
-const webhookCallbackUrl = `${process.env.SERVER_BASE_URL}/strava/webhook`;
+const webhookCallbackUrl = `${process.env['SERVER_BASE_URL']}/strava/webhook`;
 export class StravaService {
   readonly subscriptionErrorUrl: string;
   readonly subscriptionSuccessUrl: string;
@@ -30,10 +31,10 @@ export class StravaService {
         throw new Error(`Missing configuration variable: ${envvar}`);
       }
     });
-    this.subscriptionErrorUrl = `${process.env.FRONTEND_BASE_URL}/${process.env.SUBSCRIPTION_ERROR_URL}`;
-    this.subscriptionSuccessUrl = `${process.env.FRONTEND_BASE_URL}/${process.env.SUBSCRIPTION_SUCCESS_URL}`;
+    this.subscriptionErrorUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_ERROR_URL']}`;
+    this.subscriptionSuccessUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_SUCCESS_URL']}`;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.stravaWebhookSubscriptionVerifyToken = process.env.STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN!;
+    this.stravaWebhookSubscriptionVerifyToken = process.env['STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN']!;
   }
 
   containsRequiredScopes(scopes: string[]): boolean {
@@ -79,6 +80,7 @@ export class StravaService {
       await userService.updateStravaAuth(c2cId, auth);
       return stravaInfo.access_token;
     }
+    return undefined;
   }
 
   async getActivityLine(token: string, id: string): Promise<GeoJSON.LineString> {
@@ -169,7 +171,8 @@ export class StravaService {
       .filter((activity) => activity.vendor === 'strava')
       .forEach((activity) => activityRepository.delete(activity.id));
     // clear user Strava data
-    await userRepository.update({ ...user, strava: undefined });
+    const { strava, ...userWithoutData } = user;
+    await userRepository.update({ ...userWithoutData });
   }
 
   /*

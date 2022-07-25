@@ -8,12 +8,11 @@ module.exports = {
     'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
-    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+    ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
   },
   rules: {
-    '@typescript-eslint/explicit-function-return-type': 2,
-    '@typescript-eslint/camelcase': 0,
+    '@typescript-eslint/camelcase': 'off',
     'import/order': [
       'error',
       {
@@ -24,5 +23,7 @@ module.exports = {
         },
       },
     ],
+    '@typescript-eslint/explicit-function-return-type': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
   },
 };

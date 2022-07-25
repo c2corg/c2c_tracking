@@ -1,7 +1,7 @@
 import { database as db } from '../db';
 import { IOError, NotFoundError } from '../errors';
 
-import { Activity } from './activity';
+import type { Activity } from './activity';
 
 class ActivityRepository {
   readonly #TABLE = 'activities';
@@ -50,7 +50,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
     const result = await conn.table(this.#TABLE).insert(this.activityToRecord(activity));
-    return { ...activity, id: result[0] };
+    return { ...activity, id: result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   public async update(activity: Activity): Promise<Activity> {
@@ -68,10 +68,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    const result = await conn
-      .from(this.#TABLE)
-      .delete()
-      .where({ id });
+    const result = await conn.from(this.#TABLE).delete().where({ id });
 
     if (result === 0) {
       throw new NotFoundError('Activity does not exist');
@@ -84,10 +81,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    const result = await conn
-      .from(this.#TABLE)
-      .delete()
-      .where({ vendor, vendorId });
+    const result = await conn.from(this.#TABLE).delete().where({ vendor, vendorId });
 
     if (result === 0) {
       throw new NotFoundError('Activity does not exist');

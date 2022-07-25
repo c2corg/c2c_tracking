@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { database as db } from '../db';
 import { IOError } from '../errors';
 
-import { User } from './user';
+import type { User } from './user';
 
 export class UserRepository {
   readonly #TABLE = 'users';
@@ -14,10 +14,7 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn
-        ?.table(this.#TABLE)
-        .where({ c2c_id: c2cId })
-        .first();
+      const row = await conn?.table(this.#TABLE).where({ c2c_id: c2cId }).first();
 
       if (!row) {
         return undefined;
@@ -35,10 +32,7 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn
-        ?.table(this.#TABLE)
-        .where({ strava_id: stravaId })
-        .first();
+      const row = await conn?.table(this.#TABLE).where({ strava_id: stravaId }).first();
       if (!row) {
         return undefined;
       }
