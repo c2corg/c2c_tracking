@@ -4,6 +4,7 @@ import { ErrorCallback, retry } from 'async'; // eslint-disable-line import/orde
 
 import type { Server } from 'http'; // eslint-disable-line import/order
 
+import cors from '@koa/cors';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
@@ -91,6 +92,7 @@ export async function start(): Promise<void> {
     router.use('/toto', activities.routes(), activities.allowedMethods());
 
     app
+      .use(cors())
       .use(bodyParser())
       .use(helmet())
       .use(logger())
