@@ -20,6 +20,7 @@ import health from './server/health';
 import { logRequest } from './server/log-request';
 import strava from './server/strava';
 import { stravaService } from './server/strava/service';
+import user from './server/users';
 
 const PORT = Number(process.env['PORT']) || 80;
 
@@ -89,7 +90,8 @@ export async function start(): Promise<void> {
 
     router.use('/health', health.routes(), health.allowedMethods());
     router.use('/strava', strava.routes(), strava.allowedMethods());
-    router.use('/toto', activities.routes(), activities.allowedMethods());
+    router.use('/users/:userId/activities', activities.routes(), activities.allowedMethods());
+    router.use('/users/:userId', user.routes(), user.allowedMethods());
 
     app
       .use(cors())

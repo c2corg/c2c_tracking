@@ -95,13 +95,15 @@ export class StravaService {
   private async checkWebhookSubscription(): Promise<boolean> {
     const subscriptionId = await stravaRepository.findSubscription();
     if (!subscriptionId) {
+      log.info('No Strava webhook subscription found in DB');
       return false;
     }
     try {
-      const subscriptions = await stravaApi.getSubscriptions();
-      return subscriptions.some(
+      const foundCurrent = (await stravaApi.getSubscriptions()).some(
         (subscription) => subscription.id === subscriptionId && subscription.callback_url === webhookCallbackUrl,
       );
+      log.info(foundCurrent ? 'Found matching subscription' : 'No matching subscription found');
+      return foundCurrent;
     } catch (error) {
       log.warn(
         `Strava webhook subscription status couldn't be checked: unable to retrieve current subscription. Assuming not set`,
@@ -111,6 +113,7 @@ export class StravaService {
   }
 
   private async requestWebhookSubscription(): Promise<void> {
+    log.info('Requesting new Strava webhook subscription');
     let subscription: Subscription;
     try {
       subscription = await stravaApi.requestSubscriptionCreation(
@@ -118,13 +121,13 @@ export class StravaService {
         this.stravaWebhookSubscriptionVerifyToken,
       );
     } catch (error) {
-      log.warn(`Strava subscription couldn't be requested`);
+      log.warn(`Strava subscription couldn't be requested, maybe another webhook is already registered`);
       return;
     }
     try {
       stravaRepository.setSubscription(subscription.id); // async call
     } catch (error) {
-      log.warn(`Strava subscription couldn't stored in DB`);
+      log.warn(`Strava subscription couldn't be stored in DB`);
     }
   }
 
