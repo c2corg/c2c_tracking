@@ -12,7 +12,7 @@ class ActivityRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const rows = await conn?.table(this.#TABLE).where({ user_id: userId });
+      const rows = await conn?.table(this.#TABLE).where({ user_id: userId }).orderBy('date', 'desc');
 
       if (!rows) {
         return [];
@@ -60,6 +60,28 @@ class ActivityRepository {
     }
     await conn.table(this.#TABLE).update(this.activityToRecord(activity));
     return activity;
+  }
+
+  public async upsert(
+    activitiesToUpdate: Activity[],
+    activitiesToInsert: Omit<Activity, 'id' | 'userId'>[],
+    activitiesToDelete: Activity[],
+  ): Promise<void> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+    await conn.transaction(async (trx) => {
+      activitiesToUpdate.length && (await trx(this.#TABLE).update(activitiesToUpdate.map(this.activityToRecord)));
+      activitiesToInsert.length && (await trx(this.#TABLE).insert(activitiesToInsert.map(this.activityToRecord)));
+      activitiesToDelete.length &&
+        (await trx(this.#TABLE)
+          .delete()
+          .whereIn(
+            'id',
+            activitiesToDelete.map(({ id }) => id),
+          ));
+    });
   }
 
   public async delete(id: number): Promise<void> {

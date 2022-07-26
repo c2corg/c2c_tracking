@@ -3,11 +3,11 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-export interface Status {
+export type Status = {
   startTime: string;
   upTime: string;
   isShuttingDown: boolean;
-}
+};
 
 export class HealthService {
   private startTime: number;

@@ -19,11 +19,11 @@ export class IOError extends AppError {
   }
 }
 
-export interface FieldError {
+export type FieldError = {
   message: string;
   type: string;
   path: (string | number)[];
-}
+};
 
 export class FieldValidationError extends AppError {
   constructor(message: string, readonly details: FieldError[], cause?: Error) {

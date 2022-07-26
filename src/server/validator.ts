@@ -1,14 +1,17 @@
+import type { Middleware } from '@koa/router';
 import type { ArraySchema, ObjectSchema, ValidationOptions } from 'joi';
 import type { Context } from 'koa';
-import type { IMiddleware } from 'koa-router';
+import pino from 'pino';
 
 import { FieldValidationError } from '../errors';
 
-export interface Schema {
+export type Schema = {
   query?: ObjectSchema;
   body?: ObjectSchema | ArraySchema;
   headers?: ObjectSchema;
-}
+};
+
+const log = pino();
 
 function validateObject(
   object: unknown = {},
@@ -20,6 +23,11 @@ function validateObject(
     const { error } = schema.validate(object, options);
     if (error) {
       // Throw error with custom message if validation failed
+      log.info(
+        `Validation failed, invalid ${label}: ${error.details
+          .map((f) => `[message: ${f.message}, path: ${f.path}, type: ${f.type}]`)
+          .join(' - ')}`,
+      );
       throw new FieldValidationError(
         `Invalid ${label}`,
         error.details.map((f) => ({ message: f.message, path: f.path, type: f.type })),
@@ -28,7 +36,7 @@ function validateObject(
   }
 }
 
-export function validate(schema: Schema): IMiddleware {
+export function validate(schema: Schema): Middleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
     ctx.headers && validateObject(ctx.headers, 'Headers', schema.headers, { allowUnknown: true, abortEarly: true });
     ctx.query && validateObject(ctx.query, 'URL query', schema.query, { allowUnknown: true, abortEarly: true });

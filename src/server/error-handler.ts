@@ -1,9 +1,9 @@
+import type { Middleware } from '@koa/router';
 import type { Context } from 'koa';
-import type { IMiddleware } from 'koa-router';
 
 import { AppError } from '../errors';
 
-export function defaultErrorHandler(): IMiddleware {
+export function defaultErrorHandler(): Middleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
     try {
       await next();

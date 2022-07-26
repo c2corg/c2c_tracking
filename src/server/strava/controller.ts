@@ -5,12 +5,18 @@ import { stravaService as service } from './service';
 
 class StravaController {
   public async exchangeTokens(ctx: Context): Promise<void> {
+    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    if (ctx.query['error']) {
+      ctx.log.info(`User ${c2cId} denied Strava authorization`);
+      ctx.redirect(service.subscriptionErrorUrl);
+      return;
+    }
+
     const authorizationCode = ctx.query['code'] as string;
     const scopes: string[] = (ctx.query['scope'] as string).split(',');
-    const c2cId = Number(ctx.query['state']);
 
     if (!service.containsRequiredScopes(scopes)) {
-      ctx.log.info('Auth failed, missing required scopes');
+      ctx.log.info('Strava authorization request failed, missing required scopes');
       ctx.redirect(service.subscriptionErrorUrl);
       return;
     }

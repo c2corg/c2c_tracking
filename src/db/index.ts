@@ -4,14 +4,14 @@ import { fileURLToPath } from 'url';
 import { AsyncResultCallback, retry } from 'async';
 import knex, { Knex } from 'knex';
 
-export interface Configuration {
+export type Configuration = {
   host: string;
   port: number;
   user: string;
   password: string;
   database: string;
   debug: boolean;
-}
+};
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 

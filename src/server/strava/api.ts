@@ -1,18 +1,19 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import FormData from 'form-data';
 
-import { AppError } from '../../errors';
+import { handleAppError } from '../../helpers/error';
 
-export interface Athlete {
+export type Athlete = {
   id: number;
-}
-export interface StravaAuth {
+};
+
+export type StravaAuth = {
   access_token: string;
   refresh_token: string;
   expires_at: number;
   expires_in: number;
   athlete: Athlete;
-}
+};
 
 export type StravaRefreshAuth = Omit<StravaAuth, 'athlete'>;
 
@@ -55,12 +56,12 @@ export type ActivityType =
   | 'Workout'
   | 'Yoga';
 
-export interface PolylineMap {
+export type PolylineMap = {
   polyline?: string;
   summary_polyline: string;
-}
+};
 
-export interface Activity {
+export type Activity = {
   id: string;
   name: string;
   type: ActivityType;
@@ -68,23 +69,23 @@ export interface Activity {
   timezone: string;
   start_latlng: number[];
   map: PolylineMap;
-}
+};
 
-export interface Subscription {
+export type Subscription = {
   id: number;
   application_id: number;
   callback_url: string;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface WebhookSubscription {
+export type WebhookSubscription = {
   'hub.mode': 'subscribe';
   'hub.challenge': string;
   'hub.verify_token': string;
-}
+};
 
-export interface WebhookEvent {
+export type WebhookEvent = {
   object_type: 'activity' | 'athlete';
   object_id: number;
   aspect_type: 'create' | 'update' | 'delete';
@@ -92,7 +93,7 @@ export interface WebhookEvent {
   owner_id: number;
   subscription_id: number;
   event_time: number;
-}
+};
 
 export class StravaApi {
   private readonly baseUrl = 'https://www.strava.com/api/v3/';
@@ -100,6 +101,7 @@ export class StravaApi {
   readonly #clientSecret: string;
 
   constructor() {
+    // FIXME move to index?
     ['STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET'].forEach((envvar) => {
       if (!process.env[envvar]) {
         console.log(process.env);
@@ -112,7 +114,7 @@ export class StravaApi {
 
   public async exchangeTokens(code: string): Promise<StravaAuth> {
     try {
-      const response: AxiosResponse<StravaAuth> = await axios.post<StravaAuth>(`${this.baseUrl}oauth/token`, null, {
+      const response = await axios.post<StravaAuth>(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -122,27 +124,23 @@ export class StravaApi {
       });
       return response.data;
     } catch (error: unknown) {
-      throw this.handleAppError(502, 'Error on Strava token exchange request', error);
+      throw handleAppError(502, 'Error on Strava token exchange request', error);
     }
   }
 
   public async refreshAuth(token: string): Promise<StravaRefreshAuth> {
     try {
-      const response: AxiosResponse<StravaRefreshAuth> = await axios.post<StravaRefreshAuth>(
-        `${this.baseUrl}oauth/token`,
-        null,
-        {
-          params: {
-            client_id: this.#clientId,
-            client_secret: this.#clientSecret,
-            refresh_token: token,
-            grant_type: 'refresh_token',
-          },
+      const response = await axios.post<StravaRefreshAuth>(`${this.baseUrl}oauth/token`, null, {
+        params: {
+          client_id: this.#clientId,
+          client_secret: this.#clientSecret,
+          refresh_token: token,
+          grant_type: 'refresh_token',
         },
-      );
+      });
       return response.data;
     } catch (error: unknown) {
-      throw this.handleAppError(502, 'Error on Strava refresh token request', error);
+      throw handleAppError(502, 'Error on Strava refresh token request', error);
     }
   }
 
@@ -153,7 +151,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      throw this.handleAppError(502, 'Error on Strava getAthleteActivities request', error);
+      throw handleAppError(502, 'Error on Strava getAthleteActivities request', error);
     }
   }
 
@@ -164,7 +162,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      throw this.handleAppError(502, 'Error on Strava getActivity request', error);
+      throw handleAppError(502, 'Error on Strava getActivity request', error);
     }
   }
 
@@ -180,7 +178,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      throw this.handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
+      throw handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
     }
   }
 
@@ -191,7 +189,7 @@ export class StravaApi {
       });
       return response.data;
     } catch (error) {
-      throw this.handleAppError(502, 'Error on Strava getSubscriptions request', error);
+      throw handleAppError(502, 'Error on Strava getSubscriptions request', error);
     }
   }
 
@@ -201,21 +199,8 @@ export class StravaApi {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
     } catch (error) {
-      throw this.handleAppError(502, 'Error on Strava deleteSubscription request', error);
+      throw handleAppError(502, 'Error on Strava deleteSubscription request', error);
     }
-  }
-
-  private handleAppError(code: number, message: string, error: unknown): AppError {
-    if (axios.isAxiosError(error)) {
-      throw new AppError(code, message, error);
-    }
-    if (error instanceof Error) {
-      throw new AppError(500, message, error);
-    }
-    if (typeof error === 'string') {
-      throw new AppError(500, message, new Error(error));
-    }
-    throw new AppError(500, message);
   }
 }
 

@@ -13,7 +13,6 @@ class ActivityController {
   public async getUserActivity(ctx: Context): Promise<void> {
     const userId: number = Number.parseInt(ctx['params'].userId, 10);
     const activityId: number = Number.parseInt(ctx['params'].activityId, 10);
-    // TODO check rights & all
     // retrieve activity id and vendor
     const activity = await userService.getActivity(userId, activityId);
     if (!activity) {

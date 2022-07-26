@@ -5,11 +5,15 @@ import type { Schema } from '../validator';
 const { number, object, string } = joi.types();
 
 export const exchangeTokens: Schema = {
-  query: object.keys({
-    code: string.required().min(10).max(50),
-    scope: string.required().pattern(/(?:[\w:]{1,30},){0,4}(?:[\w:]{1,30})/),
-    state: number.required().positive().min(1).max(99999999),
-  }),
+  query: object
+    .keys({
+      code: string.min(10).max(50),
+      scope: string.pattern(/(?:[\w:]{1,30},){0,4}(?:[\w:]{1,30})/),
+      state: string.allow(''),
+      error: string,
+    })
+    .xor('code', 'error')
+    .with('code', ['scope']),
 };
 
 export const webhookSubscription: Schema = {

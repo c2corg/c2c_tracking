@@ -48,7 +48,6 @@ export class StravaService {
 
   async setupUser(c2cId: number, auth: StravaAuth): Promise<void> {
     try {
-      // TODO check user exists, check rights?
       // retrieve last 30 outings
       const activities: StravaActivity[] = await api.getAthleteActivities(auth.access_token);
       await userService.configureStrava(c2cId, auth);
@@ -71,14 +70,14 @@ export class StravaService {
 
   async getToken(c2cId: number): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
-    const stravaInfo = await userService.getStravaInfo(c2cId);
-    if (stravaInfo?.access_token && dayjs(stravaInfo.expires_at).isAfter(dayjs().subtract(1, 'minute'))) {
-      return stravaInfo.access_token;
+    const { access_token, expires_at, refresh_token } = (await userService.getStravaInfo(c2cId)) ?? {};
+    if (access_token && dayjs(expires_at).isAfter(dayjs().subtract(1, 'minute'))) {
+      return access_token;
     }
-    if (stravaInfo?.refresh_token) {
-      const auth = await api.refreshAuth(stravaInfo.refresh_token);
+    if (refresh_token) {
+      const auth = await api.refreshAuth(refresh_token);
       await userService.updateStravaAuth(c2cId, auth);
-      return stravaInfo.access_token;
+      return access_token;
     }
     return undefined;
   }
@@ -102,7 +101,9 @@ export class StravaService {
       const foundCurrent = (await stravaApi.getSubscriptions()).some(
         (subscription) => subscription.id === subscriptionId && subscription.callback_url === webhookCallbackUrl,
       );
-      log.info(foundCurrent ? 'Found matching subscription' : 'No matching subscription found');
+      log.info(
+        foundCurrent ? 'Found matching Strava webhook subscription' : 'No matching Strava webhook subscription found',
+      );
       return foundCurrent;
     } catch (error) {
       log.warn(

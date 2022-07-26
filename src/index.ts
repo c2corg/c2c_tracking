@@ -5,11 +5,11 @@ import { ErrorCallback, retry } from 'async'; // eslint-disable-line import/orde
 import type { Server } from 'http'; // eslint-disable-line import/order
 
 import cors from '@koa/cors';
+import Router from '@koa/router';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
-import Router from 'koa-router';
 import pino from 'pino';
 
 import { database as db } from './db';
@@ -20,7 +20,8 @@ import health from './server/health';
 import { logRequest } from './server/log-request';
 import strava from './server/strava';
 import { stravaService } from './server/strava/service';
-import user from './server/users';
+import suunto from './server/suunto';
+import users from './server/users';
 
 const PORT = Number(process.env['PORT']) || 80;
 
@@ -90,8 +91,9 @@ export async function start(): Promise<void> {
 
     router.use('/health', health.routes(), health.allowedMethods());
     router.use('/strava', strava.routes(), strava.allowedMethods());
+    router.use('/suunto', suunto.routes(), suunto.allowedMethods());
     router.use('/users/:userId/activities', activities.routes(), activities.allowedMethods());
-    router.use('/users/:userId', user.routes(), user.allowedMethods());
+    router.use('/users/:userId', users.routes(), users.allowedMethods());
 
     app
       .use(cors())

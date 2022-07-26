@@ -1,7 +1,7 @@
+import type { Middleware } from '@koa/router';
 import type { Context } from 'koa';
-import type { IMiddleware } from 'koa-router';
 
-export function logRequest(): IMiddleware {
+export function logRequest(): Middleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
     const start = Date.now();
 
