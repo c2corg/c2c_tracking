@@ -49,7 +49,7 @@
     "@types/mapbox__polyline": "1.0.2",
     "@types/node": "18.0.6",
     "@types/pg": "8.6.5",
-    "@typescript-eslint/eslint-plugin": "5.30.7",
+    "@typescript-eslint/eslint-plugin": "5.31.0",
     "@typescript-eslint/parser": "5.30.7",
     "axios": "0.27.2",
     "eslint": "8.20.0",
