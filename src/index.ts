@@ -14,6 +14,7 @@ import pino from 'pino';
 
 import { database as db } from './db';
 import { healthService } from './health.service';
+import { checkEnvvars } from './helpers/envar';
 import activities from './server/activities';
 import { defaultErrorHandler } from './server/error-handler';
 import health from './server/health';
@@ -82,6 +83,7 @@ function registerProcessEvents(server: Server): void {
 }
 
 export async function start(): Promise<void> {
+  checkEnvvars('SERVER_BASE_URL', 'FRONTEND_BASE_URL', 'SUBSCRIPTION_ERROR_URL', 'SUBSCRIPTION_SUCCESS_URL');
   try {
     log.info('Apply database migration');
     await db.schemaMigration();

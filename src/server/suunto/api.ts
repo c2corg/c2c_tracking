@@ -168,11 +168,6 @@ export class SuuntoApi {
   readonly #clientSecret: string;
 
   constructor() {
-    ['SUUNTO_CLIENT_ID', 'SUUNTO_CLIENT_SECRET'].forEach((envvar) => {
-      if (!process.env[envvar]) {
-        throw new Error(`Missing configuration variable: ${envvar}`);
-      }
-    });
     this.#clientId = process.env['SUUNTO_CLIENT_ID']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     this.#clientSecret = process.env['SUUNTO_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     this.frontendBaseUrl = process.env['FRONTEND_BASE_URL'];

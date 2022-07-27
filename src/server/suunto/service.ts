@@ -16,18 +16,6 @@ export class SuuntoService {
   readonly #suuntoWebhookSubscriptionToken: string;
 
   constructor() {
-    [
-      'FRONTEND_BASE_URL',
-      'SUBSCRIPTION_ERROR_URL',
-      'SUBSCRIPTION_SUCCESS_URL',
-      'SUUNTO_CLIENT_SECRET',
-      'SUUNTO_SUBSCRIPTION_KEY',
-      'SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN',
-    ].forEach((envvar) => {
-      if (!process.env[envvar]) {
-        throw new Error(`Missing configuration variable: ${envvar}`);
-      }
-    });
     this.subscriptionErrorUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_ERROR_URL']}`;
     this.subscriptionSuccessUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_SUCCESS_URL']}`;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

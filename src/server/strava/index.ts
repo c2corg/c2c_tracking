@@ -1,9 +1,12 @@
 import Router from '@koa/router';
 
+import { checkEnvvars } from '../../helpers/envar';
 import { validate } from '../validator';
 
 import { controller } from './controller';
 import { exchangeTokens, webhook, webhookSubscription } from './validators';
+
+checkEnvvars('STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET', 'STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN');
 
 const router = new Router();
 

@@ -101,13 +101,6 @@ export class StravaApi {
   readonly #clientSecret: string;
 
   constructor() {
-    // FIXME move to index?
-    ['STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET'].forEach((envvar) => {
-      if (!process.env[envvar]) {
-        console.log(process.env);
-        throw new Error(`Missing configuration variable: ${envvar}`);
-      }
-    });
     this.#clientId = process.env['STRAVA_CLIENT_ID']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     this.#clientSecret = process.env['STRAVA_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }

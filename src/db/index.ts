@@ -4,6 +4,8 @@ import { fileURLToPath } from 'url';
 import { AsyncResultCallback, retry } from 'async';
 import knex, { Knex } from 'knex';
 
+import { checkEnvvars } from '../helpers/envar';
+
 export type Configuration = {
   host: string;
   port: number;
@@ -22,6 +24,7 @@ export class Database {
 
   constructor(config: Configuration) {
     this.config = config;
+    checkEnvvars('DB_NAME', 'DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD');
   }
 
   public async getConnection(): Promise<Knex | undefined> {

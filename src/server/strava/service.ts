@@ -20,17 +20,6 @@ export class StravaService {
   readonly stravaWebhookSubscriptionVerifyToken: string;
 
   constructor() {
-    [
-      'SERVER_BASE_URL',
-      'FRONTEND_BASE_URL',
-      'SUBSCRIPTION_ERROR_URL',
-      'SUBSCRIPTION_SUCCESS_URL',
-      'STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN',
-    ].forEach((envvar) => {
-      if (!process.env[envvar]) {
-        throw new Error(`Missing configuration variable: ${envvar}`);
-      }
-    });
     this.subscriptionErrorUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_ERROR_URL']}`;
     this.subscriptionSuccessUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_SUCCESS_URL']}`;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
