@@ -97,6 +97,15 @@ class ActivityRepository {
     }
   }
 
+  public async deleteByUserAndVendor(c2cId: number, vendor: string): Promise<void> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+
+    await conn.from(this.#TABLE).delete().where({ vendor, user_id: c2cId });
+  }
+
   public async deleteByVendorId(vendor: string, vendorId: string): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {

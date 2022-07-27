@@ -160,9 +160,7 @@ export class StravaService {
       return;
     }
     // clear user Strava activities
-    (await activityRepository.findByUser(user.c2cId))
-      .filter((activity) => activity.vendor === 'strava')
-      .forEach((activity) => activityRepository.delete(activity.id));
+    await activityRepository.deleteByUserAndVendor(user.c2cId, 'strava');
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
