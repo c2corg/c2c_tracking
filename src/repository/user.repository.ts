@@ -79,19 +79,23 @@ export class UserRepository {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private rowToUser(row: any): User {
     return {
-      c2cId: row.c2c_id,
-      strava: {
-        id: row.strava_id,
-        access_token: row.strava_access_token,
-        expires_at: Math.floor(row.strava_expires_at / 1000),
-        refresh_token: row.strava_refresh_token,
-      },
-      suunto: {
-        username: row.suunto_username,
-        access_token: row.suunto_access_token,
-        expires_at: Math.floor(row.suunto_expires_at / 1000),
-        refresh_token: row.suunto_refresh_token,
-      },
+      ...{ c2cId: row.c2c_id },
+      ...(row.strava_id && {
+        strava: {
+          id: row.strava_id,
+          access_token: row.strava_access_token,
+          expires_at: Math.floor(row.strava_expires_at / 1000),
+          refresh_token: row.strava_refresh_token,
+        },
+      }),
+      ...(row.suunto_username && {
+        suunto: {
+          username: row.suunto_username,
+          access_token: row.suunto_access_token,
+          expires_at: Math.floor(row.suunto_expires_at / 1000),
+          refresh_token: row.suunto_refresh_token,
+        },
+      }),
     };
   }
 
@@ -106,6 +110,14 @@ export class UserRepository {
         strava_expires_at: user.strava.expires_at ? dayjs.unix(user.strava.expires_at).toISOString() : undefined,
         strava_refresh_token: user.strava.refresh_token,
       };
+    } else {
+      data = {
+        ...data,
+        strava_id: null,
+        strava_access_token: null,
+        strava_expires_at: null,
+        strava_refresh_token: null,
+      };
     }
     if (user.suunto) {
       data = {
@@ -114,6 +126,14 @@ export class UserRepository {
         suunto_access_token: user.suunto.access_token,
         suunto_expires_at: user.suunto.expires_at ? dayjs.unix(user.suunto.expires_at).toISOString() : undefined,
         suunto_refresh_token: user.suunto.refresh_token,
+      };
+    } else {
+      data = {
+        ...data,
+        suunto_username: null,
+        suunto_access_token: null,
+        suunto_expires_at: null,
+        suunto_refresh_token: null,
       };
     }
     return data;
