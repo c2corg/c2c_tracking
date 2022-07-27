@@ -28,6 +28,17 @@ class SuuntoController {
     service.handleWebhookEvent(event, auth); // async handling
     ctx.status = 200; // acknowledge event
   }
+
+  public async deauthorize(ctx: Context): Promise<void> {
+    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    try {
+      await service.deauthorize(c2cId);
+      ctx.redirect(service.subscriptionSuccessUrl);
+    } catch (error) {
+      ctx.log.info(error);
+      ctx.redirect(service.subscriptionErrorUrl); // TODO better feedback
+    }
+  }
 }
 
 export const controller = new SuuntoController();

@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
 import pino from 'pino';
 
+import { NotFoundError } from '../../errors';
 import type { Vendor } from '../../repository/activity';
+import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
@@ -108,6 +110,25 @@ export class SuuntoService {
 
   async isWebhookHeaderValid(authHeader: string | undefined): Promise<boolean> {
     return authHeader === `Bearer: ${this.#suuntoWebhookSubscriptionToken}`;
+  }
+
+  async deauthorize(c2cId: number): Promise<void> {
+    const user = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    const token = await this.getToken(c2cId);
+    if (!token) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+
+    await api.deauthorize(token);
+
+    // clear user Suunto activities
+    await activityRepository.deleteByUserAndVendor(c2cId, 'suunto');
+    // clear user Suunto data
+    const { suunto, ...userWithoutData } = user;
+    await userRepository.update({ ...userWithoutData }); // !FIXME ok juste en enlevant l'info?
   }
 }
 

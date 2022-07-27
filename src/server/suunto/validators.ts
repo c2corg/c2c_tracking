@@ -25,3 +25,5 @@ export const webhook: Schema = {
     Authorization: string.required(),
   }),
 };
+
+export const deauthorize: Schema = {};
