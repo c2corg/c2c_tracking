@@ -8,7 +8,7 @@ import type { User } from './user';
 export class UserRepository {
   readonly #TABLE = 'users';
 
-  public async findById(c2cId: number): Promise<User | undefined> {
+  async findById(c2cId: number): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -26,7 +26,7 @@ export class UserRepository {
     }
   }
 
-  public async findByStravaId(stravaId: number): Promise<User | undefined> {
+  async findByStravaId(stravaId: number): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -42,7 +42,7 @@ export class UserRepository {
     }
   }
 
-  public async findBySuuntoUsername(username: string): Promise<User | undefined> {
+  async findBySuuntoUsername(username: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -58,7 +58,7 @@ export class UserRepository {
     }
   }
 
-  public async insert(user: User): Promise<User> {
+  async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -67,7 +67,7 @@ export class UserRepository {
     return user;
   }
 
-  public async update(user: User): Promise<User> {
+  async update(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');

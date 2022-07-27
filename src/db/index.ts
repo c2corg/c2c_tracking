@@ -27,7 +27,7 @@ export class Database {
     checkEnvvars('DB_NAME', 'DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD');
   }
 
-  public async getConnection(): Promise<Knex | undefined> {
+  async getConnection(): Promise<Knex | undefined> {
     if (!this.connection) {
       this.connection = await this.retryDbConnection();
     }
@@ -35,7 +35,7 @@ export class Database {
     return this.connection;
   }
 
-  public async getTransaction(): Promise<Knex.Transaction> {
+  async getTransaction(): Promise<Knex.Transaction> {
     const connection = await this.getConnection();
 
     return new Promise<Knex.Transaction>((resolve, reject) => {
@@ -53,14 +53,14 @@ export class Database {
     });
   }
 
-  public async closeDatabase(): Promise<void> {
+  async closeDatabase(): Promise<void> {
     if (this.connection) {
       await this.connection.destroy();
       this.connection = undefined;
     }
   }
 
-  public async schemaMigration(): Promise<void> {
+  async schemaMigration(): Promise<void> {
     const connection = await this.getConnection();
     if (!connection) {
       return;

@@ -31,7 +31,7 @@ export class SuuntoService {
     this.setupUser(c2cId, token); // do this asynchronously
   }
 
-  async setupUser(c2cId: number, auth: SuuntoAuth): Promise<void> {
+  private async setupUser(c2cId: number, auth: SuuntoAuth): Promise<void> {
     try {
       // retrieve last 30 outings
       const workouts: Workouts = await api.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
@@ -108,7 +108,7 @@ export class SuuntoService {
     }
   }
 
-  async isWebhookHeaderValid(authHeader: string | undefined): Promise<boolean> {
+  private async isWebhookHeaderValid(authHeader: string | undefined): Promise<boolean> {
     return authHeader === `Bearer: ${this.#suuntoWebhookSubscriptionToken}`;
   }
 

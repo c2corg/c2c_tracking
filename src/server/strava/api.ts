@@ -105,7 +105,7 @@ export class StravaApi {
     this.#clientSecret = process.env['STRAVA_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
-  public async exchangeTokens(code: string): Promise<StravaAuth> {
+  async exchangeTokens(code: string): Promise<StravaAuth> {
     try {
       const response = await axios.post<StravaAuth>(`${this.baseUrl}oauth/token`, null, {
         params: {
@@ -121,7 +121,7 @@ export class StravaApi {
     }
   }
 
-  public async refreshAuth(token: string): Promise<StravaRefreshAuth> {
+  async refreshAuth(token: string): Promise<StravaRefreshAuth> {
     try {
       const response = await axios.post<StravaRefreshAuth>(`${this.baseUrl}oauth/token`, null, {
         params: {
@@ -137,7 +137,7 @@ export class StravaApi {
     }
   }
 
-  public async getAthleteActivities(token: string): Promise<Activity[]> {
+  async getAthleteActivities(token: string): Promise<Activity[]> {
     try {
       const response = await axios.get<Activity[]>(`${this.baseUrl}athlete/activities`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -148,7 +148,7 @@ export class StravaApi {
     }
   }
 
-  public async getActivity(token: string, id: string): Promise<Activity> {
+  async getActivity(token: string, id: string): Promise<Activity> {
     try {
       const response = await axios.get<Activity>(`${this.baseUrl}activities/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -159,7 +159,7 @@ export class StravaApi {
     }
   }
 
-  public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
+  async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
     try {
       const formData = new FormData();
       formData.append('client_id', this.#clientId);
@@ -175,7 +175,7 @@ export class StravaApi {
     }
   }
 
-  public async getSubscriptions(): Promise<Subscription[]> {
+  async getSubscriptions(): Promise<Subscription[]> {
     try {
       const response = await axios.get<Subscription[]>(`${this.baseUrl}push_subscriptions`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
@@ -186,7 +186,7 @@ export class StravaApi {
     }
   }
 
-  public async deleteSubscription(id: string): Promise<void> {
+  async deleteSubscription(id: string): Promise<void> {
     try {
       await axios.delete<void>(`${this.baseUrl}push_subscriptions/${id}`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },

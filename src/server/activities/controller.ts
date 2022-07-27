@@ -5,12 +5,12 @@ import { userService } from '../../user.service';
 import { stravaService } from '../strava/service';
 
 class ActivityController {
-  public async getUserActivities(ctx: Context): Promise<void> {
+  async getUserActivities(ctx: Context): Promise<void> {
     ctx.body = (await userService.getActivities(ctx['params'].userId)).map(({ vendorId, ...keep }) => keep);
     ctx.status = 200;
   }
 
-  public async getUserActivity(ctx: Context): Promise<void> {
+  async getUserActivity(ctx: Context): Promise<void> {
     const userId: number = Number.parseInt(ctx['params'].userId, 10);
     const activityId: number = Number.parseInt(ctx['params'].activityId, 10);
     // retrieve activity id and vendor

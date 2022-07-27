@@ -1,5 +1,5 @@
 export class AppError extends Error {
-  public readonly code: number;
+  readonly code: number;
 
   constructor(code: number, message: string, cause?: Error) {
     super(message, { ...(cause && { cause }) });

@@ -17,11 +17,11 @@ export class HealthService {
     this.startTime = Date.now();
   }
 
-  public setShuttingDown(): void {
+  setShuttingDown(): void {
     this.isShuttingDown = true;
   }
 
-  public getStatus(): Status {
+  getStatus(): Status {
     return {
       startTime: new Date(this.startTime).toISOString(),
       upTime: dayjs(this.startTime).fromNow(true),
