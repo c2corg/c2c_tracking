@@ -11,6 +11,7 @@ checkEnvvars(
   'SUUNTO_CLIENT_SECRET',
   'SUUNTO_SUBSCRIPTION_KEY',
   'SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN',
+  'SUUNTO_REDIRECT_URI',
 );
 
 const router = new Router();

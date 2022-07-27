@@ -163,14 +163,14 @@ export type WebhookEvent = {
 export class SuuntoApi {
   private readonly oauthBaseUrl = 'https://cloudapi-oauth.suunto.com/';
   private readonly baseUrl = 'https://cloudapi.suunto.com/v2/';
-  private readonly frontendBaseUrl;
+  private readonly redirectUrl;
   readonly #clientId: string;
   readonly #clientSecret: string;
 
   constructor() {
     this.#clientId = process.env['SUUNTO_CLIENT_ID']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
     this.#clientSecret = process.env['SUUNTO_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.frontendBaseUrl = process.env['FRONTEND_BASE_URL'];
+    this.redirectUrl = process.env['SUUNTO_REDIRECT_URI']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   async exchangeTokens(code: string): Promise<SuuntoAuth> {
@@ -179,7 +179,7 @@ export class SuuntoApi {
         params: {
           code,
           grant_type: 'authorization_code',
-          redirect_uri: `${this.frontendBaseUrl}/external-services/suunto/exchange_token`, // FIXME try without?
+          redirect_uri: this.redirectUrl,
         },
         auth: {
           username: this.#clientId,

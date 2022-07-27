@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
+import dotenvExpand from 'dotenv-expand';
 
 if (process.env['NODE_ENV'] !== 'PRODUCTION') {
-  dotenv.config();
+  dotenvExpand.expand(dotenv.config());
 }
