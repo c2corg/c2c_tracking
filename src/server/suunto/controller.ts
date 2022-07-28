@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type { Context } from 'koa';
 
 import type { WebhookEvent } from './api';
@@ -33,10 +34,13 @@ class SuuntoController {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     try {
       await service.deauthorize(c2cId);
-      ctx.redirect(service.subscriptionSuccessUrl);
+      ctx.status = 200;
     } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw error;
+      }
       ctx.log.info(error);
-      ctx.redirect(service.subscriptionErrorUrl); // TODO better feedback
+      ctx.status = 501;
     }
   }
 }

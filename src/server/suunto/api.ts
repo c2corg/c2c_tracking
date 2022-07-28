@@ -248,13 +248,11 @@ export class SuuntoApi {
 
   async deauthorize(token: string): Promise<void> {
     try {
-      const response = await axios.get<void>(`${this.oauthBaseUrl}oauth/deauthorize?client_id=${this.#clientId}`, {
+      await axios.get<void>(`${this.oauthBaseUrl}oauth/deauthorize?client_id=${this.#clientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
     } catch (error) {
-      log.error(error);
-      throw handleAppError(502, 'Error on Strava deauthorize request', error);
+      throw handleAppError(502, 'Error on Suunto deauthorize request', error);
     }
   }
 }

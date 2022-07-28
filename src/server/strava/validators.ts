@@ -35,3 +35,5 @@ export const webhook: Schema = {
     event_time: number.required(),
   }),
 };
+
+export const deauthorize: Schema = {};

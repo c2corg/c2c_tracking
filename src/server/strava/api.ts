@@ -121,6 +121,14 @@ export class StravaApi {
     }
   }
 
+  async deauthorize(token: string): Promise<void> {
+    try {
+      await axios.post<void>(`${this.baseUrl}oauth/deauthorize?access_token=${token}`);
+    } catch (error) {
+      throw handleAppError(502, 'Error on Strava deauthorize request', error);
+    }
+  }
+
   async refreshAuth(token: string): Promise<StravaRefreshAuth> {
     try {
       const response = await axios.post<StravaRefreshAuth>(`${this.baseUrl}oauth/token`, null, {

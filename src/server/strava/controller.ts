@@ -1,3 +1,4 @@
+import axios from 'axios';
 import type { Context } from 'koa';
 
 import type { WebhookEvent, WebhookSubscription } from './api';
@@ -27,6 +28,20 @@ class StravaController {
     } catch (error) {
       ctx.log.info(error);
       ctx.redirect(service.subscriptionErrorUrl);
+    }
+  }
+
+  async deauthorize(ctx: Context): Promise<void> {
+    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    try {
+      await service.deauthorize(c2cId);
+      ctx.status = 200;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw error;
+      }
+      ctx.log.info(error);
+      ctx.status = 501;
     }
   }
 

@@ -3,6 +3,7 @@ const { toGeoJSON } = polyline;
 import dayjs from 'dayjs';
 import pino from 'pino';
 
+import { NotFoundError } from '../../errors';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { stravaRepository } from '../../repository/strava.repository';
@@ -55,6 +56,25 @@ export class StravaService {
         log.error(err);
       }
     }
+  }
+
+  async deauthorize(c2cId: number): Promise<void> {
+    const user = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    const token = await this.getToken(c2cId);
+    if (!token) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+
+    await api.deauthorize(token);
+
+    // clear user Strava activities
+    await activityRepository.deleteByUserAndVendor(c2cId, 'strava');
+    // clear user Strava data
+    const { strava, ...userWithoutData } = user;
+    await userRepository.update({ ...userWithoutData });
   }
 
   async getToken(c2cId: number): Promise<string | undefined> {

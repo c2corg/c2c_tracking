@@ -128,7 +128,7 @@ export class SuuntoService {
     await activityRepository.deleteByUserAndVendor(c2cId, 'suunto');
     // clear user Suunto data
     const { suunto, ...userWithoutData } = user;
-    await userRepository.update({ ...userWithoutData }); // !FIXME ok juste en enlevant l'info?
+    await userRepository.update({ ...userWithoutData });
   }
 }
 
