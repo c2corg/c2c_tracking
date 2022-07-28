@@ -83,7 +83,7 @@ function registerProcessEvents(server: Server): void {
 }
 
 export async function start(): Promise<void> {
-  checkEnvvars('SERVER_BASE_URL', 'FRONTEND_BASE_URL', 'SUBSCRIPTION_ERROR_URL', 'SUBSCRIPTION_SUCCESS_URL');
+  checkEnvvars('SERVER_BASE_URL', 'FRONTEND_BASE_URL', 'FRONTEND_SUBSCRIPTION_URL');
   try {
     log.info('Apply database migration');
     await db.schemaMigration();

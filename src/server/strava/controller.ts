@@ -9,7 +9,7 @@ class StravaController {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     if (ctx.query['error']) {
       ctx.log.info(`User ${c2cId} denied Strava authorization`);
-      ctx.redirect(service.subscriptionErrorUrl);
+      ctx.redirect(`${service.subscriptionUrl}?error=auth-denied`);
       return;
     }
 
@@ -18,16 +18,16 @@ class StravaController {
 
     if (!service.containsRequiredScopes(scopes)) {
       ctx.log.info('Strava authorization request failed, missing required scopes');
-      ctx.redirect(service.subscriptionErrorUrl);
+      ctx.redirect(`${service.subscriptionUrl}?error=unsufficient-scopes`);
       return;
     }
 
     try {
       await service.requestShortLivedAccessTokenAndSetupUser(c2cId, authorizationCode);
-      ctx.redirect(service.subscriptionSuccessUrl);
+      ctx.redirect(service.subscriptionUrl);
     } catch (error) {
       ctx.log.info(error);
-      ctx.redirect(service.subscriptionErrorUrl);
+      ctx.redirect(`${service.subscriptionUrl}?error=setup-failed`);
     }
   }
 

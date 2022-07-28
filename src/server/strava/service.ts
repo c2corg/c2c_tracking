@@ -16,15 +16,12 @@ const log = pino();
 
 const webhookCallbackUrl = `${process.env['SERVER_BASE_URL']}/strava/webhook`;
 export class StravaService {
-  readonly subscriptionErrorUrl: string;
-  readonly subscriptionSuccessUrl: string;
+  readonly subscriptionUrl: string;
   readonly stravaWebhookSubscriptionVerifyToken: string;
 
   constructor() {
-    this.subscriptionErrorUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_ERROR_URL']}`;
-    this.subscriptionSuccessUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_SUCCESS_URL']}`;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.stravaWebhookSubscriptionVerifyToken = process.env['STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN']!;
+    this.subscriptionUrl = process.env['FRONTEND_SUBSCRIPTION_URL']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.stravaWebhookSubscriptionVerifyToken = process.env['STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   containsRequiredScopes(scopes: string[]): boolean {

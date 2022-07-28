@@ -12,18 +12,14 @@ import { SuuntoAuth, Workouts, suuntoApi as api, workoutTypes, WebhookEvent, Wor
 const log = pino();
 
 export class SuuntoService {
-  readonly subscriptionErrorUrl: string;
-  readonly subscriptionSuccessUrl: string;
+  readonly subscriptionUrl: string;
   readonly #suuntoSubscriptionKey: string;
   readonly #suuntoWebhookSubscriptionToken: string;
 
   constructor() {
-    this.subscriptionErrorUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_ERROR_URL']}`;
-    this.subscriptionSuccessUrl = `${process.env['FRONTEND_BASE_URL']}/${process.env['SUBSCRIPTION_SUCCESS_URL']}`;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.#suuntoSubscriptionKey = process.env['SUUNTO_SUBSCRIPTION_KEY']!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.#suuntoWebhookSubscriptionToken = process.env['SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN']!;
+    this.subscriptionUrl = process.env['FRONTEND_SUBSCRIPTION_URL']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#suuntoSubscriptionKey = process.env['SUUNTO_SUBSCRIPTION_KEY']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#suuntoWebhookSubscriptionToken = process.env['SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
