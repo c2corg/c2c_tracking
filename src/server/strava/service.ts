@@ -33,7 +33,7 @@ export class StravaService {
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
     const token = await api.exchangeTokens(authorizationCode);
-    this.setupUser(c2cId, token); // do this asynchronously
+    await this.setupUser(c2cId, token);
   }
 
   async setupUser(c2cId: number, auth: StravaAuth): Promise<void> {

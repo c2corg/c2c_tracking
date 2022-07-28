@@ -28,7 +28,7 @@ export class SuuntoService {
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
     const token = await api.exchangeTokens(authorizationCode);
-    this.setupUser(c2cId, token); // do this asynchronously
+    await this.setupUser(c2cId, token);
   }
 
   private async setupUser(c2cId: number, auth: SuuntoAuth): Promise<void> {
