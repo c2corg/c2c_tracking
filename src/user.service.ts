@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import pino from 'pino';
 
 import { NotFoundError } from './errors';
-import type { Activity } from './repository/activity';
+import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
 import type { StravaInfo, SuuntoInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
@@ -29,11 +29,11 @@ const isActivityToUpdate = (
 } => !!activity.id && !!activity.update;
 
 export class UserService {
-  async getUserInfo(c2cId: number): Promise<{ strava?: StravaInfo; suunto?: SuuntoInfo }> {
+  async getUserInfo(c2cId: number): Promise<{ [key in Vendor]?: boolean }> {
     const { strava, suunto } = (await userRepository.findById(c2cId)) || {};
     return {
-      ...(strava && { strava }),
-      ...(suunto && { suunto }),
+      strava: !!strava,
+      suunto: !!suunto,
     };
   }
 
