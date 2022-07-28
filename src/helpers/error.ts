@@ -1,9 +1,13 @@
 import axios from 'axios';
+import pino from 'pino';
 
 import { AppError } from '../errors';
 
+const log = pino();
+
 export function handleAppError(code: number, message: string, error: unknown): AppError {
   if (axios.isAxiosError(error)) {
+    log.error(error);
     throw new AppError(code, message, error);
   }
   if (error instanceof Error) {
