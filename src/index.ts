@@ -18,7 +18,6 @@ import { checkEnvvars } from './helpers/envar';
 import activities from './server/activities';
 import { defaultErrorHandler } from './server/error-handler';
 import health from './server/health';
-import { logRequest } from './server/log-request';
 import strava from './server/strava';
 import { stravaService } from './server/strava/service';
 import suunto from './server/suunto';
@@ -101,13 +100,16 @@ export async function start(): Promise<void> {
       .use(cors())
       .use(bodyParser())
       .use(helmet())
-      .use(logger())
-      .use(logRequest())
+      .use(
+        logger({
+          level: process.env['ENV'] !== 'production' ? 'trace' : 'info',
+        }),
+      )
       .use(defaultErrorHandler())
       .use(router.routes())
       .use(router.allowedMethods());
     const server = app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      log.info(`Server is running on port ${PORT}`);
       stravaService.setupWebhook();
     });
 
