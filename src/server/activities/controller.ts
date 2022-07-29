@@ -1,8 +1,12 @@
 import type { Context } from 'koa';
 
 import { AppError } from '../../errors';
+import FitParser from '../../helpers/fit/fit-parser';
 import { userService } from '../../user.service';
 import { stravaService } from '../strava/service';
+import { suuntoService } from '../suunto/service';
+
+import { activitiesService as service } from './service';
 
 class ActivityController {
   async getUserActivities(ctx: Context): Promise<void> {
@@ -21,16 +25,35 @@ class ActivityController {
     }
 
     switch (activity.vendor) {
-      case 'strava':
+      case 'strava': {
         const token = await stravaService.getToken(userId);
         if (!token) {
-          ctx.log.warn(`Error: unable to acquire valid token`);
+          ctx.log.warn(`Error: unable to acquire valid Strava token`);
           ctx.status = 503;
           return;
         }
-        ctx.body = await stravaService.getActivityLine(token, activity.vendorId);
+
+        const stream = await stravaService.getActivityStream(token, activity.vendorId);
+        ctx.body = service.stravaStreamSetToGeoJSON(activity, stream);
         ctx.status = 200;
         break;
+      }
+      case 'suunto': {
+        const token = await suuntoService.getToken(userId);
+        if (!token) {
+          ctx.log.warn(`Error: unable to acquire valid Suunto token`);
+          ctx.status = 503;
+          return;
+        }
+        const fit = await suuntoService.getFIT(token, activity.vendorId);
+        try {
+          ctx.body = service.suuntoFitToGeoJSON(new FitParser().parse(fit));
+          ctx.status = 200;
+        } catch (error) {
+          throw new AppError(500, 'Error: unable to convert Suunto FIT file to geometry');
+        }
+        break;
+      }
       default:
         throw new AppError(400, `Vendor not handled: ${activity.vendor}`);
     }

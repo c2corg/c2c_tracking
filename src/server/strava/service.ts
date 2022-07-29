@@ -10,7 +10,15 @@ import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { Activity as StravaActivity, StravaAuth, stravaApi as api, stravaApi, WebhookEvent, Subscription } from './api';
+import {
+  Activity as StravaActivity,
+  StravaAuth,
+  stravaApi as api,
+  stravaApi,
+  WebhookEvent,
+  Subscription,
+  StreamSet,
+} from './api';
 
 const log = pino();
 
@@ -43,7 +51,7 @@ export class StravaService {
         ...activities.map((activity) => ({
           vendor: 'strava' as Vendor,
           vendorId: activity.id,
-          date: activity.start_date_local,
+          date: activity.start_date,
           name: activity.name,
           type: activity.type,
         })),
@@ -91,6 +99,10 @@ export class StravaService {
   async getActivityLine(token: string, id: string): Promise<GeoJSON.LineString> {
     const { map } = await stravaApi.getActivity(token, id);
     return toGeoJSON(map.polyline || map.summary_polyline);
+  }
+
+  async getActivityStream(token: string, id: string): Promise<StreamSet> {
+    return await stravaApi.getActivityStream(token, id);
   }
 
   async setupWebhook(): Promise<void> {
@@ -215,7 +227,7 @@ export class StravaService {
       await userService.addActivities(user.c2cId, {
         vendor: 'strava',
         vendorId: activityId,
-        date: activity.start_date_local,
+        date: activity.start_date,
         name: activity.name,
         type: activity.type,
       });
@@ -258,7 +270,7 @@ export class StravaService {
       await userService.updateActivity(user.c2cId, {
         vendor: 'strava',
         vendorId: activityId,
-        date: activity.start_date_local,
+        date: activity.start_date,
         name: activity.name,
         type: activity.type,
       });

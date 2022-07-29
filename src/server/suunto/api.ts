@@ -222,7 +222,8 @@ export class SuuntoApi {
     }
   }
 
-  async getWorkoutDetails(token: string, id: number, subscriptionKey: string): Promise<WorkoutSummary> {
+  // id is workout key
+  async getWorkoutDetails(id: number, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
     try {
       const response = await axios.get<WorkoutSummary>(`${this.baseUrl}workouts/${id}`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
@@ -234,11 +235,11 @@ export class SuuntoApi {
   }
 
   // Id is workout id or key
-  async getFIT(token: string, id: string): Promise<Buffer> {
+  async getFIT(id: string, token: string, subscriptionKey: string): Promise<Uint8Array> {
     try {
-      const response = await axios.get<Buffer>(`${this.baseUrl}workout/exportFit${id}`, {
+      const response = await axios.get<Uint8Array>(`${this.baseUrl}workout/exportFit/${id}`, {
         responseType: 'arraybuffer',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return response.data;
     } catch (error) {

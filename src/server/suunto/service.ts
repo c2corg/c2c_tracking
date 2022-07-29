@@ -62,6 +62,10 @@ export class SuuntoService {
     return undefined;
   }
 
+  async getFIT(token: string, vendorId: string): Promise<Uint8Array> {
+    return api.getFIT(vendorId, token, this.#suuntoSubscriptionKey);
+  }
+
   async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
     if (await !this.isWebhookHeaderValid(authHeader)) {
       return;
@@ -82,7 +86,8 @@ export class SuuntoService {
     }
     let workout: WorkoutSummary;
     try {
-      workout = await suuntoApi.getWorkoutDetails(token, event.workoutid, this.#suuntoSubscriptionKey);
+      // !FIXME need workout key, not id? maybe retrieve FIT file instead...
+      workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
     } catch (error) {
       log.warn(
         `Suunto workout webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,

@@ -24,6 +24,6 @@ module.exports = {
       },
     ],
     '@typescript-eslint/explicit-function-return-type': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
   },
 };

@@ -65,11 +65,40 @@ export type Activity = {
   id: string;
   name: string;
   type: ActivityType;
-  start_date_local: string; // ISO 8601 format
+  start_date: string; // ISO 8601 format
   timezone: string;
   start_latlng: number[];
   map: PolylineMap;
 };
+
+type ActivityStream = {
+  type: string;
+  original_size: number;
+  series_type: 'distance' | 'time';
+  resolution: 'low' | 'medium' | 'high';
+};
+
+export type DistanceStream = ActivityStream & {
+  type: 'distance';
+  data: number[];
+};
+
+export type TimeStream = ActivityStream & {
+  type: 'time';
+  data: number[];
+};
+
+export type LatLngStream = ActivityStream & {
+  type: 'latlng';
+  data: number[][];
+};
+
+export type AltitudeStream = ActivityStream & {
+  type: 'altitude';
+  data: number[];
+};
+
+export type StreamSet = (DistanceStream | TimeStream | LatLngStream | AltitudeStream)[];
 
 export type Subscription = {
   id: number;
@@ -164,6 +193,20 @@ export class StravaApi {
       return response.data;
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getActivity request', error);
+    }
+  }
+
+  async getActivityStream(token: string, id: string): Promise<StreamSet> {
+    try {
+      const response = await axios.get<StreamSet>(
+        `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      throw handleAppError(502, 'Error on Strava getActivityStream request', error);
     }
   }
 
