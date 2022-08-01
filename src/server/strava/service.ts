@@ -50,7 +50,7 @@ export class StravaService {
         c2cId,
         ...activities.map((activity) => ({
           vendor: 'strava' as Vendor,
-          vendorId: activity.id,
+          vendorId: activity.id.toString(),
           date: activity.start_date,
           name: activity.name,
           type: activity.type,
@@ -156,7 +156,9 @@ export class StravaService {
     }
     switch (event.object_type) {
       case 'athlete':
-        event.aspect_type === 'delete' && (await this.handleAthleteDeleteEvent(event.owner_id));
+        event.aspect_type === 'update' &&
+          event.updates?.['authorized'] === 'false' &&
+          (await this.handleAthleteDeleteEvent(event.owner_id));
         break;
       case 'activity':
         switch (event.aspect_type) {

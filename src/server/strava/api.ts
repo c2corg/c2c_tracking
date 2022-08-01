@@ -62,7 +62,7 @@ export type PolylineMap = {
 };
 
 export type Activity = {
-  id: string;
+  id: number;
   name: string;
   type: ActivityType;
   start_date: string; // ISO 8601 format
