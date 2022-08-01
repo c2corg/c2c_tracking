@@ -157,7 +157,7 @@ export type WorkoutSummary = {
 
 export type WebhookEvent = {
   username: string;
-  workoutid: number;
+  workoutid: string;
 };
 
 export class SuuntoApi {
@@ -223,7 +223,7 @@ export class SuuntoApi {
   }
 
   // id is workout key
-  async getWorkoutDetails(id: number, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
+  async getWorkoutDetails(id: string, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
     try {
       const response = await axios.get<WorkoutSummary>(`${this.baseUrl}workouts/${id}`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },

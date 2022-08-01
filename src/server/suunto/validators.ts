@@ -2,7 +2,7 @@ import joi from 'joi';
 
 import type { Schema } from '../validator';
 
-const { number, object, string } = joi.types();
+const { object, string } = joi.types();
 
 export const exchangeTokens: Schema = {
   query: object
@@ -19,10 +19,10 @@ export const exchangeTokens: Schema = {
 export const webhook: Schema = {
   body: object.keys({
     username: string.required().min(1).max(50),
-    workoutid: number.required().min(1).max(Number.MAX_VALUE),
+    workoutid: string.required().min(1).max(50),
   }),
   headers: object.keys({
-    Authorization: string.required(),
+    authorization: string.required(),
   }),
 };
 

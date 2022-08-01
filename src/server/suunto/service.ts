@@ -7,7 +7,7 @@ import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { SuuntoAuth, Workouts, suuntoApi as api, workoutTypes, WebhookEvent, WorkoutSummary, suuntoApi } from './api';
+import { SuuntoAuth, Workouts, suuntoApi as api, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary } from './api';
 
 const log = pino();
 
@@ -55,7 +55,7 @@ export class SuuntoService {
       return access_token;
     }
     if (refresh_token) {
-      log.debug('Suunto access token expired, requiring rfresh');
+      log.debug('Suunto access token expired, requiring refresh');
       const auth = await api.refreshAuth(refresh_token);
       await userService.updateSuuntoAuth(c2cId, auth);
       return auth.access_token;
@@ -87,7 +87,6 @@ export class SuuntoService {
     }
     let workout: WorkoutSummary;
     try {
-      // !FIXME need workout key, not id? maybe retrieve FIT file instead...
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
     } catch (error) {
       log.warn(
@@ -98,10 +97,10 @@ export class SuuntoService {
     try {
       await userService.addActivities(user.c2cId, {
         vendor: 'suunto' as Vendor,
-        vendorId: workout.payload.workoutKey,
+        vendorId: event.workoutid, // corresponds to workout key
         date: dayjs(workout.payload.startTime).format(),
         name: workout.payload.workoutName ?? '',
-        type: workoutTypes[workout.payload.activityId] || 'Unkown',
+        type: workoutTypes[workout.payload.activityId] || 'Unknown',
       });
     } catch (error) {
       log.warn(
