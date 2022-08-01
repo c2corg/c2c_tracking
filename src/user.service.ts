@@ -181,7 +181,7 @@ export class UserService {
 
   async updateActivity(c2cId: number, activity: Omit<Activity, 'id' | 'userId'>): Promise<void> {
     const savedActivity = (await activityRepository.findByUser(c2cId)).find(
-      (act) => act.vendorId === activity.vendor && act.vendorId === activity.vendorId,
+      (act) => act.vendor === activity.vendor && act.vendorId === activity.vendorId,
     );
     if (savedActivity) {
       await activityRepository.update({
