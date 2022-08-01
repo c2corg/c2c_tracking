@@ -58,7 +58,7 @@ class ActivityRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn.table(this.#TABLE).update(this.activityToRecord(activity));
+    await conn.table(this.#TABLE).where({ id: activity.id }).update(this.activityToRecord(activity));
     return activity;
   }
 
@@ -72,7 +72,11 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
     await conn.transaction(async (trx) => {
-      activitiesToUpdate.length && (await trx(this.#TABLE).update(activitiesToUpdate.map(this.activityToRecord)));
+      if (activitiesToUpdate.length) {
+        activitiesToUpdate.forEach(async (activity) => {
+          await trx(this.#TABLE).where({ id: activity.id }).update(this.activityToRecord(activity));
+        });
+      }
       activitiesToInsert.length && (await trx(this.#TABLE).insert(activitiesToInsert.map(this.activityToRecord)));
       activitiesToDelete.length &&
         (await trx(this.#TABLE)
@@ -103,7 +107,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    await conn.from(this.#TABLE).delete().where({ vendor, user_id: c2cId });
+    await conn.from(this.#TABLE).where({ vendor, user_id: c2cId }).delete();
   }
 
   async deleteByVendorId(vendor: string, vendorId: string): Promise<void> {
@@ -112,7 +116,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    const result = await conn.from(this.#TABLE).delete().where({ vendor, vendorId });
+    const result = await conn.from(this.#TABLE).where({ vendor, vendor_id: vendorId }).delete();
 
     if (result === 0) {
       throw new NotFoundError('Activity does not exist');
@@ -123,7 +127,7 @@ class ActivityRepository {
   private rowToActivity(row: any): Activity {
     return {
       id: row.id,
-      userId: row.c2c_id,
+      userId: row.user_id,
       vendor: row.vendor,
       vendorId: row.vendor_id,
       date: row.date,
@@ -133,7 +137,6 @@ class ActivityRepository {
   }
 
   private activityToRecord = (activity: Partial<Activity>): Record<string, unknown> => ({
-    id: activity.id,
     user_id: activity.userId,
     vendor: activity.vendor,
     vendor_id: activity.vendorId,
