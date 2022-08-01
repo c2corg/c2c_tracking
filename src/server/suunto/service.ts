@@ -51,13 +51,14 @@ export class SuuntoService {
   async getToken(c2cId: number): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
     const { access_token, expires_at, refresh_token } = (await userService.getSuuntoInfo(c2cId)) ?? {};
-    if (access_token && dayjs(expires_at).isAfter(dayjs().subtract(1, 'minute'))) {
+    if (access_token && expires_at && dayjs.unix(expires_at).isAfter(dayjs().add(1, 'minute'))) {
       return access_token;
     }
     if (refresh_token) {
+      log.debug('Suunto access token expired, requiring rfresh');
       const auth = await api.refreshAuth(refresh_token);
       await userService.updateSuuntoAuth(c2cId, auth);
-      return access_token;
+      return auth.access_token;
     }
     return undefined;
   }
