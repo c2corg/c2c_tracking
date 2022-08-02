@@ -10,7 +10,7 @@ checkEnvvars('STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET', 'STRAVA_WEBHOOK_SUBSCRI
 
 const router = new Router();
 
-router.get('/exchange_token/:userId', validate(exchangeTokens), controller.exchangeTokens.bind(controller));
+router.get('/exchange-token/:userId', validate(exchangeTokens), controller.exchangeTokens.bind(controller));
 router.post('/deauthorize/:userId', validate(deauthorize), controller.deauthorize.bind(controller));
 router.get('/webhook', validate(webhookSubscription), controller.webhookSubscription.bind(controller));
 router.post('/webhook', validate(webhook), controller.webhook.bind(controller));

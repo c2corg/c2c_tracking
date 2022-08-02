@@ -16,7 +16,7 @@ checkEnvvars(
 
 const router = new Router();
 
-router.get('/exchange_token/:userId', validate(exchangeTokens), controller.exchangeTokens.bind(controller));
+router.get('/exchange-token/:userId', validate(exchangeTokens), controller.exchangeTokens.bind(controller));
 router.post('/webhook', validate(webhook), controller.webhook.bind(controller));
 router.post('/deauthorize/:userId', validate(deauthorize), controller.deauthorize.bind(controller));
 
