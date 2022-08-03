@@ -23,7 +23,7 @@ export class SuuntoService {
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
-    const token = await api.exchangeTokens(authorizationCode);
+    const token = await api.exchangeToken(authorizationCode);
     await this.setupUser(c2cId, token);
   }
 
@@ -50,13 +50,13 @@ export class SuuntoService {
 
   async getToken(c2cId: number): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
-    const { access_token, expires_at, refresh_token } = (await userService.getSuuntoInfo(c2cId)) ?? {};
-    if (access_token && expires_at && dayjs.unix(expires_at).isAfter(dayjs().add(1, 'minute'))) {
-      return access_token;
+    const { accessToken, expiresAt, refreshToken } = (await userService.getSuuntoInfo(c2cId)) ?? {};
+    if (accessToken && expiresAt && dayjs.unix(expiresAt).isAfter(dayjs().add(1, 'minute'))) {
+      return accessToken;
     }
-    if (refresh_token) {
+    if (refreshToken) {
       log.debug('Suunto access token expired, requiring refresh');
-      const auth = await api.refreshAuth(refresh_token);
+      const auth = await api.refreshAuth(refreshToken);
       await userService.updateSuuntoAuth(c2cId, auth);
       return auth.access_token;
     }

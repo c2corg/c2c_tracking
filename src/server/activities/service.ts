@@ -11,7 +11,7 @@ export class ActivitiesService {
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
     }
 
-    let coordinates: number[][] = fit.activity.records
+    let coordinates = fit.activity.records
       .map((record) => [
         record['position_long'] as number,
         record['position_lat'] as number,

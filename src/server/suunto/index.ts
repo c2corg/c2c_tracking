@@ -4,7 +4,7 @@ import { checkEnvvars } from '../../helpers/envar';
 import { validate } from '../validator';
 
 import { controller } from './controller';
-import { exchangeTokens, webhook, deauthorize } from './validators';
+import { exchangeToken, webhook, deauthorize } from './validators';
 
 checkEnvvars(
   'SUUNTO_CLIENT_ID',
@@ -16,7 +16,7 @@ checkEnvvars(
 
 const router = new Router();
 
-router.get('/exchange-token/:userId', validate(exchangeTokens), controller.exchangeTokens.bind(controller));
+router.get('/exchange-token/:userId', validate(exchangeToken), controller.exchangeTokens.bind(controller));
 router.post('/webhook', validate(webhook), controller.webhook.bind(controller));
 router.post('/deauthorize/:userId', validate(deauthorize), controller.deauthorize.bind(controller));
 

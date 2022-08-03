@@ -1,7 +1,7 @@
 import { database as db } from '../db';
 import { IOError, NotFoundError } from '../errors';
 
-import type { Activity } from './activity';
+import type { Activity, Vendor } from './activity';
 
 class ActivityRepository {
   readonly #TABLE = 'activities';
@@ -101,7 +101,7 @@ class ActivityRepository {
     }
   }
 
-  async deleteByUserAndVendor(c2cId: number, vendor: string): Promise<void> {
+  async deleteByUserAndVendor(c2cId: number, vendor: Vendor): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -110,7 +110,7 @@ class ActivityRepository {
     await conn.from(this.#TABLE).where({ vendor, user_id: c2cId }).delete();
   }
 
-  async deleteByVendorId(vendor: string, vendorId: string): Promise<void> {
+  async deleteByVendorId(vendor: Vendor, vendorId: string): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');

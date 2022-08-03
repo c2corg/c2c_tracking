@@ -134,7 +134,7 @@ export class StravaApi {
     this.#clientSecret = process.env['STRAVA_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
-  async exchangeTokens(code: string): Promise<StravaAuth> {
+  async exchangeToken(code: string): Promise<StravaAuth> {
     try {
       const response = await axios.post<StravaAuth>(`${this.baseUrl}oauth/token`, null, {
         params: {

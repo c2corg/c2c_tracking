@@ -4,8 +4,9 @@ import pino from 'pino';
 import { NotFoundError } from './errors';
 import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
-import type { StravaInfo, SuuntoInfo, User } from './repository/user';
+import type { GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
+import type { GarminAuth } from './server/garmin/api';
 import type { StravaAuth, StravaRefreshAuth } from './server/strava/api';
 import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/api';
 
@@ -30,10 +31,11 @@ const isActivityToUpdate = (
 
 export class UserService {
   async getUserInfo(c2cId: number): Promise<{ [key in Vendor]?: boolean }> {
-    const { strava, suunto } = (await userRepository.findById(c2cId)) || {};
+    const { strava, suunto, garmin } = (await userRepository.findById(c2cId)) || {};
     return {
       strava: !!strava,
       suunto: !!suunto,
+      garmin: !!garmin,
     };
   }
 
@@ -44,9 +46,9 @@ export class UserService {
         ...user,
         strava: {
           id: auth.athlete.id,
-          access_token: auth.access_token,
-          expires_at: auth.expires_at,
-          refresh_token: auth.refresh_token,
+          accessToken: auth.access_token,
+          expiresAt: auth.expires_at,
+          refreshToken: auth.refresh_token,
         },
       };
       await userRepository.update(user);
@@ -55,9 +57,9 @@ export class UserService {
         c2cId,
         strava: {
           id: auth.athlete.id,
-          access_token: auth.access_token,
-          expires_at: auth.expires_at,
-          refresh_token: auth.refresh_token,
+          accessToken: auth.access_token,
+          expiresAt: auth.expires_at,
+          refreshToken: auth.refresh_token,
         },
       };
       await userRepository.insert(user);
@@ -76,9 +78,9 @@ export class UserService {
       ...user,
       strava: {
         id: user.strava?.id,
-        access_token: auth.access_token,
-        expires_at: auth.expires_at,
-        refresh_token: auth.refresh_token,
+        accessToken: auth.access_token,
+        expiresAt: auth.expires_at,
+        refreshToken: auth.refresh_token,
       },
     };
     await userRepository.update(user);
@@ -96,9 +98,9 @@ export class UserService {
         ...user,
         suunto: {
           username: auth.user,
-          access_token: auth.access_token,
-          expires_at: this.#expiresAt(auth.expires_in),
-          refresh_token: auth.refresh_token,
+          accessToken: auth.access_token,
+          expiresAt: this.#expiresAt(auth.expires_in),
+          refreshToken: auth.refresh_token,
         },
       };
       await userRepository.update(user);
@@ -107,9 +109,9 @@ export class UserService {
         c2cId,
         suunto: {
           username: auth.user,
-          access_token: auth.access_token,
-          expires_at: this.#expiresAt(auth.expires_in),
-          refresh_token: auth.refresh_token,
+          accessToken: auth.access_token,
+          expiresAt: this.#expiresAt(auth.expires_in),
+          refreshToken: auth.refresh_token,
         },
       };
       await userRepository.insert(user);
@@ -128,9 +130,9 @@ export class UserService {
       ...user,
       suunto: {
         username: user.suunto?.username,
-        access_token: auth.access_token,
-        expires_at: this.#expiresAt(auth.expires_in),
-        refresh_token: auth.refresh_token,
+        accessToken: auth.access_token,
+        expiresAt: this.#expiresAt(auth.expires_in),
+        refreshToken: auth.refresh_token,
       },
     };
     await userRepository.update(user);
@@ -139,6 +141,34 @@ export class UserService {
   async getSuuntoInfo(c2cId: number): Promise<SuuntoInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.suunto;
+  }
+
+  async configureGarmin(c2cId: number, auth: GarminAuth): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (user) {
+      user = {
+        ...user,
+        garmin: {
+          token: auth.token,
+          tokenSecret: auth.tokenSecret,
+        },
+      };
+      await userRepository.update(user);
+    } else {
+      user = {
+        c2cId,
+        garmin: {
+          token: auth.token,
+          tokenSecret: auth.tokenSecret,
+        },
+      };
+      await userRepository.insert(user);
+    }
+  }
+
+  async getGarminInfo(c2cId: number): Promise<GarminInfo | undefined> {
+    const user = await userRepository.findById(c2cId);
+    return user?.garmin;
   }
 
   async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {
@@ -195,7 +225,7 @@ export class UserService {
     }
   }
 
-  async deleteActivity(vendor: string, vendorId: string): Promise<void> {
+  async deleteActivity(vendor: Vendor, vendorId: string): Promise<void> {
     await activityRepository.deleteByVendorId(vendor, vendorId);
   }
 
