@@ -17,6 +17,7 @@ import { healthService } from './health.service';
 import { checkEnvvars } from './helpers/envar';
 import activities from './server/activities';
 import { defaultErrorHandler } from './server/error-handler';
+import garmin from './server/garmin';
 import health from './server/health';
 import strava from './server/strava';
 import { stravaService } from './server/strava/service';
@@ -93,6 +94,7 @@ export async function start(): Promise<void> {
     router.use('/health', health.routes(), health.allowedMethods());
     router.use('/strava', strava.routes(), strava.allowedMethods());
     router.use('/suunto', suunto.routes(), suunto.allowedMethods());
+    router.use('/garmin', garmin.routes(), garmin.allowedMethods());
     router.use('/users/:userId/activities', activities.routes(), activities.allowedMethods());
     router.use('/users/:userId', users.routes(), users.allowedMethods());
 

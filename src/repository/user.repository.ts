@@ -58,6 +58,22 @@ export class UserRepository {
     }
   }
 
+  async findByGarminToken(token: string): Promise<User | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      const row = await conn?.table(this.#TABLE).where({ garmin_token: token }).first();
+      if (!row) {
+        return undefined;
+      }
+      return this.rowToUser(row);
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
@@ -83,17 +99,23 @@ export class UserRepository {
       ...(row.strava_id && {
         strava: {
           id: row.strava_id,
-          access_token: row.strava_access_token,
-          expires_at: Math.floor(row.strava_expires_at / 1000),
-          refresh_token: row.strava_refresh_token,
+          accessToken: row.strava_access_token,
+          expiresAt: Math.floor(row.strava_expires_at / 1000),
+          refreshToken: row.strava_refresh_token,
         },
       }),
       ...(row.suunto_username && {
         suunto: {
           username: row.suunto_username,
-          access_token: row.suunto_access_token,
-          expires_at: Math.floor(row.suunto_expires_at / 1000),
-          refresh_token: row.suunto_refresh_token,
+          accessToken: row.suunto_access_token,
+          expiresAt: Math.floor(row.suunto_expires_at / 1000),
+          refreshToken: row.suunto_refresh_token,
+        },
+      }),
+      ...(row.garmin_token && {
+        garmin: {
+          token: row.garmin_token,
+          tokenSecret: row.garmin_token_secret,
         },
       }),
     };
@@ -106,9 +128,9 @@ export class UserRepository {
       data = {
         ...data,
         strava_id: user.strava.id,
-        strava_access_token: user.strava.access_token,
-        strava_expires_at: user.strava.expires_at ? dayjs.unix(user.strava.expires_at).toISOString() : undefined,
-        strava_refresh_token: user.strava.refresh_token,
+        strava_access_token: user.strava.accessToken,
+        strava_expires_at: user.strava.expiresAt ? dayjs.unix(user.strava.expiresAt).toISOString() : undefined,
+        strava_refresh_token: user.strava.refreshToken,
       };
     } else {
       data = {
@@ -123,9 +145,9 @@ export class UserRepository {
       data = {
         ...data,
         suunto_username: user.suunto.username,
-        suunto_access_token: user.suunto.access_token,
-        suunto_expires_at: user.suunto.expires_at ? dayjs.unix(user.suunto.expires_at).toISOString() : undefined,
-        suunto_refresh_token: user.suunto.refresh_token,
+        suunto_access_token: user.suunto.accessToken,
+        suunto_expires_at: user.suunto.expiresAt ? dayjs.unix(user.suunto.expiresAt).toISOString() : undefined,
+        suunto_refresh_token: user.suunto.refreshToken,
       };
     } else {
       data = {
@@ -134,6 +156,19 @@ export class UserRepository {
         suunto_access_token: null,
         suunto_expires_at: null,
         suunto_refresh_token: null,
+      };
+    }
+    if (user.garmin) {
+      data = {
+        ...data,
+        garmin_token: user.garmin.token,
+        garmin_token_secret: user.garmin.tokenSecret,
+      };
+    } else {
+      data = {
+        ...data,
+        garmin_token: null,
+        garmin_token_secret: null,
       };
     }
     return data;

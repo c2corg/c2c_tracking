@@ -4,7 +4,7 @@ import type { Schema } from '../validator';
 
 const { object, string } = joi.types();
 
-export const exchangeTokens: Schema = {
+export const exchangeToken: Schema = {
   query: object
     .keys({
       code: string.min(5).max(50),

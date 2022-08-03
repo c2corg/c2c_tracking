@@ -173,7 +173,7 @@ export class SuuntoApi {
     this.redirectUrl = process.env['SUUNTO_REDIRECT_URI']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
-  async exchangeTokens(code: string): Promise<SuuntoAuth> {
+  async exchangeToken(code: string): Promise<SuuntoAuth> {
     try {
       const response = await axios.post<SuuntoAuth>(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {

@@ -10,7 +10,7 @@ import { activitiesService as service } from './service';
 
 class ActivityController {
   async getUserActivities(ctx: Context): Promise<void> {
-    ctx.body = (await userService.getActivities(ctx['params'].userId)).map(({ vendorId, ...keep }) => keep);
+    ctx.body = (await userService.getActivities(ctx['params'].userId)).map(({ vendorId, geojson, ...keep }) => keep);
     ctx.status = 200;
   }
 
@@ -21,6 +21,12 @@ class ActivityController {
     const activity = await userService.getActivity(userId, activityId);
     if (!activity) {
       ctx.status = 404;
+      return;
+    }
+
+    if (activity.geojson) {
+      ctx.body = activity.geojson;
+      ctx.status = 200;
       return;
     }
 
@@ -54,6 +60,9 @@ class ActivityController {
         }
         break;
       }
+      case 'garmin':
+        // should contain data in db and be returned above
+        throw new AppError(500, `Error: unable to acquire Garmin geometry`);
       default:
         throw new AppError(400, `Vendor not handled: ${activity.vendor}`);
     }
