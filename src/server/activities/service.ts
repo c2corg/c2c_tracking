@@ -67,12 +67,15 @@ export class ActivitiesService {
     const startDate = activity?.date ? dayjs(activity?.date).unix() : 0;
     const coordinates: GeoJSON.Position[] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
-      const coordinate: number[] = latlngStream.data[i]!.reverse(); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
+      const coordinate: number[] = latlngStream.data[i]!.reverse();
       if (layout.includes('Z')) {
-        coordinate.push(altStream!.data[i]!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
+        coordinate.push(altStream!.data[i]!);
       }
       if (layout.includes('M')) {
-        coordinate.push(startDate + timeStream!.data[i]!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
+        coordinate.push(startDate + timeStream!.data[i]!);
       }
       coordinates.push(coordinate);
     }

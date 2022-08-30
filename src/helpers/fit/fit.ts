@@ -4273,10 +4273,12 @@ export const FIT: FIT = {
 };
 
 export function getMessageName(messageNum: number): string {
+  // eslint-disable-next-line security/detect-object-injection
   const message = FIT.messages[messageNum];
   return message ? message.name : '';
 }
 
 export function getFieldObject(fieldNum: number, messageNum: number): Message {
+  // eslint-disable-next-line security/detect-object-injection
   return FIT.messages[messageNum]![fieldNum]!;
 }

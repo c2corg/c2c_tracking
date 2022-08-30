@@ -78,7 +78,7 @@ function registerProcessEvents(server: Server): void {
       }
     }
 
-    process.exit(exitCode);
+    process.exit(exitCode); // eslint-disable-line no-process-exit
   });
 }
 
