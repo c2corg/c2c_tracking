@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { Buffer } from 'buffer';

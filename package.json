@@ -1,6 +1,9 @@
 {
   "name": "tracker-connect",
   "version": "1.0.0",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "description": "Tiny server to handle connection with activity trackers such as Strava, Garmin or Suunto",
   "type": "module",
   "main": "dist/index.js",
@@ -8,7 +11,7 @@
     "start": "ts-node src/index.ts | pino-pretty -c -t",
     "start:dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts | pino-pretty -c -t -i req.headers,res.headers\"",
     "build": "tsc",
-    "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint src/**",
+    "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint --ext .ts,.js src/",
     "prepare": "husky install"
   },
   "repository": {
@@ -26,6 +29,7 @@
     "@koa/router": "12.0.0",
     "@mapbox/polyline": "1.1.1",
     "async": "3.2.4",
+    "axios": "0.27.2",
     "dayjs": "1.11.5",
     "dotenv": "16.0.1",
     "dotenv-expand": "8.0.3",
@@ -53,11 +57,13 @@
     "@types/pg": "8.6.5",
     "@typescript-eslint/eslint-plugin": "5.35.1",
     "@typescript-eslint/parser": "5.35.1",
-    "axios": "0.27.2",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.0",
     "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-security": "1.5.0",
     "husky": "8.0.1",
     "lint-staged": "13.0.3",
     "nodemon": "2.0.19",

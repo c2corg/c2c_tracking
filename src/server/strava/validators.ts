@@ -8,6 +8,7 @@ export const exchangeToken: Schema = {
   query: object
     .keys({
       code: string.min(10).max(50),
+      // eslint-disable-next-line security/detect-unsafe-regex
       scope: string.pattern(/(?:[\w:]{1,30},){0,4}(?:[\w:]{1,30})/),
       state: string.allow(''),
       error: string,
