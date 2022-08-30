@@ -41,7 +41,8 @@
     "koa-bodyparser": "4.3.0",
     "koa-helmet": "6.1.0",
     "koa-pino-logger": "4.0.0",
-    "pg": "8.8.0"
+    "pg": "8.8.0",
+    "pino": "8.4.2"
   },
   "devDependencies": {
     "@tsconfig/node18-strictest-esm": "1.0.1",
@@ -59,7 +60,7 @@
     "@typescript-eslint/parser": "5.35.1",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
-    "eslint-import-resolver-typescript": "^3.5.0",
+    "eslint-import-resolver-typescript": "3.5.0",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-prettier": "4.2.1",
