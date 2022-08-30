@@ -9,10 +9,14 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
-    sourceType: 'module', // Allows for the use of imports
+    sourceType: 'module', // Allows for the use of imports,
+    project: ['./tsconfig.json'],
   },
   rules: {
     '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'error',
+    '@typescript-eslint/no-throw-literal': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
     'import/order': [
       'error',
       {
@@ -23,7 +27,5 @@ module.exports = {
         },
       },
     ],
-    '@typescript-eslint/explicit-function-return-type': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
   },
 };
