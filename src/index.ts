@@ -28,6 +28,20 @@ const PORT = Number(process.env['PORT']) || 80;
 
 const log = pino();
 
+process.on('unhandledRejection', (reason: string) => {
+  // I just caught an unhandled promise rejection,
+  // since we already have fallback handler for unhandled errors (see below),
+  // let throw and let him handle that
+  throw new Error(reason);
+});
+
+process.on('uncaughtException', (error: Error) => {
+  // I just received an error that was never handled, time to handle it and then decide whether a restart is needed
+  log.error(error);
+  // eslint-disable-next-line no-process-exit
+  process.exit(1);
+});
+
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
     server.getConnections((err: Error | null, pendingRequests: number) => {
