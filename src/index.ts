@@ -1,20 +1,20 @@
 import './dotenv'; // eslint-disable-line import/order
 
-import { ErrorCallback, retry } from 'async'; // eslint-disable-line import/order
-
-import type { Server } from 'http'; // eslint-disable-line import/order
+import type { Server } from 'http';
 
 import cors from '@koa/cors';
 import Router from '@koa/router';
+import { ErrorCallback, retry } from 'async';
+import rTracer from 'cls-rtracer';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
-import pino from 'pino';
 
 import config from './config';
 import { database as db } from './db';
 import { healthService } from './health.service';
+import log from './helpers/logger';
 import activities from './server/activities';
 import { defaultErrorHandler } from './server/error-handler';
 import garmin from './server/garmin';
@@ -25,8 +25,6 @@ import suunto from './server/suunto';
 import users from './server/users';
 
 const PORT = config.get('server.port');
-
-const log = pino();
 
 process.on('unhandledRejection', (reason: string) => {
   // I just caught an unhandled promise rejection,
@@ -115,8 +113,10 @@ export async function start(): Promise<void> {
       .use(cors())
       .use(bodyParser())
       .use(helmet())
+      .use(rTracer.koaMiddleware())
       .use(
         logger({
+          logger: log,
           level: process.env['ENV'] !== 'production' ? 'trace' : 'info',
         }),
       )

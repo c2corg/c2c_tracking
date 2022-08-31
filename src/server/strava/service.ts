@@ -1,10 +1,10 @@
 import polyline from '@mapbox/polyline';
 const { toGeoJSON } = polyline;
 import dayjs from 'dayjs';
-import pino from 'pino';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
+import log from '../../helpers/logger';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { stravaRepository } from '../../repository/strava.repository';
@@ -20,8 +20,6 @@ import {
   Subscription,
   StreamSet,
 } from './api';
-
-const log = pino();
 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 export class StravaService {

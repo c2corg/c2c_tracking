@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import pino from 'pino';
 
 import { NotFoundError } from './errors';
+import log from './helpers/logger';
 import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
 import type { GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
@@ -13,8 +13,6 @@ import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/api';
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 const MAX_ACTIVITIES_PER_USER = 30;
-
-const log = pino();
 
 const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number => {
   const d1 = dayjs(a1.date);

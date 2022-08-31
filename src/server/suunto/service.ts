@@ -1,16 +1,14 @@
 import dayjs from 'dayjs';
-import pino from 'pino';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
+import log from '../../helpers/logger';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
 import { SuuntoAuth, Workouts, suuntoApi as api, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary } from './api';
-
-const log = pino();
 
 export class SuuntoService {
   readonly subscriptionUrl: string;

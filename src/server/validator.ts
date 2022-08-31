@@ -1,17 +1,15 @@
 import type { Middleware } from '@koa/router';
 import type { ArraySchema, ObjectSchema, ValidationOptions } from 'joi';
 import type { Context } from 'koa';
-import pino from 'pino';
 
 import { FieldValidationError } from '../errors';
+import log from '../helpers/logger';
 
 export type Schema = {
   query?: ObjectSchema;
   body?: ObjectSchema | ArraySchema;
   headers?: ObjectSchema;
 };
-
-const log = pino();
 
 function validateObject(
   object: unknown = {},
