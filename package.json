@@ -41,8 +41,7 @@
     "koa-bodyparser": "4.3.0",
     "koa-helmet": "6.1.0",
     "koa-pino-logger": "4.0.0",
-    "pg": "8.8.0",
-    "pino": "8.4.2"
+    "pg": "8.8.0"
   },
   "devDependencies": {
     "@tsconfig/node18-strictest-esm": "1.0.1",

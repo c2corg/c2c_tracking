@@ -19,6 +19,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/no-throw-literal': 'error',
     '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
+    'node/no-extraneous-import': ['error', { allowModules: ['pino'] }],
     'node/no-missing-import': 'off',
     'import/order': [
       'error',
