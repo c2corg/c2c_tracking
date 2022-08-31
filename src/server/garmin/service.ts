@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
-import pino from 'pino';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
+import log from '../../helpers/logger';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { GarminInfo } from '../../repository/user';
@@ -10,8 +10,6 @@ import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
 import { GarminActivity, garminApi as api, GarminAuth, GarminSample } from './api';
-
-const log = pino();
 
 export class GarminService {
   readonly subscriptionUrl: string;

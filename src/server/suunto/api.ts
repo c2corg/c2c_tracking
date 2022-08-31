@@ -1,10 +1,8 @@
 import axios from 'axios';
-import pino from 'pino';
 
 import config from '../../config';
 import { handleAppError } from '../../helpers/error';
-
-const log = pino();
+import log from '../../helpers/logger';
 
 export type SuuntoAuth = {
   access_token: string;

@@ -30,6 +30,7 @@
     "@mapbox/polyline": "1.1.1",
     "async": "3.2.4",
     "axios": "0.27.2",
+    "cls-rtracer": "2.6.2",
     "convict": "6.2.3",
     "dayjs": "1.11.5",
     "dotenv": "16.0.2",
