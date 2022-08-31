@@ -3,6 +3,7 @@ import { createHmac, randomBytes } from 'crypto';
 import axios from 'axios';
 import dayjs from 'dayjs';
 
+import config from '../../config';
 import { AppError } from '../../errors';
 
 export type GarminAuth = {
@@ -128,8 +129,8 @@ export class GarminApi {
   readonly #consumerSecret: string;
 
   constructor() {
-    this.#consumerKey = process.env['GARMIN_CONSUMER_KEY']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.#consumerSecret = process.env['GARMIN_CONSUMER_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#consumerKey = config.get('trackers.garmin.consumerKey');
+    this.#consumerSecret = config.get('trackers.garmin.consumerSecret');
   }
 
   async requestUnauthorizedRequestToken(): Promise<GarminAuth> {

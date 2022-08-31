@@ -12,9 +12,9 @@ import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
 import pino from 'pino';
 
+import config from './config';
 import { database as db } from './db';
 import { healthService } from './health.service';
-import { checkEnvvars } from './helpers/envar';
 import activities from './server/activities';
 import { defaultErrorHandler } from './server/error-handler';
 import garmin from './server/garmin';
@@ -24,7 +24,7 @@ import { stravaService } from './server/strava/service';
 import suunto from './server/suunto';
 import users from './server/users';
 
-const PORT = Number(process.env['PORT']) || 80;
+const PORT = config.get('server.port');
 
 const log = pino();
 
@@ -97,7 +97,6 @@ function registerProcessEvents(server: Server): void {
 }
 
 export async function start(): Promise<void> {
-  checkEnvvars('SERVER_BASE_URL', 'FRONTEND_BASE_URL', 'FRONTEND_SUBSCRIPTION_URL');
   try {
     log.info('Apply database migration');
     await db.schemaMigration();

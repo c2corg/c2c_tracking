@@ -1,18 +1,9 @@
 import Router from '@koa/router';
 
-import { checkEnvvars } from '../../helpers/envar';
 import { validate } from '../validator';
 
 import { controller } from './controller';
 import { exchangeToken, webhook, deauthorize } from './validators';
-
-checkEnvvars(
-  'SUUNTO_CLIENT_ID',
-  'SUUNTO_CLIENT_SECRET',
-  'SUUNTO_SUBSCRIPTION_KEY',
-  'SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN',
-  'SUUNTO_REDIRECT_URI',
-);
 
 const router = new Router();
 

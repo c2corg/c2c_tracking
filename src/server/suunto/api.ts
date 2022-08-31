@@ -1,6 +1,7 @@
 import axios from 'axios';
 import pino from 'pino';
 
+import config from '../../config';
 import { handleAppError } from '../../helpers/error';
 
 const log = pino();
@@ -168,9 +169,9 @@ export class SuuntoApi {
   readonly #clientSecret: string;
 
   constructor() {
-    this.#clientId = process.env['SUUNTO_CLIENT_ID']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.#clientSecret = process.env['SUUNTO_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.redirectUrl = process.env['SUUNTO_REDIRECT_URI']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#clientId = config.get('trackers.suunto.clientId');
+    this.#clientSecret = config.get('trackers.suunto.clientSecret');
+    this.redirectUrl = config.get('c2c.frontend.baseUrl') + config.get('trackers.suunto.redirectPath');
   }
 
   async exchangeToken(code: string): Promise<SuuntoAuth> {

@@ -1,12 +1,9 @@
 import Router from '@koa/router';
 
-import { checkEnvvars } from '../../helpers/envar';
 import { validate } from '../validator';
 
 import { controller } from './controller';
 import { activityWebhook, deauthorize, deauthorizeWebhook, exchangeToken, requestToken } from './validators';
-
-checkEnvvars('GARMIN_CONSUMER_KEY', 'GARMIN_CONSUMER_SECRET');
 
 const router = new Router();
 
