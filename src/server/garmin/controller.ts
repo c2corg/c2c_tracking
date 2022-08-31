@@ -2,6 +2,8 @@ import axios from 'axios';
 import Keyv from 'keyv';
 import type { Context } from 'koa';
 
+import config from '../../config';
+
 import type { GarminActivity } from './api';
 import { garminService as service } from './service';
 
@@ -10,7 +12,7 @@ class GarminController {
   private readonly keyv;
 
   constructor() {
-    this.exchangeTokenUrl = `${process.env['SERVER_BASE_URL']!}/garmin/exchange-token`; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.exchangeTokenUrl = `${config.get('server.baseUrl')}garmin/exchange-token`;
     this.keyv = new Keyv();
   }
 

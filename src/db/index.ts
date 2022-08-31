@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { AsyncResultCallback, retry } from 'async';
 import knex, { Knex } from 'knex';
 
-import { checkEnvvars } from '../helpers/envar';
+import config from '../config';
 
 export type Configuration = {
   host: string;
@@ -24,7 +24,6 @@ export class Database {
 
   constructor(config: Configuration) {
     this.config = config;
-    checkEnvvars('DB_NAME', 'DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD');
   }
 
   async getConnection(): Promise<Knex | undefined> {
@@ -127,10 +126,10 @@ export class Database {
 }
 
 export const database = new Database({
-  database: process.env['DB_NAME'] ?? 'postgres',
-  host: process.env['DB_HOST'] ?? 'localhost',
-  port: Number(process.env['DB_PORT']) ?? 5432,
-  user: process.env['DB_USER'] ?? 'postgres',
-  password: process.env['DB_PASSWORD'] ?? 'postgres',
-  debug: false, // process.env['ENV'] !== 'production',
+  database: config.get('db.name'),
+  host: config.get('db.host'),
+  port: config.get('db.port'),
+  user: config.get('db.user'),
+  password: config.get('db.password'),
+  debug: false, // config.get('env') !== 'production'
 });

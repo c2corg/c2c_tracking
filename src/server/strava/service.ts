@@ -3,6 +3,7 @@ const { toGeoJSON } = polyline;
 import dayjs from 'dayjs';
 import pino from 'pino';
 
+import config from '../../config';
 import { NotFoundError } from '../../errors';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
@@ -22,14 +23,14 @@ import {
 
 const log = pino();
 
-const webhookCallbackUrl = `${process.env['SERVER_BASE_URL']}/strava/webhook`;
+const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 export class StravaService {
   readonly subscriptionUrl: string;
   readonly stravaWebhookSubscriptionVerifyToken: string;
 
   constructor() {
-    this.subscriptionUrl = process.env['FRONTEND_SUBSCRIPTION_URL']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.stravaWebhookSubscriptionVerifyToken = process.env['STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
+    this.stravaWebhookSubscriptionVerifyToken = config.get('trackers.strava.webhookSubscriptionVerifyToken');
   }
 
   containsRequiredScopes(scopes: string[]): boolean {

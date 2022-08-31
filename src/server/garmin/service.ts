@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import pino from 'pino';
 
+import config from '../../config';
 import { NotFoundError } from '../../errors';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
@@ -16,7 +17,7 @@ export class GarminService {
   readonly subscriptionUrl: string;
 
   constructor() {
-    this.subscriptionUrl = process.env['FRONTEND_SUBSCRIPTION_URL']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
   }
 
   async requestUnauthorizedRequestToken(): Promise<GarminAuth> {

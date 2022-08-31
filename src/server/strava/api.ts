@@ -1,6 +1,7 @@
 import axios from 'axios';
 import FormData from 'form-data';
 
+import config from '../../config';
 import { handleAppError } from '../../helpers/error';
 
 export type Athlete = {
@@ -130,8 +131,8 @@ export class StravaApi {
   readonly #clientSecret: string;
 
   constructor() {
-    this.#clientId = process.env['STRAVA_CLIENT_ID']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.#clientSecret = process.env['STRAVA_CLIENT_SECRET']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.#clientId = config.get('trackers.strava.clientId');
+    this.#clientSecret = config.get('trackers.strava.clientSecret');
   }
 
   async exchangeToken(code: string): Promise<StravaAuth> {

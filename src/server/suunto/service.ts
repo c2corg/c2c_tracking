@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import pino from 'pino';
 
+import config from '../../config';
 import { NotFoundError } from '../../errors';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
@@ -17,9 +18,9 @@ export class SuuntoService {
   readonly #suuntoWebhookSubscriptionToken: string;
 
   constructor() {
-    this.subscriptionUrl = process.env['FRONTEND_SUBSCRIPTION_URL']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.#suuntoSubscriptionKey = process.env['SUUNTO_SUBSCRIPTION_KEY']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    this.#suuntoWebhookSubscriptionToken = process.env['SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN']!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
+    this.#suuntoSubscriptionKey = config.get('trackers.suunto.subscriptionKey');
+    this.#suuntoWebhookSubscriptionToken = config.get('trackers.suunto.webhookSubscriptionToken');
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
