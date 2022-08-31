@@ -247,7 +247,7 @@ export default class Binary {
           temp.push(blob[startIndex + i]!);
         }
       }
-      return Buffer.from(temp).toString('utf-8');
+      return Buffer.from(temp).toString('utf8');
     }
 
     if (fDef.type === 'byte_array') {
@@ -351,11 +351,11 @@ export default class Binary {
   private isInvalidValue(data: string | number | number[], type: string): boolean {
     switch (type) {
       case 'enum':
+      case 'uint8':
+      case 'byte':
         return data === 0xff;
       case 'sint8':
         return data === 0x7f;
-      case 'uint8':
-        return data === 0xff;
       case 'sint16':
         return data === 0x7fff;
       case 'uint16':
@@ -363,27 +363,18 @@ export default class Binary {
       case 'sint32':
         return data === 0x7fffffff;
       case 'uint32':
-        return data === 0xffffffff;
-      case 'string':
-        return data === 0x00;
       case 'float32':
         return data === 0xffffffff;
-      case 'float64':
-        return data === 0xffffffffffffffff; // eslint-disable-line @typescript-eslint/no-loss-of-precision
+      case 'string':
       case 'uint8z':
-        return data === 0x00;
       case 'uint16z':
-        return data === 0x0000;
       case 'uint32z':
-        return data === 0x000000;
-      case 'byte':
-        return data === 0xff;
+      case 'uint64z':
+        return data === 0;
+      case 'float64':
       case 'sint64':
-        return data === 0x7fffffffffffffff; // eslint-disable-line @typescript-eslint/no-loss-of-precision
       case 'uint64':
         return data === 0xffffffffffffffff; // eslint-disable-line @typescript-eslint/no-loss-of-precision
-      case 'uint64z':
-        return data === 0x0000000000000000;
       default:
         return false;
     }

@@ -68,7 +68,7 @@ export class SuuntoService {
   }
 
   async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
-    if (await !this.isWebhookHeaderValid(authHeader)) {
+    if (!this.isWebhookHeaderValid(authHeader)) {
       return;
     }
     const user = await userRepository.findBySuuntoUsername(event.username);
@@ -109,7 +109,7 @@ export class SuuntoService {
     }
   }
 
-  private async isWebhookHeaderValid(authHeader: string | undefined): Promise<boolean> {
+  private isWebhookHeaderValid(authHeader: string | undefined): boolean {
     return authHeader === `Bearer: ${this.#suuntoWebhookSubscriptionToken}`;
   }
 

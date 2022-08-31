@@ -152,7 +152,7 @@ export class StravaService {
   }
 
   async handleWebhookEvent(event: WebhookEvent): Promise<void> {
-    if (await !this.isWebhookEventvalid(event)) {
+    if (!(await this.isWebhookEventvalid(event))) {
       return;
     }
     switch (event.object_type) {

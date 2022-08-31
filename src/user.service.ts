@@ -16,8 +16,11 @@ const MAX_ACTIVITIES_PER_USER = 30;
 
 const log = pino();
 
-const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number =>
-  dayjs(a1.date).isBefore(dayjs(a2.date)) ? -1 : 1;
+const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number => {
+  const d1 = dayjs(a1.date);
+  const d2 = dayjs(a2.date);
+  return d1.isSame(d2, 'second') ? 0 : d1.isBefore(d2) ? -1 : 1;
+};
 
 const isInDb = (activity: Optional<Activity, 'id'>): activity is Activity => !!activity.id;
 
