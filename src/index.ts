@@ -117,7 +117,7 @@ export async function start(): Promise<void> {
       .use(
         logger({
           logger: log,
-          level: process.env['ENV'] !== 'production' ? 'trace' : 'info',
+          level: config.get('env') !== 'production' ? 'trace' : 'info',
         }),
       )
       .use(defaultErrorHandler())
