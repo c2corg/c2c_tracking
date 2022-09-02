@@ -37,7 +37,7 @@
     "dotenv-expand": "9.0.0",
     "form-data": "4.0.0",
     "joi": "17.6.0",
-    "keyv": "4.4.1",
+    "keyv": "4.5.0",
     "knex": "2.3.0",
     "koa": "2.13.4",
     "koa-bodyparser": "4.3.0",
