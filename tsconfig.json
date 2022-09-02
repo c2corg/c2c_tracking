@@ -1,11 +1,7 @@
 {
-  "extends": "@tsconfig/node18-strictest-esm/tsconfig.json",
+  "extends": "@tsconfig/node18-strictest/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
     "strict": true
-  },
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
   }
 }

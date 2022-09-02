@@ -21,6 +21,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
     'node/no-extraneous-import': ['error', { allowModules: ['pino'] }],
     'node/no-missing-import': 'off',
+    'node/no-unsupported-features/es-syntax': 'off',
     'import/order': [
       'error',
       {
