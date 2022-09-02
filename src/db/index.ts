@@ -1,5 +1,4 @@
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 import { AsyncResultCallback, retry } from 'async';
 import knex, { Knex } from 'knex';
@@ -14,8 +13,6 @@ export type Configuration = {
   database: string;
   debug: boolean;
 };
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export class Database {
   private config: Configuration;
