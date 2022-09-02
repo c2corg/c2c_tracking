@@ -66,7 +66,7 @@ const config = convict({
       arg: 'port',
     },
     baseUrl: {
-      doc: 'Base URL he server binds to',
+      doc: 'Base URL the server binds to',
       format: 'baseUrl',
       default: '',
       env: 'SERVER_BASE_URL',
