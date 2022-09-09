@@ -68,14 +68,15 @@ class GarminController {
   }
 
   async activityWebhook(ctx: Context): Promise<void> {
-    const body: { activityDetails: (GarminActivity & { userId: string; userAccessToken: string })[] } =
-      ctx.request.body;
+    const body = ctx.request.body as {
+      activityDetails: (GarminActivity & { userId: string; userAccessToken: string })[];
+    };
     service.handleActivityWebhook(body.activityDetails); // async
     ctx.status = 200;
   }
 
   async deauthorizeWebhook(ctx: Context): Promise<void> {
-    const body: { deregistrations: { userId: string; userAccessToken: string }[] } = ctx.request.body;
+    const body = ctx.request.body as { deregistrations: { userId: string; userAccessToken: string }[] };
     service.handleDeauthorizeWebhook(body.deregistrations); // async
     ctx.status = 200;
   }
