@@ -89,6 +89,7 @@ function registerProcessEvents(server: Server): void {
         exitCode = 1;
       }
     }
+    console.log('toto');
 
     process.exit(exitCode); // eslint-disable-line no-process-exit
   });
