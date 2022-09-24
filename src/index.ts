@@ -11,6 +11,7 @@ import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
 
+import { ensureAuthenticated, ensureUserFromParams, passport } from './auth';
 import config from './config';
 import { database as db } from './db';
 import { healthService } from './health.service';
@@ -106,11 +107,23 @@ export async function start(): Promise<void> {
     router.use('/strava', strava.routes(), strava.allowedMethods());
     router.use('/suunto', suunto.routes(), suunto.allowedMethods());
     router.use('/garmin', garmin.routes(), garmin.allowedMethods());
-    router.use('/users/:userId/activities', activities.routes(), activities.allowedMethods());
-    router.use('/users/:userId', users.routes(), users.allowedMethods());
+    router.use(
+      '/users/:userId/activities',
+      ensureAuthenticated,
+      ensureUserFromParams,
+      activities.routes(),
+      activities.allowedMethods(),
+    );
+    router.use('/users/:userId', ensureAuthenticated, ensureUserFromParams, users.routes(), users.allowedMethods());
 
     app
-      .use(cors())
+      .use(
+        cors({
+          allowMethods: ['GET', 'POST'],
+          allowHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+          maxAge: 1728000,
+        }),
+      )
       .use(bodyParser())
       .use(helmet())
       .use(rTracer.koaMiddleware())
@@ -120,6 +133,7 @@ export async function start(): Promise<void> {
           level: config.get('env') !== 'production' ? 'trace' : 'info',
         }),
       )
+      .use(passport.initialize())
       .use(defaultErrorHandler())
       .use(router.routes())
       .use(router.allowedMethods());
