@@ -1,4 +1,4 @@
-# tracker-connect
+# c2c_tracking
 
 ## Development mode
 

@@ -1,5 +1,5 @@
 {
-  "name": "tracker-connect",
+  "name": "c2c_tracking",
   "version": "1.0.0",
   "engines": {
     "node": ">=16.0.0"
@@ -16,14 +16,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brunobesson/tracker-connect.git"
+    "url": "git+https://github.com/c2corg/c2c_tracking.git"
   },
   "author": "https://www.camptocamp.org",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brunobesson/tracker-connect/issues"
+    "url": "https://github.com/c2corg/c2c_tracking/issues"
   },
-  "homepage": "https://github.com/brunobesson/tracker-connect#readme",
+  "homepage": "https://github.com/c2corg/c2c_tracking#readme",
   "dependencies": {
     "@koa/cors": "3.4.1",
     "@koa/router": "12.0.0",
