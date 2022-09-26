@@ -1,29 +1,15 @@
-import './dotenv'; // eslint-disable-line import/order
+import './dotenv';
 
 import type { Server } from 'http';
 
-import cors from '@koa/cors';
-import Router from '@koa/router';
 import { ErrorCallback, retry } from 'async';
-import rTracer from 'cls-rtracer';
-import Koa from 'koa';
-import bodyParser from 'koa-bodyparser';
-import helmet from 'koa-helmet';
-import logger from 'koa-pino-logger';
 
-import { ensureAuthenticated, ensureUserFromParams, passport } from './auth';
+import { app } from './app';
 import config from './config';
 import { database as db } from './db';
 import { healthService } from './health.service';
 import log from './helpers/logger';
-import activities from './server/activities';
-import { defaultErrorHandler } from './server/error-handler';
-import garmin from './server/garmin';
-import health from './server/health';
-import strava from './server/strava';
 import { stravaService } from './server/strava/service';
-import suunto from './server/suunto';
-import users from './server/users';
 
 const PORT = config.get('server.port');
 
@@ -100,43 +86,6 @@ export async function start(): Promise<void> {
     log.info('Apply database migration');
     await db.schemaMigration();
 
-    const app = new Koa();
-    const router = new Router();
-
-    router.use('/health', health.routes(), health.allowedMethods());
-    router.use('/strava', strava.routes(), strava.allowedMethods());
-    router.use('/suunto', suunto.routes(), suunto.allowedMethods());
-    router.use('/garmin', garmin.routes(), garmin.allowedMethods());
-    router.use(
-      '/users/:userId/activities',
-      ensureAuthenticated,
-      ensureUserFromParams,
-      activities.routes(),
-      activities.allowedMethods(),
-    );
-    router.use('/users/:userId', ensureAuthenticated, ensureUserFromParams, users.routes(), users.allowedMethods());
-
-    app
-      .use(
-        cors({
-          allowMethods: ['GET', 'POST'],
-          allowHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-          maxAge: 1728000,
-        }),
-      )
-      .use(bodyParser())
-      .use(helmet())
-      .use(rTracer.koaMiddleware())
-      .use(
-        logger({
-          logger: log,
-          level: config.get('env') !== 'production' ? 'trace' : 'info',
-        }),
-      )
-      .use(passport.initialize())
-      .use(defaultErrorHandler())
-      .use(router.routes())
-      .use(router.allowedMethods());
     const server = app.listen(PORT, () => {
       log.info(`Server is running on port ${PORT}`);
       stravaService.setupWebhook();

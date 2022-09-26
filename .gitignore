@@ -106,3 +106,6 @@ dist
 
 # snyk.io
 .dccache
+
+# testing reports
+reports/

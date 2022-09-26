@@ -14,6 +14,7 @@ module.exports = {
     sourceType: 'module', // Allows for the use of imports,
     project: ['./tsconfig.json'],
   },
+  reportUnusedDisableDirectives: true,
   rules: {
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'error',
@@ -33,6 +34,14 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['test/**/*.ts'],
+      rules: {
+        'node/no-unpublished-import': 'off',
+      },
+    },
+  ],
   settings: {
     'import/resolvers': {
       typescript: {

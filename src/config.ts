@@ -20,7 +20,7 @@ convict.addFormats({
     coerce: (v) => v.toString(),
     validate: (value: string) => {
       if (!isUUID(value, 4)) {
-        throw new Error('must be a UUID vrsion 4');
+        throw new Error('must be a UUID version 4');
       }
     },
   },
@@ -134,7 +134,7 @@ const config = convict({
     strava: {
       clientId: {
         doc: 'Strava client ID',
-        format: String,
+        format: 'notEmptyString',
         default: '63968',
         env: 'STRAVA_CLIENT_ID',
       },

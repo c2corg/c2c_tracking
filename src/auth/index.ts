@@ -17,6 +17,23 @@ const c2cJwtExtractor = (request: Request): string | null => {
   return found[1] ?? null;
 };
 
+const ensureAuthenticated: Middleware = async (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
+  passport.authenticate('jwt', { session: false })(ctx, next);
+
+const ensureUserFromParamsMatchesAuthUser: Middleware = async (
+  ctx: Context,
+  next: () => Promise<unknown>,
+): Promise<unknown> => {
+  const authenticatedUser: { id: number } | undefined = ctx.state['user'];
+  const requiredUser = Number.parseInt(ctx['params'].userId, 10);
+  if (authenticatedUser?.id === requiredUser) {
+    await next();
+    return;
+  }
+  ctx.status = 403;
+  return;
+};
+
 passport.use(
   new JwtStrategy(
     {
@@ -27,24 +44,10 @@ passport.use(
       if (!payload || typeof payload !== 'object' || !('sub' in payload)) {
         return done('Invalid token', false);
       }
-      const user = (payload as { sub: number }).sub;
+      const user = { id: (payload as { sub: number }).sub };
       return done(null, user);
     },
   ),
 );
 
-const ensureAuthenticated: Middleware = async (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
-  passport.authenticate('jwt', { session: false })(ctx, next);
-
-const ensureUserFromParams: Middleware = async (ctx: Context, next: () => Promise<unknown>): Promise<unknown> => {
-  const authenticatedUser: number = ctx.state['user'];
-  const requiredUser = Number.parseInt(ctx['params'].userId, 10);
-  if (authenticatedUser === requiredUser) {
-    await next();
-    return;
-  }
-  ctx.status = 403;
-  return;
-};
-
-export { passport, ensureAuthenticated, ensureUserFromParams };
+export { c2cJwtExtractor, passport, ensureAuthenticated, ensureUserFromParamsMatchesAuthUser };
