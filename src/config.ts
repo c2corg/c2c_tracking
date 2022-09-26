@@ -71,13 +71,6 @@ const config = convict({
       default: '',
       env: 'SERVER_BASE_URL',
     },
-    auth: {
-      doc: 'Very basic auth. If enabled, requires value as token query parameter for protected routes',
-      format: String,
-      default: '',
-      nullable: true,
-      env: 'SIMPLE_AUTH',
-    },
   },
   db: {
     host: {
@@ -109,6 +102,16 @@ const config = convict({
       format: String,
       default: 'postgres',
       env: 'DB_PASSWORD',
+      sensitive: true,
+    },
+  },
+  auth: {
+    jwtSecret: {
+      doc: 'JWT auth secret key',
+      format: String,
+      default: '',
+      nullable: false,
+      env: 'JWT_SECRET_KEY',
       sensitive: true,
     },
   },
