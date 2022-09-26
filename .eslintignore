@@ -1,5 +1,6 @@
 dist/
 lib/
+report/
 node_modules/
 *.sh
 .eslintrc.cjs
