@@ -42,7 +42,7 @@ passport.use(
     },
     (payload: unknown, done: VerifiedCallback): void => {
       if (!payload || typeof payload !== 'object' || !('sub' in payload)) {
-        return done('Invalid token', false);
+        return done(null, false);
       }
       const user = { id: (payload as { sub: number }).sub };
       return done(null, user);
