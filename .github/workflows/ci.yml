@@ -38,9 +38,17 @@ jobs:
         run: |
           npm ci
           npm run lint
+          npm run test:ci
           npm run build
         env:
           CI: ${{ true }}
+      - name: Send coverage to codacy
+        # secrets are not available for PR from forks, and dependabot PRs
+        if: ${{ github.event_name != 'pull_request' && github.actor != 'dependabot[bot]' }}
+        uses: codacy/codacy-coverage-reporter-action@v1
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/s3/lcov.info
       - name: Docker meta
         id: docker_meta
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"

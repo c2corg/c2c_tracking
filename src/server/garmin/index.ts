@@ -1,6 +1,6 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParams } from '../../auth';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
 import { validate } from '../validator';
 
 import { controller } from './controller';
@@ -11,7 +11,7 @@ const router = new Router();
 router.get(
   '/request-token/:userId',
   ensureAuthenticated,
-  ensureUserFromParams,
+  ensureUserFromParamsMatchesAuthUser,
   validate(requestToken),
   controller.requestUnauthorizedRequestToken.bind(controller),
 );
@@ -19,7 +19,7 @@ router.get('/exchange-token/:userId', validate(exchangeToken), controller.exchan
 router.post(
   '/deauthorize/:userId',
   ensureAuthenticated,
-  ensureUserFromParams,
+  ensureUserFromParamsMatchesAuthUser,
   validate(deauthorize),
   controller.deauthorize.bind(controller),
 );

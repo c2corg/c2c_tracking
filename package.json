@@ -12,7 +12,11 @@
     "start:dev": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts | pino-pretty -c -t -i req.headers,res.headers\"",
     "build": "tsc",
     "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint --ext .ts,.js src/",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "npm run test:unit",
+    "test:ci": "npm run test:ci:unit",
+    "test:unit": "jest --runInBand",
+    "test:ci:unit": "jest --config jest.config.ci.mjs --runInBand"
   },
   "repository": {
     "type": "git",
@@ -50,9 +54,11 @@
     "validator": "13.7.0"
   },
   "devDependencies": {
+    "@shopify/jest-koa-mocks": "5.0.1",
     "@tsconfig/node18-strictest": "1.0.0",
     "@types/async": "3.2.15",
     "@types/convict": "6.1.1",
+    "@types/jest": "29.0.3",
     "@types/keyv": "3.1.4",
     "@types/koa": "2.13.5",
     "@types/koa__cors": "3.3.0",
@@ -64,6 +70,7 @@
     "@types/node": "18.7.19",
     "@types/passport-jwt": "3.0.6",
     "@types/pg": "8.6.5",
+    "@types/supertest": "2.0.12",
     "@types/validator": "13.7.6",
     "@typescript-eslint/eslint-plugin": "5.38.0",
     "@typescript-eslint/parser": "5.38.0",
@@ -75,10 +82,16 @@
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-security": "1.5.0",
     "husky": "8.0.1",
+    "jest": "29.0.3",
+    "jest-junit": "14.0.1",
     "lint-staged": "13.0.3",
+    "node-mocks-http": "1.11.0",
     "nodemon": "2.0.20",
+    "passport-custom": "1.1.1",
     "pino-pretty": "9.1.0",
     "prettier": "2.7.1",
+    "supertest": "6.2.4",
+    "ts-jest": "29.0.2",
     "ts-node": "10.9.1",
     "typescript": "4.8.3"
   }
