@@ -3,14 +3,15 @@ import type { Context } from 'koa';
 import { AppError } from '../../errors';
 import FitParser from '../../helpers/fit/fit-parser';
 import { userService } from '../../user.service';
-import { stravaService } from '../strava/service';
-import { suuntoService } from '../suunto/service';
+import { stravaService } from '../strava/strava.service';
+import { suuntoService } from '../suunto/suunto.service';
 
-import { activitiesService as service } from './service';
+import { activityService as service } from './activity.service';
 
 class ActivityController {
   async getUserActivities(ctx: Context): Promise<void> {
-    ctx.body = (await userService.getActivities(ctx['params'].userId)).map(({ vendorId, geojson, ...keep }) => keep);
+    const userId: number = Number.parseInt(ctx['params'].userId, 10);
+    ctx.body = (await userService.getActivities(userId)).map(({ vendorId, geojson, ...keep }) => keep);
     ctx.status = 200;
   }
 

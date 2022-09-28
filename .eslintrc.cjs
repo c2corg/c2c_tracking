@@ -1,4 +1,8 @@
 module.exports = {
+  env: {
+    node: true,
+    es2022: true,
+  },
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   extends: [
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
@@ -10,15 +14,10 @@ module.exports = {
     'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
-    ecmaVersion: 2022, // Allows for the parsing of modern ECMAScript features
+    ecmaVersion: 'latest',
     sourceType: 'module', // Allows for the use of imports,
-    project: ['./tsconfig.eslint.json'],
   },
   rules: {
-    '@typescript-eslint/camelcase': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'error',
-    '@typescript-eslint/no-throw-literal': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
     'node/no-extraneous-import': ['error', { allowModules: ['pino'] }],
     'node/no-missing-import': 'off',
     'node/no-unsupported-features/es-syntax': 'off',
@@ -32,12 +31,25 @@ module.exports = {
         },
       },
     ],
+    '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
+    '@typescript-eslint/camelcase': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'error',
   },
   overrides: [
+    {
+      files: ['./**/*.ts]'],
+      rules: {
+        '@typescript-eslint/no-throw-literal': 'error',
+      },
+      parserOptions: {
+        project: ['./tsconfig.eslint.json'],
+      },
+    },
     {
       files: ['test/**/*.ts'],
       rules: {
         'node/no-unpublished-import': 'off',
+        'node/no-extraneous-import': 'off',
       },
     },
   ],

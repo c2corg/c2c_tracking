@@ -3,8 +3,8 @@ import Router from '@koa/router';
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
 import { validate } from '../validator';
 
-import { controller } from './controller';
-import { exchangeToken, webhook, webhookSubscription } from './validators';
+import { controller } from './strava.controller';
+import { exchangeToken, webhook, webhookSubscription } from './strava.validators';
 
 const router = new Router();
 

@@ -1,8 +1,7 @@
-import axios from 'axios';
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './api';
-import { suuntoService as service } from './service';
+import type { WebhookEvent } from './suunto.api';
+import { suuntoService as service } from './suunto.service';
 
 class SuuntoController {
   async exchangeTokens(ctx: Context): Promise<void> {
@@ -36,9 +35,6 @@ class SuuntoController {
       await service.deauthorize(c2cId);
       ctx.status = 200;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw error;
-      }
       ctx.log.info(error);
       ctx.status = 501;
     }

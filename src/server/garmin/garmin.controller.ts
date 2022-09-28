@@ -4,8 +4,8 @@ import type { Context } from 'koa';
 
 import config from '../../config';
 
-import type { GarminActivity } from './api';
-import { garminService as service } from './service';
+import type { GarminActivity } from './garmin.api';
+import { garminService as service } from './garmin.service';
 
 class GarminController {
   private readonly exchangeTokenUrl;
@@ -31,7 +31,7 @@ class GarminController {
     const token = ctx.query['oauth_token'] as string;
     const verifier = ctx.query['oauth_verifier'] as string;
 
-    if (verifier === 'null') {
+    if (verifier.toLocaleLowerCase() === 'null') {
       ctx.log.info(`User ${c2cId} denied Garmin authorization`);
       ctx.redirect(`${service.subscriptionUrl}?error=auth-denied`);
       return;
