@@ -27,8 +27,8 @@ convict.addFormats({
   base64: {
     coerce: (v) => v.toString(),
     validate: (value: string) => {
-      if (!isBase64(value)) {
-        throw new Error('must be a base64 string');
+      if (!value.trim().length || !isBase64(value)) {
+        throw new Error('must be a non-empty base64 string');
       }
     },
   },
@@ -108,7 +108,7 @@ const config = convict({
   auth: {
     jwtSecret: {
       doc: 'JWT auth secret key',
-      format: String,
+      format: 'notEmptyString',
       default: '',
       nullable: false,
       env: 'JWT_SECRET_KEY',

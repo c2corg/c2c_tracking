@@ -1,6 +1,10 @@
 import { database as db } from '../db';
 import { IOError } from '../errors';
 
+type StravaRow = {
+  id: number;
+  subscription_id: number;
+};
 export class StravaRepository {
   readonly #TABLE = 'strava';
 
@@ -10,9 +14,9 @@ export class StravaRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const rows = await conn?.table(this.#TABLE).limit(1);
+      const rows = await conn<StravaRow>(this.#TABLE).limit(1);
 
-      if (!rows) {
+      if (!rows?.[0]) {
         return undefined;
       }
 
@@ -27,7 +31,7 @@ export class StravaRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn?.table(this.#TABLE).insert({ id: 1, subscription_id: subscriptionId }).onConflict('id').merge();
+    await conn<StravaRow>(this.#TABLE).insert({ id: 1, subscription_id: subscriptionId }).onConflict('id').merge();
   }
 }
 

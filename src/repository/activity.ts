@@ -5,7 +5,7 @@ export type Activity = {
   vendor: Vendor;
   vendorId: string;
   date: string; // ISO 8601
-  name: string;
-  type?: string;
+  name?: string;
+  type: string;
   geojson?: GeoJSON.LineString;
 };

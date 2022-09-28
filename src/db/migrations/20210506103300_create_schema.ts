@@ -24,7 +24,7 @@ export function up(db: Knex): Knex.SchemaBuilder {
     })
     .createTable('strava', (table) => {
       table.increments('id').primary();
-      table.integer('subscription_id');
+      table.integer('subscription_id').notNullable();
     });
 }
 

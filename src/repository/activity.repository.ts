@@ -3,6 +3,16 @@ import { IOError, NotFoundError } from '../errors';
 
 import type { Activity, Vendor } from './activity';
 
+type ActivityRow = {
+  id: number;
+  user_id: number;
+  vendor: Vendor;
+  vendor_id: string;
+  date: string;
+  name: string | undefined | null;
+  type: string;
+};
+
 class ActivityRepository {
   readonly #TABLE = 'activities';
 
@@ -12,14 +22,13 @@ class ActivityRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const rows = await conn?.table(this.#TABLE).where({ user_id: userId }).orderBy('date', 'desc');
+      const rows = await conn<ActivityRow>(this.#TABLE).where({ user_id: userId }).orderBy('date', 'desc');
 
       if (!rows) {
         return [];
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return rows.map((row: any) => this.rowToActivity(row));
+      return rows.map((row) => this.rowToActivity(row));
     } catch (err) {
       return [];
     }
@@ -31,9 +40,9 @@ class ActivityRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const rows = await conn?.table(this.#TABLE).where({ user_id: userId, id: activityId });
+      const rows = await conn<ActivityRow>(this.#TABLE).where({ user_id: userId, id: activityId });
 
-      if (!rows) {
+      if (!rows?.[0]) {
         return undefined;
       }
 
@@ -48,7 +57,7 @@ class ActivityRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    const result = await conn.table(this.#TABLE).insert(this.activityToRecord(activity));
+    const result = await conn(this.#TABLE).insert(this.activityToRecord(activity), ['id']);
     return { ...activity, id: result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
@@ -57,13 +66,15 @@ class ActivityRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn.table(this.#TABLE).where({ id: activity.id }).update(this.activityToRecord(activity));
+    await conn(this.#TABLE)
+      .where({ id: activity.id })
+      .update<ActivityRow>({ ...this.activityToRecord(activity), id: activity.id });
     return activity;
   }
 
   async upsert(
     activitiesToUpdate: Activity[],
-    activitiesToInsert: Omit<Activity, 'id' | 'userId'>[],
+    activitiesToInsert: Omit<Activity, 'id'>[],
     activitiesToDelete: Activity[],
   ): Promise<void> {
     const conn = await db.getConnection();
@@ -73,12 +84,12 @@ class ActivityRepository {
     await conn.transaction(async (trx) => {
       if (activitiesToUpdate.length) {
         activitiesToUpdate.forEach(async (activity) => {
-          await trx(this.#TABLE).where({ id: activity.id }).update(this.activityToRecord(activity));
+          await trx<ActivityRow>(this.#TABLE).update(this.activityToRecord(activity)).where({ id: activity.id });
         });
       }
       activitiesToInsert.length && (await trx(this.#TABLE).insert(activitiesToInsert.map(this.activityToRecord)));
       activitiesToDelete.length &&
-        (await trx(this.#TABLE)
+        (await trx<ActivityRow>(this.#TABLE)
           .delete()
           .whereIn(
             'id',
@@ -93,7 +104,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    const result = await conn.from(this.#TABLE).delete().where({ id });
+    const result = await conn<ActivityRow>(this.#TABLE).delete().where({ id });
 
     if (result === 0) {
       throw new NotFoundError('Activity does not exist');
@@ -106,7 +117,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    await conn.from(this.#TABLE).where({ vendor, user_id: c2cId }).delete();
+    await conn<ActivityRow>(this.#TABLE).delete().where({ vendor, user_id: c2cId });
   }
 
   async deleteByVendorId(vendor: Vendor, vendorId: string): Promise<void> {
@@ -115,34 +126,39 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
 
-    const result = await conn.from(this.#TABLE).where({ vendor, vendor_id: vendorId }).delete();
+    const result = await conn<ActivityRow>(this.#TABLE).where({ vendor, vendor_id: vendorId }).delete();
 
     if (result === 0) {
       throw new NotFoundError('Activity does not exist');
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private rowToActivity(row: any): Activity {
+  private rowToActivity(row: ActivityRow): Activity {
     return {
-      id: row.id,
-      userId: row.user_id,
-      vendor: row.vendor,
-      vendorId: row.vendor_id,
-      date: row.date,
-      name: row.name,
-      type: row.type,
+      ...{
+        id: row.id,
+        userId: row.user_id,
+        vendor: row.vendor,
+        vendorId: row.vendor_id,
+        date: row.date,
+        type: row.type,
+      },
+      ...(row.name && {
+        name: row.name,
+      }),
     };
   }
 
-  private activityToRecord = (activity: Partial<Activity>): Record<string, unknown> => ({
-    user_id: activity.userId,
-    vendor: activity.vendor,
-    vendor_id: activity.vendorId,
-    date: activity.date,
-    name: activity.name,
-    type: activity.type,
-  });
+  private activityToRecord(activity: Omit<Activity, 'id'>): Omit<ActivityRow, 'id'> {
+    return {
+      type: activity.type,
+      user_id: activity.userId,
+      vendor: activity.vendor,
+      vendor_id: activity.vendorId,
+      date: activity.date,
+      name: activity.name,
+    };
+  }
 }
 
 export const activityRepository = new ActivityRepository();
