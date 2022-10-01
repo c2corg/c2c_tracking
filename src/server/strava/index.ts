@@ -4,7 +4,7 @@ import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../
 import { validate } from '../validator';
 
 import { controller } from './controller';
-import { deauthorize, exchangeToken, webhook, webhookSubscription } from './validators';
+import { exchangeToken, webhook, webhookSubscription } from './validators';
 
 const router = new Router();
 
@@ -19,7 +19,6 @@ router.post(
   '/deauthorize/:userId',
   ensureAuthenticated,
   ensureUserFromParamsMatchesAuthUser,
-  validate(deauthorize),
   controller.deauthorize.bind(controller),
 );
 router.get('/webhook', validate(webhookSubscription), controller.webhookSubscription.bind(controller));

@@ -1,11 +1,20 @@
-export type Vendor = 'strava' | 'suunto' | 'garmin';
-export type Activity = {
-  id: number;
-  userId: number;
-  vendor: Vendor;
-  vendorId: string;
-  date: string; // ISO 8601
-  name?: string;
-  type: string;
-  geojson?: GeoJSON.LineString;
-};
+import isISO8601 from 'validator/lib/isISO8601';
+import { z } from 'zod';
+
+import { LineString } from './geojson';
+
+export const Vendor = z.enum(['strava', 'suunto', 'garmin']);
+export type Vendor = z.infer<typeof Vendor>;
+
+export const Activity = z.object({
+  id: z.number().int().positive(),
+  userId: z.number().int().positive(),
+  vendor: Vendor,
+  vendorId: z.string().min(1),
+  date: z.string().refine(isISO8601),
+  name: z.string().min(1).optional(),
+  type: z.string().min(1),
+  geojson: LineString.optional(),
+});
+
+export type Activity = z.infer<typeof Activity>;

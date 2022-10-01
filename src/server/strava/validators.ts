@@ -1,40 +1,39 @@
-import joi from 'joi';
+import { z } from 'zod';
 
-import type { Schema } from '../validator';
+import type { ValidationSchema } from '../validator';
 
-const { number, object, string } = joi.types();
-
-export const exchangeToken: Schema = {
-  query: object
-    .keys({
-      code: string.min(10).max(50),
+export const exchangeToken: ValidationSchema = {
+  query: z
+    .object({
+      code: z.string().min(10).max(50),
       // eslint-disable-next-line security/detect-unsafe-regex
-      scope: string.pattern(/(?:[\w:]{1,30},){0,4}(?:[\w:]{1,30})/),
-      state: string.allow(''),
-      error: string,
+      scope: z.string().regex(/(?:[\w:]{1,30},){0,4}(?:[\w:]{1,30})/),
+      state: z.string().max(100),
     })
-    .xor('code', 'error')
-    .with('code', ['scope']),
+    .or(
+      z.object({
+        state: z.string().max(100),
+        error: z.string().min(1).max(100),
+      }),
+    ),
 };
 
-export const webhookSubscription: Schema = {
-  query: object.keys({
-    'hub.mode': string.required().equal('subscribe'),
-    'hub.challenge': string.required(),
-    'hub.verify_token': string.required(),
+export const webhookSubscription: ValidationSchema = {
+  query: z.object({
+    'hub.mode': z.literal('subscribe'),
+    'hub.challenge': z.string().min(1).max(255),
+    'hub.verify_token': z.string().min(1).max(255),
   }),
 };
 
-export const webhook: Schema = {
-  body: object.keys({
-    object_type: string.required().equal('activity', 'athlete'),
-    object_id: number.required(),
-    aspect_type: string.equal('create', 'update', 'delete'),
-    updates: object.pattern(string, string),
-    owner_id: number.required(),
-    subscription_id: number.required(),
-    event_time: number.required(),
+export const webhook: ValidationSchema = {
+  body: z.object({
+    object_type: z.enum(['activity', 'athlete']),
+    object_id: z.number().int().positive(),
+    aspect_type: z.enum(['create', 'update', 'delete']),
+    updates: z.record(z.string()).optional(),
+    owner_id: z.number().int().positive(),
+    subscription_id: z.number().int().positive(),
+    event_time: z.number().int().positive(),
   }),
 };
-
-export const deauthorize: Schema = {};

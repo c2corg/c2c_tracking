@@ -3,10 +3,11 @@ import dayjs from 'dayjs';
 import { AppError } from '../../errors';
 import type { FitObj } from '../../helpers/fit/fit-parser';
 import type { Activity } from '../../repository/activity';
+import type { LineString } from '../../repository/geojson';
 import type { AltitudeStream, DistanceStream, LatLngStream, StreamSet, TimeStream } from '../strava/api';
 
 export class ActivitiesService {
-  suuntoFitToGeoJSON(fit: FitObj): GeoJSON.LineString {
+  suuntoFitToGeoJSON(fit: FitObj): LineString {
     if (!fit.activity?.['records']) {
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
     }
@@ -41,7 +42,7 @@ export class ActivitiesService {
     };
   }
 
-  stravaStreamSetToGeoJSON(activity: Activity, stream: StreamSet): GeoJSON.LineString {
+  stravaStreamSetToGeoJSON(activity: Activity, stream: StreamSet): LineString {
     const distanceStream: DistanceStream | undefined = stream.find(ActivitiesService.isDistanceStream);
     const timeStream: TimeStream | undefined = stream.find(ActivitiesService.isTimeStream);
     const latlngStream: LatLngStream | undefined = stream.find(ActivitiesService.isLatLngStream);

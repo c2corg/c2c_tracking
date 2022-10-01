@@ -2,125 +2,132 @@ import { createHmac, randomBytes } from 'crypto';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
+import { z } from 'zod';
 
 import config from '../../config';
 import { AppError } from '../../errors';
 
-export type GarminAuth = {
-  token: string;
-  tokenSecret: string;
-};
+export const GarminAuth = z.object({
+  token: z.string().min(10).max(5000),
+  tokenSecret: z.string().min(10).max(5000),
+});
+export type GarminAuth = z.infer<typeof GarminAuth>;
 
-export type GarminActivityType =
-  | 'RUNNING'
-  | 'INDOOR RUNNING'
-  | 'OBSTACLE RUNNING'
-  | 'STREET RUNNING'
-  | 'TRACK RUNNING'
-  | 'TRAIL RUNNING'
-  | 'TREADMILL RUNNING'
-  | 'ULTRA RUNNING'
-  | 'VIRTUAL RUNNING'
-  | 'CYCLING'
-  | 'BMX'
-  | 'CYCLOCROSS'
-  | 'DOWNHILL BIKING'
-  | 'GRAVEL/UNPAVED CYCLING'
-  | 'INDOOR CYCLING'
-  | 'MOUNTAIN BIKING'
-  | 'RECUMBENT CYCLING'
-  | 'ROAD CYCLING'
-  | 'TRACK CYCLING'
-  | 'VIRTUAL CYCLING'
-  | 'GYM & FITNESS EQUIPMENT'
-  | 'BOULDERING'
-  | 'ELLIPTICAL'
-  | 'CARDIO'
-  | 'INDOOR CLIMBING'
-  | 'INDOOR ROWING'
-  | 'PILATES'
-  | 'STAIR STEPPER'
-  | 'STRENGTH TRAINING'
-  | 'YOGA'
-  | 'HIKING'
-  | 'SWIMMING'
-  | 'POOL SWIMMING'
-  | 'OPEN WATER SWIMMING'
-  | 'WALKING/INDOOR WALKING'
-  | 'CASUAL WALKING'
-  | 'SPEED WALKING'
-  | 'TRANSITION'
-  | 'BIKE TO RUN TRANSITION'
-  | 'RUN TO BIKE TRANSITION'
-  | 'SWIM TO BIKE TRANSITION'
-  | 'MOTORCYCLING'
-  | 'ATV'
-  | 'MOTOCROSS'
-  | 'OTHER'
-  | 'AUTO RACING'
-  | 'BOATING'
-  | 'BREATHWORK'
-  | 'DRIVING'
-  | 'E_SPORT'
-  | 'FLOOR CLIMBING'
-  | 'FLYING'
-  | 'GOLF'
-  | 'HANG GLIDING'
-  | 'HORSEBACK RIDING'
-  | 'HUNTING/FISHING'
-  | 'HUNTING'
-  | 'FISHING'
-  | 'INLINE SKATING'
-  | 'MOUNTAINEERING'
-  | 'OFFSHORE GRINDING'
-  | 'ONSHORE GRINDING'
-  | 'PADDLING'
-  | 'RC/DRONE'
-  | 'ROCK CLIMBING'
-  | 'ROWING'
-  | 'SAILING'
-  | 'SKY DIVING'
-  | 'STAND UP PADDLEBOARDING'
-  | 'STOPWATCH'
-  | 'SURFING'
-  | 'TENNIS'
-  | 'WAKEBOARDING'
-  | 'WHITEWATER KAYAKING/RAFTING'
-  | 'WIND/KITE SURFING'
-  | 'WINGSUIT FLYING'
-  | 'DIVING'
-  | 'APNEA'
-  | 'APNEA HUNT'
-  | 'CCR DIVE'
-  | 'GAUGE DIVE'
-  | 'MULTI-GAS DIVE'
-  | 'SINGLE-GAS DIVE'
-  | 'WINTER SPORTS'
-  | 'BACKCOUNTRY SKIING/SNOWBOARDING'
-  | 'CROSS COUNTRY CLASSIC SKIING'
-  | 'RESORT SKIING/SNOWBOARDING'
-  | 'CROSS COUNTRY SKATE SKIING'
-  | 'SKATING'
-  | 'SNOWSHOEING'
-  | 'SNOWMOBILING';
+export const GarminActivityType = z.enum([
+  'RUNNING',
+  'INDOOR RUNNING',
+  'OBSTACLE RUNNING',
+  'STREET RUNNING',
+  'TRACK RUNNING',
+  'TRAIL RUNNING',
+  'TREADMILL RUNNING',
+  'ULTRA RUNNING',
+  'VIRTUAL RUNNING',
+  'CYCLING',
+  'BMX',
+  'CYCLOCROSS',
+  'DOWNHILL BIKING',
+  'GRAVEL/UNPAVED CYCLING',
+  'INDOOR CYCLING',
+  'MOUNTAIN BIKING',
+  'RECUMBENT CYCLING',
+  'ROAD CYCLING',
+  'TRACK CYCLING',
+  'VIRTUAL CYCLING',
+  'GYM & FITNESS EQUIPMENT',
+  'BOULDERING',
+  'ELLIPTICAL',
+  'CARDIO',
+  'INDOOR CLIMBING',
+  'INDOOR ROWING',
+  'PILATES',
+  'STAIR STEPPER',
+  'STRENGTH TRAINING',
+  'YOGA',
+  'HIKING',
+  'SWIMMING',
+  'POOL SWIMMING',
+  'OPEN WATER SWIMMING',
+  'WALKING/INDOOR WALKING',
+  'CASUAL WALKING',
+  'SPEED WALKING',
+  'TRANSITION',
+  'BIKE TO RUN TRANSITION',
+  'RUN TO BIKE TRANSITION',
+  'SWIM TO BIKE TRANSITION',
+  'MOTORCYCLING',
+  'ATV',
+  'MOTOCROSS',
+  'OTHER',
+  'AUTO RACING',
+  'BOATING',
+  'BREATHWORK',
+  'DRIVING',
+  'E_SPORT',
+  'FLOOR CLIMBING',
+  'FLYING',
+  'GOLF',
+  'HANG GLIDING',
+  'HORSEBACK RIDING',
+  'HUNTING/FISHING',
+  'HUNTING',
+  'FISHING',
+  'INLINE SKATING',
+  'MOUNTAINEERING',
+  'OFFSHORE GRINDING',
+  'ONSHORE GRINDING',
+  'PADDLING',
+  'RC/DRONE',
+  'ROCK CLIMBING',
+  'ROWING',
+  'SAILING',
+  'SKY DIVING',
+  'STAND UP PADDLEBOARDING',
+  'STOPWATCH',
+  'SURFING',
+  'TENNIS',
+  'WAKEBOARDING',
+  'WHITEWATER KAYAKING/RAFTING',
+  'WIND/KITE SURFING',
+  'WINGSUIT FLYING',
+  'DIVING',
+  'APNEA',
+  'APNEA HUNT',
+  'CCR DIVE',
+  'GAUGE DIVE',
+  'MULTI-GAS DIVE',
+  'SINGLE-GAS DIVE',
+  'WINTER SPORTS',
+  'BACKCOUNTRY SKIING/SNOWBOARDING',
+  'CROSS COUNTRY CLASSIC SKIING',
+  'RESORT SKIING/SNOWBOARDING',
+  'CROSS COUNTRY SKATE SKIING',
+  'SKATING',
+  'SNOWSHOEING',
+  'SNOWMOBILING',
+]);
+export type GarminActivityType = z.infer<typeof GarminActivityType>;
 
-export type GarminActivitySummary = {
-  activityType: GarminActivityType;
-  startTimeInSeconds: number;
-};
+export const GarminActivitySummary = z.object({
+  activityType: GarminActivityType,
+  startTimeInSeconds: z.number().int().positive(),
+});
+export type GarminActivitySummary = z.infer<typeof GarminActivitySummary>;
 
-export type GarminSample = {
-  startTimeInSeconds?: number;
-  latitudeInDegree?: number;
-  longitudeInDegree?: number;
-  elevationInMeters?: number;
-};
+export const GarminSample = z.object({
+  startTimeInSeconds: z.number().int().positive().optional(),
+  latitudeInDegree: z.number().optional(),
+  longitudeInDegree: z.number().optional(),
+  elevationInMeters: z.number().optional(),
+});
+export type GarminSample = z.infer<typeof GarminSample>;
 
-export type GarminActivity = {
-  activityId: number;
-  summary: GarminActivitySummary;
-  samples?: GarminSample[];
-};
+export const GarminActivity = z.object({
+  activityId: z.number().int().positive(),
+  summary: GarminActivitySummary,
+  samples: z.array(GarminSample),
+});
+export type GarminActivity = z.infer<typeof GarminActivity>;
 
 export class GarminApi {
   private readonly oauthUrl = 'https://connectapi.garmin.com/oauth-service/';

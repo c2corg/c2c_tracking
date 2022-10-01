@@ -1,23 +1,26 @@
 import axios from 'axios';
+import { z } from 'zod';
 
 import config from '../../config';
 import { handleAppError } from '../../helpers/error';
 import log from '../../helpers/logger';
 
-export type SuuntoAuth = {
-  access_token: string;
-  token_type: 'bearer';
-  refresh_token: string;
-  expires_in: number;
-  user: string;
+export const SuuntoAuth = z.object({
+  access_token: z.string().min(10).max(5000),
+  token_type: z.literal('bearer'),
+  refresh_token: z.string().min(10).max(5000),
+  expires_in: z.number().int().positive(),
+  user: z.string().min(1).max(255),
   // scope: 'workout';
   // ukv: string;
   // uk: string;
   // user: string;
   // jti: string;
-};
+});
+export type SuuntoAuth = z.infer<typeof SuuntoAuth>;
 
-export type SuuntoRefreshAuth = Omit<SuuntoAuth, 'user'>;
+export const SuuntoRefreshAuth = SuuntoAuth.omit({ user: true });
+export type SuuntoRefreshAuth = z.infer<typeof SuuntoRefreshAuth>;
 
 export const workoutTypes = [
   'Walking', // 0
@@ -121,43 +124,49 @@ export const workoutTypes = [
   'Transition', // 98
 ];
 
-export type Position = {
-  x: number;
-  y: number;
-};
+export const Position = z.object({
+  x: z.number(),
+  y: z.number(),
+});
+export type Position = z.infer<typeof Position>;
 
-export type Workout = {
-  workoutId: number;
-  workoutKey: string; // Workout unique id
-  workoutName: string;
-  activityId: number; // Activity/workout type id. Activity mapping can be found in the FIT file activity id's document (check Suunto App column).
-  description: string;
-  startTime: number; // e.g. 1625986322376 unix epoch with milliseconds
-  totalTime: number; // e.g. 6452.1
-  timeOffsetInMinutes: number; // Timezone offset in minutes. 0 for UTC.
-};
+export const Workout = z.object({
+  workoutId: z.number().int().positive(),
+  workoutKey: z.string().min(1).max(255), // Workout unique id
+  workoutName: z.string().min(1).max(255),
+  activityId: z.number().int().positive(), // Activity/workout type id. Activity mapping can be found in the FIT file activity id's document (check Suunto App column).
+  description: z.string().max(5000),
+  startTime: z.number().int().positive(), // e.g. 1625986322376 unix epoch with milliseconds
+  totalTime: z.number().positive(), // e.g. 6452.1
+  timeOffsetInMinutes: z.number().int(), // Timezone offset in minutes. 0 for UTC.
+});
+export type Workout = z.infer<typeof Workout>;
 
-export type Error = {
-  code: string;
-  description: string;
-};
+export const Error = z.object({
+  code: z.string().min(1).max(100),
+  description: z.string().max(1000),
+});
+export type Error = z.infer<typeof Error>;
 
-export type Workouts = {
-  error?: Error | null;
-  metadata: { [key: string]: string };
-  payload: Workout[];
-};
+export const Workouts = z.object({
+  error: Error.nullish(),
+  metadata: z.record(z.string()),
+  payload: z.array(Workout),
+});
+export type Workouts = z.infer<typeof Workouts>;
 
-export type WorkoutSummary = {
-  error?: Error | null;
-  metadata: { [key: string]: string };
-  payload: Workout;
-};
+export const WorkoutSummary = z.object({
+  error: Error.nullish(),
+  metadata: z.record(z.string()),
+  payload: Workout,
+});
+export type WorkoutSummary = z.infer<typeof WorkoutSummary>;
 
-export type WebhookEvent = {
-  username: string;
-  workoutid: string;
-};
+export const WebhookEvent = z.object({
+  username: z.string().min(1).max(255),
+  workoutid: z.string().min(1).max(255),
+});
+export type WebhookEvent = z.infer<typeof WebhookEvent>;
 
 export class SuuntoApi {
   private readonly oauthBaseUrl = 'https://cloudapi-oauth.suunto.com/';

@@ -7,6 +7,7 @@ import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
+import type { LineString } from '../../repository/geojson';
 import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
@@ -96,7 +97,7 @@ export class StravaService {
     return undefined;
   }
 
-  async getActivityLine(token: string, id: string): Promise<GeoJSON.LineString> {
+  async getActivityLine(token: string, id: string): Promise<LineString> {
     const { map } = await stravaApi.getActivity(token, id);
     return toGeoJSON(map.polyline || map.summary_polyline);
   }
