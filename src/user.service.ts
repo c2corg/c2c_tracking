@@ -217,11 +217,9 @@ export class UserService {
     if (savedActivity) {
       await activityRepository.update({
         ...savedActivity,
-        ...{
-          date: activity.date,
-          name: activity.name,
-        },
-        ...(activity.type && { type: activity.type }),
+        date: activity.date,
+        type: activity.type,
+        ...(activity.name && { name: activity.name }),
       });
     }
   }
