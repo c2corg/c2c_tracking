@@ -155,7 +155,7 @@ export class StravaApi {
 
   async exchangeToken(code: string): Promise<StravaAuth> {
     try {
-      const response = await axios.post<StravaAuth>(`${this.baseUrl}oauth/token`, null, {
+      const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -163,7 +163,7 @@ export class StravaApi {
           grant_type: 'authorization_code',
         },
       });
-      return response.data;
+      return StravaAuth.parse(response.data);
     } catch (error: unknown) {
       throw handleAppError(502, 'Error on Strava token exchange request', error);
     }
@@ -179,7 +179,7 @@ export class StravaApi {
 
   async refreshAuth(token: string): Promise<StravaRefreshAuth> {
     try {
-      const response = await axios.post<StravaRefreshAuth>(`${this.baseUrl}oauth/token`, null, {
+      const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -187,7 +187,7 @@ export class StravaApi {
           grant_type: 'refresh_token',
         },
       });
-      return response.data;
+      return StravaRefreshAuth.parse(response.data);
     } catch (error: unknown) {
       throw handleAppError(502, 'Error on Strava refresh token request', error);
     }
@@ -195,10 +195,10 @@ export class StravaApi {
 
   async getAthleteActivities(token: string): Promise<Activity[]> {
     try {
-      const response = await axios.get<Activity[]>(`${this.baseUrl}athlete/activities`, {
+      const response = await axios.get(`${this.baseUrl}athlete/activities`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
+      return z.array(Activity).parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getAthleteActivities request', error);
     }
@@ -206,10 +206,10 @@ export class StravaApi {
 
   async getActivity(token: string, id: string): Promise<Activity> {
     try {
-      const response = await axios.get<Activity>(`${this.baseUrl}activities/${id}`, {
+      const response = await axios.get(`${this.baseUrl}activities/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
+      return Activity.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getActivity request', error);
     }
@@ -217,13 +217,13 @@ export class StravaApi {
 
   async getActivityStream(token: string, id: string): Promise<StreamSet> {
     try {
-      const response = await axios.get<StreamSet>(
+      const response = await axios.get(
         `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      return response.data;
+      return StreamSet.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getActivityStream request', error);
     }
@@ -236,10 +236,10 @@ export class StravaApi {
       formData.append('client_secret', this.#clientSecret);
       formData.append('callback_url', callbackUrl);
       formData.append('verify_token', verifyToken);
-      const response = await axios.post<Subscription>(`${this.baseUrl}push_subscriptions`, formData, {
+      const response = await axios.post(`${this.baseUrl}push_subscriptions`, formData, {
         headers: formData.getHeaders(),
       });
-      return response.data;
+      return Subscription.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
     }
@@ -247,10 +247,10 @@ export class StravaApi {
 
   async getSubscriptions(): Promise<Subscription[]> {
     try {
-      const response = await axios.get<Subscription[]>(`${this.baseUrl}push_subscriptions`, {
+      const response = await axios.get(`${this.baseUrl}push_subscriptions`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
-      return response.data;
+      return z.array(Subscription).parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getSubscriptions request', error);
     }

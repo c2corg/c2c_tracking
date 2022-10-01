@@ -6,9 +6,9 @@ import { FieldValidationError } from '../errors';
 import log from '../helpers/logger';
 
 export type ValidationSchema = {
-  query?: Schema;
-  body?: Schema;
-  headers?: Schema;
+  query?: Schema<object>;
+  body?: Schema<object> | Schema<Array<object>>;
+  headers?: Schema<object>;
 };
 
 function validateObject(object: unknown = {}, label: string, schema: Schema | undefined): void {

@@ -183,7 +183,7 @@ export class SuuntoApi {
 
   async exchangeToken(code: string): Promise<SuuntoAuth> {
     try {
-      const response = await axios.post<SuuntoAuth>(`${this.oauthBaseUrl}oauth/token`, null, {
+      const response = await axios.post(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {
           code,
           grant_type: 'authorization_code',
@@ -194,7 +194,7 @@ export class SuuntoApi {
           password: this.#clientSecret,
         },
       });
-      return response.data;
+      return SuuntoAuth.parse(response.data);
     } catch (error) {
       log.error(error);
       throw handleAppError(502, 'Error on Suunto token exchange request', error);
@@ -203,7 +203,7 @@ export class SuuntoApi {
 
   async refreshAuth(token: string): Promise<SuuntoRefreshAuth> {
     try {
-      const response = await axios.post<SuuntoRefreshAuth>(`${this.oauthBaseUrl}oauth/token`, null, {
+      const response = await axios.post(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {
           refresh_token: token,
           grant_type: 'refresh_token',
@@ -213,7 +213,7 @@ export class SuuntoApi {
           password: this.#clientSecret,
         },
       });
-      return response.data;
+      return SuuntoRefreshAuth.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Suunto refresh token request', error);
     }
@@ -221,10 +221,10 @@ export class SuuntoApi {
 
   async getWorkouts(token: string, subscriptionKey: string): Promise<Workouts> {
     try {
-      const response = await axios.get<Workouts>(`${this.baseUrl}workouts?limit=30`, {
+      const response = await axios.get(`${this.baseUrl}workouts?limit=30`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
-      return response.data;
+      return Workouts.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getWorkouts request', error);
     }
@@ -233,10 +233,10 @@ export class SuuntoApi {
   // id is workout key
   async getWorkoutDetails(id: string, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
     try {
-      const response = await axios.get<WorkoutSummary>(`${this.baseUrl}workouts/${id}`, {
+      const response = await axios.get(`${this.baseUrl}workouts/${id}`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
-      return response.data;
+      return WorkoutSummary.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getWorkoutDetails request', error);
     }
@@ -245,11 +245,11 @@ export class SuuntoApi {
   // Id is workout id or key
   async getFIT(id: string, token: string, subscriptionKey: string): Promise<Uint8Array> {
     try {
-      const response = await axios.get<Uint8Array>(`${this.baseUrl}workout/exportFit/${id}`, {
+      const response = await axios.get(`${this.baseUrl}workout/exportFit/${id}`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
-      return response.data;
+      return z.instanceof(Uint8Array).parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getActivity request', error);
     }

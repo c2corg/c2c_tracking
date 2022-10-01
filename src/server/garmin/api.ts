@@ -147,13 +147,15 @@ export class GarminApi {
     const authorization = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${
       this.#consumerKey
     }", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
-    const response = await axios.post<string>(`${this.oauthUrl}oauth/request_token`, null, {
+    const response = await axios.post(`${this.oauthUrl}oauth/request_token`, null, {
       headers: {
         Authorization: authorization,
       },
       responseType: 'text',
     });
-    const [_oauth_token, token, _oauth_token_secret, tokenSecret] = response.data
+    const [_oauth_token, token, _oauth_token_secret, tokenSecret] = z
+      .string()
+      .parse(response.data)
       .split('&')
       .flatMap((substring) => substring.split('='));
     if (!token || !tokenSecret) {
@@ -178,7 +180,7 @@ export class GarminApi {
     const signature = encodeURIComponent(
       this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
     );
-    const response = await axios.post<string>(`${this.oauthUrl}oauth/access_token`, null, {
+    const response = await axios.post(`${this.oauthUrl}oauth/access_token`, null, {
       headers: {
         Authorization: `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${
           this.#consumerKey
@@ -186,7 +188,9 @@ export class GarminApi {
       },
       responseType: 'text',
     });
-    const [_oauth_token, token, _oauth_token_secret, tokenSecret] = response.data
+    const [_oauth_token, token, _oauth_token_secret, tokenSecret] = z
+      .string()
+      .parse(response.data)
       .split('&')
       .flatMap((substring) => substring.split('='));
     if (!requestToken || !tokenSecret) {
@@ -215,13 +219,10 @@ export class GarminApi {
     const url = `${this.apiUrl}wellness-api/rest/activityDetails`;
     const end = dayjs(date).endOf('day').unix();
     const start = dayjs(date).startOf('day').unix();
-    const response = await axios.get<GarminActivity[]>(
-      `${url}?uploadStartTimeInSeconds=${start}&uploadEndTimeInSeconds=${end}`,
-      {
-        headers: { Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, start, end) },
-      },
-    );
-    return response.data;
+    const response = await axios.get(`${url}?uploadStartTimeInSeconds=${start}&uploadEndTimeInSeconds=${end}`, {
+      headers: { Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, start, end) },
+    });
+    return z.array(GarminActivity).parse(response.data);
   }
 
   async deauthorize(token: string, tokenSecret: string): Promise<void> {
