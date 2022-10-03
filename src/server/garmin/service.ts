@@ -5,6 +5,7 @@ import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
+import type { LineString } from '../../repository/geojson';
 import type { GarminInfo } from '../../repository/user';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
@@ -81,7 +82,7 @@ export class GarminService {
     settled: PromiseSettledResult<GarminActivity[]>,
   ): settled is PromiseFulfilledResult<GarminActivity[]> => settled.status === 'fulfilled';
 
-  private toGeoJSON(samples?: GarminSample[]): GeoJSON.LineString | undefined {
+  private toGeoJSON(samples?: GarminSample[]): LineString | undefined {
     if (!samples?.length) {
       return undefined;
     }

@@ -1,42 +1,34 @@
-import joi from 'joi';
+import { z } from 'zod';
 
-import type { Schema } from '../validator';
+import type { ValidationSchema } from '../validator';
 
-const { array, number, object, string } = joi.types();
-
-export const requestToken: Schema = {};
-
-export const exchangeToken: Schema = {
-  query: object
-    .keys({
-      oauth_token: string.min(10).max(50),
-      oauth_verifier: string.min(4).max(50),
+export const exchangeToken: ValidationSchema = {
+  query: z
+    .object({
+      oauth_token: z.string().min(10).max(50),
+      oauth_verifier: z.string().min(4).max(50),
     })
     .required(),
 };
 
-export const deauthorize: Schema = {};
-
-export const activityWebhook: Schema = {
-  body: object
-    .keys({
-      activityDetails: array.items(
-        object.keys({
-          userId: string.required(),
-          userAccessToken: string.required(),
-          activityId: number.required(),
-          summary: object
-            .keys({
-              activityType: string.required(),
-              startTimeInSeconds: number.positive().required(),
-            })
-            .required(),
-          samples: array.items(
-            object.keys({
-              startTimeInSeconds: number.min(0),
-              latitudeInDegree: number,
-              longitudeInDegree: number,
-              elevationInMeters: number.min(0),
+export const activityWebhook: ValidationSchema = {
+  body: z
+    .object({
+      activityDetails: z.array(
+        z.object({
+          userId: z.string(),
+          userAccessToken: z.string(),
+          activityId: z.number().int().positive(),
+          summary: z.object({
+            activityType: z.string().min(1).max(50),
+            startTimeInSeconds: z.number().int().positive(),
+          }),
+          samples: z.array(
+            z.object({
+              startTimeInSeconds: z.number().int().positive().optional(),
+              latitudeInDegree: z.number().optional(),
+              longitudeInDegree: z.number().optional(),
+              elevationInMeters: z.number().optional(),
             }),
           ),
         }),
@@ -45,15 +37,15 @@ export const activityWebhook: Schema = {
     .required(),
 };
 
-export const deauthorizeWebhook: Schema = {
-  body: object.keys({
-    deregistrations: array
-      .items(
-        object.keys({
-          userId: string.required(),
-          userAccessToken: string.required(),
+export const deauthorizeWebhook: ValidationSchema = {
+  body: z
+    .object({
+      deregistrations: z.array(
+        z.object({
+          userId: z.string().min(1).max(50),
+          userAccessToken: z.string().min(10).max(5000),
         }),
-      )
-      .required(),
-  }),
+      ),
+    })
+    .required(),
 };

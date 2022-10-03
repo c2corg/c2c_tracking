@@ -1,29 +1,21 @@
-import joi from 'joi';
+import { z } from 'zod';
 
-import type { Schema } from '../validator';
+import type { ValidationSchema } from '../validator';
 
-const { object, string } = joi.types();
-
-export const exchangeToken: Schema = {
-  query: object
-    .keys({
-      code: string.min(5).max(50),
-      error: string,
-      error_desscription: string,
+export const exchangeToken: ValidationSchema = {
+  query: z
+    .object({
+      code: z.string().min(5).max(50),
     })
-    .xor('code', 'error')
-    .without('code', ['error_description'])
-    .with('error', 'error_description'),
+    .or(z.object({ error: z.string().min(1).max(50), error_desscription: z.string().min(1).max(255) })),
 };
 
-export const webhook: Schema = {
-  body: object.keys({
-    username: string.required().min(1).max(50),
-    workoutid: string.required().min(1).max(50),
+export const webhook: ValidationSchema = {
+  body: z.object({
+    username: z.string().min(1).max(50),
+    workoutid: z.string().min(1).max(50),
   }),
-  headers: object.keys({
-    authorization: string.required(),
+  headers: z.object({
+    authorization: z.string(),
   }),
 };
-
-export const deauthorize: Schema = {};

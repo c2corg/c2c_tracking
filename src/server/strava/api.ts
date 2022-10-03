@@ -1,129 +1,147 @@
 import axios from 'axios';
 import FormData from 'form-data';
+import isISO8601 from 'validator/lib/isISO8601';
+import { z } from 'zod';
 
 import config from '../../config';
 import { handleAppError } from '../../helpers/error';
 
-export type Athlete = {
-  id: number;
-};
+export const Athlete = z.object({
+  id: z.number().int().positive(),
+});
+export type Athlete = z.infer<typeof Athlete>;
 
-export type StravaAuth = {
-  access_token: string;
-  refresh_token: string;
-  expires_at: number;
-  expires_in: number;
-  athlete: Athlete;
-};
+export const StravaAuth = z.object({
+  access_token: z.string().min(10).max(5000),
+  refresh_token: z.string().min(10).max(5000),
+  expires_at: z.number().int().positive(),
+  expires_in: z.number().int().positive(),
+  athlete: Athlete,
+});
+export type StravaAuth = z.infer<typeof StravaAuth>;
 
-export type StravaRefreshAuth = Omit<StravaAuth, 'athlete'>;
+export const StravaRefreshAuth = StravaAuth.omit({ athlete: true });
+export type StravaRefreshAuth = z.infer<typeof StravaRefreshAuth>;
 
-export type ActivityType =
-  | 'AlpineSki'
-  | 'BackcountrySki'
-  | 'Canoeing'
-  | 'Crossfit'
-  | 'EBikeRide'
-  | 'Elliptical'
-  | 'Golf'
-  | 'Handcycle'
-  | 'Hike'
-  | 'IceSkate'
-  | 'InlineSkate'
-  | 'Kayaking'
-  | 'Kitesurf'
-  | 'NordicSki'
-  | 'Ride'
-  | 'RockClimbing'
-  | 'RollerSki'
-  | 'Rowing'
-  | 'Run'
-  | 'Sail'
-  | 'Skateboard'
-  | 'Snowboard'
-  | 'Snowshoe'
-  | 'Soccer'
-  | 'StairStepper'
-  | 'StandUpPaddling'
-  | 'Surfing'
-  | 'Swim'
-  | 'Velomobile'
-  | 'VirtualRide'
-  | 'VirtualRun'
-  | 'Walk'
-  | 'WeightTraining'
-  | 'Wheelchair'
-  | 'Windsurf'
-  | 'Workout'
-  | 'Yoga';
+export const ActivityType = z.enum([
+  'AlpineSki',
+  'BackcountrySki',
+  'Canoeing',
+  'Crossfit',
+  'EBikeRide',
+  'Elliptical',
+  'Golf',
+  'Handcycle',
+  'Hike',
+  'IceSkate',
+  'InlineSkate',
+  'Kayaking',
+  'Kitesurf',
+  'NordicSki',
+  'Ride',
+  'RockClimbing',
+  'RollerSki',
+  'Rowing',
+  'Run',
+  'Sail',
+  'Skateboard',
+  'Snowboard',
+  'Snowshoe',
+  'Soccer',
+  'StairStepper',
+  'StandUpPaddling',
+  'Surfing',
+  'Swim',
+  'Velomobile',
+  'VirtualRide',
+  'VirtualRun',
+  'Walk',
+  'WeightTraining',
+  'Wheelchair',
+  'Windsurf',
+  'Workout',
+  'Yoga',
+]);
+export type ActivityType = z.infer<typeof ActivityType>;
 
-export type PolylineMap = {
-  polyline?: string;
-  summary_polyline: string;
-};
+export const PolylineMap = z.object({
+  polyline: z.string().min(1).optional(),
+  summary_polyline: z.string().min(1),
+});
+export type PolylineMap = z.infer<typeof PolylineMap>;
 
-export type Activity = {
-  id: number;
-  name: string;
-  type: ActivityType;
-  start_date: string; // ISO 8601 format
-  timezone: string;
-  start_latlng: number[];
-  map: PolylineMap;
-};
+export const Activity = z.object({
+  id: z.number().int().positive(),
+  name: z.string(),
+  type: ActivityType,
+  start_date: z.string().refine(isISO8601),
+  timezone: z.string().min(1).max(50),
+  start_latlng: z.array(z.number()),
+  map: PolylineMap,
+});
+export type Activity = z.infer<typeof Activity>;
 
-type ActivityStream = {
-  type: string;
-  original_size: number;
-  series_type: 'distance' | 'time';
-  resolution: 'low' | 'medium' | 'high';
-};
+const ActivityStream = z.object({
+  type: z.string(),
+  original_size: z.number().int().positive(),
+  series_type: z.enum(['distance', 'time']),
+  resolution: z.enum(['low', 'medium', 'high']),
+});
+type ActivityStream = z.infer<typeof ActivityStream>;
 
-export type DistanceStream = ActivityStream & {
-  type: 'distance';
-  data: number[];
-};
+export const DistanceStream = ActivityStream.extend({
+  type: z.literal('distance'),
+  data: z.array(z.number()),
+});
+export type DistanceStream = z.infer<typeof DistanceStream>;
 
-export type TimeStream = ActivityStream & {
-  type: 'time';
-  data: number[];
-};
+export const TimeStream = ActivityStream.extend({
+  type: z.literal('time'),
+  data: z.array(z.number().int()),
+});
+export type TimeStream = z.infer<typeof TimeStream>;
 
-export type LatLngStream = ActivityStream & {
-  type: 'latlng';
-  data: number[][];
-};
+export const LatLngStream = ActivityStream.extend({
+  type: z.literal('latlng'),
+  data: z.array(z.array(z.number())),
+});
+export type LatLngStream = z.infer<typeof LatLngStream>;
 
-export type AltitudeStream = ActivityStream & {
-  type: 'altitude';
-  data: number[];
-};
+export const AltitudeStream = ActivityStream.extend({
+  type: z.literal('altitude'),
+  data: z.array(z.number()),
+});
+export type AltitudeStream = z.infer<typeof AltitudeStream>;
 
-export type StreamSet = (DistanceStream | TimeStream | LatLngStream | AltitudeStream)[];
+export const StreamSet = z.array(DistanceStream.or(TimeStream).or(LatLngStream).or(AltitudeStream));
+export type StreamSet = z.infer<typeof StreamSet>;
 
-export type Subscription = {
-  id: number;
-  application_id: number;
-  callback_url: string;
-  created_at: string;
-  updated_at: string;
-};
+export const Subscription = z.object({
+  id: z.number().int().positive(),
+  application_id: z.number().int().positive(),
+  callback_url: z.string().url(),
+  created_at: z.string().refine(isISO8601),
+  updated_at: z.string().refine(isISO8601),
+});
+export type Subscription = z.infer<typeof Subscription>;
 
-export type WebhookSubscription = {
-  'hub.mode': 'subscribe';
-  'hub.challenge': string;
-  'hub.verify_token': string;
-};
+export const WebhookSubscription = z.object({
+  'hub.mode': z.literal('subscribe'),
+  'hub.challenge': z.string().min(1).max(255),
+  'hub.verify_token': z.string().min(1).max(255),
+});
+export type WebhookSubscription = z.infer<typeof WebhookSubscription>;
 
-export type WebhookEvent = {
-  object_type: 'activity' | 'athlete';
-  object_id: number;
-  aspect_type: 'create' | 'update' | 'delete';
-  updates?: Record<string, string>;
-  owner_id: number;
-  subscription_id: number;
-  event_time: number;
-};
+export const WebhookEvent = z.object({
+  object_type: z.enum(['activity', 'athlete']),
+  object_id: z.number().int().positive(),
+  aspect_type: z.enum(['create', 'update', 'delete']),
+  updates: z.record(z.string()),
+  owner_id: z.number().int().positive(),
+  subscription_id: z.number().int().positive(),
+  event_time: z.number().int().positive(),
+});
+export type WebhookEvent = z.infer<typeof WebhookEvent>;
 
 export class StravaApi {
   private readonly baseUrl = 'https://www.strava.com/api/v3/';
@@ -137,7 +155,7 @@ export class StravaApi {
 
   async exchangeToken(code: string): Promise<StravaAuth> {
     try {
-      const response = await axios.post<StravaAuth>(`${this.baseUrl}oauth/token`, null, {
+      const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -145,7 +163,7 @@ export class StravaApi {
           grant_type: 'authorization_code',
         },
       });
-      return response.data;
+      return StravaAuth.parse(response.data);
     } catch (error: unknown) {
       throw handleAppError(502, 'Error on Strava token exchange request', error);
     }
@@ -161,7 +179,7 @@ export class StravaApi {
 
   async refreshAuth(token: string): Promise<StravaRefreshAuth> {
     try {
-      const response = await axios.post<StravaRefreshAuth>(`${this.baseUrl}oauth/token`, null, {
+      const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -169,7 +187,7 @@ export class StravaApi {
           grant_type: 'refresh_token',
         },
       });
-      return response.data;
+      return StravaRefreshAuth.parse(response.data);
     } catch (error: unknown) {
       throw handleAppError(502, 'Error on Strava refresh token request', error);
     }
@@ -177,10 +195,10 @@ export class StravaApi {
 
   async getAthleteActivities(token: string): Promise<Activity[]> {
     try {
-      const response = await axios.get<Activity[]>(`${this.baseUrl}athlete/activities`, {
+      const response = await axios.get(`${this.baseUrl}athlete/activities`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
+      return z.array(Activity).parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getAthleteActivities request', error);
     }
@@ -188,10 +206,10 @@ export class StravaApi {
 
   async getActivity(token: string, id: string): Promise<Activity> {
     try {
-      const response = await axios.get<Activity>(`${this.baseUrl}activities/${id}`, {
+      const response = await axios.get(`${this.baseUrl}activities/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return response.data;
+      return Activity.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getActivity request', error);
     }
@@ -199,13 +217,13 @@ export class StravaApi {
 
   async getActivityStream(token: string, id: string): Promise<StreamSet> {
     try {
-      const response = await axios.get<StreamSet>(
+      const response = await axios.get(
         `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      return response.data;
+      return StreamSet.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getActivityStream request', error);
     }
@@ -218,10 +236,10 @@ export class StravaApi {
       formData.append('client_secret', this.#clientSecret);
       formData.append('callback_url', callbackUrl);
       formData.append('verify_token', verifyToken);
-      const response = await axios.post<Subscription>(`${this.baseUrl}push_subscriptions`, formData, {
+      const response = await axios.post(`${this.baseUrl}push_subscriptions`, formData, {
         headers: formData.getHeaders(),
       });
-      return response.data;
+      return Subscription.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
     }
@@ -229,10 +247,10 @@ export class StravaApi {
 
   async getSubscriptions(): Promise<Subscription[]> {
     try {
-      const response = await axios.get<Subscription[]>(`${this.baseUrl}push_subscriptions`, {
+      const response = await axios.get(`${this.baseUrl}push_subscriptions`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
-      return response.data;
+      return z.array(Subscription).parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava getSubscriptions request', error);
     }
