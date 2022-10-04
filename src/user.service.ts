@@ -2,15 +2,14 @@ import dayjs from 'dayjs';
 
 import { NotFoundError } from './errors';
 import log from './helpers/logger';
+import type { Optional } from './helpers/utils';
 import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
 import type { GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
-import type { GarminAuth } from './server/garmin/api';
-import type { StravaAuth, StravaRefreshAuth } from './server/strava/api';
-import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/api';
-
-type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+import type { GarminAuth } from './server/garmin/garmin.api';
+import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api';
+import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api';
 
 const MAX_ACTIVITIES_PER_USER = 30;
 
@@ -31,7 +30,7 @@ const isActivityToUpdate = (
 } => !!activity.id && !!activity.update;
 
 export class UserService {
-  async getUserInfo(c2cId: number): Promise<{ [key in Vendor]?: boolean }> {
+  async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: boolean }> {
     const { strava, suunto, garmin } = (await userRepository.findById(c2cId)) || {};
     return {
       strava: !!strava,
@@ -70,10 +69,10 @@ export class UserService {
   async updateStravaAuth(c2cId: number, auth: StravaRefreshAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (!user) {
-      throw new NotFoundError(`User ${c2cId} not found in db`);
+      throw new NotFoundError(`User ${c2cId} not found`);
     }
     if (!user.strava || !user.strava.id) {
-      throw new NotFoundError('User ${c2cId} not configured for Strava');
+      throw new NotFoundError(`User ${c2cId} not configured for Strava`);
     }
     user = {
       ...user,
@@ -184,11 +183,11 @@ export class UserService {
           if (userActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)) {
             // replace
             return {
-              ...activity,
               id: userActivities.find(
                 ({ vendor, vendorId }) => vendor === activity.vendor && vendorId === activity.vendorId,
               )?.id,
               update: true,
+              ...activity,
             };
           }
           return activity;
@@ -214,14 +213,15 @@ export class UserService {
     const savedActivity = (await activityRepository.findByUser(c2cId)).find(
       (act) => act.vendor === activity.vendor && act.vendorId === activity.vendorId,
     );
-    if (savedActivity) {
-      await activityRepository.update({
-        ...savedActivity,
-        date: activity.date,
-        type: activity.type,
-        ...(activity.name && { name: activity.name }),
-      });
+    if (!savedActivity) {
+      return;
     }
+    await activityRepository.update({
+      ...savedActivity,
+      date: activity.date,
+      type: activity.type,
+      ...(activity.name && { name: activity.name }),
+    });
   }
 
   async deleteActivity(vendor: Vendor, vendorId: string): Promise<void> {

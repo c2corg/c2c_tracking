@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import dayjsPluginUTC from 'dayjs/plugin/utc';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
@@ -10,7 +11,9 @@ import type { GarminInfo } from '../../repository/user';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { GarminActivity, garminApi as api, GarminAuth, GarminSample } from './api';
+import { GarminActivity, garminApi as api, GarminAuth, GarminSample } from './garmin.api';
+
+dayjs.extend(dayjsPluginUTC);
 
 export class GarminService {
   readonly subscriptionUrl: string;
@@ -33,26 +36,29 @@ export class GarminService {
     await this.setupUser(c2cId, auth);
   }
 
-  async setupUser(c2cId: number, auth: GarminAuth): Promise<void> {
-    try {
-      await userService.configureGarmin(c2cId, auth);
-      // retrieve activities from last 7 days
-      const now = dayjs();
-      const activities: GarminActivity[] = (
-        await Promise.allSettled(
-          [...Array(7).keys()]
-            .map((i) => now.subtract(i, 'day').toDate())
-            .flatMap(async (date) => await api.getActivitiesForDay(date, auth.token, auth.tokenSecret)),
-        )
+  private async setupUser(c2cId: number, auth: GarminAuth): Promise<void> {
+    await userService.configureGarmin(c2cId, auth);
+    // retrieve activities from last 8 days
+    const now = dayjs();
+    const activities: GarminActivity[] = (
+      await Promise.allSettled(
+        [...Array(8).keys()]
+          .map((i) => now.subtract(i, 'day').toDate())
+          .flatMap(async (date) => await api.getActivitiesForDay(date, auth.token, auth.tokenSecret)),
       )
-        .map((result) => {
-          if (!this.isFullfilled(result)) {
-            log.warn('Unable to retrieve some Garmin activities summary: ' + JSON.stringify(result.reason, null, 2));
-          }
-          return result;
-        })
-        .filter(this.isFullfilled)
-        .flatMap((result) => result.value);
+    )
+      .map((result) => {
+        if (!this.isFullfilled(result)) {
+          log.warn('Unable to retrieve some Garmin activities summary: ' + JSON.stringify(result.reason, null, 2));
+        }
+        return result;
+      })
+      .filter(this.isFullfilled)
+      .flatMap((result) => result.value);
+    if (!activities.length) {
+      return;
+    }
+    try {
       await userService.addActivities(
         c2cId,
         ...activities
@@ -62,8 +68,7 @@ export class GarminService {
               ...{
                 vendor: 'garmin' as Vendor,
                 vendorId: activity.activityId.toString(),
-                date: dayjs.unix(activity.summary.startTimeInSeconds).format(),
-                name: '',
+                date: dayjs.unix(activity.summary.startTimeInSeconds).utc().format(),
                 type: activity.summary.activityType,
               },
               ...(geojson && { geojson }),
@@ -72,9 +77,7 @@ export class GarminService {
           .filter(({ geojson }) => !!geojson),
       );
     } catch (err: unknown) {
-      if (err instanceof Object) {
-        log.error(err);
-      }
+      log.warn(err);
     }
   }
 
@@ -87,16 +90,17 @@ export class GarminService {
       return undefined;
     }
     let coordinates = samples
-      .map((sample) => [
-        sample.longitudeInDegree!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        sample.latitudeInDegree!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-        sample.elevationInMeters || 0,
-        sample.startTimeInSeconds!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
-      ])
-      .filter(([lng, lat]) => !!lng && !!lat);
+      .filter((sample) => !!sample.latitudeInDegree && !!sample.longitudeInDegree)
+      .map((sample) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const coord: number[] = [sample.longitudeInDegree!, sample.latitudeInDegree!, sample.elevationInMeters || 0];
+        sample.startTimeInSeconds && coord.push(sample.startTimeInSeconds);
+        return coord;
+      });
 
     if (coordinates.every(([_lng, _lat, alt]) => !alt)) {
-      coordinates = coordinates.map((coordinate) => [coordinate[0]!, coordinate[1]!, coordinate[2]!]); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      coordinates = coordinates.map((coordinate) => [coordinate[0]!, coordinate[1]!, coordinate[2]!]);
     }
 
     if (!coordinates.length) {
@@ -146,19 +150,25 @@ export class GarminService {
         activityMap.set(user.c2cId, []);
       }
       const geojson = this.toGeoJSON(activity.samples);
+      if (!geojson) {
+        continue;
+      }
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       activityMap.get(user.c2cId)!.push({
         ...{
           vendor: 'garmin',
           vendorId: activity.activityId.toString(),
-          date: dayjs.unix(activity.summary.startTimeInSeconds).format(),
+          date: dayjs.unix(activity.summary.startTimeInSeconds).utc().format(),
           name: '',
           type: activity.summary.activityType,
+          geojson,
         },
-        ...(geojson && { geojson }),
       });
     }
     for (const [c2cId, activities] of activityMap) {
+      if (!activities.length) {
+        continue;
+      }
       try {
         await userService.addActivities(c2cId, ...activities.filter(({ geojson }) => !!geojson));
       } catch (error) {
@@ -173,7 +183,10 @@ export class GarminService {
     for (const { userAccessToken } of deregistrations) {
       const user = await userRepository.findByGarminToken(userAccessToken);
       if (!user) {
-        throw new NotFoundError(`User matching Garmin token ${userAccessToken} not found`);
+        log.warn(
+          `Garmin deauthorize webhook event for Garmin token ${userAccessToken} couldn't be processed: unable to find matching user in DB`,
+        );
+        continue;
       }
       // clear user Garmin activities
       await activityRepository.deleteByUserAndVendor(user.c2cId, 'garmin');

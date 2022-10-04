@@ -7,7 +7,7 @@ export const exchangeToken: ValidationSchema = {
     .object({
       code: z.string().min(5).max(50),
     })
-    .or(z.object({ error: z.string().min(1).max(50), error_desscription: z.string().min(1).max(255) })),
+    .or(z.object({ error: z.string().min(1).max(50), error_description: z.string().min(1).max(255) })),
 };
 
 export const webhook: ValidationSchema = {

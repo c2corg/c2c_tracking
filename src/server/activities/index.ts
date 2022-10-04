@@ -1,6 +1,6 @@
 import Router from '@koa/router';
 
-import { controller } from './controller';
+import { controller } from './activity.controller';
 
 const router = new Router();
 

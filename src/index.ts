@@ -9,7 +9,7 @@ import config from './config';
 import { database as db } from './db';
 import { healthService } from './health.service';
 import log from './helpers/logger';
-import { stravaService } from './server/strava/service';
+import { stravaService } from './server/strava/strava.service';
 
 const PORT = config.get('server.port');
 

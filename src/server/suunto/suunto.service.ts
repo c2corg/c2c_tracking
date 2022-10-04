@@ -1,14 +1,25 @@
 import dayjs from 'dayjs';
+import dayjsPluginUTC from 'dayjs/plugin/utc';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
-import type { Vendor } from '../../repository/activity';
+import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { SuuntoAuth, Workouts, suuntoApi as api, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary } from './api';
+import {
+  SuuntoAuth,
+  Workouts,
+  suuntoApi as api,
+  workoutTypes,
+  WebhookEvent,
+  suuntoApi,
+  WorkoutSummary,
+} from './suunto.api';
+
+dayjs.extend(dayjsPluginUTC);
 
 export class SuuntoService {
   readonly subscriptionUrl: string;
@@ -22,28 +33,30 @@ export class SuuntoService {
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
-    const token = await api.exchangeToken(authorizationCode);
-    await this.setupUser(c2cId, token);
+    const auth = await api.exchangeToken(authorizationCode);
+    await this.setupUser(c2cId, auth);
   }
 
   private async setupUser(c2cId: number, auth: SuuntoAuth): Promise<void> {
     try {
+      await userService.configureSuunto(c2cId, auth);
       // retrieve last 30 outings
       const workouts: Workouts = await api.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
-      log.info(workouts);
-      await userService.configureSuunto(c2cId, auth);
-      await userService.addActivities(
-        c2cId,
-        ...workouts.payload.map((workout) => ({
+      if (!workouts.payload.length) {
+        return;
+      }
+      const activities: Omit<Activity, 'id' | 'userId'>[] = workouts.payload.map((workout) => ({
+        ...{
           vendor: 'suunto' as Vendor,
           vendorId: workout.workoutKey,
-          date: dayjs(workout.startTime).format(),
-          name: workout.workoutName ?? '',
+          date: dayjs(workout.startTime).utc().format(),
           type: workoutTypes[workout.activityId] || 'Unkown',
-        })),
-      );
-    } catch (err) {
-      log.error(err);
+        },
+        ...(workout.workoutName && { name: workout.workoutName }),
+      }));
+      await userService.addActivities(c2cId, ...activities);
+    } catch (err: unknown) {
+      log.warn(err);
     }
   }
 
@@ -55,9 +68,14 @@ export class SuuntoService {
     }
     if (refreshToken) {
       log.debug('Suunto access token expired, requiring refresh');
-      const auth = await api.refreshAuth(refreshToken);
-      await userService.updateSuuntoAuth(c2cId, auth);
-      return auth.access_token;
+      try {
+        const auth = await api.refreshAuth(refreshToken);
+        await userService.updateSuuntoAuth(c2cId, auth);
+        return auth.access_token;
+      } catch (error: unknown) {
+        log.warn(`Suunto access token refresh failed for user ${c2cId}`);
+        return undefined;
+      }
     }
     return undefined;
   }
@@ -68,6 +86,7 @@ export class SuuntoService {
 
   async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
     if (!this.isWebhookHeaderValid(authHeader)) {
+      log.warn(`Suunto workout webhook event for Suunto user ${event.username} couldn't be processed: bad auth`);
       return;
     }
     const user = await userRepository.findBySuuntoUsername(event.username);
@@ -97,7 +116,7 @@ export class SuuntoService {
       await userService.addActivities(user.c2cId, {
         vendor: 'suunto' as Vendor,
         vendorId: event.workoutid, // corresponds to workout key
-        date: dayjs(workout.payload.startTime).format(),
+        date: dayjs(workout.payload.startTime).utc().format(),
         name: workout.payload.workoutName ?? '',
         type: workoutTypes[workout.payload.activityId] || 'Unknown',
       });

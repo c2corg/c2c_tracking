@@ -169,21 +169,21 @@ export class StravaApi {
     }
   }
 
-  async deauthorize(token: string): Promise<void> {
+  async deauthorize(accessToken: string): Promise<void> {
     try {
-      await axios.post<void>(`${this.baseUrl}oauth/deauthorize?access_token=${token}`);
+      await axios.post<void>(`${this.baseUrl}oauth/deauthorize?access_token=${accessToken}`);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava deauthorize request', error);
     }
   }
 
-  async refreshAuth(token: string): Promise<StravaRefreshAuth> {
+  async refreshAuth(refreshToken: string): Promise<StravaRefreshAuth> {
     try {
       const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
-          refresh_token: token,
+          refresh_token: refreshToken,
           grant_type: 'refresh_token',
         },
       });
@@ -193,10 +193,10 @@ export class StravaApi {
     }
   }
 
-  async getAthleteActivities(token: string): Promise<Activity[]> {
+  async getAthleteActivities(accessToken: string): Promise<Activity[]> {
     try {
       const response = await axios.get(`${this.baseUrl}athlete/activities`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       return z.array(Activity).parse(response.data);
     } catch (error) {
@@ -204,10 +204,10 @@ export class StravaApi {
     }
   }
 
-  async getActivity(token: string, id: string): Promise<Activity> {
+  async getActivity(accessToken: string, id: string): Promise<Activity> {
     try {
       const response = await axios.get(`${this.baseUrl}activities/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       return Activity.parse(response.data);
     } catch (error) {
@@ -215,12 +215,12 @@ export class StravaApi {
     }
   }
 
-  async getActivityStream(token: string, id: string): Promise<StreamSet> {
+  async getActivityStream(accessToken: string, id: string): Promise<StreamSet> {
     try {
       const response = await axios.get(
-        `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=`,
+        `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=true`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${accessToken}` },
         },
       );
       return StreamSet.parse(response.data);

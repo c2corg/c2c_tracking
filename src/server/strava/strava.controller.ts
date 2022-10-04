@@ -1,8 +1,8 @@
 import axios from 'axios';
 import type { Context } from 'koa';
 
-import type { WebhookEvent, WebhookSubscription } from './api';
-import { stravaService as service } from './service';
+import type { WebhookEvent, WebhookSubscription } from './strava.api';
+import { stravaService as service } from './strava.service';
 
 class StravaController {
   async exchangeTokens(ctx: Context): Promise<void> {

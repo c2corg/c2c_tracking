@@ -8,11 +8,10 @@ export const exchangeToken: ValidationSchema = {
       code: z.string().min(10).max(50),
       // eslint-disable-next-line security/detect-unsafe-regex
       scope: z.string().regex(/(?:[\w:]{1,30},){0,4}(?:[\w:]{1,30})/),
-      state: z.string().max(100),
+      state: z.string().max(100).optional(),
     })
     .or(
       z.object({
-        state: z.string().max(100),
         error: z.string().min(1).max(100),
       }),
     ),

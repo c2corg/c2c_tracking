@@ -5,6 +5,7 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
+import type { LevelWithSilent } from 'pino';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth';
 import config from './config';
@@ -39,13 +40,13 @@ router.use(
   users.allowedMethods(),
 );
 
-let logLevel: string;
+let logLevel: LevelWithSilent;
 switch (config.get('env')) {
   case 'production':
     logLevel = 'info';
     break;
   case 'test':
-    logLevel = 'warn';
+    logLevel = 'silent';
     break;
   default:
     logLevel = 'trace';

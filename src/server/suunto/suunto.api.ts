@@ -133,7 +133,7 @@ export type Position = z.infer<typeof Position>;
 export const Workout = z.object({
   workoutId: z.number().int().positive(),
   workoutKey: z.string().min(1).max(255), // Workout unique id
-  workoutName: z.string().min(1).max(255),
+  workoutName: z.string().min(1).max(255).optional(),
   activityId: z.number().int().positive(), // Activity/workout type id. Activity mapping can be found in the FIT file activity id's document (check Suunto App column).
   description: z.string().max(5000),
   startTime: z.number().int().positive(), // e.g. 1625986322376 unix epoch with milliseconds
@@ -196,7 +196,7 @@ export class SuuntoApi {
       });
       return SuuntoAuth.parse(response.data);
     } catch (error) {
-      log.error(error);
+      log.warn(error);
       throw handleAppError(502, 'Error on Suunto token exchange request', error);
     }
   }
@@ -251,7 +251,7 @@ export class SuuntoApi {
       });
       return z.instanceof(Uint8Array).parse(response.data);
     } catch (error) {
-      throw handleAppError(502, 'Error on Strava getActivity request', error);
+      throw handleAppError(502, 'Error on Suunto getFIT request', error);
     }
   }
 

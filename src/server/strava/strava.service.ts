@@ -1,5 +1,4 @@
-import polyline from '@mapbox/polyline';
-const { toGeoJSON } = polyline;
+import { toGeoJSON } from '@mapbox/polyline';
 import dayjs from 'dayjs';
 
 import config from '../../config';
@@ -20,9 +19,10 @@ import {
   WebhookEvent,
   Subscription,
   StreamSet,
-} from './api';
+} from './strava.api';
 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
+
 export class StravaService {
   readonly subscriptionUrl: string;
   readonly stravaWebhookSubscriptionVerifyToken: string;
@@ -37,15 +37,19 @@ export class StravaService {
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
-    const token = await api.exchangeToken(authorizationCode);
-    await this.setupUser(c2cId, token);
+    const auth = await api.exchangeToken(authorizationCode);
+    await this.setupUser(c2cId, auth);
   }
 
   async setupUser(c2cId: number, auth: StravaAuth): Promise<void> {
+    await userService.configureStrava(c2cId, auth);
+
     try {
       // retrieve last 30 outings
       const activities: StravaActivity[] = await api.getAthleteActivities(auth.access_token);
-      await userService.configureStrava(c2cId, auth);
+      if (!activities.length) {
+        return;
+      }
       await userService.addActivities(
         c2cId,
         ...activities.map((activity) => ({
@@ -56,10 +60,8 @@ export class StravaService {
           type: activity.type,
         })),
       );
-    } catch (err: unknown) {
-      if (err instanceof Object) {
-        log.error(err);
-      }
+    } catch (error) {
+      log.info(`Unable to retrieve Strava activities for user ${c2cId}`);
     }
   }
 
@@ -89,10 +91,15 @@ export class StravaService {
       return accessToken;
     }
     if (refreshToken) {
-      log.debug('Strava access token expired, requiring rfresh');
-      const auth = await api.refreshAuth(refreshToken);
-      await userService.updateStravaAuth(c2cId, auth);
-      return auth.access_token;
+      log.debug('Strava access token expired, requiring refresh');
+      try {
+        const auth = await api.refreshAuth(refreshToken);
+        await userService.updateStravaAuth(c2cId, auth);
+        return auth.access_token;
+      } catch (error) {
+        log.warn(`Strava access token refresh failed for user ${c2cId}`);
+        return undefined;
+      }
     }
     return undefined;
   }
@@ -145,7 +152,7 @@ export class StravaService {
       return;
     }
     try {
-      stravaRepository.setSubscription(subscription.id); // async call
+      await stravaRepository.setSubscription(subscription.id);
     } catch (error) {
       log.warn(`Strava subscription couldn't be stored in DB`);
     }
@@ -153,13 +160,19 @@ export class StravaService {
 
   async handleWebhookEvent(event: WebhookEvent): Promise<void> {
     if (!(await this.isWebhookEventvalid(event))) {
+      log.warn(`Invalid webhook event: subscription id ${event.subscription_id} doesn't match`);
       return;
     }
     switch (event.object_type) {
       case 'athlete':
-        event.aspect_type === 'update' &&
-          event.updates?.['authorized'] === 'false' &&
-          (await this.handleAthleteDeleteEvent(event.owner_id));
+        switch (event.aspect_type) {
+          case 'delete':
+            event.updates?.['authorized'] === 'false' && (await this.handleAthleteDeleteEvent(event.owner_id));
+            break;
+          default:
+            log.info(`Not handling event athlete/${event.aspect_type}`);
+            break;
+        }
         break;
       case 'activity':
         switch (event.aspect_type) {
@@ -173,7 +186,6 @@ export class StravaService {
             await this.handleActivityDeleteEvent(event.object_id.toString());
             break;
         }
-        break;
     }
   }
 
@@ -189,6 +201,9 @@ export class StravaService {
   private async handleAthleteDeleteEvent(userStravaId: number): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
+      log.warn(
+        `Strava athlete deletion webhook event for Strava user ${userStravaId} couldn't be processed: unable to find matching user in DB`,
+      );
       return;
     }
     // clear user Strava activities

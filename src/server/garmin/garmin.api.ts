@@ -2,10 +2,14 @@ import { createHmac, randomBytes } from 'crypto';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
+import dayjsPluginUTC from 'dayjs/plugin/utc';
 import { z } from 'zod';
 
 import config from '../../config';
 import { AppError } from '../../errors';
+import { handleAppError } from '../../helpers/error';
+
+dayjs.extend(dayjsPluginUTC);
 
 export const GarminAuth = z.object({
   token: z.string().min(10).max(5000),
@@ -125,9 +129,11 @@ export type GarminSample = z.infer<typeof GarminSample>;
 export const GarminActivity = z.object({
   activityId: z.number().int().positive(),
   summary: GarminActivitySummary,
-  samples: z.array(GarminSample),
+  samples: z.array(GarminSample).optional(),
 });
 export type GarminActivity = z.infer<typeof GarminActivity>;
+
+dayjs.extend(dayjsPluginUTC);
 
 export class GarminApi {
   private readonly oauthUrl = 'https://connectapi.garmin.com/oauth-service/';
@@ -148,20 +154,14 @@ export class GarminApi {
       this.#consumerKey
     }", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
     const response = await axios.post(`${this.oauthUrl}oauth/request_token`, null, {
-      headers: {
-        Authorization: authorization,
-      },
+      headers: { Authorization: authorization },
       responseType: 'text',
     });
-    const [_oauth_token, token, _oauth_token_secret, tokenSecret] = z
-      .string()
-      .parse(response.data)
-      .split('&')
-      .flatMap((substring) => substring.split('='));
-    if (!token || !tokenSecret) {
+    const found = /oauth_token=([\w-]+)&oauth_token_secret=([\w-]+)/.exec(z.string().parse(response.data));
+    if (!found || found.length < 3) {
       throw new AppError(502, 'Unable to acquire Garmin unauthorized request token');
     }
-    return { token: token!, tokenSecret: tokenSecret! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return { token: found[1]!, tokenSecret: found[2]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   private generateUnauthorizedRequestTokenSignature(timestamp: number, nonce: string): string {
@@ -180,23 +180,18 @@ export class GarminApi {
     const signature = encodeURIComponent(
       this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
     );
-    const response = await axios.post(`${this.oauthUrl}oauth/access_token`, null, {
-      headers: {
-        Authorization: `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${
-          this.#consumerKey
-        }", oauth_token="${requestToken}", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_signature_method="HMAC-SHA1", oauth_signature="${signature}"`,
-      },
+    const authorization = `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${
+      this.#consumerKey
+    }", oauth_token="${requestToken}", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_signature_method="HMAC-SHA1", oauth_signature="${signature}"`;
+    const response = await axios.post<string>(`${this.oauthUrl}oauth/access_token`, null, {
+      headers: { Authorization: authorization },
       responseType: 'text',
     });
-    const [_oauth_token, token, _oauth_token_secret, tokenSecret] = z
-      .string()
-      .parse(response.data)
-      .split('&')
-      .flatMap((substring) => substring.split('='));
-    if (!requestToken || !tokenSecret) {
+    const found = /oauth_token=([\w-]+)&oauth_token_secret=([\w-]+)/.exec(z.string().parse(response.data));
+    if (!found || found.length < 3) {
       throw new AppError(502, 'Unable to acquire Garmin access request token');
     }
-    return { token: token!, tokenSecret: tokenSecret! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return { token: found[1]!, tokenSecret: found[2]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   private generateExchangeTokenSignature(
@@ -217,8 +212,8 @@ export class GarminApi {
 
   async getActivitiesForDay(date: Date, token: string, tokenSecret: string): Promise<GarminActivity[]> {
     const url = `${this.apiUrl}wellness-api/rest/activityDetails`;
-    const end = dayjs(date).endOf('day').unix();
-    const start = dayjs(date).startOf('day').unix();
+    const end = dayjs(date).utc().endOf('day').unix();
+    const start = dayjs(date).utc().startOf('day').unix();
     const response = await axios.get(`${url}?uploadStartTimeInSeconds=${start}&uploadEndTimeInSeconds=${end}`, {
       headers: { Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, start, end) },
     });
@@ -226,12 +221,16 @@ export class GarminApi {
   }
 
   async deauthorize(token: string, tokenSecret: string): Promise<void> {
-    const url = `${this.apiUrl}wellness-api/rest/user/registration`;
-    await axios.delete<void>(`${url}`, {
-      headers: {
-        Authorization: this.generateApiRequestAuth('DELETE', url, token, tokenSecret),
-      },
-    });
+    try {
+      const url = `${this.apiUrl}wellness-api/rest/user/registration`;
+      await axios.delete<void>(`${url}`, {
+        headers: {
+          Authorization: this.generateApiRequestAuth('DELETE', url, token, tokenSecret),
+        },
+      });
+    } catch (error) {
+      throw handleAppError(502, 'Error on Garmin deauthorize request', error);
+    }
   }
 
   private generateApiRequestAuth(
@@ -247,7 +246,7 @@ export class GarminApi {
     let normalizedParameters = `oauth_consumer_key=${
       this.#consumerKey
     }&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
-    if (start && end) {
+    if (start != undefined && end != undefined) {
       normalizedParameters += `&uploadEndTimeInSeconds=${end}&uploadStartTimeInSeconds=${start}`;
     }
     const signatureBaseString = `${method}&${encodeURIComponent(url)}&${encodeURIComponent(normalizedParameters)}`;

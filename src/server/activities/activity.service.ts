@@ -4,9 +4,9 @@ import { AppError } from '../../errors';
 import type { FitObj } from '../../helpers/fit/fit-parser';
 import type { Activity } from '../../repository/activity';
 import type { LineString } from '../../repository/geojson';
-import type { AltitudeStream, DistanceStream, LatLngStream, StreamSet, TimeStream } from '../strava/api';
+import type { AltitudeStream, DistanceStream, LatLngStream, StreamSet, TimeStream } from '../strava/strava.api';
 
-export class ActivitiesService {
+export class ActivityService {
   suuntoFitToGeoJSON(fit: FitObj): LineString {
     if (!fit.activity?.['records']) {
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
@@ -43,10 +43,10 @@ export class ActivitiesService {
   }
 
   stravaStreamSetToGeoJSON(activity: Activity, stream: StreamSet): LineString {
-    const distanceStream: DistanceStream | undefined = stream.find(ActivitiesService.isDistanceStream);
-    const timeStream: TimeStream | undefined = stream.find(ActivitiesService.isTimeStream);
-    const latlngStream: LatLngStream | undefined = stream.find(ActivitiesService.isLatLngStream);
-    const altStream: AltitudeStream | undefined = stream.find(ActivitiesService.isAltitudeStream);
+    const distanceStream: DistanceStream | undefined = stream.find(ActivityService.isDistanceStream);
+    const timeStream: TimeStream | undefined = stream.find(ActivityService.isTimeStream);
+    const latlngStream: LatLngStream | undefined = stream.find(ActivityService.isLatLngStream);
+    const altStream: AltitudeStream | undefined = stream.find(ActivityService.isAltitudeStream);
 
     if (!distanceStream || !latlngStream) {
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
@@ -55,17 +55,18 @@ export class ActivitiesService {
       stream.some(({ series_type }) => series_type !== 'distance') ||
       new Set(stream.map(({ original_size }) => original_size)).size > 1
     ) {
+      // for now, we cannot handle streams where not everything is synchronized with the distance stream
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
     }
 
     const layout = !!altStream
-      ? !!timeStream && activity?.date
+      ? !!timeStream && activity.date
         ? 'XYZM'
         : 'XYZ'
-      : !!timeStream && activity?.date
+      : !!timeStream && activity.date
       ? 'XYM'
       : 'XY';
-    const startDate = activity?.date ? dayjs(activity?.date).unix() : 0;
+    const startDate = activity.date ? dayjs(activity.date).unix() : 0;
     const coordinates: GeoJSON.Position[] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
       // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
@@ -103,4 +104,4 @@ export class ActivitiesService {
   ): stream is AltitudeStream => stream.type === 'altitude';
 }
 
-export const activitiesService = new ActivitiesService();
+export const activityService = new ActivityService();
