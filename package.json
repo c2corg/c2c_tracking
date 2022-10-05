@@ -17,9 +17,9 @@
     "test:ci": "npm run test:ci:unit && npm run test:ci:psql",
     "test:unit": "jest --runInBand",
     "test:ci:unit": "jest --config jest.config.ci.mjs --runInBand",
-    "test:psql": "jest --config jest.config.psql.mjs --runInBand",
-    "test:ci:psql": "npm run test:ci:psql:init && jest --config jest.config.psql.ci.mjs --runInBand",
-    "test:ci:psql:init": "ts-node test/environment/init-db.ts"
+    "test:psql": "jest --config jest.config.psql.local.mjs --runInBand",
+    "test:ci:psql": "npm run test:psql:init && jest --config jest.config.psql.ci.mjs --runInBand",
+    "test:psql:init": "ts-node test/environment/run-init-db.ts"
   },
   "repository": {
     "type": "git",
@@ -94,6 +94,7 @@
     "pino-pretty": "9.1.0",
     "prettier": "2.7.1",
     "supertest": "6.3.0",
+    "testcontainers": "8.14.0",
     "ts-jest": "29.0.3",
     "ts-node": "10.9.1",
     "typescript": "4.8.4"

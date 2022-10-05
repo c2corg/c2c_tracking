@@ -2,7 +2,7 @@ import path from 'path';
 
 import knex, { Knex } from 'knex';
 
-(async (): Promise<void> => {
+export const initDb = async (): Promise<void> => {
   let connection: Knex | undefined;
   try {
     connection = await knex({
@@ -30,4 +30,4 @@ import knex, { Knex } from 'knex';
   } finally {
     connection?.destroy();
   }
-})();
+};
