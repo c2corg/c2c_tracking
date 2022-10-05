@@ -1,5 +1,4 @@
 import axios from 'axios';
-import FormData from 'form-data';
 import isISO8601 from 'validator/lib/isISO8601';
 import { z } from 'zod';
 
@@ -231,14 +230,18 @@ export class StravaApi {
 
   async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
     try {
-      const formData = new FormData();
-      formData.append('client_id', this.#clientId);
-      formData.append('client_secret', this.#clientSecret);
-      formData.append('callback_url', callbackUrl);
-      formData.append('verify_token', verifyToken);
-      const response = await axios.post(`${this.baseUrl}push_subscriptions`, formData, {
-        headers: formData.getHeaders(),
-      });
+      const response = await axios.post(
+        `${this.baseUrl}push_subscriptions`,
+        {
+          client_id: this.#clientId,
+          client_secret: this.#clientSecret,
+          callback_url: callbackUrl,
+          verify_token: verifyToken,
+        },
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        },
+      );
       return Subscription.parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
