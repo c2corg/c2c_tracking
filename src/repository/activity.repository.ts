@@ -2,6 +2,7 @@ import { database as db } from '../db';
 import { IOError, NotFoundError } from '../errors';
 
 import type { Activity, Vendor } from './activity';
+import type { LineString } from './geojson';
 
 type ActivityRow = {
   id: number;
@@ -11,9 +12,10 @@ type ActivityRow = {
   date: string;
   name: string | undefined | null;
   type: string;
+  geojson: LineString | undefined | null;
 };
 
-class ActivityRepository {
+export class ActivityRepository {
   readonly #TABLE = 'activities';
 
   async findByUser(userId: number): Promise<Activity[]> {
@@ -24,11 +26,7 @@ class ActivityRepository {
       }
       const rows = await conn<ActivityRow>(this.#TABLE).where({ user_id: userId }).orderBy('date', 'desc');
 
-      if (!rows) {
-        return [];
-      }
-
-      return rows.map((row) => this.rowToActivity(row));
+      return rows?.map((row) => this.rowToActivity(row));
     } catch (err) {
       return [];
     }
@@ -40,13 +38,13 @@ class ActivityRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const rows = await conn<ActivityRow>(this.#TABLE).where({ user_id: userId, id: activityId });
+      const row = await conn<ActivityRow>(this.#TABLE).where({ user_id: userId, id: activityId }).first();
 
-      if (!rows?.[0]) {
+      if (!row) {
         return undefined;
       }
 
-      return this.rowToActivity(rows[0]);
+      return this.rowToActivity(row);
     } catch (err) {
       return undefined;
     }
@@ -58,7 +56,7 @@ class ActivityRepository {
       throw new IOError('No connection to database');
     }
     const result = await conn(this.#TABLE).insert(this.activityToRecord(activity), ['id']);
-    return { ...activity, id: result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return { ...activity, ...result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
   async update(activity: Activity): Promise<Activity> {
@@ -135,17 +133,14 @@ class ActivityRepository {
 
   private rowToActivity(row: ActivityRow): Activity {
     return {
-      ...{
-        id: row.id,
-        userId: row.user_id,
-        vendor: row.vendor,
-        vendorId: row.vendor_id,
-        date: row.date,
-        type: row.type,
-      },
-      ...(row.name && {
-        name: row.name,
-      }),
+      id: row.id,
+      userId: row.user_id,
+      vendor: row.vendor,
+      vendorId: row.vendor_id,
+      date: row.date,
+      type: row.type,
+      ...(row.name && { name: row.name }),
+      ...(row.geojson && { geojson: row.geojson }),
     };
   }
 
@@ -157,6 +152,7 @@ class ActivityRepository {
       vendor_id: activity.vendorId,
       date: activity.date,
       name: activity.name,
+      geojson: activity.geojson,
     };
   }
 }

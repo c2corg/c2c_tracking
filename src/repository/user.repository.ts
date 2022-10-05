@@ -102,13 +102,13 @@ export class UserRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn(this.#TABLE).update(this.userToRecord(user));
+    await conn(this.#TABLE).where({ c2c_id: user.c2cId }).update<UserRow>(this.userToRecord(user));
     return user;
   }
 
   private rowToUser(row: UserRow): User {
     return {
-      ...{ c2cId: row.c2c_id },
+      c2cId: row.c2c_id,
       ...(row.strava_id &&
         row.strava_access_token &&
         row.strava_expires_at &&
@@ -182,7 +182,7 @@ export class UserRepository {
           garmin_token_secret: null,
         };
     return {
-      ...{ c2c_id: user.c2cId },
+      c2c_id: user.c2cId,
       ...(strava && { ...strava }),
       ...(suunto && { ...suunto }),
       ...(garmin && { ...garmin }),

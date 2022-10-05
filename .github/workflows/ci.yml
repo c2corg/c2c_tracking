@@ -10,6 +10,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     permissions:
       contents: read
     strategy:
@@ -48,7 +61,7 @@ jobs:
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: reports/coverage/unit/lcov.info
+          coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/psql/lcov.info
       - name: Docker meta
         id: docker_meta
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"

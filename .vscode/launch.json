@@ -15,8 +15,22 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Jest Tests",
+      "name": "Debug Jest Unit Tests",
       "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/jest/bin/jest", "--runInBand"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Jest Psql Tests",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/node_modules/jest/bin/jest",
+        "--config",
+        "${workspaceRoot}/jest.config.psql.mjs",
+        "--runInBand"
+      ],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }

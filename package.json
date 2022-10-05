@@ -13,10 +13,13 @@
     "build": "tsc",
     "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint --report-unused-disable-directives --ext .ts,.js .",
     "prepare": "husky install",
-    "test": "npm run test:unit",
-    "test:ci": "npm run test:ci:unit",
+    "test": "npm run test:unit && npm run test:psql",
+    "test:ci": "npm run test:ci:unit && npm run test:ci:psql",
     "test:unit": "jest --runInBand",
-    "test:ci:unit": "jest --config jest.config.ci.mjs --runInBand"
+    "test:ci:unit": "jest --config jest.config.ci.mjs --runInBand",
+    "test:psql": "jest --config jest.config.psql.mjs --runInBand",
+    "test:ci:psql": "npm run test:ci:psql:init && jest --config jest.config.psql.ci.mjs --runInBand",
+    "test:ci:psql:init": "ts-node test/environment/init-db.ts"
   },
   "repository": {
     "type": "git",
@@ -40,7 +43,6 @@
     "dayjs-plugin-utc": "0.1.2",
     "dotenv": "16.0.3",
     "dotenv-expand": "9.0.0",
-    "form-data": "4.0.0",
     "keyv": "4.5.0",
     "knex": "2.3.0",
     "koa": "2.13.4",
