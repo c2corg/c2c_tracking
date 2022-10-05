@@ -1,5 +1,4 @@
 import axios from 'axios';
-import FormData from 'form-data';
 
 import {
   Activity,
@@ -11,7 +10,6 @@ import {
 } from '../../../../src/server/strava/strava.api';
 
 jest.mock('axios');
-jest.mock('form-data');
 
 describe('Strava API', () => {
   beforeEach(() => {
@@ -247,14 +245,14 @@ describe('Strava API', () => {
       expect(axios.post).toBeCalledTimes(1);
       expect(axios.post).toBeCalledWith(
         'https://www.strava.com/api/v3/push_subscriptions',
-        expect.any(FormData),
+        {
+          client_id: '63968',
+          client_secret: 'd37d09886c3a92ced03feca580ccecd5630559ec',
+          callback_url: 'http://redirect.to',
+          verify_token: 'verify_token',
+        },
         expect.anything(),
       );
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const mockFormDataInstance = jest.mocked(FormData).mock.instances[0]!;
-      expect(mockFormDataInstance.append).toBeCalledTimes(4);
-      expect(mockFormDataInstance.append).nthCalledWith(3, 'callback_url', 'http://redirect.to');
-      expect(mockFormDataInstance.append).nthCalledWith(4, 'verify_token', 'verify_token');
     });
   });
 
