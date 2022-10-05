@@ -1,7 +1,6 @@
 import request from 'supertest';
 
 import { app } from '../../../../src/app';
-import FitParser, { type FitObj } from '../../../../src/helpers/fit/fit-parser';
 import type { Activity } from '../../../../src/repository/activity';
 import { activityService } from '../../../../src/server/activities/activity.service';
 import { stravaService } from '../../../../src/server/strava/strava.service';
@@ -185,10 +184,7 @@ describe('Activities Controller', () => {
       jest.spyOn(stravaService, 'getToken');
       jest.spyOn(suuntoService, 'getToken').mockResolvedValueOnce('token');
       jest.spyOn(suuntoService, 'getFIT').mockResolvedValue(fitBin);
-      const mockFitParserParse = jest
-        .spyOn(FitParser.prototype, 'parse')
-        .mockImplementationOnce((): FitObj => ({} as FitObj));
-      jest.spyOn(activityService, 'suuntoFitToGeoJSON').mockReturnValueOnce({
+      jest.spyOn(activityService, 'fitToGeoJSON').mockReturnValueOnce({
         type: 'LineString',
         coordinates: [[0.0, 0.0, 220]],
       });
@@ -221,10 +217,8 @@ describe('Activities Controller', () => {
       expect(suuntoService.getToken).toBeCalledWith(1);
       expect(suuntoService.getToken).toBeCalledTimes(1);
       expect(suuntoService.getToken).toBeCalledWith(1);
-      expect(mockFitParserParse).toBeCalledTimes(1);
-      expect(mockFitParserParse).toBeCalledWith(fitBin);
-      expect(activityService.suuntoFitToGeoJSON).toBeCalledTimes(1);
-      expect(activityService.suuntoFitToGeoJSON).toBeCalledWith({});
+      expect(activityService.fitToGeoJSON).toBeCalledTimes(1);
+      expect(activityService.fitToGeoJSON).toBeCalledWith(fitBin);
     });
 
     it('returns 503 if geojson cannot be retrieved from suunto', async () => {
@@ -254,10 +248,9 @@ describe('Activities Controller', () => {
       jest.spyOn(stravaService, 'getToken');
       jest.spyOn(suuntoService, 'getToken').mockResolvedValueOnce('token');
       jest.spyOn(suuntoService, 'getFIT').mockResolvedValue(fitBin);
-      const mockFitParserParse = jest.spyOn(FitParser.prototype, 'parse').mockImplementationOnce((): FitObj => {
+      jest.spyOn(activityService, 'fitToGeoJSON').mockImplementationOnce(() => {
         throw new Error();
       });
-      jest.spyOn(activityService, 'suuntoFitToGeoJSON');
       jest.spyOn(userService, 'getActivity').mockResolvedValueOnce({
         id: 1,
         userId: 1,
@@ -275,9 +268,7 @@ describe('Activities Controller', () => {
       expect(suuntoService.getToken).toBeCalledWith(1);
       expect(suuntoService.getToken).toBeCalledTimes(1);
       expect(suuntoService.getToken).toBeCalledWith(1);
-      expect(mockFitParserParse).toBeCalledTimes(1);
-      expect(mockFitParserParse).toBeCalledWith(fitBin);
-      expect(activityService.suuntoFitToGeoJSON).not.toHaveBeenCalled();
+      expect(activityService.fitToGeoJSON).toHaveBeenCalledTimes(1);
     });
 
     it('throws if geojson is not present for garmin activity', async () => {

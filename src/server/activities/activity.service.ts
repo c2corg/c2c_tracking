@@ -1,45 +1,18 @@
 import dayjs from 'dayjs';
 
 import { AppError } from '../../errors';
-import type { FitObj } from '../../helpers/fit/fit-parser';
+import { readFitFile } from '../../helpers/fit';
 import type { Activity } from '../../repository/activity';
 import type { LineString } from '../../repository/geojson';
 import type { AltitudeStream, DistanceStream, LatLngStream, StreamSet, TimeStream } from '../strava/strava.api';
 
 export class ActivityService {
-  suuntoFitToGeoJSON(fit: FitObj): LineString {
-    if (!fit.activity?.['records']) {
+  fitToGeoJSON(fit: ArrayBuffer): LineString {
+    const geometry = readFitFile(new Uint8Array(fit));
+    if (!geometry.coordinates.length) {
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
     }
-
-    let coordinates = fit.activity.records
-      .map((record) => [
-        record['position_long'] as number,
-        record['position_lat'] as number,
-        (record['altitude'] as number) || 0,
-        dayjs(record['timestamp'] as Date).unix(),
-      ])
-      .filter(([lng, lat]) => !!lng && !!lat);
-
-    if (coordinates.every(([_lng, _lat, alt]) => !alt)) {
-      coordinates = coordinates.map((coordinate) => [coordinate[0]!, coordinate[1]!, coordinate[2]!]); // eslint-disable-line @typescript-eslint/no-non-null-assertion
-    }
-
-    // Often, the first point has no altitude, but the next one has
-    if (coordinates.length > 2) {
-      /* eslint-disable @typescript-eslint/no-non-null-assertion */
-      const [first, second, ...other] = coordinates;
-      if (first![2] === 0 && second![2] !== 0) {
-        first![2] = second![2]!;
-        coordinates = [first!, second!, ...other];
-      }
-      /* eslint-enable @typescript-eslint/no-non-null-assertion */
-    }
-
-    return {
-      type: 'LineString',
-      coordinates,
-    };
+    return geometry;
   }
 
   stravaStreamSetToGeoJSON(activity: Activity, stream: StreamSet): LineString {

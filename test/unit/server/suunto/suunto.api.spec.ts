@@ -263,12 +263,12 @@ describe('Suunto API', () => {
     });
 
     it('returns FIT', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: new Uint8Array() });
+      jest.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 
       const api = new SuuntoApi();
       const result = await api.getFIT('1', 'token', 'subscription');
 
-      expect(result).toMatchInlineSnapshot(`Uint8Array []`);
+      expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
       expect(axios.get).toBeCalledTimes(1);
     });
   });

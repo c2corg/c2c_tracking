@@ -80,7 +80,7 @@ export class SuuntoService {
     return undefined;
   }
 
-  async getFIT(token: string, vendorId: string): Promise<Uint8Array> {
+  async getFIT(token: string, vendorId: string): Promise<ArrayBuffer> {
     return api.getFIT(vendorId, token, this.#suuntoSubscriptionKey);
   }
 

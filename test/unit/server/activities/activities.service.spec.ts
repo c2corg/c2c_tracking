@@ -1,201 +1,30 @@
+import * as fit from '../../../../src/helpers/fit';
 import type { Activity } from '../../../../src/repository/activity';
 import { ActivityService } from '../../../../src/server/activities/activity.service';
+
+jest.mock('../../../../src/helpers/fit');
 
 describe('Activity Service', () => {
   describe('suuntoFitToGeoJSON', () => {
     it('throws if FIT activity has no records', async () => {
+      jest.mocked(fit).readFitFile.mockReturnValueOnce({ type: 'LineString', coordinates: [] });
       const service = new ActivityService();
       expect(() => {
-        service.suuntoFitToGeoJSON({
-          activity: {},
-          other: {},
-        });
+        service.fitToGeoJSON(new ArrayBuffer(0));
       }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
     });
 
-    it('converts records to coordinates', () => {
+    it('retrieves geometry from FIT', () => {
       const service = new ActivityService();
-      expect(
-        service.suuntoFitToGeoJSON({
-          activity: {
-            records: [
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                altitude: 1,
-                timestamp: new Date('1970-01-01T00:00:01Z'),
-              },
-            ],
-          },
-
-          other: {},
-        }),
-      ).toMatchInlineSnapshot(`
+      jest.mocked(fit).readFitFile.mockReturnValueOnce({ type: 'LineString', coordinates: [[1, 2, 3, 4]] });
+      expect(service.fitToGeoJSON(new ArrayBuffer(0))).toMatchInlineSnapshot(`
         {
           "coordinates": [
             [
-              1,
-              1,
-              1,
-              1,
-            ],
-          ],
-          "type": "LineString",
-        }
-      `);
-    });
-
-    it('filters out records without coordinates', () => {
-      const service = new ActivityService();
-      expect(
-        service.suuntoFitToGeoJSON({
-          activity: {
-            records: [
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                altitude: 1,
-                timestamp: new Date('1970-01-01T00:00:01Z'),
-              },
-
-              {
-                position_long: 1.0,
-                altitude: 1,
-                timestamp: new Date('1970-01-01T00:00:02Z'),
-              },
-
-              {
-                position_lat: 1.0,
-                altitude: 1,
-                timestamp: new Date('1970-01-01T00:00:03Z'),
-              },
-
-              {
-                altitude: 1,
-                timestamp: new Date('1970-01-01T00:00:04Z'),
-              },
-            ],
-          },
-
-          other: {},
-        }),
-      ).toMatchInlineSnapshot(`
-        {
-          "coordinates": [
-            [
-              1,
-              1,
-              1,
-              1,
-            ],
-          ],
-          "type": "LineString",
-        }
-      `);
-    });
-
-    it('filters out altitude if no coordinates have one', () => {
-      const service = new ActivityService();
-      expect(
-        service.suuntoFitToGeoJSON({
-          activity: {
-            records: [
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                timestamp: new Date('1970-01-01T00:00:01Z'),
-              },
-
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                timestamp: new Date('1970-01-01T00:00:02Z'),
-              },
-
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                timestamp: new Date('1970-01-01T00:00:03Z'),
-              },
-            ],
-          },
-
-          other: {},
-        }),
-      ).toMatchInlineSnapshot(`
-        {
-          "coordinates": [
-            [
-              1,
-              1,
-              0,
-            ],
-            [
-              1,
-              1,
-              0,
-            ],
-            [
-              1,
-              1,
-              0,
-            ],
-          ],
-          "type": "LineString",
-        }
-      `);
-    });
-
-    it(`replaces out first point's altitude with second point's one if it has none`, () => {
-      const service = new ActivityService();
-      expect(
-        service.suuntoFitToGeoJSON({
-          activity: {
-            records: [
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                timestamp: new Date('1970-01-01T00:00:01Z'),
-              },
-
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                altitude: 2,
-                timestamp: new Date('1970-01-01T00:00:02Z'),
-              },
-
-              {
-                position_long: 1.0,
-                position_lat: 1.0,
-                altitude: 3,
-                timestamp: new Date('1970-01-01T00:00:03Z'),
-              },
-            ],
-          },
-
-          other: {},
-        }),
-      ).toMatchInlineSnapshot(`
-        {
-          "coordinates": [
-            [
-              1,
               1,
               2,
-              1,
-            ],
-            [
-              1,
-              1,
-              2,
-              2,
-            ],
-            [
-              1,
-              1,
               3,
-              3,
+              4,
             ],
           ],
           "type": "LineString",
