@@ -243,13 +243,13 @@ export class SuuntoApi {
   }
 
   // Id is workout id or key
-  async getFIT(id: string, token: string, subscriptionKey: string): Promise<Uint8Array> {
+  async getFIT(id: string, token: string, subscriptionKey: string): Promise<ArrayBuffer> {
     try {
       const response = await axios.get(`${this.baseUrl}workout/exportFit/${id}`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
-      return z.instanceof(Uint8Array).parse(response.data);
+      return z.instanceof(ArrayBuffer).parse(response.data);
     } catch (error) {
       throw handleAppError(502, 'Error on Suunto getFIT request', error);
     }

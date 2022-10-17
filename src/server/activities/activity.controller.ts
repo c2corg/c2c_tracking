@@ -1,7 +1,6 @@
 import type { Context } from 'koa';
 
 import { AppError } from '../../errors';
-import FitParser from '../../helpers/fit/fit-parser';
 import { userService } from '../../user.service';
 import { stravaService } from '../strava/strava.service';
 import { suuntoService } from '../suunto/suunto.service';
@@ -54,7 +53,7 @@ class ActivityController {
         }
         const fit = await suuntoService.getFIT(token, activity.vendorId);
         try {
-          ctx.body = service.suuntoFitToGeoJSON(new FitParser().parse(fit));
+          ctx.body = service.fitToGeoJSON(fit);
           ctx.status = 200;
         } catch (error) {
           throw new AppError(500, 'Error: unable to convert Suunto FIT file to geometry');
