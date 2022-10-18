@@ -1,18 +1,18 @@
+import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
 import dayjs from 'dayjs';
 
 import { AppError } from '../../errors';
-import { readFitFile } from '../../helpers/fit';
 import type { Activity } from '../../repository/activity';
 import type { LineString } from '../../repository/geojson';
 import type { AltitudeStream, DistanceStream, LatLngStream, StreamSet, TimeStream } from '../strava/strava.api';
 
 export class ActivityService {
   fitToGeoJSON(fit: ArrayBuffer): LineString {
-    const geometry = readFitFile(new Uint8Array(fit));
-    if (!geometry.coordinates.length) {
+    const coordinates = extractGeometry(new Uint8Array(fit));
+    if (!coordinates.length) {
       throw new AppError(501, 'Available data cannot be converted to a valid geometry');
     }
-    return geometry;
+    return { coordinates, type: 'LineString' };
   }
 
   stravaStreamSetToGeoJSON(activity: Activity, stream: StreamSet): LineString {
