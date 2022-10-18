@@ -1,13 +1,14 @@
-import * as fit from '../../../../src/helpers/fit';
+import * as fitParser from '@c2corg/fit-parser-extract-geometry';
+
 import type { Activity } from '../../../../src/repository/activity';
 import { ActivityService } from '../../../../src/server/activities/activity.service';
 
-jest.mock('../../../../src/helpers/fit');
+jest.mock('@c2corg/fit-parser-extract-geometry');
 
 describe('Activity Service', () => {
   describe('suuntoFitToGeoJSON', () => {
     it('throws if FIT activity has no records', async () => {
-      jest.mocked(fit).readFitFile.mockReturnValueOnce({ type: 'LineString', coordinates: [] });
+      jest.mocked(fitParser).extractGeometry.mockReturnValueOnce([]);
       const service = new ActivityService();
       expect(() => {
         service.fitToGeoJSON(new ArrayBuffer(0));
@@ -16,7 +17,7 @@ describe('Activity Service', () => {
 
     it('retrieves geometry from FIT', () => {
       const service = new ActivityService();
-      jest.mocked(fit).readFitFile.mockReturnValueOnce({ type: 'LineString', coordinates: [[1, 2, 3, 4]] });
+      jest.mocked(fitParser).extractGeometry.mockReturnValueOnce([[1, 2, 3, 4]]);
       expect(service.fitToGeoJSON(new ArrayBuffer(0))).toMatchInlineSnapshot(`
         {
           "coordinates": [
