@@ -1,5 +1,6 @@
 # build stage
-FROM node:18-alpine as build-stage
+FROM node:18-slim as build-stage
+RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /usr
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -8,13 +9,15 @@ RUN npm ci
 RUN npm run build
 
 # production stage
-FROM node:18-alpine
-WORKDIR /usr/src/app
-COPY --from=build-stage /usr/package.json ./
+FROM node:18-slim
 ENV NODE_ENV production
+COPY --from=build-stage /usr/bin/dumb-init /usr/bin/dumb-init
+WORKDIR /usr/src/app
+COPY --from=build-stage --chown=node:node /usr/package.json ./
 # because of husky no available without dev deps
 RUN npm set-script prepare ""
-RUN npm install
-COPY --from=build-stage /usr/dist .
+RUN npm ci --only=production
+COPY --from=build-stage --chown=node:node /usr/dist .
 EXPOSE 8080
-CMD [ "node", "index.js" ]
+USER node
+CMD [ "dumb-init", "node", "index.js" ]
