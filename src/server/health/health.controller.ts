@@ -9,6 +9,6 @@ export default class HealthController {
     const status = this.health.getStatus();
 
     ctx.body = status;
-    ctx.status = status.isShuttingDown ? 503 : 200;
+    ctx.status = 200;
   }
 }
