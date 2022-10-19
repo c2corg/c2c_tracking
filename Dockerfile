@@ -16,7 +16,7 @@ WORKDIR /usr/src/app
 COPY --from=build-stage --chown=node:node /usr/package*.json ./
 # because husky is not available without dev deps
 RUN npm set-script prepare ""
-RUN npm ci --only=production
+RUN npm ci --omit=dev --fund=false
 COPY --from=build-stage --chown=node:node /usr/dist .
 EXPOSE 8080
 USER node
