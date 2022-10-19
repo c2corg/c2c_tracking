@@ -1,5 +1,5 @@
 # build stage
-FROM node:18-alpine as build-stage
+FROM node:18-slim as build-stage
 WORKDIR /usr
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -8,7 +8,7 @@ RUN npm ci
 RUN npm run build
 
 # production stage
-FROM node:18-alpine
+FROM node:18-slim
 WORKDIR /usr/src/app
 COPY --from=build-stage /usr/package.json ./
 ENV NODE_ENV production
