@@ -13,8 +13,8 @@ FROM node:18-slim
 ENV NODE_ENV production
 COPY --from=build-stage /usr/bin/dumb-init /usr/bin/dumb-init
 WORKDIR /usr/src/app
-COPY --from=build-stage --chown=node:node /usr/package.json ./
-# because of husky no available without dev deps
+COPY --from=build-stage --chown=node:node /usr/package*.json ./
+# because husky is not available without dev deps
 RUN npm set-script prepare ""
 RUN npm ci --only=production
 COPY --from=build-stage --chown=node:node /usr/dist .
