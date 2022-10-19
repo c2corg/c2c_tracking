@@ -1,7 +1,7 @@
 import cors from '@koa/cors';
 import Router from '@koa/router';
 import rTracer from 'cls-rtracer';
-import Koa from 'koa';
+import Koa, { Context } from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
@@ -52,6 +52,15 @@ switch (config.get('env')) {
     logLevel = 'trace';
 }
 app
+  .use(async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
+    if (ctx['shuttingDown']) {
+      ctx.status = 503;
+      ctx.set('Connection', 'close');
+      ctx.body = 'Server is shutting down';
+    } else {
+      await next();
+    }
+  })
   .use(
     cors({
       allowMethods: ['GET', 'POST'],

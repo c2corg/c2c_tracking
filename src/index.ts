@@ -7,25 +7,10 @@ import { ErrorCallback, retry } from 'async';
 import { app } from './app';
 import config from './config';
 import { database as db } from './db';
-import { healthService } from './health.service';
 import log from './helpers/logger';
 import { stravaService } from './server/strava/strava.service';
 
 const PORT = config.get('server.port');
-
-process.on('unhandledRejection', (reason: string) => {
-  // I just caught an unhandled promise rejection,
-  // since we already have fallback handler for unhandled errors (see below),
-  // let throw and let him handle that
-  throw new Error(reason);
-});
-
-process.on('uncaughtException', (error: Error) => {
-  // I just received an error that was never handled, time to handle it and then decide whether a restart is needed
-  log.error(error);
-  // eslint-disable-next-line no-process-exit
-  process.exit(1);
-});
 
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
@@ -51,37 +36,43 @@ async function closeServer(server: Server): Promise<void> {
   });
 }
 
-function registerProcessEvents(server: Server): void {
-  process.on('uncaughtException', (error: Error) => {
-    log.error('UncaughtException', error);
-  });
+async function closeGracefully(signal: string, server: Server): Promise<void> {
+  log.info(`Received signal to terminate: ${signal}`);
 
-  process.on('unhandledRejection', (reason: unknown) => {
-    log.info(reason as Record<string, unknown>);
-  });
+  app.context['shuttingDown'] = true;
 
-  process.on('SIGTERM', async () => {
-    log.info('Starting graceful shutdown');
+  const shutdown = [closeServer(server), db.closeDatabase()];
 
-    healthService.setShuttingDown();
-
-    let exitCode = 0;
-    const shutdown = [closeServer(server), db.closeDatabase()];
-
-    for (const s of shutdown) {
-      try {
-        await s;
-      } catch (e) {
-        log.error('Error in graceful shutdown ', e);
-        exitCode = 1;
-      }
+  for (const s of shutdown) {
+    try {
+      await s;
+    } catch (e) {
+      log.error('Error in graceful shutdown ', e);
     }
+  }
 
-    process.exit(exitCode); // eslint-disable-line no-process-exit
-  });
+  process.kill(process.pid, signal);
 }
 
 export async function start(): Promise<void> {
+  process.on('unhandledRejection', (reason: string) => {
+    // I just caught an unhandled promise rejection,
+    // since we already have fallback handler for unhandled errors (see below),
+    // let throw and let him handle that
+    throw new Error(reason);
+  });
+
+  process.on('uncaughtException', (error: Error) => {
+    // I just received an error that was never handled, time to handle it and then decide whether a restart is needed
+    log.error(error);
+    // eslint-disable-next-line no-process-exit
+    process.exit(1);
+  });
+
+  process.once('SIGHUP', () => {
+    log.info(`Received event: SIGHUP`);
+  });
+
   try {
     log.info('Apply database migration');
     await db.schemaMigration();
@@ -91,7 +82,8 @@ export async function start(): Promise<void> {
       stravaService.setupWebhook();
     });
 
-    registerProcessEvents(server);
+    process.once('SIGINT', async (signal: string) => closeGracefully(signal, server));
+    process.once('SIGTERM', async (signal: string) => closeGracefully(signal, server));
   } catch (err) {
     log.error(err, 'An error occurred while initializing application.');
   }
