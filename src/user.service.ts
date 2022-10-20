@@ -5,8 +5,9 @@ import log from './helpers/logger';
 import type { Optional } from './helpers/utils';
 import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
-import type { GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
+import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
+import type { DecathlonAuth } from './server/decathlon/decathlon.api';
 import type { GarminAuth } from './server/garmin/garmin.api';
 import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api';
 import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api';
@@ -31,11 +32,12 @@ const isActivityToUpdate = (
 
 export class UserService {
   async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: boolean }> {
-    const { strava, suunto, garmin } = (await userRepository.findById(c2cId)) || {};
+    const { strava, suunto, garmin, decathlon } = (await userRepository.findById(c2cId)) || {};
     return {
       strava: !!strava,
       suunto: !!suunto,
       garmin: !!garmin,
+      decathlon: !!decathlon,
     };
   }
 
@@ -169,6 +171,61 @@ export class UserService {
   async getGarminInfo(c2cId: number): Promise<GarminInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.garmin;
+  }
+
+  async configureDecathlon(c2cId: number, auth: DecathlonAuth, userId: string, webhookId: string): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (user) {
+      user = {
+        ...user,
+        decathlon: {
+          id: userId,
+          accessToken: auth.access_token,
+          expiresAt: this.#expiresAt(auth.expires_in),
+          refreshToken: auth.refresh_token,
+          webhookId: webhookId,
+        },
+      };
+      await userRepository.update(user);
+    } else {
+      user = {
+        c2cId,
+        decathlon: {
+          id: userId,
+          accessToken: auth.access_token,
+          expiresAt: this.#expiresAt(auth.expires_in),
+          refreshToken: auth.refresh_token,
+          webhookId: webhookId,
+        },
+      };
+      await userRepository.insert(user);
+    }
+  }
+
+  async updateDecathlonAuth(c2cId: number, auth: DecathlonAuth): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.decathlon || !user.decathlon.id) {
+      throw new NotFoundError(`User ${c2cId} not configured for Decathlon`);
+    }
+    user = {
+      ...user,
+      decathlon: {
+        id: user.decathlon.id,
+        accessToken: auth.access_token,
+        expiresAt: this.#expiresAt(auth.expires_in),
+        refreshToken: auth.refresh_token,
+        webhookId: user.decathlon.webhookId,
+      },
+    };
+    await userRepository.update(user);
+  }
+
+  async getDecathlonInfo(c2cId: number): Promise<DecathlonInfo | undefined> {
+    const user = await userRepository.findById(c2cId);
+    return user?.decathlon;
   }
 
   async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {

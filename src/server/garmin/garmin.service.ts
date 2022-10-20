@@ -11,7 +11,7 @@ import type { GarminInfo } from '../../repository/user';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { GarminActivity, garminApi as api, GarminAuth, GarminSample } from './garmin.api';
+import { GarminActivity, garminApi, GarminAuth, GarminSample } from './garmin.api';
 
 dayjs.extend(dayjsPluginUTC);
 
@@ -23,7 +23,7 @@ export class GarminService {
   }
 
   async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
-    return await api.requestUnauthorizedRequestToken();
+    return await garminApi.requestUnauthorizedRequestToken();
   }
 
   async requestAccessTokenAndSetupUser(
@@ -32,7 +32,7 @@ export class GarminService {
     requestTokenSecret: string,
     verifier: string,
   ): Promise<void> {
-    const auth = await api.exchangeToken(requestToken, requestTokenSecret, verifier);
+    const auth = await garminApi.exchangeToken(requestToken, requestTokenSecret, verifier);
     await this.setupUser(c2cId, auth);
   }
 
@@ -44,7 +44,7 @@ export class GarminService {
       await Promise.allSettled(
         [...Array(8).keys()]
           .map((i) => now.subtract(i, 'day').toDate())
-          .flatMap(async (date) => await api.getActivitiesForDay(date, auth.token, auth.tokenSecret)),
+          .flatMap(async (date) => await garminApi.getActivitiesForDay(date, auth.token, auth.tokenSecret)),
       )
     )
       .map((result) => {
@@ -125,7 +125,7 @@ export class GarminService {
       throw new NotFoundError(`User ${c2cId} not found`);
     }
 
-    await api.deauthorize(auth.token, auth.tokenSecret);
+    await garminApi.deauthorize(auth.token, auth.tokenSecret);
 
     // clear user Garmin activities
     await activityRepository.deleteByUserAndVendor(c2cId, 'garmin');

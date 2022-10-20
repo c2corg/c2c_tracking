@@ -11,15 +11,7 @@ import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import {
-  Activity as StravaActivity,
-  StravaAuth,
-  stravaApi as api,
-  stravaApi,
-  WebhookEvent,
-  Subscription,
-  StreamSet,
-} from './strava.api';
+import { Activity, StravaAuth, stravaApi, WebhookEvent, Subscription, StreamSet } from './strava.api';
 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 
@@ -37,16 +29,16 @@ export class StravaService {
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
-    const auth = await api.exchangeToken(authorizationCode);
+    const auth = await stravaApi.exchangeToken(authorizationCode);
     await this.setupUser(c2cId, auth);
   }
 
-  async setupUser(c2cId: number, auth: StravaAuth): Promise<void> {
+  private async setupUser(c2cId: number, auth: StravaAuth): Promise<void> {
     await userService.configureStrava(c2cId, auth);
 
     try {
       // retrieve last 30 outings
-      const activities: StravaActivity[] = await api.getAthleteActivities(auth.access_token);
+      const activities: Activity[] = await stravaApi.getAthleteActivities(auth.access_token);
       if (!activities.length) {
         return;
       }
@@ -72,10 +64,10 @@ export class StravaService {
     }
     const token = await this.getToken(c2cId);
     if (!token) {
-      throw new NotFoundError(`User ${c2cId} not found`);
+      throw new NotFoundError(`Unable to retrieve token for user ${c2cId}`);
     }
 
-    await api.deauthorize(token);
+    await stravaApi.deauthorize(token);
 
     // clear user Strava activities
     await activityRepository.deleteByUserAndVendor(c2cId, 'strava');
@@ -93,7 +85,7 @@ export class StravaService {
     if (refreshToken) {
       log.debug('Strava access token expired, requiring refresh');
       try {
-        const auth = await api.refreshAuth(refreshToken);
+        const auth = await stravaApi.refreshAuth(refreshToken);
         await userService.updateStravaAuth(c2cId, auth);
         return auth.access_token;
       } catch (error) {
@@ -232,7 +224,7 @@ export class StravaService {
       );
       return;
     }
-    let activity: StravaActivity;
+    let activity: Activity;
     try {
       activity = await stravaApi.getActivity(token, activityId);
     } catch (error) {
@@ -275,7 +267,7 @@ export class StravaService {
       );
       return;
     }
-    let activity: StravaActivity;
+    let activity: Activity;
     try {
       activity = await stravaApi.getActivity(token, activityId);
     } catch (error) {

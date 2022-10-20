@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import type { ValidationSchema } from '../validator';
 
+import { WebhookEvent } from './strava.api';
+
 export const exchangeToken: ValidationSchema = {
   query: z
     .object({
@@ -26,13 +28,5 @@ export const webhookSubscription: ValidationSchema = {
 };
 
 export const webhook: ValidationSchema = {
-  body: z.object({
-    object_type: z.enum(['activity', 'athlete']),
-    object_id: z.number().int().positive(),
-    aspect_type: z.enum(['create', 'update', 'delete']),
-    updates: z.record(z.string()).optional(),
-    owner_id: z.number().int().positive(),
-    subscription_id: z.number().int().positive(),
-    event_time: z.number().int().positive(),
-  }),
+  body: WebhookEvent,
 };

@@ -203,6 +203,28 @@ const config = convict({
         sensitive: true,
       },
     },
+    decathlon: {
+      clientId: {
+        doc: 'Decathlon client ID',
+        format: 'uuid4',
+        default: 'b708af3b-fd46-41ab-af73-5176a0a56f92',
+        env: 'DECATHLON_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'Decathlon client secret',
+        format: 'base64',
+        default: '',
+        env: 'DECATHLON_CLIENT_SECRET',
+        sensitive: true,
+      },
+      apiKey: {
+        doc: 'Decahlon API key',
+        format: 'uuid4',
+        default: '',
+        env: 'DECATHLON_API_KEY',
+        sensitive: true,
+      },
+    },
   },
 });
 

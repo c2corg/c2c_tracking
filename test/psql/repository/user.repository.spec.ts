@@ -26,6 +26,13 @@ describe('User Repository', () => {
         expiresAt: 2,
       },
       garmin: { token: 'garmin_token', tokenSecret: 'garmin_token_secret' },
+      decathlon: {
+        id: '1',
+        accessToken: 'decathlon_access_token',
+        refreshToken: 'decathlon_refresh_token',
+        expiresAt: 1,
+        webhookId: 'webhookId',
+      },
     };
     await expect(repository.update(user1)).resolves.toEqual(user1);
 
@@ -35,5 +42,7 @@ describe('User Repository', () => {
     await expect(repository.findBySuuntoUsername('99')).resolves.toBeUndefined();
     await expect(repository.findByGarminToken('garmin_token')).resolves.toEqual(user1);
     await expect(repository.findByGarminToken('unknown_token')).resolves.toBeUndefined();
+    await expect(repository.findByDecathlonId('1')).resolves.toEqual(user1);
+    await expect(repository.findByDecathlonId('99')).resolves.toBeUndefined();
   });
 });

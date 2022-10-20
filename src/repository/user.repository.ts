@@ -17,6 +17,11 @@ type UserRow = {
   suunto_refresh_token: string | undefined | null;
   garmin_token: string | undefined | null;
   garmin_token_secret: string | undefined | null;
+  decathlon_id: string | undefined | null;
+  decathlon_access_token: string | undefined | null;
+  decathlon_expires_at: Date | undefined | null;
+  decathlon_refresh_token: string | undefined | null;
+  decathlon_webhook_id: string | undefined | null;
 };
 
 export class UserRepository {
@@ -88,6 +93,22 @@ export class UserRepository {
     }
   }
 
+  async findByDecathlonId(decathlonId: string): Promise<User | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      const row = await conn(this.#TABLE).where({ decathlon_id: decathlonId }).first();
+      if (!row) {
+        return undefined;
+      }
+      return this.rowToUser(row);
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
@@ -138,6 +159,19 @@ export class UserRepository {
             tokenSecret: row.garmin_token_secret,
           },
         }),
+      ...(row.decathlon_id &&
+        row.decathlon_access_token &&
+        row.decathlon_expires_at &&
+        row.decathlon_refresh_token &&
+        row.decathlon_webhook_id && {
+          decathlon: {
+            id: row.decathlon_id,
+            accessToken: row.decathlon_access_token,
+            expiresAt: dayjs(row.decathlon_expires_at).unix(),
+            refreshToken: row.decathlon_refresh_token,
+            webhookId: row.decathlon_webhook_id,
+          },
+        }),
     };
   }
 
@@ -181,11 +215,36 @@ export class UserRepository {
           garmin_token: null,
           garmin_token_secret: null,
         };
+    const decathlon:
+      | Pick<
+          UserRow,
+          | 'decathlon_id'
+          | 'decathlon_access_token'
+          | 'decathlon_expires_at'
+          | 'decathlon_refresh_token'
+          | 'decathlon_webhook_id'
+        >
+      | undefined = user.decathlon
+      ? {
+          decathlon_id: user.decathlon.id,
+          decathlon_access_token: user.decathlon.accessToken,
+          decathlon_expires_at: user.decathlon.expiresAt ? dayjs.unix(user.decathlon.expiresAt).toDate() : undefined,
+          decathlon_refresh_token: user.decathlon.refreshToken,
+          decathlon_webhook_id: user.decathlon.webhookId,
+        }
+      : {
+          decathlon_id: null,
+          decathlon_access_token: null,
+          decathlon_expires_at: null,
+          decathlon_refresh_token: null,
+          decathlon_webhook_id: null,
+        };
     return {
       c2c_id: user.c2cId,
       ...(strava && { ...strava }),
       ...(suunto && { ...suunto }),
       ...(garmin && { ...garmin }),
+      ...(decathlon && { ...decathlon }),
     };
   }
 }

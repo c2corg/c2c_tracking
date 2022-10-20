@@ -2,6 +2,7 @@ import type { Context } from 'koa';
 
 import { AppError } from '../../errors';
 import { userService } from '../../user.service';
+import { decathlonService } from '../decathlon/decathlon.service';
 import { stravaService } from '../strava/strava.service';
 import { suuntoService } from '../suunto/suunto.service';
 
@@ -58,6 +59,18 @@ class ActivityController {
         } catch (error) {
           throw new AppError(500, 'Error: unable to convert Suunto FIT file to geometry');
         }
+        break;
+      }
+      case 'decathlon': {
+        const token = await decathlonService.getToken(userId);
+        if (!token) {
+          ctx.log.warn(`Error: unable to acquire valid Decathlon token`);
+          ctx.status = 503;
+          return;
+        }
+
+        ctx.body = await decathlonService.getActivityGeometry(token, activity.vendorId);
+        ctx.status = 200;
         break;
       }
       case 'garmin':

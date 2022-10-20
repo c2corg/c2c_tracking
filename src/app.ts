@@ -11,6 +11,7 @@ import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } fr
 import config from './config';
 import log from './helpers/logger';
 import activities from './server/activities';
+import decathlon from './server/decathlon';
 import { defaultErrorHandler } from './server/error-handler';
 import garmin from './server/garmin';
 import health from './server/health';
@@ -25,6 +26,7 @@ router.use('/health', health.routes(), health.allowedMethods());
 router.use('/strava', strava.routes(), strava.allowedMethods());
 router.use('/suunto', suunto.routes(), suunto.allowedMethods());
 router.use('/garmin', garmin.routes(), garmin.allowedMethods());
+router.use('/decathlon', decathlon.routes(), decathlon.allowedMethods());
 router.use(
   '/users/:userId/activities',
   ensureAuthenticated,
