@@ -1,4 +1,5 @@
 process.env['SERVER_BASE_URL'] = 'http://localhost:3000/';
+process.env['DB_CRYPTO'] = 'secret';
 process.env['JWT_SECRET_KEY'] = 'secret';
 process.env['STRAVA_CLIENT_SECRET'] = 'd37d09886c3a92ced03feca580ccecd5630559ec';
 process.env['STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN'] = '%trongpAssM0rd';

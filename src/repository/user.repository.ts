@@ -1,5 +1,8 @@
+import aes from 'crypto-js/aes';
+import encUtf8 from 'crypto-js/enc-utf8';
 import dayjs from 'dayjs';
 
+import config from '../config';
 import { database as db } from '../db';
 import { IOError } from '../errors';
 
@@ -26,6 +29,7 @@ type UserRow = {
 
 export class UserRepository {
   readonly #TABLE = 'users';
+  readonly #cryptoSecret = config.get('db.crypto');
 
   async findById(c2cId: number): Promise<User | undefined> {
     try {
@@ -136,9 +140,9 @@ export class UserRepository {
         row.strava_refresh_token && {
           strava: {
             id: row.strava_id,
-            accessToken: row.strava_access_token,
+            accessToken: this.decrypt(row.strava_access_token),
             expiresAt: dayjs(row.strava_expires_at).unix(),
-            refreshToken: row.strava_refresh_token,
+            refreshToken: this.decrypt(row.strava_refresh_token),
           },
         }),
       ...(row.suunto_username &&
@@ -147,16 +151,16 @@ export class UserRepository {
         row.suunto_refresh_token && {
           suunto: {
             username: row.suunto_username,
-            accessToken: row.suunto_access_token,
+            accessToken: this.decrypt(row.suunto_access_token),
             expiresAt: dayjs(row.suunto_expires_at).unix(),
-            refreshToken: row.suunto_refresh_token,
+            refreshToken: this.decrypt(row.suunto_refresh_token),
           },
         }),
       ...(row.garmin_token &&
         row.garmin_token_secret && {
           garmin: {
             token: row.garmin_token,
-            tokenSecret: row.garmin_token_secret,
+            tokenSecret: this.decrypt(row.garmin_token_secret),
           },
         }),
       ...(row.decathlon_id &&
@@ -166,9 +170,9 @@ export class UserRepository {
         row.decathlon_webhook_id && {
           decathlon: {
             id: row.decathlon_id,
-            accessToken: row.decathlon_access_token,
+            accessToken: this.decrypt(row.decathlon_access_token),
             expiresAt: dayjs(row.decathlon_expires_at).unix(),
-            refreshToken: row.decathlon_refresh_token,
+            refreshToken: this.decrypt(row.decathlon_refresh_token),
             webhookId: row.decathlon_webhook_id,
           },
         }),
@@ -181,9 +185,9 @@ export class UserRepository {
       | undefined = user.strava
       ? {
           strava_id: user.strava.id,
-          strava_access_token: user.strava.accessToken,
+          strava_access_token: this.encrypt(user.strava.accessToken),
           strava_expires_at: user.strava.expiresAt ? dayjs.unix(user.strava.expiresAt).toDate() : undefined,
-          strava_refresh_token: user.strava.refreshToken,
+          strava_refresh_token: this.encrypt(user.strava.refreshToken),
         }
       : {
           strava_id: null,
@@ -196,9 +200,9 @@ export class UserRepository {
       | undefined = user.suunto
       ? {
           suunto_username: user.suunto.username,
-          suunto_access_token: user.suunto.accessToken,
+          suunto_access_token: this.encrypt(user.suunto.accessToken),
           suunto_expires_at: user.suunto.expiresAt ? dayjs.unix(user.suunto.expiresAt).toDate() : undefined,
-          suunto_refresh_token: user.suunto.refreshToken,
+          suunto_refresh_token: this.encrypt(user.suunto.refreshToken),
         }
       : {
           suunto_username: null,
@@ -209,7 +213,7 @@ export class UserRepository {
     const garmin: Pick<UserRow, 'garmin_token' | 'garmin_token_secret'> | undefined = user.garmin
       ? {
           garmin_token: user.garmin.token,
-          garmin_token_secret: user.garmin.tokenSecret,
+          garmin_token_secret: this.encrypt(user.garmin.tokenSecret),
         }
       : {
           garmin_token: null,
@@ -227,9 +231,9 @@ export class UserRepository {
       | undefined = user.decathlon
       ? {
           decathlon_id: user.decathlon.id,
-          decathlon_access_token: user.decathlon.accessToken,
+          decathlon_access_token: this.encrypt(user.decathlon.accessToken),
           decathlon_expires_at: user.decathlon.expiresAt ? dayjs.unix(user.decathlon.expiresAt).toDate() : undefined,
-          decathlon_refresh_token: user.decathlon.refreshToken,
+          decathlon_refresh_token: this.encrypt(user.decathlon.refreshToken),
           decathlon_webhook_id: user.decathlon.webhookId,
         }
       : {
@@ -246,6 +250,14 @@ export class UserRepository {
       ...(garmin && { ...garmin }),
       ...(decathlon && { ...decathlon }),
     };
+  }
+
+  private encrypt(token: string): string {
+    return aes.encrypt(token, this.#cryptoSecret).toString();
+  }
+
+  private decrypt(token: string): string {
+    return aes.decrypt(token, this.#cryptoSecret).toString(encUtf8);
   }
 }
 
