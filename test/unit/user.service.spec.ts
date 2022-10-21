@@ -11,6 +11,7 @@ import { UserService } from '../../src/user.service';
 describe('User service', () => {
   beforeEach(() => {
     jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
   });
 
   afterEach(() => {

@@ -1,10 +1,16 @@
 import request from 'supertest';
 
 import { app } from '../../../../src/app';
+import log from '../../../../src/helpers/logger';
 import { userService } from '../../../../src/user.service';
 import { authenticated } from '../../../utils';
 
 describe('User Controller', () => {
+  beforeEach(() => {
+    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+  });
+
   describe('GET /users/:userId/status', () => {
     it('requires an authenticated user', async () => {
       const response = await request(app.callback()).get('/users/1/status');

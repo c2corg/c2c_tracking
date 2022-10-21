@@ -14,6 +14,7 @@ describe('Garmin Controller', () => {
     jest.clearAllMocks();
     await (garminController['keyv'] as Keyv).clear();
     jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
   });
 
   describe('GET /garmin/request-token/:useId', () => {

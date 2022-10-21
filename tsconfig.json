@@ -4,6 +4,7 @@
     "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "./dist",
+    "resolveJsonModule": true,
     "useUnknownInCatchVariables": true
   },
   "include": ["src/**/*.ts"],

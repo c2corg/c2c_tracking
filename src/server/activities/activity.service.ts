@@ -2,6 +2,7 @@ import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
 import dayjs from 'dayjs';
 
 import { AppError, ExternalApiError, NotFoundError } from '../../errors';
+import { Lang, translations } from '../../helpers/i18n';
 import type { Activity } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -12,7 +13,28 @@ import { stravaService } from '../strava/strava.service';
 import { suuntoService } from '../suunto/suunto.service';
 
 export class ActivityService {
-  public async getActivity(userId: number, activityId: number): Promise<LineString | undefined> {
+  public async getActivities(
+    userId: number,
+    lang?: Lang,
+  ): Promise<(Omit<Activity, 'vendorId' | 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
+    const langs: Lang[] = lang ? [lang] : Lang.options;
+    return (await userService.getActivities(userId)).map(({ vendorId, geojson, type, ...keep }) => {
+      const translated = langs.map((l) => ({
+        // eslint-disable-next-line security/detect-object-injection
+        [l]: translations[l][this.i18nKey(type)]?.string ?? translations[l]['unknown']?.string ?? 'Unknown',
+      }));
+      return {
+        ...keep,
+        type: translated,
+      };
+    });
+  }
+
+  private i18nKey(key: string): string {
+    return key.replaceAll(/[:_\- ]/g, '').toLowerCase();
+  }
+
+  public async getActivityGeometry(userId: number, activityId: number): Promise<LineString | undefined> {
     // retrieve activity id and vendor
     const activity = await userService.getActivity(userId, activityId);
     if (!activity) {

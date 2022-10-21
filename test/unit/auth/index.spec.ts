@@ -2,9 +2,15 @@ import { createMockContext } from '@shopify/jest-koa-mocks';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth';
 import { ForbiddenError } from '../../../src/errors';
+import log from '../../../src/helpers/logger';
 import { AuthenticatedUserStrategy } from '../../utils';
 
 describe('ensureAuthenticated', () => {
+  beforeEach(() => {
+    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+  });
+
   it('allows authenticated user', async () => {
     passport.use('jwt', AuthenticatedUserStrategy(123));
     const ctx = createMockContext();

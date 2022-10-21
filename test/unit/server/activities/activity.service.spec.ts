@@ -1,6 +1,7 @@
 import * as fitParser from '@c2corg/fit-parser-extract-geometry';
 
 import { NotFoundError } from '../../../../src/errors';
+import log from '../../../../src/helpers/logger';
 import type { Activity } from '../../../../src/repository/activity';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { ActivityService } from '../../../../src/server/activities/activity.service';
@@ -12,16 +13,159 @@ import { userService } from '../../../../src/user.service';
 jest.mock('@c2corg/fit-parser-extract-geometry');
 
 describe('Activity Service', () => {
-  describe('getActivity', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('getActivities', () => {
+    it('returns all translations if lang is not specified', async () => {
+      jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          name: 'name',
+        },
+      ]);
+
+      const service = new ActivityService();
+      const response = await service.getActivities(1);
+
+      expect(response).toMatchInlineSnapshot(`
+        [
+          {
+            "date": "2022-01-01T00:00:01Z",
+            "id": 1,
+            "name": "name",
+            "type": [
+              {
+                "fr": "Run",
+              },
+              {
+                "en": "Run",
+              },
+              {
+                "ca": "Run",
+              },
+              {
+                "eu": "Run",
+              },
+              {
+                "it": "Run",
+              },
+              {
+                "de": "Run",
+              },
+              {
+                "es": "Run",
+              },
+              {
+                "hu": "Run",
+              },
+              {
+                "sl": "Run",
+              },
+              {
+                "zh_CN": "Run",
+              },
+            ],
+            "userId": 1,
+            "vendor": "strava",
+          },
+        ]
+      `);
+      expect(userService.getActivities).toBeCalledTimes(1);
+      expect(userService.getActivities).toBeCalledWith(1);
+    });
+
+    it('returns only specific lang if specified', async () => {
+      jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          name: 'name',
+        },
+      ]);
+
+      const service = new ActivityService();
+      const response = await service.getActivities(1, 'fr');
+
+      expect(response).toMatchInlineSnapshot(`
+        [
+          {
+            "date": "2022-01-01T00:00:01Z",
+            "id": 1,
+            "name": "name",
+            "type": [
+              {
+                "fr": "Run",
+              },
+            ],
+            "userId": 1,
+            "vendor": "strava",
+          },
+        ]
+      `);
+      expect(userService.getActivities).toBeCalledTimes(1);
+      expect(userService.getActivities).toBeCalledWith(1);
+    });
+  });
+
+  it('defaults to unknown if i18n key is not found', async () => {
+    jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
+      {
+        id: 1,
+        userId: 1,
+        vendor: 'strava',
+        vendorId: '1',
+        date: '2022-01-01T00:00:01Z',
+        type: 'whut?',
+        name: 'name',
+      },
+    ]);
+
+    const service = new ActivityService();
+    const response = await service.getActivities(1, 'fr');
+
+    expect(response).toMatchInlineSnapshot(`
+      [
+        {
+          "date": "2022-01-01T00:00:01Z",
+          "id": 1,
+          "name": "name",
+          "type": [
+            {
+              "fr": "Unknown",
+            },
+          ],
+          "userId": 1,
+          "vendor": "strava",
+        },
+      ]
+    `);
+    expect(userService.getActivities).toBeCalledTimes(1);
+    expect(userService.getActivities).toBeCalledWith(1);
+  });
+
+  describe('getActivityGeometry', () => {
     beforeEach(() => {
       jest.clearAllMocks();
+      jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+      jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
     });
 
     it('throws if activity does not exist', async () => {
       jest.spyOn(userService, 'getActivity').mockResolvedValueOnce(undefined);
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toBeInstanceOf(NotFoundError);
+      await expect(service.getActivityGeometry(1, 1)).rejects.toBeInstanceOf(NotFoundError);
     });
 
     it('returns geojson from DB if already present', async () => {
@@ -41,7 +185,7 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      const response = await service.getActivity(1, 1);
+      const response = await service.getActivityGeometry(1, 1);
 
       expect(response).toEqual({
         type: 'LineString',
@@ -75,7 +219,7 @@ describe('Activity Service', () => {
         });
 
       const service = new ActivityService();
-      const response = await service.getActivity(1, 1);
+      const response = await service.getActivityGeometry(1, 1);
 
       expect(response).toEqual({
         type: 'LineString',
@@ -111,7 +255,9 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toMatchInlineSnapshot('[Error: Unable to acquire valid token]');
+      await expect(service.getActivityGeometry(1, 1)).rejects.toMatchInlineSnapshot(
+        '[Error: Unable to acquire valid token]',
+      );
 
       expect(stravaService.getToken).toBeCalledTimes(1);
       expect(stravaService.getToken).toBeCalledWith(1);
@@ -133,7 +279,7 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toBeInstanceOf(NotFoundError);
+      await expect(service.getActivityGeometry(1, 1)).rejects.toBeInstanceOf(NotFoundError);
 
       expect(stravaService.getToken).toBeCalledTimes(1);
       expect(stravaService.getToken).toBeCalledWith(1);
@@ -163,7 +309,7 @@ describe('Activity Service', () => {
       jest.spyOn(activityRepository, 'update').mockResolvedValueOnce({} as Activity);
 
       const service = new ActivityService();
-      const response = await service.getActivity(1, 1);
+      const response = await service.getActivityGeometry(1, 1);
 
       expect(response).toEqual({
         type: 'LineString',
@@ -194,7 +340,9 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toMatchInlineSnapshot('[Error: Unable to acquire valid token]');
+      await expect(service.getActivityGeometry(1, 1)).rejects.toMatchInlineSnapshot(
+        '[Error: Unable to acquire valid token]',
+      );
 
       expect(stravaService.getToken).not.toHaveBeenCalled();
       expect(suuntoService.getToken).toBeCalledTimes(1);
@@ -216,7 +364,7 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toBeInstanceOf(NotFoundError);
+      await expect(service.getActivityGeometry(1, 1)).rejects.toBeInstanceOf(NotFoundError);
 
       expect(stravaService.getToken).not.toHaveBeenCalled();
       expect(suuntoService.getToken).toBeCalledTimes(1);
@@ -246,7 +394,7 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toBeInstanceOf(NotFoundError);
+      await expect(service.getActivityGeometry(1, 1)).rejects.toBeInstanceOf(NotFoundError);
 
       expect(stravaService.getToken).not.toHaveBeenCalled();
       expect(suuntoService.getToken).toBeCalledTimes(1);
@@ -276,7 +424,7 @@ describe('Activity Service', () => {
       jest.spyOn(activityRepository, 'update').mockResolvedValueOnce({} as Activity);
 
       const service = new ActivityService();
-      const response = await service.getActivity(1, 1);
+      const response = await service.getActivityGeometry(1, 1);
 
       expect(response).toEqual({
         type: 'LineString',
@@ -302,7 +450,9 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toMatchInlineSnapshot('[Error: Unable to acquire valid token]');
+      await expect(service.getActivityGeometry(1, 1)).rejects.toMatchInlineSnapshot(
+        '[Error: Unable to acquire valid token]',
+      );
 
       expect(decathlonService.getToken).toBeCalledTimes(1);
       expect(decathlonService.getToken).toBeCalledWith(1);
@@ -324,7 +474,7 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toBeInstanceOf(NotFoundError);
+      await expect(service.getActivityGeometry(1, 1)).rejects.toBeInstanceOf(NotFoundError);
 
       expect(decathlonService.getToken).toBeCalledTimes(1);
       expect(decathlonService.getToken).toBeCalledWith(1);
@@ -346,7 +496,7 @@ describe('Activity Service', () => {
       });
 
       const service = new ActivityService();
-      await expect(service.getActivity(1, 1)).rejects.toMatchInlineSnapshot(
+      await expect(service.getActivityGeometry(1, 1)).rejects.toMatchInlineSnapshot(
         '[Error: Unable to acquire Garmin geometry]',
       );
 
@@ -372,7 +522,7 @@ describe('Activity Service', () => {
       jest.spyOn(activityRepository, 'update').mockRejectedValueOnce(undefined);
 
       const service = new ActivityService();
-      const response = await service.getActivity(1, 1);
+      const response = await service.getActivityGeometry(1, 1);
 
       expect(response).toEqual({
         type: 'LineString',

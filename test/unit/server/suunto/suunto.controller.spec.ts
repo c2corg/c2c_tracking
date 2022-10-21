@@ -9,6 +9,7 @@ describe('Suunto Controller', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
   });
 
   describe('GET /suunto/exchange-token/:userId', () => {

@@ -1,0 +1,1595 @@
+{
+  "100/110mhurdles": {
+    "string": "100-110米跨栏跑"
+  },
+  "100km": {
+    "string": "100公里"
+  },
+  "10km": {
+    "string": "10公里"
+  },
+  "22longrifleshooting": {
+    "string": "22LR射击"
+  },
+  "3darchery": {
+    "string": "3D射箭"
+  },
+  "400mhurdles": {
+    "string": "400米跨栏跑"
+  },
+  "adventureracing": {
+    "string": "定向穿越"
+  },
+  "adventureroute": {
+    "string": "探险路线"
+  },
+  "aerobatics": {
+    "string": "空中特技"
+  },
+  "aerobics": {
+    "string": "健身操"
+  },
+  "africandance": {
+    "string": "非洲舞"
+  },
+  "aggressiveinlineskating(stunts)": {
+    "string": "杂技旱冰"
+  },
+  "aïkido": {
+    "string": "合气道"
+  },
+  "airrifleshooting": {
+    "string": "压缩气枪射击"
+  },
+  "allmountainmtb": {
+    "string": "山地自行车"
+  },
+  "alpineski": {
+    "string": "Alpine Ski"
+  },
+  "alpineskiing": {
+    "string": "高山滑雪"
+  },
+  "alpinesnowboarding": {
+    "string": "高山单板滑雪"
+  },
+  "alternativenordicskiing": {
+    "string": "北欧式交替滑雪"
+  },
+  "americanfootball": {
+    "string": "美式足球"
+  },
+  "apnea": {
+    "string": "Apnea"
+  },
+  "apneahunt": {
+    "string": "Apnea Hunt"
+  },
+  "aquabike": {
+    "string": "水上自行车"
+  },
+  "aquaboxing": {
+    "string": "水上拳击"
+  },
+  "aquabuilding": {
+    "string": "水上健美"
+  },
+  "aquafitness": {
+    "string": "水上健身"
+  },
+  "aquagym/aquafitness": {
+    "string": "水上健身操/水上健美"
+  },
+  "aquagymsessions": {
+    "string": "水中体操"
+  },
+  "aquajogging": {
+    "string": "水中跑步"
+  },
+  "aquapump": {
+    "string": "水中俯卧撑"
+  },
+  "aquathlon": {
+    "string": "Aquathlon"
+  },
+  "archery": {
+    "string": "射箭"
+  },
+  "artisticgymnastics(ag)": {
+    "string": "艺术体操"
+  },
+  "artisticrollerskating": {
+    "string": "艺术旱冰"
+  },
+  "athletics": {
+    "string": "田径"
+  },
+  "atv": {
+    "string": "Atv"
+  },
+  "autoracing": {
+    "string": "Auto Racing"
+  },
+  "babyswimming": {
+    "string": "水中启蒙教育"
+  },
+  "backcountryski": {
+    "string": "Backcountry Ski"
+  },
+  "backcountryskiing": {
+    "string": "越野滑雪"
+  },
+  "backcountryskiing/snowboarding": {
+    "string": "Backcountry Skiing/Snowboarding"
+  },
+  "badminton": {
+    "string": "羽毛球"
+  },
+  "ballet": {
+    "string": "古典舞"
+  },
+  "ballgames": {
+    "string": "Ball Games"
+  },
+  "ballroomdance": {
+    "string": "交谊舞"
+  },
+  "baroquedance": {
+    "string": "巴洛克舞"
+  },
+  "baseball": {
+    "string": "Baseball"
+  },
+  "basketball": {
+    "string": "篮球"
+  },
+  "basquepelota": {
+    "string": "巴斯克回力球"
+  },
+  "beachrugby": {
+    "string": "沙滩橄榄球"
+  },
+  "beachsoccer": {
+    "string": "沙滩足球"
+  },
+  "beachvolley": {
+    "string": "沙滩排球"
+  },
+  "bicycle": {
+    "string": "自行车"
+  },
+  "bicycletouring": {
+    "string": "自行车观光"
+  },
+  "bigboreshooting": {
+    "string": "大口径枪射击"
+  },
+  "biketoruntransition": {
+    "string": "Bike to Run Transition"
+  },
+  "billiards": {
+    "string": "桌球"
+  },
+  "blindhuntingforbiggame": {
+    "string": "大型猎物潜伏式狩猎"
+  },
+  "blockclimbing": {
+    "string": "抱石攀岩"
+  },
+  "blowgun": {
+    "string": "吹管游戏"
+  },
+  "bmx": {
+    "string": "小轮单车"
+  },
+  "bmxrace": {
+    "string": "比赛用小轮单车"
+  },
+  "bmxstreet": {
+    "string": "街头小轮单车"
+  },
+  "bmxtrial": {
+    "string": "越野小轮单车"
+  },
+  "boating": {
+    "string": "Boating"
+  },
+  "bobsleigh": {
+    "string": "长雪橇"
+  },
+  "bodyboarding": {
+    "string": "趴板冲浪"
+  },
+  "bodysurf": {
+    "string": "徒手冲浪"
+  },
+  "bolognesefishing": {
+    "string": "浮钓"
+  },
+  "bouldering": {
+    "string": "Bouldering"
+  },
+  "boules": {
+    "string": "滚球游戏"
+  },
+  "bowhunting": {
+    "string": "弓箭狩猎"
+  },
+  "bowling": {
+    "string": "保龄球"
+  },
+  "boxing": {
+    "string": "拳击"
+  },
+  "breathwork": {
+    "string": "Breathwork"
+  },
+  "britishboxing": {
+    "string": "英式拳击"
+  },
+  "bushcraft": {
+    "string": "丛林生存"
+  },
+  "canihiking": {
+    "string": "长途犬赛"
+  },
+  "canicross": {
+    "string": "越野犬赛"
+  },
+  "canoeing": {
+    "string": "Canoeing"
+  },
+  "canoeingandkayaking": {
+    "string": "皮划艇"
+  },
+  "canoepolo": {
+    "string": "皮划艇水球"
+  },
+  "canyoning": {
+    "string": "溪降运动"
+  },
+  "capoeira": {
+    "string": "巴西卡波耶拉舞"
+  },
+  "cardio": {
+    "string": "Cardio"
+  },
+  "cardioboxing": {
+    "string": "有氧拳击"
+  },
+  "carombilliards": {
+    "string": "法式桌球"
+  },
+  "carpfishing": {
+    "string": "钓鲤"
+  },
+  "casualwalking": {
+    "string": "Casual Walking"
+  },
+  "catamaran": {
+    "string": "双体帆船"
+  },
+  "catfishfishing": {
+    "string": "钓鲇"
+  },
+  "caving": {
+    "string": "洞穴探索"
+  },
+  "ccrdive": {
+    "string": "Ccr Dive"
+  },
+  "cestapunta": {
+    "string": "cesta-punta柳条长勺捧兜回力球"
+  },
+  "cheerleading": {
+    "string": "Cheerleading"
+  },
+  "circuittraining": {
+    "string": "Circuit Training"
+  },
+  "claypigeonshooting": {
+    "string": "飞碟射击"
+  },
+  "climbing": {
+    "string": "攀岩"
+  },
+  "climbingmajorroutes": {
+    "string": "多段攀岩"
+  },
+  "combatsport": {
+    "string": "Combat Sport"
+  },
+  "contemporarydance": {
+    "string": "当代舞"
+  },
+  "countryactivities": {
+    "string": "自然活动"
+  },
+  "countrydance": {
+    "string": "乡村舞"
+  },
+  "countrysidedogwork": {
+    "string": "乡村驯狗"
+  },
+  "cricket": {
+    "string": "板球"
+  },
+  "crosscountry": {
+    "string": "越野障碍赛跑"
+  },
+  "crosscountryhorseracing": {
+    "string": "越野赛马"
+  },
+  "crosscountrymtb": {
+    "string": "越野山地自行车"
+  },
+  "crossbow": {
+    "string": "弩"
+  },
+  "crosscountryclassicskiing": {
+    "string": "Cross Country Classic Skiing"
+  },
+  "crosscountryskateskiing": {
+    "string": "Cross Country Skate Skiing"
+  },
+  "crosscountryskiing": {
+    "string": "Cross Country Skiing"
+  },
+  "crossfit": {
+    "string": "Crossfit"
+  },
+  "crosstrainer": {
+    "string": "椭圆训练自行车"
+  },
+  "crosstraining": {
+    "string": "交叉训练"
+  },
+  "curling": {
+    "string": "冰壶"
+  },
+  "cycling": {
+    "string": "Cycling"
+  },
+  "cyclocross": {
+    "string": "冬季自行车越野"
+  },
+  "dailyactivity": {
+    "string": "日常活动"
+  },
+  "dancing": {
+    "string": "舞蹈"
+  },
+  "darts": {
+    "string": "飞镖"
+  },
+  "dartswithelectronicboards": {
+    "string": "电子靶掷飞镖"
+  },
+  "dartswithtraditionalboards": {
+    "string": "传统靶掷飞镖"
+  },
+  "dayhiking": {
+    "string": "白日徒步"
+  },
+  "decathlon": {
+    "string": "十项全能"
+  },
+  "dinghysailing": {
+    "string": "小帆船"
+  },
+  "dirtmtb": {
+    "string": "泥地山地自行车"
+  },
+  "disabledsports": {
+    "string": "残疾人运动"
+  },
+  "discus": {
+    "string": "掷铁饼"
+  },
+  "diving": {
+    "string": "跳水"
+  },
+  "dogagility": {
+    "string": "灵敏性赛"
+  },
+  "dogsledandpulk": {
+    "string": "狗拉雪橇及船型雪橇"
+  },
+  "dogsledding": {
+    "string": "雪橇狗"
+  },
+  "dogsports": {
+    "string": "犬类运动"
+  },
+  "domavaquera": {
+    "string": "驯马赛"
+  },
+  "downhillbiking": {
+    "string": "Downhill Biking"
+  },
+  "downhillmtb": {
+    "string": "下坡山地自行车"
+  },
+  "downhillskiing": {
+    "string": "Downhill Skiing"
+  },
+  "dressage": {
+    "string": "驯马"
+  },
+  "drivehuntingforbiggame": {
+    "string": "大型猎物驱赶式狩猎"
+  },
+  "driving": {
+    "string": "Driving"
+  },
+  "duathlon": {
+    "string": "两项全能"
+  },
+  "esport": {
+    "string": "E-Sport"
+  },
+  "ebikeride": {
+    "string": "E-Bike Ride"
+  },
+  "elliptical": {
+    "string": "Elliptical"
+  },
+  "enduranceriding": {
+    "string": "耐力马术赛"
+  },
+  "enduro": {
+    "string": "摩托车耐力赛"
+  },
+  "enduromtb": {
+    "string": "耐力自行车"
+  },
+  "englishbilliards": {
+    "string": "英式桌球"
+  },
+  "epée": {
+    "string": "重剑"
+  },
+  "equestrianvaulting": {
+    "string": "特技马术"
+  },
+  "eventing": {
+    "string": "马术三项赛"
+  },
+  "exploration": {
+    "string": "探索"
+  },
+  "fencing": {
+    "string": "击剑"
+  },
+  "fieldarchery": {
+    "string": "野外射箭"
+  },
+  "fieldcrossbow": {
+    "string": "野外弩"
+  },
+  "fieldhockey": {
+    "string": "草地曲棍球"
+  },
+  "fieldtrial": {
+    "string": "田野越野犬赛"
+  },
+  "figureskating": {
+    "string": "艺术滑冰"
+  },
+  "fishing": {
+    "string": "钓鱼"
+  },
+  "fishingonfoot": {
+    "string": "沙滩步行捕鱼"
+  },
+  "fitness": {
+    "string": "健身"
+  },
+  "fitnessbike,treadmillathome": {
+    "string": "家庭健身自行车，跑步机"
+  },
+  "fitnessclass": {
+    "string": "Fitness Class"
+  },
+  "fives": {
+    "string": "空手回力球"
+  },
+  "floorball": {
+    "string": "Floorball"
+  },
+  "floorclimbing": {
+    "string": "Floor Climbing"
+  },
+  "flyball": {
+    "string": "飞球赛"
+  },
+  "flyfishing": {
+    "string": "假蝇飞钓"
+  },
+  "flying": {
+    "string": "Flying"
+  },
+  "foil": {
+    "string": "花剑"
+  },
+  "football": {
+    "string": "足球"
+  },
+  "formularacing": {
+    "string": "方程式赛车"
+  },
+  "formulawindsurfing": {
+    "string": "方程式风帆冲浪"
+  },
+  "fountain": {
+    "string": "喷泉"
+  },
+  "freediving": {
+    "string": "屏气潜水"
+  },
+  "freerideskiing": {
+    "string": "休闲滑雪"
+  },
+  "freeridesnowboarding": {
+    "string": "休闲单板滑雪"
+  },
+  "freeridewindsurfing": {
+    "string": "休闲帆板"
+  },
+  "freestyleskiing": {
+    "string": "自由式滑雪"
+  },
+  "freestylesnowboarding": {
+    "string": "自由式单板滑雪"
+  },
+  "freestylewindsurfing": {
+    "string": "自由式帆板"
+  },
+  "frenchboxing": {
+    "string": "法式拳击"
+  },
+  "frescobol": {
+    "string": "Frescobol沙滩球"
+  },
+  "freshwaterlurefishing": {
+    "string": "淡水人造鱼饵钓鱼"
+  },
+  "frisbee": {
+    "string": "掷飞碟"
+  },
+  "frisbeegolf": {
+    "string": "Frisbee Golf"
+  },
+  "frontenis": {
+    "string": "Fronteni回力球"
+  },
+  "fullcontact": {
+    "string": "综合格斗"
+  },
+  "futsal": {
+    "string": "五人制室内足球"
+  },
+  "gaugedive": {
+    "string": "Gauge Dive"
+  },
+  "gentlegym": {
+    "string": "柔性体操"
+  },
+  "glacierhiking": {
+    "string": "冰川徒步"
+  },
+  "golf": {
+    "string": "高尔夫球"
+  },
+  "grandchistera": {
+    "string": "grand chistera柳条大捧兜回力球"
+  },
+  "grappling": {
+    "string": "格斗"
+  },
+  "gravel/unpaved cycling": {
+    "string": "Gravel/unpaved Cycling"
+  },
+  "gym": {
+    "string": "Gym"
+  },
+  "gym&fitnessequipment": {
+    "string": "Gym & Fitness Equipment"
+  },
+  "gymnastics": {
+    "string": "体操"
+  },
+  "gymtraining": {
+    "string": "集体业余体操"
+  },
+  "hacking": {
+    "string": "远途骑行"
+  },
+  "halfmarathon": {
+    "string": "半马拉松"
+  },
+  "hammer": {
+    "string": "掷链球"
+  },
+  "handball": {
+    "string": "手球"
+  },
+  "handbike": {
+    "string": "残疾人自行车"
+  },
+  "handcycle": {
+    "string": "Handcycle"
+  },
+  "hanggliding": {
+    "string": "Hang Gliding"
+  },
+  "harnessracing": {
+    "string": "赛马车"
+  },
+  "heptathlon": {
+    "string": "女子七项全能"
+  },
+  "highjump": {
+    "string": "跳高"
+  },
+  "hike": {
+    "string": "Hike"
+  },
+  "hiking": {
+    "string": "徒步"
+  },
+  "hiphop": {
+    "string": "街舞"
+  },
+  "hockey": {
+    "string": "曲棍球"
+  },
+  "hometrainer": {
+    "string": "家里教练"
+  },
+  "horsedrawncarriage": {
+    "string": "安装马具"
+  },
+  "horsebackriding": {
+    "string": "Horseback Riding"
+  },
+  "horseball": {
+    "string": "马球"
+  },
+  "horseracing": {
+    "string": "平地赛马"
+  },
+  "horseriding": {
+    "string": "马术"
+  },
+  "house": {
+    "string": "房屋"
+  },
+  "hunting": {
+    "string": "狩猎"
+  },
+  "hunting/fishing": {
+    "string": "Hunting/Fishing"
+  },
+  "huntingwithhounds": {
+    "string": "围猎"
+  },
+  "hybridcycling": {
+    "string": "远足自行车"
+  },
+  "hydrospeed": {
+    "string": "漂流"
+  },
+  "iceclimbing": {
+    "string": "攀冰"
+  },
+  "icehockey": {
+    "string": "冰球"
+  },
+  "iceskate": {
+    "string": "Ice Skate"
+  },
+  "iceskating": {
+    "string": "滑冰"
+  },
+  "indoor": {
+    "string": "Indoor"
+  },
+  "indoorclimbing": {
+    "string": "室内攀岩"
+  },
+  "indoorcycling": {
+    "string": "Indoor Cycling"
+  },
+  "indoorfitnessbike": {
+    "string": "室内自行车"
+  },
+  "indoorfootball": {
+    "string": "室内足球"
+  },
+  "indoorrowing": {
+    "string": "Indoor Rowing"
+  },
+  "indoorrunning": {
+    "string": "Indoor Running"
+  },
+  "indoorweighttraining": {
+    "string": "室内肌肉锻炼"
+  },
+  "inlineskate": {
+    "string": "Inline Skate"
+  },
+  "inlineskating": {
+    "string": "旱冰"
+  },
+  "itinerantcamping": {
+    "string": "巡回露营"
+  },
+  "javelin": {
+    "string": "标枪"
+  },
+  "jetski": {
+    "string": "水上摩托艇"
+  },
+  "jigfishing": {
+    "string": "跳汰杆钓鱼"
+  },
+  "jiujitsu": {
+    "string": "柔术"
+  },
+  "jocari": {
+    "string": "Jocari球"
+  },
+  "jokogarbi": {
+    "string": "Joko-garbi柳条小捧兜回力球"
+  },
+  "judo": {
+    "string": "柔道"
+  },
+  "jumpingrope": {
+    "string": "跳绳"
+  },
+  "karate": {
+    "string": "空手道"
+  },
+  "karting": {
+    "string": "卡丁车"
+  },
+  "kayakfishing": {
+    "string": "皮划艇钓鱼 "
+  },
+  "kayaking": {
+    "string": "Kayaking"
+  },
+  "kayaksurf": {
+    "string": "皮划艇冲浪"
+  },
+  "kendo": {
+    "string": "剑道"
+  },
+  "kettlebell": {
+    "string": "Kettlebell"
+  },
+  "kickboxing": {
+    "string": "自由搏击"
+  },
+  "kitebuggy": {
+    "string": "风筝车"
+  },
+  "kitesurf": {
+    "string": "Kitesurf"
+  },
+  "kitesurfing": {
+    "string": "风筝冲浪"
+  },
+  "kitesurfingkiting": {
+    "string": "Kitesurfing Kiting"
+  },
+  "kungfu": {
+    "string": "功夫"
+  },
+  "lacrosse": {
+    "string": "长曲棍球"
+  },
+  "landsailing": {
+    "string": "沙滩帆车"
+  },
+  "lasergame": {
+    "string": "激光游戏"
+  },
+  "latindance": {
+    "string": "拉丁舞"
+  },
+  "legs,bumsandtumstraining": {
+    "string": "腰腹臀"
+  },
+  "lia": {
+    "string": "低强度有氧健身操"
+  },
+  "livebaitfishing": {
+    "string": "活鱼饵钓鱼"
+  },
+  "longrangekayakingoutings": {
+    "string": "长途皮划艇"
+  },
+  "longboard": {
+    "string": "长板"
+  },
+  "longjump": {
+    "string": "跳远"
+  },
+  "longtrailrunning(between40and80km)": {
+    "string": "长途越野跑（40到80公里）"
+  },
+  "lurecoursing": {
+    "string": "诱饵追踪赛"
+  },
+  "marathon": {
+    "string": "马拉松"
+  },
+  "martialarts": {
+    "string": "武术"
+  },
+  "matchcrossbow": {
+    "string": "竞赛弩"
+  },
+  "matchfishing": {
+    "string": "英式钓鱼"
+  },
+  "meal": {
+    "string": "饮食"
+  },
+  "migratorybirdhunting": {
+    "string": "候鸟狩猎"
+  },
+  "mixedclimbing": {
+    "string": "混合赛跑"
+  },
+  "mmamixedmartialarts": {
+    "string": "MMA：混合武术"
+  },
+  "modernjazzdance": {
+    "string": "现代舞/爵士舞"
+  },
+  "monoskiing": {
+    "string": "长单板滑雪"
+  },
+  "motocross": {
+    "string": "摩托车越野障碍赛"
+  },
+  "motorboat": {
+    "string": "动力船"
+  },
+  "motorcycling": {
+    "string": "摩托车"
+  },
+  "mototsports": {
+    "string": "Mototsports"
+  },
+  "mount": {
+    "string": "山"
+  },
+  "mountainbiking": {
+    "string": "山地自行车"
+  },
+  "mountainboard": {
+    "string": "山地板"
+  },
+  "mountaineering": {
+    "string": "登山"
+  },
+  "multigasdive": {
+    "string": "Multi-gas Dive"
+  },
+  "multisport": {
+    "string": "Multisport"
+  },
+  "naturalbaittroutfishing": {
+    "string": "天然诱饵钓鳟"
+  },
+  "netball": {
+    "string": "无板篮球"
+  },
+  "nordicskating": {
+    "string": "北欧式雪板滑雪"
+  },
+  "nordicski": {
+    "string": "Nordic Ski"
+  },
+  "nordicskiing": {
+    "string": "北欧式滑雪"
+  },
+  "nordicwalking": {
+    "string": "北欧式步行"
+  },
+  "obedience": {
+    "string": "顺从度赛"
+  },
+  "obstacleracing": {
+    "string": "Obstacle Racing"
+  },
+  "obstaclerunning": {
+    "string": "Obstacle Running"
+  },
+  "offroadrunning": {
+    "string": "野外跑"
+  },
+  "offshoregrinding": {
+    "string": "Offshore Grinding"
+  },
+  "offshoresurfcasting": {
+    "string": "大洋激浪抛钓"
+  },
+  "olympicwalking": {
+    "string": "奥运会步行"
+  },
+  "onshoregrinding": {
+    "string": "Onshore Grinding"
+  },
+  "openwaterswimming": {
+    "string": "Open water Swimming"
+  },
+  "orientaldance": {
+    "string": "东方舞"
+  },
+  "orientationracing": {
+    "string": "定向跑"
+  },
+  "orienteering": {
+    "string": "Orienteering"
+  },
+  "other": {
+    "string": "Other"
+  },
+  "other1": {
+    "string": "Other1"
+  },
+  "other2": {
+    "string": "Other2"
+  },
+  "other3": {
+    "string": "Other3"
+  },
+  "other4": {
+    "string": "Other4"
+  },
+  "other5": {
+    "string": "Other5"
+  },
+  "other6": {
+    "string": "Other6"
+  },
+  "outdoorgym": {
+    "string": "Outdoor Gym"
+  },
+  "paddling": {
+    "string": "Paddling"
+  },
+  "padel": {
+    "string": "Padel网球"
+  },
+  "paintball": {
+    "string": "彩弹游戏"
+  },
+  "palacuir": {
+    "string": "pala皮革捧兜回力球"
+  },
+  "paragliding": {
+    "string": "滑翔伞"
+  },
+  "paramotor": {
+    "string": "动力伞"
+  },
+  "parking": {
+    "string": "停车场"
+  },
+  "parkour": {
+    "string": "Parkour"
+  },
+  "pasaka": {
+    "string": "Pasaka带网回力球"
+  },
+  "pelota": {
+    "string": "回力球"
+  },
+  "pétanque": {
+    "string": "法国南部滚球"
+  },
+  "peteca": {
+    "string": "巴西peteca毽子"
+  },
+  "photo": {
+    "string": "照片"
+  },
+  "pilates": {
+    "string": "普拉特健身操"
+  },
+  "pistolshooting": {
+    "string": "手枪射击"
+  },
+  "playbike": {
+    "string": "普雷派克"
+  },
+  "pointofview": {
+    "string": "观光点"
+  },
+  "polevault": {
+    "string": "撑杆跳高"
+  },
+  "polo": {
+    "string": "马杆球"
+  },
+  "ponygames": {
+    "string": "小马游戏"
+  },
+  "pool": {
+    "string": "美式桌球"
+  },
+  "poolswimming": {
+    "string": "Pool Swimming"
+  },
+  "punchbagboxing": {
+    "string": "沙袋击打"
+  },
+  "quadbiking": {
+    "string": "四轮摩托车越野赛"
+  },
+  "quadrollerskating": {
+    "string": "四轮旱冰"
+  },
+  "quivertip/feederfishing": {
+    "string": "进料器钓鱼"
+  },
+  "rackandfield": {
+    "string": "Rack And Field"
+  },
+  "racquetball": {
+    "string": "美式壁球"
+  },
+  "rafting": {
+    "string": "橡皮筏"
+  },
+  "rallying": {
+    "string": "汽车拉力赛"
+  },
+  "rampskateboarding": {
+    "string": "上坡滑板"
+  },
+  "rc/drone": {
+    "string": "Rc/Drone"
+  },
+  "rebot": {
+    "string": "Rebot室外回力球"
+  },
+  "recumbent cycling": {
+    "string": "Recumbent Cycling"
+  },
+  "relay": {
+    "string": "接力跑"
+  },
+  "remonte": {
+    "string": "remonte藤条弯捧兜回力球"
+  },
+  "rescue": {
+    "string": "搜救赛"
+  },
+  "resortskiing/snowboarding": {
+    "string": "Resort Skiing/Snowboarding"
+  },
+  "rhythmicgymnastics(rg)": {
+    "string": "节奏体操"
+  },
+  "ride": {
+    "string": "Ride"
+  },
+  "rifleshooting": {
+    "string": "气枪射击"
+  },
+  "ring": {
+    "string": "跳环赛"
+  },
+  "rinkhockey": {
+    "string": "冰球"
+  },
+  "roadcycling": {
+    "string": "公路自行车"
+  },
+  "roadrunning": {
+    "string": "公路跑"
+  },
+  "rockclimbing": {
+    "string": "攀岩赛跑"
+  },
+  "rollerhockey": {
+    "string": "轮滑曲棍球"
+  },
+  "rollerskating": {
+    "string": "Roller Skating"
+  },
+  "rollerski": {
+    "string": "Roller Ski"
+  },
+  "rollerskiing": {
+    "string": "Roller Skiing"
+  },
+  "rowing": {
+    "string": "赛艇"
+  },
+  "rowingmachine": {
+    "string": "划桨机"
+  },
+  "rugby": {
+    "string": "橄榄球"
+  },
+  "rugbyleague": {
+    "string": "13人制橄榄球"
+  },
+  "rugbysevens": {
+    "string": "7人制橄榄球"
+  },
+  "rugbyunion": {
+    "string": "15人制橄榄球"
+  },
+  "run": {
+    "string": "Run"
+  },
+  "run&bike": {
+    "string": "跑步 & 自行车"
+  },
+  "running": {
+    "string": "跑步"
+  },
+  "runtobiketransition": {
+    "string": "Run to Bike Transition"
+  },
+  "sabre": {
+    "string": "佩剑"
+  },
+  "sail": {
+    "string": "Sail"
+  },
+  "sailing": {
+    "string": "帆船"
+  },
+  "sandball": {
+    "string": "沙滩手球"
+  },
+  "scooter": {
+    "string": "踏板车"
+  },
+  "scubadiving": {
+    "string": "水肺潜水"
+  },
+  "sealurefishing": {
+    "string": "海域人造鱼饵钓鱼"
+  },
+  "seasurfcasting": {
+    "string": "海域激浪抛钓"
+  },
+  "selfdefense": {
+    "string": "自卫"
+  },
+  "sheepdogwork": {
+    "string": "牧羊犬比赛"
+  },
+  "shorelinefishing": {
+    "string": "海边钓鱼"
+  },
+  "shorttermkayakingoutings": {
+    "string": "短途皮划艇"
+  },
+  "shortandlongrangerollerskatingouting": {
+    "string": "闲步和远足旱冰"
+  },
+  "shortboard": {
+    "string": "短板冲浪"
+  },
+  "shorttrailrunning(lessthan40km)": {
+    "string": "短途越野跑（短于40公里）"
+  },
+  "shotput": {
+    "string": "掷铅球"
+  },
+  "showjumping": {
+    "string": "障碍跳越"
+  },
+  "singlegasdive": {
+    "string": "Single-gas Dive"
+  },
+  "skateboard": {
+    "string": "Skateboard"
+  },
+  "skateboarding": {
+    "string": "滑板"
+  },
+  "skating": {
+    "string": "Skating"
+  },
+  "skiing": {
+    "string": "滑雪"
+  },
+  "skimboard": {
+    "string": "浅水冲浪"
+  },
+  "skittouring": {
+    "string": "Skit Touring"
+  },
+  "skydiving": {
+    "string": "Sky Diving"
+  },
+  "snooker": {
+    "string": "斯诺克桌球"
+  },
+  "snorkeling": {
+    "string": "Snorkeling"
+  },
+  "snorkelling": {
+    "string": "水底漫步"
+  },
+  "snowboard": {
+    "string": "Snowboard"
+  },
+  "snowboarding": {
+    "string": "单板滑雪"
+  },
+  "snowkite": {
+    "string": "风筝滑雪"
+  },
+  "snowmobile": {
+    "string": "雪地摩托车"
+  },
+  "snowmobiling": {
+    "string": "Snowmobiling"
+  },
+  "snowscoot": {
+    "string": "雪地滑板车"
+  },
+  "snowshoe": {
+    "string": "Snowshoe"
+  },
+  "snowshoeing": {
+    "string": "雪鞋"
+  },
+  "soccer": {
+    "string": "Soccer"
+  },
+  "softball": {
+    "string": "Softball"
+  },
+  "spanishriding": {
+    "string": "西班牙马术"
+  },
+  "spearfishing": {
+    "string": "水下狩猎"
+  },
+  "speedball": {
+    "string": "快速球类运动"
+  },
+  "speedminton": {
+    "string": "快速羽毛球"
+  },
+  "speedmotorcycling": {
+    "string": "摩托车速度赛"
+  },
+  "speedrollerskating": {
+    "string": "速度旱冰"
+  },
+  "speedsailing": {
+    "string": "速度帆车"
+  },
+  "speedskating": {
+    "string": "速度滑冰"
+  },
+  "speedwalking": {
+    "string": "Speed Walking"
+  },
+  "sportsandrhythmicgymnastics(srg)": {
+    "string": "节奏运动体操"
+  },
+  "sportswalking": {
+    "string": "运动步行"
+  },
+  "sprint": {
+    "string": "速度赛跑"
+  },
+  "squash": {
+    "string": "壁球"
+  },
+  "squatenton": {
+    "string": "Squatenton网球"
+  },
+  "stairstepper": {
+    "string": "Stair Stepper"
+  },
+  "standuppaddleboarding": {
+    "string": "立桨冲浪"
+  },
+  "standuppaddling": {
+    "string": "Standup Paddling"
+  },
+  "stationarysmallgamehunting": {
+    "string": "小型定居猎物狩猎"
+  },
+  "steeplechase": {
+    "string": "障碍赛跑"
+  },
+  "steptraining": {
+    "string": "踏步"
+  },
+  "stillfishing": {
+    "string": "定点钓鱼"
+  },
+  "stopwatch": {
+    "string": "Stopwatch"
+  },
+  "streetbasketball": {
+    "string": "街头篮球"
+  },
+  "streetrunning": {
+    "string": "Street Running"
+  },
+  "streetskateboarding": {
+    "string": "街头滑板"
+  },
+  "strengthtraining": {
+    "string": "Strength Training"
+  },
+  "stretching": {
+    "string": "拉伸"
+  },
+  "summerrollerskiing": {
+    "string": "夏季滑旱冰"
+  },
+  "surfing": {
+    "string": "冲浪"
+  },
+  "surfkayaking": {
+    "string": "皮划艇冲浪"
+  },
+  "swim": {
+    "string": "Swim"
+  },
+  "swimming": {
+    "string": "游泳"
+  },
+  "swimmingwithfins": {
+    "string": "脚蹼游泳"
+  },
+  "swimrun": {
+    "string": "Swimrun"
+  },
+  "swimtobiketransition": {
+    "string": "Swim to Bike Transition"
+  },
+  "synchronisedswimming": {
+    "string": "花样游泳"
+  },
+  "tabletennis": {
+    "string": "乒乓球"
+  },
+  "taekwondo": {
+    "string": "跆拳道"
+  },
+  "taichichuan": {
+    "string": "太极拳"
+  },
+  "tapdance": {
+    "string": "踢踏舞"
+  },
+  "targetarchery": {
+    "string": "射靶"
+  },
+  "telemarkskiing": {
+    "string": "屈膝旋转式滑雪"
+  },
+  "tennis": {
+    "string": "网球"
+  },
+  "thaiboxing": {
+    "string": "泰式拳击"
+  },
+  "trackcycling": {
+    "string": "场地自行车赛"
+  },
+  "trackrunning": {
+    "string": "赛道跑"
+  },
+  "trail": {
+    "string": "越野跑"
+  },
+  "trailrunning": {
+    "string": "Trail Running"
+  },
+  "trampoline": {
+    "string": "蹦床"
+  },
+  "transition": {
+    "string": "Transition"
+  },
+  "treadmill": {
+    "string": "室内跑步机"
+  },
+  "treadmillrunning": {
+    "string": "Treadmill Running"
+  },
+  "trekking": {
+    "string": "长途穿越"
+  },
+  "trekkingriding": {
+    "string": "越野马术"
+  },
+  "trialmotorcycling": {
+    "string": "摩托车越野障碍赛"
+  },
+  "trialmtb": {
+    "string": "障碍越野自行车"
+  },
+  "triathlon": {
+    "string": "三项全能"
+  },
+  "tricycledisabledsports": {
+    "string": "残疾人运动三轮车"
+  },
+  "triplejump": {
+    "string": "三级跳远"
+  },
+  "trolling": {
+    "string": "大拉网捕鱼"
+  },
+  "tumbling": {
+    "string": "翻筋斗"
+  },
+  "twirling": {
+    "string": "旋转"
+  },
+  "ultralighttroutfishing": {
+    "string": "超轻鱼杆钓鳟"
+  },
+  "ultrarunning": {
+    "string": "Ultra Running"
+  },
+  "ultratrailrunning(morethan80km)": {
+    "string": "超级越野跑（长于80公里）"
+  },
+  "undergrounddiving": {
+    "string": "洞穴潜水"
+  },
+  "underwaterdiving": {
+    "string": "潜水"
+  },
+  "underwaterhockey": {
+    "string": "水底曲棍球"
+  },
+  "unknown": {
+    "string": "Unknown"
+  },
+  "urbancycling": {
+    "string": "城市自行车"
+  },
+  "urbangoskating": {
+    "string": "都市旱冰"
+  },
+  "urbanwalking": {
+    "string": "都市步行"
+  },
+  "velomobile": {
+    "string": "Velomobile"
+  },
+  "verticalfishing": {
+    "string": "底钓"
+  },
+  "viaferrata": {
+    "string": "铁锁攀岩"
+  },
+  "virtualcycling": {
+    "string": "Virtual Cycling"
+  },
+  "virtualride": {
+    "string": "Virtual Ride"
+  },
+  "virtualrun": {
+    "string": "Virtual Run"
+  },
+  "virtualrunning": {
+    "string": "Virtual Running"
+  },
+  "volleyball": {
+    "string": "排球"
+  },
+  "wakeboard": {
+    "string": "尾波滑水"
+  },
+  "wakeboarding": {
+    "string": "Wakeboarding"
+  },
+  "wakesurf": {
+    "string": "尾波冲浪"
+  },
+  "walk": {
+    "string": "Walk"
+  },
+  "walking": {
+    "string": "步行"
+  },
+  "walking/indoor walking": {
+    "string": "Walking/indoor Walking"
+  },
+  "waterfowlhunting": {
+    "string": "水域野禽狩猎"
+  },
+  "waterpolo": {
+    "string": "水球"
+  },
+  "waterrescuework": {
+    "string": "水域驯狗"
+  },
+  "waterskiing": {
+    "string": "滑水"
+  },
+  "waterskiing(monoski)": {
+    "string": "单雪板滑水"
+  },
+  "waterskiing(twoskis)": {
+    "string": "双雪板滑水"
+  },
+  "watersports": {
+    "string": "Water Sports"
+  },
+  "weightlifting": {
+    "string": "举重"
+  },
+  "weighttraining": {
+    "string": "Weight Training"
+  },
+  "weighttrainingathome": {
+    "string": "家庭肌肉锻炼"
+  },
+  "westernriding": {
+    "string": "西部牛仔马术"
+  },
+  "wheelchair": {
+    "string": "Wheelchair"
+  },
+  "wheelchairracing": {
+    "string": "轮椅赛跑"
+  },
+  "whitewaterkayaking": {
+    "string": "皮划艇漂流"
+  },
+  "whitewaterkayaking/rafting": {
+    "string": "Whitewater Kayaking/Rafting"
+  },
+  "wind/kitesurfing": {
+    "string": "Wind/Kite Surfing"
+  },
+  "windsurf": {
+    "string": "Windsurf"
+  },
+  "windsurfing": {
+    "string": "帆板"
+  },
+  "wingsuitflying": {
+    "string": "Wingsuit Flying"
+  },
+  "wintersports": {
+    "string": "Winter Sports"
+  },
+  "workout": {
+    "string": "锻炼"
+  },
+  "wrestling": {
+    "string": "摔跤"
+  },
+  "xare": {
+    "string": "Xare回力球"
+  },
+  "yachting": {
+    "string": "可居住帆船"
+  },
+  "yoga": {
+    "string": "瑜伽"
+  },
+  "zumba": {
+    "string": "尊巴"
+  }
+}
