@@ -140,7 +140,7 @@ describe('Garmin Controller', () => {
 
       const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 1);
 
-      expect(response.status).toBe(501);
+      expect(response.status).toBe(500);
     });
 
     it('deauthorizes user with garmin API', async () => {
@@ -148,7 +148,7 @@ describe('Garmin Controller', () => {
 
       const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 1);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
       expect(garminService.deauthorize).toBeCalledTimes(1);
       expect(garminService.deauthorize).toBeCalledWith(1);
     });

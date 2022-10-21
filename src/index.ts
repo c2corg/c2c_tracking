@@ -8,9 +8,8 @@ import { app } from './app';
 import config from './config';
 import { database as db } from './db';
 import log from './helpers/logger';
+import { metricsServer } from './metrics';
 import { stravaService } from './server/strava/strava.service';
-
-const PORT = config.get('server.port');
 
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
@@ -77,10 +76,14 @@ export async function start(): Promise<void> {
     log.info('Apply database migration');
     await db.schemaMigration();
 
-    const server = app.listen(PORT, () => {
-      log.info(`Server is running on port ${PORT}`);
+    const port = config.get('server.port');
+    const server = app.listen(port, () => {
+      log.info(`Server is running on port ${port}`);
       stravaService.setupWebhook();
     });
+
+    // Export metrics for prometheus
+    metricsServer.listen(config.get('metrics.port'));
 
     process.once('SIGINT', async (signal: string) => closeGracefully(signal, server));
     process.once('SIGTERM', async (signal: string) => closeGracefully(signal, server));

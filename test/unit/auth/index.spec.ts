@@ -1,6 +1,7 @@
 import { createMockContext } from '@shopify/jest-koa-mocks';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth';
+import { ForbiddenError } from '../../../src/errors';
 import { AuthenticatedUserStrategy } from '../../utils';
 
 describe('ensureAuthenticated', () => {
@@ -38,8 +39,9 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
         params: { userId: '123' },
       },
     });
-    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
-    expect(ctx.status).toBe(403);
+    await expect(ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined)).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
   });
 
   it('rejects un-authenticated user', async () => {
@@ -49,7 +51,8 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
         params: { userId: '123' },
       },
     });
-    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
-    expect(ctx.status).toBe(403);
+    await expect(ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined)).rejects.toBeInstanceOf(
+      ForbiddenError,
+    );
   });
 });

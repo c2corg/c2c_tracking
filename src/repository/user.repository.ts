@@ -31,7 +31,7 @@ export class UserRepository {
   readonly #TABLE = 'users';
   readonly #cryptoSecret = config.get('db.crypto');
 
-  async findById(c2cId: number): Promise<User | undefined> {
+  public async findById(c2cId: number): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -49,7 +49,7 @@ export class UserRepository {
     }
   }
 
-  async findByStravaId(stravaId: number): Promise<User | undefined> {
+  public async findByStravaId(stravaId: number): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -65,7 +65,7 @@ export class UserRepository {
     }
   }
 
-  async findBySuuntoUsername(username: string): Promise<User | undefined> {
+  public async findBySuuntoUsername(username: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -81,7 +81,7 @@ export class UserRepository {
     }
   }
 
-  async findByGarminToken(token: string): Promise<User | undefined> {
+  public async findByGarminToken(token: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -97,7 +97,7 @@ export class UserRepository {
     }
   }
 
-  async findByDecathlonId(decathlonId: string): Promise<User | undefined> {
+  public async findByDecathlonId(decathlonId: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -113,7 +113,7 @@ export class UserRepository {
     }
   }
 
-  async insert(user: User): Promise<User> {
+  public async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -122,7 +122,7 @@ export class UserRepository {
     return user;
   }
 
-  async update(user: User): Promise<User> {
+  public async update(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');

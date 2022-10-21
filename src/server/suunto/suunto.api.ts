@@ -2,7 +2,7 @@ import axios from 'axios';
 import { z } from 'zod';
 
 import config from '../../config';
-import { handleAppError } from '../../helpers/error';
+import { handleExternalApiError } from '../../helpers/error';
 import log from '../../helpers/logger';
 
 export const SuuntoAuth = z.object({
@@ -181,7 +181,7 @@ export class SuuntoApi {
     this.redirectUrl = config.get('c2c.frontend.baseUrl') + config.get('trackers.suunto.redirectPath');
   }
 
-  async exchangeToken(code: string): Promise<SuuntoAuth> {
+  public async exchangeToken(code: string): Promise<SuuntoAuth> {
     try {
       const response = await axios.post(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {
@@ -195,13 +195,13 @@ export class SuuntoApi {
         },
       });
       return SuuntoAuth.parse(response.data);
-    } catch (error) {
+    } catch (error: unknown) {
       log.warn(error);
-      throw handleAppError(502, 'Error on Suunto token exchange request', error);
+      throw handleExternalApiError('suunto', 'Error on Suunto token exchange request', error);
     }
   }
 
-  async refreshAuth(token: string): Promise<SuuntoRefreshAuth> {
+  public async refreshAuth(token: string): Promise<SuuntoRefreshAuth> {
     try {
       const response = await axios.post(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {
@@ -214,54 +214,54 @@ export class SuuntoApi {
         },
       });
       return SuuntoRefreshAuth.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Suunto refresh token request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('suunto', 'Error on Suunto refresh token request', error);
     }
   }
 
-  async getWorkouts(token: string, subscriptionKey: string): Promise<Workouts> {
+  public async getWorkouts(token: string, subscriptionKey: string): Promise<Workouts> {
     try {
       const response = await axios.get(`${this.baseUrl}workouts?limit=30`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return Workouts.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava getWorkouts request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('suunto', 'Error on Strava getWorkouts request', error);
     }
   }
 
   // id is workout key
-  async getWorkoutDetails(id: string, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
+  public async getWorkoutDetails(id: string, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
     try {
       const response = await axios.get(`${this.baseUrl}workouts/${id}`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return WorkoutSummary.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava getWorkoutDetails request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('suunto', 'Error on Strava getWorkoutDetails request', error);
     }
   }
 
   // Id is workout id or key
-  async getFIT(id: string, token: string, subscriptionKey: string): Promise<ArrayBuffer> {
+  public async getFIT(id: string, token: string, subscriptionKey: string): Promise<ArrayBuffer> {
     try {
       const response = await axios.get(`${this.baseUrl}workout/exportFit/${id}`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return z.instanceof(ArrayBuffer).parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Suunto getFIT request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('suunto', 'Error on Suunto getFIT request', error);
     }
   }
 
-  async deauthorize(token: string): Promise<void> {
+  public async deauthorize(token: string): Promise<void> {
     try {
       await axios.get<void>(`${this.oauthBaseUrl}oauth/deauthorize?client_id=${this.#clientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-    } catch (error) {
-      throw handleAppError(502, 'Error on Suunto deauthorize request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('suunto', 'Error on Suunto deauthorize request', error);
     }
   }
 }

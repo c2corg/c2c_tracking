@@ -3,6 +3,7 @@ import passport from 'koa-passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 
 import config from '../config';
+import { ForbiddenError } from '../errors';
 
 import c2cJwtExtractor from './c2c-jwt-extractor';
 import verify from './c2c-jwt-verify';
@@ -20,8 +21,7 @@ const ensureUserFromParamsMatchesAuthUser: Middleware = async (
     await next();
     return;
   }
-  ctx.status = 403;
-  return;
+  throw new ForbiddenError();
 };
 
 passport.use(

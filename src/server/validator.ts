@@ -21,10 +21,7 @@ function validateObject(object: unknown = {}, label: string, schema: Schema | un
           .map((issue) => `[message: ${issue.message}, path: ${issue.path}, type: ${issue.code}]`)
           .join(' - ')}`,
       );
-      throw new FieldValidationError(
-        `Invalid ${label}`,
-        result.error.issues.map((f) => ({ message: f.message, path: f.path, type: f.code })),
-      );
+      throw new FieldValidationError(`Invalid ${label}`, result.error.format());
     }
   }
 }

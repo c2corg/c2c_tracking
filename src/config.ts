@@ -57,6 +57,12 @@ const config = convict({
     default: 'development',
     env: 'NODE_ENV',
   },
+  version: {
+    doc: 'The application version',
+    format: 'notEmptyString',
+    default: 'dev',
+    env: 'npm_package_version',
+  },
   server: {
     port: {
       doc: 'The port to bind',
@@ -70,6 +76,20 @@ const config = convict({
       format: 'baseUrl',
       default: '',
       env: 'SERVER_BASE_URL',
+    },
+  },
+  metrics: {
+    port: {
+      doc: 'Port to bind metrics to',
+      format: 'port',
+      default: 8081,
+      env: 'METRICS_PORT',
+    },
+    path: {
+      doc: 'Path for serving metrics',
+      format: 'notEmptyString',
+      default: '/metrics',
+      env: 'METRICS_PATH',
     },
   },
   db: {

@@ -16,17 +16,17 @@ import { GarminActivity, garminApi, GarminAuth, GarminSample } from './garmin.ap
 dayjs.extend(dayjsPluginUTC);
 
 export class GarminService {
-  readonly subscriptionUrl: string;
+  public readonly subscriptionUrl: string;
 
   constructor() {
     this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
   }
 
-  async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
+  public async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
     return await garminApi.requestUnauthorizedRequestToken();
   }
 
-  async requestAccessTokenAndSetupUser(
+  public async requestAccessTokenAndSetupUser(
     c2cId: number,
     requestToken: string,
     requestTokenSecret: string,
@@ -77,7 +77,8 @@ export class GarminService {
           .filter(({ geojson }) => !!geojson),
       );
     } catch (err: unknown) {
-      log.warn(err);
+      // failing to retrieve activities should not break the registration process
+      log.info(`Unable to retrieve Garmin activities for user ${c2cId}`);
     }
   }
 
@@ -113,9 +114,9 @@ export class GarminService {
     };
   }
 
-  getAuth = async (c2cId: number): Promise<GarminInfo | undefined> => await userService.getGarminInfo(c2cId);
+  public getAuth = async (c2cId: number): Promise<GarminInfo | undefined> => await userService.getGarminInfo(c2cId);
 
-  async deauthorize(c2cId: number): Promise<void> {
+  public async deauthorize(c2cId: number): Promise<void> {
     const user = await userRepository.findById(c2cId);
     if (!user) {
       throw new NotFoundError(`User ${c2cId} not found`);
@@ -134,7 +135,7 @@ export class GarminService {
     await userRepository.update({ ...userWithoutData });
   }
 
-  async handleActivityWebhook(
+  public async handleActivityWebhook(
     activities: (GarminActivity & { userId: string; userAccessToken: string })[],
   ): Promise<void> {
     const activityMap: Map<number, Omit<Activity, 'id' | 'userId'>[]> = new Map();
@@ -144,7 +145,7 @@ export class GarminService {
         log.warn(
           `Garmin activity webhook event for Garmin token ${activity.userAccessToken} couldn't be processed: unable to find matching user in DB`,
         );
-        return;
+        continue;
       }
       if (!activityMap.has(user.c2cId)) {
         activityMap.set(user.c2cId, []);
@@ -171,7 +172,7 @@ export class GarminService {
       }
       try {
         await userService.addActivities(c2cId, ...activities.filter(({ geojson }) => !!geojson));
-      } catch (error) {
+      } catch (error: unknown) {
         log.warn(
           `Garmin activity creation webhook event for user ${c2cId} couldn't be processed: unable to insert activity data`,
         );
@@ -179,7 +180,7 @@ export class GarminService {
     }
   }
 
-  async handleDeauthorizeWebhook(deregistrations: { userId: string; userAccessToken: string }[]): Promise<void> {
+  public async handleDeauthorizeWebhook(deregistrations: { userId: string; userAccessToken: string }[]): Promise<void> {
     for (const { userAccessToken } of deregistrations) {
       const user = await userRepository.findByGarminToken(userAccessToken);
       if (!user) {

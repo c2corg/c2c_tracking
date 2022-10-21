@@ -15,7 +15,7 @@ export class HealthService {
     this.startTime = Date.now();
   }
 
-  getStatus(): Status {
+  public getStatus(): Status {
     return {
       startTime: new Date(this.startTime).toISOString(),
       upTime: dayjs(this.startTime).fromNow(true),

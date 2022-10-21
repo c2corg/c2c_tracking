@@ -5,10 +5,7 @@ import type { HealthService } from '../../health.service';
 export default class HealthController {
   constructor(private readonly health: HealthService) {}
 
-  getHealth(ctx: Context): void {
-    const status = this.health.getStatus();
-
-    ctx.body = status;
-    ctx.status = 200;
+  public getHealth(ctx: Context): void {
+    ctx.body = this.health.getStatus();
   }
 }

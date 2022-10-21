@@ -8,7 +8,7 @@ type StravaRow = {
 export class StravaRepository {
   readonly #TABLE = 'strava';
 
-  async findSubscription(): Promise<number | undefined> {
+  public async findSubscription(): Promise<number | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -26,7 +26,7 @@ export class StravaRepository {
     }
   }
 
-  async setSubscription(subscriptionId: number): Promise<void> {
+  public async setSubscription(subscriptionId: number): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');

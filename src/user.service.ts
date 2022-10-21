@@ -31,7 +31,7 @@ const isActivityToUpdate = (
 } => !!activity.id && !!activity.update;
 
 export class UserService {
-  async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: boolean }> {
+  public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: boolean }> {
     const { strava, suunto, garmin, decathlon } = (await userRepository.findById(c2cId)) || {};
     return {
       strava: !!strava,
@@ -41,7 +41,7 @@ export class UserService {
     };
   }
 
-  async configureStrava(c2cId: number, auth: StravaAuth): Promise<void> {
+  public async configureStrava(c2cId: number, auth: StravaAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -68,7 +68,7 @@ export class UserService {
     }
   }
 
-  async updateStravaAuth(c2cId: number, auth: StravaRefreshAuth): Promise<void> {
+  public async updateStravaAuth(c2cId: number, auth: StravaRefreshAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (!user) {
       throw new NotFoundError(`User ${c2cId} not found`);
@@ -88,12 +88,12 @@ export class UserService {
     await userRepository.update(user);
   }
 
-  async getStravaInfo(c2cId: number): Promise<StravaInfo | undefined> {
+  public async getStravaInfo(c2cId: number): Promise<StravaInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.strava;
   }
 
-  async configureSuunto(c2cId: number, auth: SuuntoAuth): Promise<void> {
+  public async configureSuunto(c2cId: number, auth: SuuntoAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -120,7 +120,7 @@ export class UserService {
     }
   }
 
-  async updateSuuntoAuth(c2cId: number, auth: SuuntoRefreshAuth): Promise<void> {
+  public async updateSuuntoAuth(c2cId: number, auth: SuuntoRefreshAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (!user) {
       throw new NotFoundError(`User ${c2cId} not found`);
@@ -140,12 +140,12 @@ export class UserService {
     await userRepository.update(user);
   }
 
-  async getSuuntoInfo(c2cId: number): Promise<SuuntoInfo | undefined> {
+  public async getSuuntoInfo(c2cId: number): Promise<SuuntoInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.suunto;
   }
 
-  async configureGarmin(c2cId: number, auth: GarminAuth): Promise<void> {
+  public async configureGarmin(c2cId: number, auth: GarminAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -168,12 +168,17 @@ export class UserService {
     }
   }
 
-  async getGarminInfo(c2cId: number): Promise<GarminInfo | undefined> {
+  public async getGarminInfo(c2cId: number): Promise<GarminInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.garmin;
   }
 
-  async configureDecathlon(c2cId: number, auth: DecathlonAuth, userId: string, webhookId: string): Promise<void> {
+  public async configureDecathlon(
+    c2cId: number,
+    auth: DecathlonAuth,
+    userId: string,
+    webhookId: string,
+  ): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -202,7 +207,7 @@ export class UserService {
     }
   }
 
-  async updateDecathlonAuth(c2cId: number, auth: DecathlonAuth): Promise<void> {
+  public async updateDecathlonAuth(c2cId: number, auth: DecathlonAuth): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
     if (!user) {
       throw new NotFoundError(`User ${c2cId} not found`);
@@ -223,12 +228,12 @@ export class UserService {
     await userRepository.update(user);
   }
 
-  async getDecathlonInfo(c2cId: number): Promise<DecathlonInfo | undefined> {
+  public async getDecathlonInfo(c2cId: number): Promise<DecathlonInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.decathlon;
   }
 
-  async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {
+  public async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {
     log.info(activities);
     const userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
@@ -266,7 +271,7 @@ export class UserService {
     await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
   }
 
-  async updateActivity(c2cId: number, activity: Omit<Activity, 'id' | 'userId'>): Promise<void> {
+  public async updateActivity(c2cId: number, activity: Omit<Activity, 'id' | 'userId'>): Promise<void> {
     const savedActivity = (await activityRepository.findByUser(c2cId)).find(
       (act) => act.vendor === activity.vendor && act.vendorId === activity.vendorId,
     );
@@ -281,15 +286,15 @@ export class UserService {
     });
   }
 
-  async deleteActivity(vendor: Vendor, vendorId: string): Promise<void> {
+  public async deleteActivity(vendor: Vendor, vendorId: string): Promise<void> {
     await activityRepository.deleteByVendorId(vendor, vendorId);
   }
 
-  async getActivities(c2cId: number): Promise<Activity[]> {
+  public async getActivities(c2cId: number): Promise<Activity[]> {
     return await activityRepository.findByUser(c2cId);
   }
 
-  async getActivity(c2cId: number, activityId: number): Promise<Activity | undefined> {
+  public async getActivity(c2cId: number, activityId: number): Promise<Activity | undefined> {
     return await activityRepository.findByUserAndId(c2cId, activityId);
   }
 

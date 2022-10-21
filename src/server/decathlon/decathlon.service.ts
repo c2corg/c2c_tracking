@@ -1,12 +1,12 @@
 import dayjs from 'dayjs';
-import type { LineString } from 'src/repository/geojson';
-import type { DecathlonInfo } from 'src/repository/user';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
+import type { LineString } from '../../repository/geojson';
+import type { DecathlonInfo } from '../../repository/user';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
@@ -14,13 +14,13 @@ import { Activity, decathlonApi, DecathlonAuth, WebhookEvent } from './decathlon
 import { sports } from './sports';
 
 export class DecathlonService {
-  readonly subscriptionUrl: string;
+  public readonly subscriptionUrl: string;
 
   constructor() {
     this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
   }
 
-  async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
+  public async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
     const auth = await decathlonApi.exchangeToken(authorizationCode);
     await this.setupUser(c2cId, auth);
   }
@@ -53,12 +53,13 @@ export class DecathlonService {
           };
         }),
       );
-    } catch (error) {
+    } catch (error: unknown) {
+      // not retrieving past activities should not block the registration process
       log.info(`Unable to retrieve Decathlon activities for user ${c2cId}`);
     }
   }
 
-  async deauthorize(c2cId: number): Promise<void> {
+  public async deauthorize(c2cId: number): Promise<void> {
     const user = await userRepository.findById(c2cId);
     if (!user) {
       throw new NotFoundError(`User ${c2cId} not found`);
@@ -82,7 +83,7 @@ export class DecathlonService {
     await userRepository.update({ ...userWithoutData });
   }
 
-  async getToken(c2cId: number): Promise<string | undefined> {
+  public async getToken(c2cId: number): Promise<string | undefined> {
     return this.getTokenImpl(c2cId, await userService.getDecathlonInfo(c2cId));
   }
 
@@ -101,7 +102,7 @@ export class DecathlonService {
         const auth = await decathlonApi.refreshAuth(refreshToken);
         await userService.updateDecathlonAuth(c2cId, auth);
         return auth.access_token;
-      } catch (error) {
+      } catch (error: unknown) {
         log.warn(`Decathlon access token refresh failed for user ${c2cId}`);
         return undefined;
       }
@@ -109,13 +110,13 @@ export class DecathlonService {
     return undefined;
   }
 
-  async getActivityGeometry(accessToken: string, activityId: string): Promise<LineString | undefined> {
+  public async getActivityGeometry(accessToken: string, activityId: string): Promise<LineString | undefined> {
     const activity = await decathlonApi.getActivity(accessToken, activityId);
     const coordinates = this.locationsToGeoJson(activity);
     return coordinates.length ? { type: 'LineString', coordinates } : undefined;
   }
 
-  async handleWebhookEvent(event: WebhookEvent): Promise<void> {
+  public async handleWebhookEvent(event: WebhookEvent): Promise<void> {
     switch (event.event.name) {
       case 'activity_create':
         await this.handleActivityCreateEvent(event.userId, event.event.ressource_id);
@@ -148,7 +149,7 @@ export class DecathlonService {
     let activity: Activity;
     try {
       activity = await decathlonApi.getActivity(token, activityId);
-    } catch (error) {
+    } catch (error: unknown) {
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
       );
@@ -165,7 +166,7 @@ export class DecathlonService {
         type: sport?.translatedNames?.['en'] || 'unknown',
         geojson: coordinates.length ? { type: 'LineString', coordinates } : undefined,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
       );
@@ -175,7 +176,7 @@ export class DecathlonService {
   private async handleActivityDeleteEvent(activityId: string): Promise<void> {
     try {
       await userService.deleteActivity('decathlon', activityId);
-    } catch (error) {
+    } catch (error: unknown) {
       log.warn(
         `Decathlon activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
       );
