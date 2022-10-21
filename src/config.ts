@@ -75,13 +75,13 @@ const config = convict({
   db: {
     host: {
       doc: 'Database host name/IP',
-      format: String,
+      format: 'notEmptyString',
       default: 'localhost',
       env: 'DB_HOST',
     },
     name: {
       doc: 'Database name',
-      format: String,
+      format: 'notEmptyString',
       default: 'postgres',
       env: 'DB_NAME',
     },
@@ -93,15 +93,22 @@ const config = convict({
     },
     user: {
       doc: 'Database user',
-      format: String,
+      format: 'notEmptyString',
       default: 'postgres',
       env: 'DB_USER',
     },
     password: {
       doc: 'Database password',
-      format: String,
+      format: 'notEmptyString',
       default: 'postgres',
       env: 'DB_PASSWORD',
+      sensitive: true,
+    },
+    crypto: {
+      doc: 'Secret key for encoding and decoding tokens',
+      format: 'notEmptyString',
+      default: '',
+      env: 'DB_CRYPTO',
       sensitive: true,
     },
   },

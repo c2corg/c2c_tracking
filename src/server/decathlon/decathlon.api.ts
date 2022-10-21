@@ -187,7 +187,7 @@ export class DecathlonApi {
         `${this.baseUrl}sportstrackingdata/v2/user_web_hooks`,
         {
           user: `/v2/users/${userId}`,
-          url: config.get('server.baseUrl') + '/decathlon/webhook',
+          url: config.get('server.baseUrl') + 'decathlon/webhook',
           events: ['activity_create', 'activity_delete'],
         },
         {
