@@ -75,7 +75,7 @@ describe('Garmin Controller', () => {
     });
 
     it('redirects if user setup fails', async () => {
-      await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 10);
+      await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 100);
       jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await request(app.callback())
@@ -86,10 +86,13 @@ describe('Garmin Controller', () => {
       expect(response.headers['location']).toMatchInlineSnapshot(
         `"http://localhost:8080/external-services?error=setup-failed"`,
       );
+
+      // ensure we clear the entry
+      await (garminController['keyv'] as Keyv).delete('1');
     });
 
     it('setups user and redirects', async () => {
-      await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 10);
+      await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 100);
       jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await request(app.callback())
@@ -105,6 +108,9 @@ describe('Garmin Controller', () => {
         'tokenSecret',
         'oauth_verifier',
       );
+
+      // ensure we clear the entry
+      await (garminController['keyv'] as Keyv).delete('1');
     });
   });
 
