@@ -3,6 +3,7 @@ import request from 'supertest';
 import { app } from '../../../../src/app';
 import type { Activity } from '../../../../src/repository/activity';
 import { activityService } from '../../../../src/server/activities/activity.service';
+import { decathlonService } from '../../../../src/server/decathlon/decathlon.service';
 import { stravaService } from '../../../../src/server/strava/strava.service';
 import { suuntoService } from '../../../../src/server/suunto/suunto.service';
 import { userService } from '../../../../src/user.service';
@@ -269,6 +270,65 @@ describe('Activities Controller', () => {
       expect(suuntoService.getToken).toBeCalledTimes(1);
       expect(suuntoService.getToken).toBeCalledWith(1);
       expect(activityService.fitToGeoJSON).toHaveBeenCalledTimes(1);
+    });
+
+    it('retrieves geojson from decathlon', async () => {
+      const activity: Activity = {
+        id: 1,
+        userId: 1,
+        vendor: 'decathlon',
+        vendorId: 'vendorId',
+        type: 'Bicycle',
+        date: '2022-01-01T00:00:01Z',
+      };
+      jest.spyOn(decathlonService, 'getToken').mockResolvedValueOnce('token');
+      jest.spyOn(decathlonService, 'getActivityGeometry').mockResolvedValueOnce({
+        type: 'LineString',
+        coordinates: [[0.0, 0.0, 220]],
+      });
+      jest.spyOn(userService, 'getActivity').mockResolvedValueOnce(activity);
+
+      const response = await authenticated(request(app.callback()).get('/users/1/activities/1'), 1);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchInlineSnapshot(`
+        {
+          "coordinates": [
+            [
+              0,
+              0,
+              220,
+            ],
+          ],
+          "type": "LineString",
+        }
+      `);
+      expect(decathlonService.getToken).toBeCalledTimes(1);
+      expect(decathlonService.getToken).toBeCalledWith(1);
+      expect(decathlonService.getActivityGeometry).toBeCalledTimes(1);
+      expect(decathlonService.getActivityGeometry).toBeCalledWith('token', 'vendorId');
+    });
+
+    it('returns 503 if geojson cannot be retrieved from decathlon', async () => {
+      jest.spyOn(decathlonService, 'getToken').mockResolvedValueOnce(undefined);
+      jest.spyOn(suuntoService, 'getToken');
+      jest.spyOn(decathlonService, 'getActivityGeometry');
+      jest.spyOn(userService, 'getActivity').mockResolvedValueOnce({
+        id: 1,
+        userId: 1,
+        vendor: 'decathlon',
+        vendorId: 'vendorId',
+        type: 'Bicycle',
+        date: '2022-01-01T00:00:01Z',
+      });
+
+      const response = await authenticated(request(app.callback()).get('/users/1/activities/1'), 1);
+
+      expect(response.status).toBe(503);
+      expect(decathlonService.getToken).toBeCalledTimes(1);
+      expect(decathlonService.getToken).toBeCalledWith(1);
+      expect(decathlonService.getActivityGeometry).not.toHaveBeenCalled();
+      expect(suuntoService.getToken).not.toHaveBeenCalled();
     });
 
     it('throws if geojson is not present for garmin activity', async () => {

@@ -153,7 +153,9 @@ describe('Strava Service', () => {
       jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Unable to retrieve token for user 1"`,
+      );
 
       expect(userService.getStravaInfo).toBeCalledTimes(1);
       expect(userService.getStravaInfo).toBeCalledWith(1);

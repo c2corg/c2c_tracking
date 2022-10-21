@@ -5,13 +5,13 @@ export function up(db: Knex): Knex.SchemaBuilder {
     .createTable('users', (table) => {
       table.integer('c2c_id').primary();
       table.integer('strava_id').unique();
-      table.string('strava_access_token', 1024);
+      table.string('strava_access_token', 4096);
       table.timestamp('strava_expires_at');
-      table.string('strava_refresh_token', 1024);
+      table.string('strava_refresh_token', 4096);
       table.string('suunto_username').unique();
-      table.string('suunto_access_token', 1024);
+      table.string('suunto_access_token', 4096);
       table.timestamp('suunto_expires_at');
-      table.string('suunto_refresh_token', 1024);
+      table.string('suunto_refresh_token', 4096);
     })
     .createTable('activities', (table) => {
       table.increments('id').primary();

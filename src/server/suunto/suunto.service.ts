@@ -9,15 +9,7 @@ import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import {
-  SuuntoAuth,
-  Workouts,
-  suuntoApi as api,
-  workoutTypes,
-  WebhookEvent,
-  suuntoApi,
-  WorkoutSummary,
-} from './suunto.api';
+import { SuuntoAuth, Workouts, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary } from './suunto.api';
 
 dayjs.extend(dayjsPluginUTC);
 
@@ -33,7 +25,7 @@ export class SuuntoService {
   }
 
   async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
-    const auth = await api.exchangeToken(authorizationCode);
+    const auth = await suuntoApi.exchangeToken(authorizationCode);
     await this.setupUser(c2cId, auth);
   }
 
@@ -41,7 +33,7 @@ export class SuuntoService {
     try {
       await userService.configureSuunto(c2cId, auth);
       // retrieve last 30 outings
-      const workouts: Workouts = await api.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
+      const workouts: Workouts = await suuntoApi.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
       if (!workouts.payload.length) {
         return;
       }
@@ -69,7 +61,7 @@ export class SuuntoService {
     if (refreshToken) {
       log.debug('Suunto access token expired, requiring refresh');
       try {
-        const auth = await api.refreshAuth(refreshToken);
+        const auth = await suuntoApi.refreshAuth(refreshToken);
         await userService.updateSuuntoAuth(c2cId, auth);
         return auth.access_token;
       } catch (error: unknown) {
@@ -81,7 +73,7 @@ export class SuuntoService {
   }
 
   async getFIT(token: string, vendorId: string): Promise<ArrayBuffer> {
-    return api.getFIT(vendorId, token, this.#suuntoSubscriptionKey);
+    return suuntoApi.getFIT(vendorId, token, this.#suuntoSubscriptionKey);
   }
 
   async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
@@ -141,7 +133,7 @@ export class SuuntoService {
       throw new NotFoundError(`User ${c2cId} not found`);
     }
 
-    await api.deauthorize(token);
+    await suuntoApi.deauthorize(token);
 
     // clear user Suunto activities
     await activityRepository.deleteByUserAndVendor(c2cId, 'suunto');

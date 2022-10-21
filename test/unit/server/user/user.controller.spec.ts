@@ -20,6 +20,7 @@ describe('User Controller', () => {
 
     it('responds with user activities summaries', async () => {
       jest.spyOn(userService, 'getUserInfo').mockResolvedValueOnce({
+        decathlon: false,
         garmin: false,
         strava: true,
         suunto: true,
@@ -30,6 +31,7 @@ describe('User Controller', () => {
       expect(response.status).toBe(200);
       expect(response.body).toMatchInlineSnapshot(`
         {
+          "decathlon": false,
           "garmin": false,
           "strava": true,
           "suunto": true,

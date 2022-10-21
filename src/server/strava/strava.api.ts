@@ -135,7 +135,7 @@ export const WebhookEvent = z.object({
   object_type: z.enum(['activity', 'athlete']),
   object_id: z.number().int().positive(),
   aspect_type: z.enum(['create', 'update', 'delete']),
-  updates: z.record(z.string()),
+  updates: z.record(z.string()).optional(),
   owner_id: z.number().int().positive(),
   subscription_id: z.number().int().positive(),
   event_time: z.number().int().positive(),

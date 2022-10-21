@@ -108,3 +108,4 @@ dist
 
 # testing reports
 reports/
+.vscode/settings.json
