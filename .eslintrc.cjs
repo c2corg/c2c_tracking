@@ -21,6 +21,7 @@ module.exports = {
     'node/no-extraneous-import': ['error', { allowModules: ['pino'] }],
     'node/no-missing-import': 'off',
     'node/no-unsupported-features/es-syntax': 'off',
+    'import/no-named-as-default-member': 'off',
     'import/order': [
       'error',
       {
