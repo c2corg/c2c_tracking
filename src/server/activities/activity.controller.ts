@@ -1,6 +1,10 @@
 import type { Context } from 'koa';
 
 import { AppError } from '../../errors';
+import log from '../../helpers/logger';
+import type { Activity } from '../../repository/activity';
+import { activityRepository } from '../../repository/activity.repository';
+import type { LineString } from '../../repository/geojson';
 import { userService } from '../../user.service';
 import { decathlonService } from '../decathlon/decathlon.service';
 import { stravaService } from '../strava/strava.service';
@@ -40,8 +44,15 @@ class ActivityController {
           return;
         }
 
-        const stream = await stravaService.getActivityStream(token, activity.vendorId);
-        ctx.body = service.stravaStreamSetToGeoJSON(activity, stream);
+        let geojson: LineString | undefined;
+        try {
+          const stream = await stravaService.getActivityStream(token, activity.vendorId);
+          geojson = service.stravaStreamSetToGeoJSON(activity, stream);
+        } catch (error: unknown) {
+          throw new AppError(404, 'Error: unable to retrieve geometry');
+        }
+        this.saveGeometry(activity, geojson);
+        ctx.body = geojson;
         ctx.status = 200;
         break;
       }
@@ -52,13 +63,21 @@ class ActivityController {
           ctx.status = 503;
           return;
         }
-        const fit = await suuntoService.getFIT(token, activity.vendorId);
+        let fit: ArrayBuffer | undefined;
         try {
-          ctx.body = service.fitToGeoJSON(fit);
-          ctx.status = 200;
-        } catch (error) {
-          throw new AppError(500, 'Error: unable to convert Suunto FIT file to geometry');
+          fit = await suuntoService.getFIT(token, activity.vendorId);
+        } catch (error: unknown) {
+          throw new AppError(404, 'Error: unable to retrieve geometry');
         }
+        let geojson: LineString | undefined;
+        try {
+          geojson = service.fitToGeoJSON(fit);
+        } catch (error) {
+          throw new AppError(404, 'Error: unable to convert Suunto FIT file to geometry');
+        }
+        this.saveGeometry(activity, geojson);
+        ctx.body = geojson;
+        ctx.status = 200;
         break;
       }
       case 'decathlon': {
@@ -69,7 +88,17 @@ class ActivityController {
           return;
         }
 
-        ctx.body = await decathlonService.getActivityGeometry(token, activity.vendorId);
+        let geojson: LineString | undefined;
+        try {
+          geojson = await decathlonService.getActivityGeometry(token, activity.vendorId);
+        } catch (error: unknown) {
+          throw new AppError(404, 'Error: unable to retrieve geometry');
+        }
+        if (!geojson) {
+          throw new AppError(404, 'Error: unable to retrieve geometry');
+        }
+        this.saveGeometry(activity, geojson);
+        ctx.body = geojson;
         ctx.status = 200;
         break;
       }
@@ -78,6 +107,14 @@ class ActivityController {
         throw new AppError(500, `Error: unable to acquire Garmin geometry`);
       default:
         throw new AppError(400, `Vendor not handled: ${activity.vendor}`);
+    }
+  }
+
+  async saveGeometry(activity: Activity, geojson: LineString): Promise<void> {
+    try {
+      await activityRepository.update({ ...activity, geojson });
+    } catch (error: unknown) {
+      log.warn(`Failed saving geojson for ${activity.vendor} activity ${activity.vendorId}`);
     }
   }
 }
