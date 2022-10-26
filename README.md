@@ -17,3 +17,16 @@ npm install
 - Launch the app: `npm run start`
 
 You can debug server and tests within Visual Studio Code using the predefined configurations in `launch.json`.
+
+## Release
+
+To create a release,
+
+- On `main` branch, run command `npm version (major|minor|patch)` to update `package(-lock).json` versions and create a tag.
+- Push tag
+- CI/CD process will automatically create the release from tag and generate release notes.
+
+In order to produce nice release notes:
+
+- Assign labels to pull requests
+- See [release.yml](https://github.com/c2corg/c2c_tracking/blob/main/.github/release.yml) to define categories.
