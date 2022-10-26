@@ -111,12 +111,12 @@ describe('Strava Controller', () => {
       expect(response.status).toBe(403);
     });
 
-    it('retuns 501 if service fails', async () => {
+    it('retuns 500 if service fails', async () => {
       jest.spyOn(stravaService, 'deauthorize').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 1);
 
-      expect(response.status).toBe(501);
+      expect(response.status).toBe(500);
       expect(stravaService.deauthorize).toBeCalledTimes(1);
     });
 
@@ -125,7 +125,7 @@ describe('Strava Controller', () => {
 
       const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 1);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
       expect(stravaService.deauthorize).toBeCalledTimes(1);
       expect(stravaService.deauthorize).toBeCalledWith(1);
     });
@@ -143,7 +143,7 @@ describe('Strava Controller', () => {
         .get('/strava/webhook')
         .query({ 'hub.mode': 'subscribe', 'hub.challenge': 'challenge', 'hub.verify_token': 'invalid_token' });
 
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(502);
     });
 
     it('replies with challenge', async () => {

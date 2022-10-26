@@ -97,12 +97,12 @@ describe('Decathlon Controller', () => {
       expect(response.status).toBe(403);
     });
 
-    it('retuns 501 if service fails', async () => {
+    it('retuns 500 if service fails', async () => {
       jest.spyOn(decathlonService, 'deauthorize').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 1);
 
-      expect(response.status).toBe(501);
+      expect(response.status).toBe(500);
       expect(decathlonService.deauthorize).toBeCalledTimes(1);
     });
 
@@ -111,7 +111,7 @@ describe('Decathlon Controller', () => {
 
       const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 1);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
       expect(decathlonService.deauthorize).toBeCalledTimes(1);
       expect(decathlonService.deauthorize).toBeCalledWith(1);
     });

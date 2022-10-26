@@ -14,7 +14,7 @@ import { SuuntoAuth, Workouts, workoutTypes, WebhookEvent, suuntoApi, WorkoutSum
 dayjs.extend(dayjsPluginUTC);
 
 export class SuuntoService {
-  readonly subscriptionUrl: string;
+  public readonly subscriptionUrl: string;
   readonly #suuntoSubscriptionKey: string;
   readonly #suuntoWebhookSubscriptionToken: string;
 
@@ -24,7 +24,7 @@ export class SuuntoService {
     this.#suuntoWebhookSubscriptionToken = config.get('trackers.suunto.webhookSubscriptionToken');
   }
 
-  async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
+  public async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
     const auth = await suuntoApi.exchangeToken(authorizationCode);
     await this.setupUser(c2cId, auth);
   }
@@ -52,7 +52,7 @@ export class SuuntoService {
     }
   }
 
-  async getToken(c2cId: number): Promise<string | undefined> {
+  public async getToken(c2cId: number): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
     const { accessToken, expiresAt, refreshToken } = (await userService.getSuuntoInfo(c2cId)) ?? {};
     if (accessToken && expiresAt && dayjs.unix(expiresAt).isAfter(dayjs().add(1, 'minute'))) {
@@ -72,11 +72,11 @@ export class SuuntoService {
     return undefined;
   }
 
-  async getFIT(token: string, vendorId: string): Promise<ArrayBuffer> {
+  public async getFIT(token: string, vendorId: string): Promise<ArrayBuffer> {
     return suuntoApi.getFIT(vendorId, token, this.#suuntoSubscriptionKey);
   }
 
-  async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
+  public async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
     if (!this.isWebhookHeaderValid(authHeader)) {
       log.warn(`Suunto workout webhook event for Suunto user ${event.username} couldn't be processed: bad auth`);
       return;
@@ -98,7 +98,7 @@ export class SuuntoService {
     let workout: WorkoutSummary;
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
-    } catch (error) {
+    } catch (error: unknown) {
       log.warn(
         `Suunto workout webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
       );
@@ -112,7 +112,7 @@ export class SuuntoService {
         name: workout.payload.workoutName ?? '',
         type: workoutTypes[workout.payload.activityId] || 'Unknown',
       });
-    } catch (error) {
+    } catch (error: unknown) {
       log.warn(
         `Suunto activity update/creation webhook event for user ${user.c2cId} couldn't be processed: unable to upsert activity data`,
       );
@@ -123,7 +123,7 @@ export class SuuntoService {
     return authHeader === `Bearer: ${this.#suuntoWebhookSubscriptionToken}`;
   }
 
-  async deauthorize(c2cId: number): Promise<void> {
+  public async deauthorize(c2cId: number): Promise<void> {
     const user = await userRepository.findById(c2cId);
     if (!user) {
       throw new NotFoundError(`User ${c2cId} not found`);

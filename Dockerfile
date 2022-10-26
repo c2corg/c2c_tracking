@@ -17,6 +17,8 @@ WORKDIR /usr/src/app
 COPY --from=build-stage --chown=node:node /usr/package.json ./
 COPY --from=build-stage --chown=node:node /usr/node_modules ./
 COPY --from=build-stage --chown=node:node /usr/dist ./
-EXPOSE 8080
+ENV PORT 8080
+ENV METRICS_PORT 8081
+EXPOSE 8080 8081
 USER node
 CMD [ "dumb-init", "node", "index.js" ]

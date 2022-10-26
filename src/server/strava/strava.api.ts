@@ -3,7 +3,7 @@ import isISO8601 from 'validator/lib/isISO8601';
 import { z } from 'zod';
 
 import config from '../../config';
-import { handleAppError } from '../../helpers/error';
+import { handleExternalApiError } from '../../helpers/error';
 
 export const Athlete = z.object({
   id: z.number().int().positive(),
@@ -152,7 +152,7 @@ export class StravaApi {
     this.#clientSecret = config.get('trackers.strava.clientSecret');
   }
 
-  async exchangeToken(code: string): Promise<StravaAuth> {
+  public async exchangeToken(code: string): Promise<StravaAuth> {
     try {
       const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
@@ -164,19 +164,19 @@ export class StravaApi {
       });
       return StravaAuth.parse(response.data);
     } catch (error: unknown) {
-      throw handleAppError(502, 'Error on Strava token exchange request', error);
+      throw handleExternalApiError('strava', 'Error on Strava token exchange request', error);
     }
   }
 
-  async deauthorize(accessToken: string): Promise<void> {
+  public async deauthorize(accessToken: string): Promise<void> {
     try {
       await axios.post<void>(`${this.baseUrl}oauth/deauthorize?access_token=${accessToken}`);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava deauthorize request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava deauthorize request', error);
     }
   }
 
-  async refreshAuth(refreshToken: string): Promise<StravaRefreshAuth> {
+  public async refreshAuth(refreshToken: string): Promise<StravaRefreshAuth> {
     try {
       const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
         params: {
@@ -188,33 +188,33 @@ export class StravaApi {
       });
       return StravaRefreshAuth.parse(response.data);
     } catch (error: unknown) {
-      throw handleAppError(502, 'Error on Strava refresh token request', error);
+      throw handleExternalApiError('strava', 'Error on Strava refresh token request', error);
     }
   }
 
-  async getAthleteActivities(accessToken: string): Promise<Activity[]> {
+  public async getAthleteActivities(accessToken: string): Promise<Activity[]> {
     try {
       const response = await axios.get(`${this.baseUrl}athlete/activities`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return z.array(Activity).parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava getAthleteActivities request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava getAthleteActivities request', error);
     }
   }
 
-  async getActivity(accessToken: string, id: string): Promise<Activity> {
+  public async getActivity(accessToken: string, id: string): Promise<Activity> {
     try {
       const response = await axios.get(`${this.baseUrl}activities/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return Activity.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava getActivity request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava getActivity request', error);
     }
   }
 
-  async getActivityStream(accessToken: string, id: string): Promise<StreamSet> {
+  public async getActivityStream(accessToken: string, id: string): Promise<StreamSet> {
     try {
       const response = await axios.get(
         `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=true`,
@@ -223,12 +223,12 @@ export class StravaApi {
         },
       );
       return StreamSet.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava getActivityStream request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava getActivityStream request', error);
     }
   }
 
-  async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
+  public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
     try {
       const response = await axios.post(
         `${this.baseUrl}push_subscriptions`,
@@ -243,29 +243,29 @@ export class StravaApi {
         },
       );
       return Subscription.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava requestSubscriptionCreation request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava requestSubscriptionCreation request', error);
     }
   }
 
-  async getSubscriptions(): Promise<Subscription[]> {
+  public async getSubscriptions(): Promise<Subscription[]> {
     try {
       const response = await axios.get(`${this.baseUrl}push_subscriptions`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
       return z.array(Subscription).parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava getSubscriptions request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava getSubscriptions request', error);
     }
   }
 
-  async deleteSubscription(id: string): Promise<void> {
+  public async deleteSubscription(id: string): Promise<void> {
     try {
       await axios.delete<void>(`${this.baseUrl}push_subscriptions/${id}`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
-    } catch (error) {
-      throw handleAppError(502, 'Error on Strava deleteSubscription request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('strava', 'Error on Strava deleteSubscription request', error);
     }
   }
 }

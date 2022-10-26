@@ -18,7 +18,7 @@ type ActivityRow = {
 export class ActivityRepository {
   readonly #TABLE = 'activities';
 
-  async findByUser(userId: number): Promise<Activity[]> {
+  public async findByUser(userId: number): Promise<Activity[]> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -32,7 +32,7 @@ export class ActivityRepository {
     }
   }
 
-  async findByUserAndId(userId: number, activityId: number): Promise<Activity | undefined> {
+  public async findByUserAndId(userId: number, activityId: number): Promise<Activity | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
@@ -50,7 +50,7 @@ export class ActivityRepository {
     }
   }
 
-  async insert(activity: Omit<Activity, 'id'>): Promise<Activity> {
+  public async insert(activity: Omit<Activity, 'id'>): Promise<Activity> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -59,7 +59,7 @@ export class ActivityRepository {
     return { ...activity, ...result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
-  async update(activity: Activity): Promise<Activity> {
+  public async update(activity: Activity): Promise<Activity> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -70,7 +70,7 @@ export class ActivityRepository {
     return activity;
   }
 
-  async upsert(
+  public async upsert(
     activitiesToUpdate: Activity[],
     activitiesToInsert: Omit<Activity, 'id'>[],
     activitiesToDelete: Activity[],
@@ -96,7 +96,7 @@ export class ActivityRepository {
     });
   }
 
-  async delete(id: number): Promise<void> {
+  public async delete(id: number): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -109,7 +109,7 @@ export class ActivityRepository {
     }
   }
 
-  async deleteByUserAndVendor(c2cId: number, vendor: Vendor): Promise<void> {
+  public async deleteByUserAndVendor(c2cId: number, vendor: Vendor): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -118,7 +118,7 @@ export class ActivityRepository {
     await conn<ActivityRow>(this.#TABLE).delete().where({ vendor, user_id: c2cId });
   }
 
-  async deleteByVendorId(vendor: Vendor, vendorId: string): Promise<void> {
+  public async deleteByVendorId(vendor: Vendor, vendorId: string): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');

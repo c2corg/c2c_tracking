@@ -25,7 +25,7 @@ import knex, { Knex } from 'knex';
     await connection('users').insert({ c2c_id: 1 });
     await connection('users').insert({ c2c_id: 2 });
     console.log('DB initialized 🚀');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(error);
   } finally {
     connection?.destroy();

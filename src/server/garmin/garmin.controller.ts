@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Keyv from 'keyv';
 import type { Context } from 'koa';
 
@@ -16,7 +15,7 @@ class GarminController {
     this.keyv = new Keyv();
   }
 
-  async requestUnauthorizedRequestToken(ctx: Context): Promise<void> {
+  public async requestUnauthorizedRequestToken(ctx: Context): Promise<void> {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     const { token, tokenSecret } = await service.requestUnauthorizedRequestToken();
     await this.keyv.set(c2cId.toString(), tokenSecret, 1000 * 60 * 60); // 1 hour TTL
@@ -25,7 +24,7 @@ class GarminController {
     );
   }
 
-  async exchangeToken(ctx: Context): Promise<void> {
+  public async exchangeToken(ctx: Context): Promise<void> {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
 
     const token = ctx.query['oauth_token'] as string;
@@ -47,27 +46,19 @@ class GarminController {
     try {
       await service.requestAccessTokenAndSetupUser(c2cId, token, tokenSecret, verifier);
       ctx.redirect(service.subscriptionUrl);
-    } catch (error) {
+    } catch (error: unknown) {
       ctx.log.info(error);
       ctx.redirect(`${service.subscriptionUrl}?error=setup-failed`);
     }
   }
 
-  async deauthorize(ctx: Context): Promise<void> {
+  public async deauthorize(ctx: Context): Promise<void> {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
-    try {
-      await service.deauthorize(c2cId);
-      ctx.status = 200;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw error;
-      }
-      ctx.log.info(error);
-      ctx.status = 501;
-    }
+    await service.deauthorize(c2cId);
+    ctx.status = 204;
   }
 
-  async activityWebhook(ctx: Context): Promise<void> {
+  public async activityWebhook(ctx: Context): Promise<void> {
     const body = ctx.request.body as {
       activityDetails: (GarminActivity & { userId: string; userAccessToken: string })[];
     };
@@ -75,7 +66,7 @@ class GarminController {
     ctx.status = 200;
   }
 
-  async deauthorizeWebhook(ctx: Context): Promise<void> {
+  public async deauthorizeWebhook(ctx: Context): Promise<void> {
     const body = ctx.request.body as { deregistrations: { userId: string; userAccessToken: string }[] };
     service.handleDeauthorizeWebhook(body.deregistrations); // async
     ctx.status = 200;

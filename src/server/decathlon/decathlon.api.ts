@@ -3,7 +3,7 @@ import isISO8601 from 'validator/lib/isISO8601';
 import { z } from 'zod';
 
 import config from '../../config';
-import { handleAppError } from '../../helpers/error';
+import { handleExternalApiError } from '../../helpers/error';
 
 export const DecathlonAuth = z.object({
   access_token: z.string().min(10).max(5000),
@@ -75,7 +75,7 @@ export class DecathlonApi {
       config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath') + '/decathlon/exchange-token';
   }
 
-  async exchangeToken(code: string): Promise<DecathlonAuth> {
+  public async exchangeToken(code: string): Promise<DecathlonAuth> {
     try {
       const response = await axios.post(`${this.baseUrl}connect/oauth/token`, null, {
         params: {
@@ -88,11 +88,11 @@ export class DecathlonApi {
       });
       return DecathlonAuth.parse(response.data);
     } catch (error: unknown) {
-      throw handleAppError(502, 'Error on Decathlon token exchange request', error);
+      throw handleExternalApiError('decathlon', 'Error on Decathlon token exchange request', error);
     }
   }
 
-  async refreshAuth(refreshToken: string): Promise<DecathlonAuth> {
+  public async refreshAuth(refreshToken: string): Promise<DecathlonAuth> {
     try {
       const response = await axios.postForm(
         `${this.baseUrl}connect/oauth/token`,
@@ -109,11 +109,11 @@ export class DecathlonApi {
       );
       return DecathlonAuth.parse(response.data);
     } catch (error: unknown) {
-      throw handleAppError(502, 'Error on Decathlon refresh token request', error);
+      throw handleExternalApiError('decathlon', 'Error on Decathlon refresh token request', error);
     }
   }
 
-  async getUserId(accessToken: string): Promise<string> {
+  public async getUserId(accessToken: string): Promise<string> {
     try {
       const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/me`, {
         headers: {
@@ -127,13 +127,13 @@ export class DecathlonApi {
           id: z.string().min(1).max(100),
         })
         .parse(response.data).id;
-    } catch (error) {
-      throw handleAppError(502, 'Error on Decathlon getUserInfo request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('decathlon', 'Error on Decathlon getUserInfo request', error);
     }
   }
 
   // first page retrieved will contain at most 30 activities
-  async getActivities(accessToken: string): Promise<ActivitySummary[]> {
+  public async getActivities(accessToken: string): Promise<ActivitySummary[]> {
     try {
       const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/activities`, {
         headers: {
@@ -143,12 +143,12 @@ export class DecathlonApi {
         },
       });
       return z.array(ActivitySummary).parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Decathlon getActivities request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('decathlon', 'Error on Decathlon getActivities request', error);
     }
   }
 
-  async getActivity(accessToken: string, activityId: string): Promise<Activity> {
+  public async getActivity(accessToken: string, activityId: string): Promise<Activity> {
     try {
       const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/activities/${activityId}`, {
         headers: {
@@ -158,12 +158,12 @@ export class DecathlonApi {
         },
       });
       return Activity.parse(response.data);
-    } catch (error) {
-      throw handleAppError(502, 'Error on Decathlon getActivity request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('decathlon', 'Error on Decathlon getActivity request', error);
     }
   }
 
-  async getExistingWebhookSubscription(accessToken: string): Promise<string | undefined> {
+  public async getExistingWebhookSubscription(accessToken: string): Promise<string | undefined> {
     try {
       const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/user_web_hooks`, {
         headers: {
@@ -176,12 +176,12 @@ export class DecathlonApi {
         .array(WebhookSubscription)
         .parse(response.data)
         .find((webhook) => webhook.url === config.get('server.baseUrl') + 'decathlon/webhook')?.id;
-    } catch (error) {
-      throw handleAppError(502, 'Error on Decathlon getExistingWebhookSubscription request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('decathlon', 'Error on Decathlon getExistingWebhookSubscription request', error);
     }
   }
 
-  async createWebhookSubscription(userId: string, accessToken: string): Promise<string> {
+  public async createWebhookSubscription(userId: string, accessToken: string): Promise<string> {
     try {
       const response = await axios.post(
         `${this.baseUrl}sportstrackingdata/v2/user_web_hooks`,
@@ -199,12 +199,12 @@ export class DecathlonApi {
         },
       );
       return WebhookSubscription.parse(response.data).id;
-    } catch (error) {
-      throw handleAppError(502, 'Error on Decathlon createWebhookSubscription request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('decathlon', 'Error on Decathlon createWebhookSubscription request', error);
     }
   }
 
-  async deleteWebhookSubscription(id: string, accessToken: string): Promise<void> {
+  public async deleteWebhookSubscription(id: string, accessToken: string): Promise<void> {
     try {
       await axios.delete(`${this.baseUrl}sportstrackingdata/v2/user_web_hooks/${id}`, {
         headers: {
@@ -212,8 +212,8 @@ export class DecathlonApi {
           'x-api-key': this.#apiKey,
         },
       });
-    } catch (error) {
-      throw handleAppError(502, 'Error on Decathlon deleteWebhookSubscription request', error);
+    } catch (error: unknown) {
+      throw handleExternalApiError('decathlon', 'Error on Decathlon deleteWebhookSubscription request', error);
     }
   }
 }

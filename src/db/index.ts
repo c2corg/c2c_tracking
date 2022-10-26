@@ -23,7 +23,7 @@ export class Database {
     this.config = config;
   }
 
-  async getConnection(): Promise<Knex | undefined> {
+  public async getConnection(): Promise<Knex | undefined> {
     if (!this.connection) {
       this.connection = await this.retryDbConnection();
     }
@@ -31,7 +31,7 @@ export class Database {
     return this.connection;
   }
 
-  async getTransaction(): Promise<Knex.Transaction> {
+  public async getTransaction(): Promise<Knex.Transaction> {
     const connection = await this.getConnection();
 
     return new Promise<Knex.Transaction>((resolve, reject) => {
@@ -49,14 +49,14 @@ export class Database {
     });
   }
 
-  async closeDatabase(): Promise<void> {
+  public async closeDatabase(): Promise<void> {
     if (this.connection) {
       await this.connection.destroy();
       this.connection = undefined;
     }
   }
 
-  async schemaMigration(): Promise<void> {
+  public async schemaMigration(): Promise<void> {
     const connection = await this.getConnection();
     if (!connection) {
       return;

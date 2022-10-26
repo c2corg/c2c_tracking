@@ -135,8 +135,7 @@ describe('User service', () => {
           expires_at: 10,
           expires_in: 30,
         }),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
-
+      ).rejects.toMatchInlineSnapshot('[Error: User 1 not found]');
       expect(userRepository.update).not.toHaveBeenCalled();
     });
 
@@ -152,7 +151,7 @@ describe('User service', () => {
           expires_at: 10,
           expires_in: 30,
         }),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not configured for Strava"`);
+      ).rejects.toMatchInlineSnapshot('[Error: User 1 not configured for Strava]');
 
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -317,7 +316,7 @@ describe('User service', () => {
           refresh_token: 'new_refresh_token',
           expires_in: 30,
         }),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      ).rejects.toMatchInlineSnapshot('[Error: User 1 not found]');
 
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -334,7 +333,7 @@ describe('User service', () => {
           refresh_token: 'new_refresh_token',
           expires_in: 30,
         }),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not configured for Suunto"`);
+      ).rejects.toMatchInlineSnapshot('[Error: User 1 not configured for Suunto]');
 
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -591,7 +590,7 @@ describe('User service', () => {
           token_type: 'bearer',
           expires_in: 30,
         }),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      ).rejects.toMatchInlineSnapshot('[Error: User 1 not found]');
 
       expect(userRepository.update).not.toHaveBeenCalled();
     });
@@ -608,7 +607,7 @@ describe('User service', () => {
           token_type: 'bearer',
           expires_in: 30,
         }),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not configured for Decathlon"`);
+      ).rejects.toMatchInlineSnapshot('[Error: User 1 not configured for Decathlon]');
 
       expect(userRepository.update).not.toHaveBeenCalled();
     });

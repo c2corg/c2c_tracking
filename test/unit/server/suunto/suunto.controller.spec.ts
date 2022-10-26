@@ -120,7 +120,7 @@ describe('Suunto Controller', () => {
 
       const response = await authenticated(request(app.callback()).post('/suunto/deauthorize/1'), 1);
 
-      expect(response.status).toBe(501);
+      expect(response.status).toBe(500);
     });
 
     it('call service', async () => {
@@ -128,7 +128,7 @@ describe('Suunto Controller', () => {
 
       const response = await authenticated(request(app.callback()).post('/suunto/deauthorize/1'), 1);
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(204);
     });
   });
 });

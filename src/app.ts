@@ -10,6 +10,7 @@ import type { LevelWithSilent } from 'pino';
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth';
 import config from './config';
 import log from './helpers/logger';
+import { promResponseTimeSummary } from './metrics/prometheus';
 import activities from './server/activities';
 import decathlon from './server/decathlon';
 import { defaultErrorHandler } from './server/error-handler';
@@ -62,6 +63,11 @@ app
     } else {
       await next();
     }
+  })
+  .use(async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
+    const end = promResponseTimeSummary.labels({ method: ctx.method, name: ctx.path }).startTimer();
+    await next();
+    end();
   })
   .use(
     cors({
