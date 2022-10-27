@@ -2,7 +2,7 @@
   "name": "c2c_tracking",
   "version": "1.0.0",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "description": "Tiny server to handle connection with activity trackers such as Strava, Garmin or Suunto",
   "type": "commonjs",
