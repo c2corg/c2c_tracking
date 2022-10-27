@@ -28,5 +28,6 @@ jobs:
           locales: ca, de, en, es, eu, fr, hu, it, ru, sl, zh_CN
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: transifex/i18n
+          base_branch: main
           transform: none
           labels: i18n
