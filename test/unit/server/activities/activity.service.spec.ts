@@ -42,7 +42,7 @@ describe('Activity Service', () => {
             "name": "name",
             "type": [
               {
-                "fr": "Run",
+                "fr": "Course à pied",
               },
               {
                 "en": "Run",
@@ -108,7 +108,7 @@ describe('Activity Service', () => {
             "name": "name",
             "type": [
               {
-                "fr": "Run",
+                "fr": "Course à pied",
               },
             ],
             "userId": 1,
@@ -145,7 +145,7 @@ describe('Activity Service', () => {
           "name": "name",
           "type": [
             {
-              "fr": "Unknown",
+              "fr": "Inconnu",
             },
           ],
           "userId": 1,
