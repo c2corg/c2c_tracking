@@ -2,17 +2,17 @@ import { z } from 'zod';
 
 export const StravaInfo = z.object({
   id: z.number().int().positive(),
-  accessToken: z.string().min(10).max(5000),
-  expiresAt: z.number().int().positive(),
-  refreshToken: z.string().min(10).max(5000),
+  accessToken: z.string().min(10).max(5000).optional(),
+  expiresAt: z.number().int().positive().optional(),
+  refreshToken: z.string().min(10).max(5000).optional(),
 });
 export type StravaInfo = z.infer<typeof StravaInfo>;
 
 export const SuuntoInfo = z.object({
   username: z.string().min(1),
-  accessToken: z.string().min(10).max(5000),
-  expiresAt: z.number().int().positive(),
-  refreshToken: z.string().min(10).max(5000),
+  accessToken: z.string().min(10).max(5000).optional(),
+  expiresAt: z.number().int().positive().optional(),
+  refreshToken: z.string().min(10).max(5000).optional(),
 });
 export type SuuntoInfo = z.infer<typeof SuuntoInfo>;
 
@@ -24,9 +24,9 @@ export type GarminInfo = z.infer<typeof GarminInfo>;
 
 export const DecathlonInfo = z.object({
   id: z.string().min(1),
-  accessToken: z.string().min(10).max(5000),
-  expiresAt: z.number().int().positive(),
-  refreshToken: z.string().min(10).max(5000),
+  accessToken: z.string().min(10).max(5000).optional(),
+  expiresAt: z.number().int().positive().optional(),
+  refreshToken: z.string().min(10).max(5000).optional(),
   webhookId: z.string(),
 });
 export type DecathlonInfo = z.infer<typeof DecathlonInfo>;

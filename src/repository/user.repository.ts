@@ -185,9 +185,9 @@ export class UserRepository {
       | undefined = user.strava
       ? {
           strava_id: user.strava.id,
-          strava_access_token: this.encrypt(user.strava.accessToken),
-          strava_expires_at: user.strava.expiresAt ? dayjs.unix(user.strava.expiresAt).toDate() : undefined,
-          strava_refresh_token: this.encrypt(user.strava.refreshToken),
+          strava_access_token: user.strava.accessToken ? this.encrypt(user.strava.accessToken) : null,
+          strava_expires_at: user.strava.expiresAt ? dayjs.unix(user.strava.expiresAt).toDate() : null,
+          strava_refresh_token: user.strava.refreshToken ? this.encrypt(user.strava.refreshToken) : null,
         }
       : {
           strava_id: null,
@@ -200,9 +200,9 @@ export class UserRepository {
       | undefined = user.suunto
       ? {
           suunto_username: user.suunto.username,
-          suunto_access_token: this.encrypt(user.suunto.accessToken),
-          suunto_expires_at: user.suunto.expiresAt ? dayjs.unix(user.suunto.expiresAt).toDate() : undefined,
-          suunto_refresh_token: this.encrypt(user.suunto.refreshToken),
+          suunto_access_token: user.suunto.accessToken ? this.encrypt(user.suunto.accessToken) : null,
+          suunto_expires_at: user.suunto.expiresAt ? dayjs.unix(user.suunto.expiresAt).toDate() : null,
+          suunto_refresh_token: user.suunto.refreshToken ? this.encrypt(user.suunto.refreshToken) : null,
         }
       : {
           suunto_username: null,
@@ -231,9 +231,9 @@ export class UserRepository {
       | undefined = user.decathlon
       ? {
           decathlon_id: user.decathlon.id,
-          decathlon_access_token: this.encrypt(user.decathlon.accessToken),
-          decathlon_expires_at: user.decathlon.expiresAt ? dayjs.unix(user.decathlon.expiresAt).toDate() : undefined,
-          decathlon_refresh_token: this.encrypt(user.decathlon.refreshToken),
+          decathlon_access_token: user.decathlon.accessToken ? this.encrypt(user.decathlon.accessToken) : null,
+          decathlon_expires_at: user.decathlon.expiresAt ? dayjs.unix(user.decathlon.expiresAt).toDate() : null,
+          decathlon_refresh_token: user.decathlon.refreshToken ? this.encrypt(user.decathlon.refreshToken) : null,
           decathlon_webhook_id: user.decathlon.webhookId,
         }
       : {

@@ -286,6 +286,7 @@ describe('Decathlon Service', () => {
         },
       });
       jest.spyOn(decathlonApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      jest.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -387,6 +388,7 @@ describe('Decathlon Service', () => {
         webhookId: 'webhookId',
       });
       jest.spyOn(decathlonApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      jest.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       const result = await service.getToken(1);
@@ -394,6 +396,7 @@ describe('Decathlon Service', () => {
       expect(result).toBeUndefined();
       expect(decathlonApi.refreshAuth).toBeCalledTimes(1);
       expect(decathlonApi.refreshAuth).toBeCalledWith('refresh_token');
+      expect(userService.clearDecathlonTokens).toBeCalledTimes(1);
     });
   });
 

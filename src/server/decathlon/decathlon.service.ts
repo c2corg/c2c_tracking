@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
-import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -105,9 +105,11 @@ export class DecathlonService {
         return auth.access_token;
       } catch (error: unknown) {
         log.warn(`Decathlon access token refresh failed for user ${c2cId}`);
-        return undefined;
       }
     }
+    promTokenRenewalErrorsCounter.labels({ vendor: 'decathlon' }).inc(1);
+    // clear token, user needs to log again
+    await userService.clearDecathlonTokens(c2cId);
     return undefined;
   }
 

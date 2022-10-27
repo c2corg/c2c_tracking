@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../src/errors';
 import log from '../../src/helpers/logger';
 import type { Activity } from '../../src/repository/activity';
 import { activityRepository } from '../../src/repository/activity.repository';
@@ -23,6 +24,7 @@ describe('User service', () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
+        suunto: { username: 'usernam' },
       });
 
       const service = new UserService();
@@ -30,17 +32,17 @@ describe('User service', () => {
 
       expect(info).toMatchInlineSnapshot(`
         {
-          "decathlon": false,
-          "garmin": false,
-          "strava": true,
-          "suunto": false,
+          "decathlon": "not-configured",
+          "garmin": "not-configured",
+          "strava": "configured",
+          "suunto": "token-lost",
         }
       `);
       expect(userRepository.findById).toBeCalledTimes(1);
       expect(userRepository.findById).toBeCalledWith(1);
     });
 
-    it('returns with falsy values', async () => {
+    it('returns not configured state', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
@@ -48,10 +50,64 @@ describe('User service', () => {
 
       expect(info).toMatchInlineSnapshot(`
         {
-          "decathlon": false,
-          "garmin": false,
-          "strava": false,
-          "suunto": false,
+          "decathlon": "not-configured",
+          "garmin": "not-configured",
+          "strava": "not-configured",
+          "suunto": "not-configured",
+        }
+      `);
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+    });
+
+    it('should return token lost state', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: { id: '1', webhookId: 'webhookId' },
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+        strava: { id: 1 },
+        suunto: { username: 'username' },
+      });
+
+      const service = new UserService();
+      const info = await service.getUserInfo(1);
+
+      expect(info).toMatchInlineSnapshot(`
+        {
+          "decathlon": "token-lost",
+          "garmin": "configured",
+          "strava": "token-lost",
+          "suunto": "token-lost",
+        }
+      `);
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+    });
+
+    it('should return configured state', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: {
+          id: '1',
+          webhookId: 'webhokid',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+        strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
+        suunto: { username: 'username', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
+      });
+
+      const service = new UserService();
+      const info = await service.getUserInfo(1);
+
+      expect(info).toMatchInlineSnapshot(`
+        {
+          "decathlon": "configured",
+          "garmin": "configured",
+          "strava": "configured",
+          "suunto": "configured",
         }
       `);
       expect(userRepository.findById).toBeCalledTimes(1);
@@ -185,6 +241,54 @@ describe('User service', () => {
           refreshToken: 'new_refresh_token',
           expiresAt: 10,
         },
+      });
+    });
+  });
+
+  describe('clearStravaTokens', () => {
+    it('throws if user is not found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await expect(service.clearStravaTokens(1)).rejects.toBeInstanceOf(NotFoundError);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('does nothing if no auth info is found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await service.clearStravaTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('clears tokens', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
+      });
+      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+        c2cId: 1,
+        strava: { id: 1 },
+      });
+
+      const service = new UserService();
+      await service.clearStravaTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        strava: { id: 1 },
       });
     });
   });
@@ -367,6 +471,54 @@ describe('User service', () => {
           refreshToken: 'new_refresh_token',
           expiresAt: 30,
         },
+      });
+    });
+  });
+
+  describe('clearSuuntoTokens', () => {
+    it('throws if user is not found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await expect(service.clearSuuntoTokens(1)).rejects.toBeInstanceOf(NotFoundError);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('does nothing if no auth info is found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await service.clearSuuntoTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('clears tokens', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        suunto: { username: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
+      });
+      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+        c2cId: 1,
+        suunto: { username: '1' },
+      });
+
+      const service = new UserService();
+      await service.clearSuuntoTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        suunto: { username: '1' },
       });
     });
   });
@@ -643,6 +795,60 @@ describe('User service', () => {
           expiresAt: 30,
           webhookId: 'webhookId',
         },
+      });
+    });
+  });
+
+  describe('clearDecathlonTokens', () => {
+    it('throws if user is not found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await expect(service.clearDecathlonTokens(1)).rejects.toBeInstanceOf(NotFoundError);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('does nothing if no auth info is found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await service.clearDecathlonTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('clears tokens', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: {
+          id: '1',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+          webhookId: 'webhookId',
+        },
+      });
+      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: { id: '1', webhookId: 'webhookId' },
+      });
+
+      const service = new UserService();
+      await service.clearDecathlonTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        decathlon: { id: '1', webhookId: 'webhookId' },
       });
     });
   });

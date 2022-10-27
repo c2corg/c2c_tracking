@@ -41,6 +41,12 @@ export const promWebhookErrorsCounter = new Counter({
   labelNames: ['vendor', 'cause'],
 });
 
+export const promTokenRenewalErrorsCounter = new Counter({
+  name: 'token_renewal_errors',
+  help: 'Token Renewal Errors',
+  labelNames: ['vendor'],
+});
+
 // service info
 const info = new Gauge({
   name: `service_info`,
