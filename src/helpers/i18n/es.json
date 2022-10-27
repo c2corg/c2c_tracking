@@ -1,0 +1,1595 @@
+{
+  "100/110mhurdles": {
+    "string": "100/110 m Vallas"
+  },
+  "100km": {
+    "string": "100 Km"
+  },
+  "10km": {
+    "string": "10 km"
+  },
+  "22longrifleshooting": {
+    "string": "Tiro 22lr"
+  },
+  "3darchery": {
+    "string": "Tiro con arco 3D"
+  },
+  "400mhurdles": {
+    "string": "400 m Vallas"
+  },
+  "adventureracing": {
+    "string": "Raid"
+  },
+  "adventureroute": {
+    "string": "Recorrido aventura"
+  },
+  "aerobatics": {
+    "string": "Acrobacia"
+  },
+  "aerobics": {
+    "string": "Aerobic"
+  },
+  "africandance": {
+    "string": "Danza africana"
+  },
+  "aggressiveinlineskating(stunts)": {
+    "string": "Patinaje agresivo (acróbata)"
+  },
+  "aïkido": {
+    "string": "Aïkido"
+  },
+  "airrifleshooting": {
+    "string": "Tiro aire comprimido"
+  },
+  "allmountainmtb": {
+    "string": "BTT All mountain"
+  },
+  "alpineski": {
+    "string": "Alpine Ski"
+  },
+  "alpineskiing": {
+    "string": "Esquí alpino"
+  },
+  "alpinesnowboarding": {
+    "string": "Snowboard alpino"
+  },
+  "alternativenordicskiing": {
+    "string": "Esquí nórdico alternativo"
+  },
+  "americanfootball": {
+    "string": "Fútbol americano"
+  },
+  "apnea": {
+    "string": "Apnea"
+  },
+  "apneahunt": {
+    "string": "Apnea Hunt"
+  },
+  "aquabike": {
+    "string": "Aquabike"
+  },
+  "aquaboxing": {
+    "string": "Aquaboxing"
+  },
+  "aquabuilding": {
+    "string": "Aquabuilding"
+  },
+  "aquafitness": {
+    "string": "Aquafitness"
+  },
+  "aquagym/aquafitness": {
+    "string": "Aquagym / Aquafitness"
+  },
+  "aquagymsessions": {
+    "string": "Gimnasia acuática"
+  },
+  "aquajogging": {
+    "string": "Aquajogging"
+  },
+  "aquapump": {
+    "string": "Aquapump"
+  },
+  "aquathlon": {
+    "string": "Aquathlon"
+  },
+  "archery": {
+    "string": "Tiro con arco"
+  },
+  "artisticgymnastics(ag)": {
+    "string": "Gimnasia artística (GA)"
+  },
+  "artisticrollerskating": {
+    "string": "Patinaje artístico"
+  },
+  "athletics": {
+    "string": "Atletismo"
+  },
+  "atv": {
+    "string": "Atv"
+  },
+  "autoracing": {
+    "string": "Auto Racing"
+  },
+  "babyswimming": {
+    "string": "Despertar acuático"
+  },
+  "backcountryski": {
+    "string": "Backcountry Ski"
+  },
+  "backcountryskiing": {
+    "string": "Esquí de travesía"
+  },
+  "backcountryskiing/snowboarding": {
+    "string": "Backcountry Skiing/Snowboarding"
+  },
+  "badminton": {
+    "string": "Bádminton"
+  },
+  "ballet": {
+    "string": "Danza clásica"
+  },
+  "ballgames": {
+    "string": "Ball Games"
+  },
+  "ballroomdance": {
+    "string": "Bailes de salón"
+  },
+  "baroquedance": {
+    "string": "Danza barroca"
+  },
+  "baseball": {
+    "string": "Baseball"
+  },
+  "basketball": {
+    "string": "Baloncesto"
+  },
+  "basquepelota": {
+    "string": "Pelota vasca"
+  },
+  "beachrugby": {
+    "string": "Beach rugby"
+  },
+  "beachsoccer": {
+    "string": "Beach soccer"
+  },
+  "beachvolley": {
+    "string": "Voleibol de playa"
+  },
+  "bicycle": {
+    "string": "Bicicleta"
+  },
+  "bicycletouring": {
+    "string": "Cicloturismo"
+  },
+  "bigboreshooting": {
+    "string": "Tiro grandes calibres"
+  },
+  "biketoruntransition": {
+    "string": "Bike to Run Transition"
+  },
+  "billiards": {
+    "string": "Billar"
+  },
+  "blindhuntingforbiggame": {
+    "string": "Caza de presas grandes en acecho"
+  },
+  "blockclimbing": {
+    "string": "Escalada de bloques"
+  },
+  "blowgun": {
+    "string": "Sarbacane"
+  },
+  "bmx": {
+    "string": "BMX"
+  },
+  "bmxrace": {
+    "string": "BMX Race"
+  },
+  "bmxstreet": {
+    "string": "BMX Street"
+  },
+  "bmxtrial": {
+    "string": "BMX Trial"
+  },
+  "boating": {
+    "string": "Boating"
+  },
+  "bobsleigh": {
+    "string": "Bobsleigh"
+  },
+  "bodyboarding": {
+    "string": "Bodyboard"
+  },
+  "bodysurf": {
+    "string": "Body surf"
+  },
+  "bolognesefishing": {
+    "string": "Pesca a la boloñesa"
+  },
+  "bouldering": {
+    "string": "Bouldering"
+  },
+  "boules": {
+    "string": "Bolos"
+  },
+  "bowhunting": {
+    "string": "Caza al arco"
+  },
+  "bowling": {
+    "string": "Bowling"
+  },
+  "boxing": {
+    "string": "Boxeo"
+  },
+  "breathwork": {
+    "string": "Breathwork"
+  },
+  "britishboxing": {
+    "string": "Boxeo inglés"
+  },
+  "bushcraft": {
+    "string": "Bushkraft"
+  },
+  "canihiking": {
+    "string": "Cani-Rando (marcha con perros)"
+  },
+  "canicross": {
+    "string": "Canicross"
+  },
+  "canoeing": {
+    "string": "Canoeing"
+  },
+  "canoeingandkayaking": {
+    "string": "Piragüismo"
+  },
+  "canoepolo": {
+    "string": "Kayak polo"
+  },
+  "canyoning": {
+    "string": "Canyoning"
+  },
+  "capoeira": {
+    "string": "Capoeira"
+  },
+  "cardio": {
+    "string": "Cardio"
+  },
+  "cardioboxing": {
+    "string": "Cardio Boxing"
+  },
+  "carombilliards": {
+    "string": "Billar francés"
+  },
+  "carpfishing": {
+    "string": "Pesca de carpas"
+  },
+  "casualwalking": {
+    "string": "Casual Walking"
+  },
+  "catamaran": {
+    "string": "Catamarán"
+  },
+  "catfishfishing": {
+    "string": "Pesca del siluro"
+  },
+  "caving": {
+    "string": "Espeleología"
+  },
+  "ccrdive": {
+    "string": "Ccr Dive"
+  },
+  "cestapunta": {
+    "string": "La cesta punta"
+  },
+  "cheerleading": {
+    "string": "Cheerleading"
+  },
+  "circuittraining": {
+    "string": "Circuit Training"
+  },
+  "claypigeonshooting": {
+    "string": "Ball trap"
+  },
+  "climbing": {
+    "string": "Escalada"
+  },
+  "climbingmajorroutes": {
+    "string": "Escalada grandes vías"
+  },
+  "combatsport": {
+    "string": "Combat Sport"
+  },
+  "contemporarydance": {
+    "string": "Danza contemporánea"
+  },
+  "countryactivities": {
+    "string": "Actividades en la naturaleza"
+  },
+  "countrydance": {
+    "string": "Danza country"
+  },
+  "countrysidedogwork": {
+    "string": "Trabajo práctico en el campo"
+  },
+  "cricket": {
+    "string": "Cricket"
+  },
+  "crosscountry": {
+    "string": "Cross"
+  },
+  "crosscountryhorseracing": {
+    "string": "Cross a caballo"
+  },
+  "crosscountrymtb": {
+    "string": "BTT Cross country"
+  },
+  "crossbow": {
+    "string": "Arbalète"
+  },
+  "crosscountryclassicskiing": {
+    "string": "Cross Country Classic Skiing"
+  },
+  "crosscountryskateskiing": {
+    "string": "Cross Country Skate Skiing"
+  },
+  "crosscountryskiing": {
+    "string": "Cross Country Skiing"
+  },
+  "crossfit": {
+    "string": "Crossfit"
+  },
+  "crosstrainer": {
+    "string": "Bicicleta elíptica"
+  },
+  "crosstraining": {
+    "string": "Cross training"
+  },
+  "curling": {
+    "string": "Curling"
+  },
+  "cycling": {
+    "string": "Cycling"
+  },
+  "cyclocross": {
+    "string": "Ciclocross"
+  },
+  "dailyactivity": {
+    "string": "Actividad diaria"
+  },
+  "dancing": {
+    "string": "Baile"
+  },
+  "darts": {
+    "string": "Dados"
+  },
+  "dartswithelectronicboards": {
+    "string": "Tiro de dados en blancos electrónicos"
+  },
+  "dartswithtraditionalboards": {
+    "string": "Tiro de dados en blancos tradicionales"
+  },
+  "dayhiking": {
+    "string": "Senderismo de un día"
+  },
+  "decathlon": {
+    "string": "Decatlón"
+  },
+  "dinghysailing": {
+    "string": "Barco de orza"
+  },
+  "dirtmtb": {
+    "string": "BTT Dirt"
+  },
+  "disabledsports": {
+    "string": "Handisport"
+  },
+  "discus": {
+    "string": "Lanzamiento de disco"
+  },
+  "diving": {
+    "string": "Salto"
+  },
+  "dogagility": {
+    "string": "Agility"
+  },
+  "dogsledandpulk": {
+    "string": "Trineo de perros y Pulka"
+  },
+  "dogsledding": {
+    "string": "Trineos de perros"
+  },
+  "dogsports": {
+    "string": "Deportes caninos"
+  },
+  "domavaquera": {
+    "string": "Doma Vaquera"
+  },
+  "downhillbiking": {
+    "string": "Downhill Biking"
+  },
+  "downhillmtb": {
+    "string": "BTT Descenso"
+  },
+  "downhillskiing": {
+    "string": "Downhill Skiing"
+  },
+  "dressage": {
+    "string": "Doma ecuestre"
+  },
+  "drivehuntingforbiggame": {
+    "string": "Caza de presas grandes en batida"
+  },
+  "driving": {
+    "string": "Driving"
+  },
+  "duathlon": {
+    "string": "Duatlón"
+  },
+  "esport": {
+    "string": "E-Sport"
+  },
+  "ebikeride": {
+    "string": "E-Bike Ride"
+  },
+  "elliptical": {
+    "string": "Elliptical"
+  },
+  "enduranceriding": {
+    "string": "Resistencia a caballo"
+  },
+  "enduro": {
+    "string": "Moto enduro"
+  },
+  "enduromtb": {
+    "string": "BTT Enduro"
+  },
+  "englishbilliards": {
+    "string": "Billar inglés"
+  },
+  "epée": {
+    "string": "Espada"
+  },
+  "equestrianvaulting": {
+    "string": "Acrobacia ecuestre"
+  },
+  "eventing": {
+    "string": "Concurso completo"
+  },
+  "exploration": {
+    "string": "Exploración"
+  },
+  "fencing": {
+    "string": "Esgrima"
+  },
+  "fieldarchery": {
+    "string": "Tiro con arco natural"
+  },
+  "fieldcrossbow": {
+    "string": "Ballesta field"
+  },
+  "fieldhockey": {
+    "string": "Hockey sobre hierba"
+  },
+  "fieldtrial": {
+    "string": "Field Trial"
+  },
+  "figureskating": {
+    "string": "Patinaje artístico"
+  },
+  "fishing": {
+    "string": "Pesca"
+  },
+  "fishingonfoot": {
+    "string": "Pesca a pie"
+  },
+  "fitness": {
+    "string": "Fitness"
+  },
+  "fitnessbike,treadmillathome": {
+    "string": "Bicicleta, máquina de carrera a domicilio"
+  },
+  "fitnessclass": {
+    "string": "Fitness Class"
+  },
+  "fives": {
+    "string": "Pelota mano"
+  },
+  "floorball": {
+    "string": "Floorball"
+  },
+  "floorclimbing": {
+    "string": "Floor Climbing"
+  },
+  "flyball": {
+    "string": "Fly-Ball"
+  },
+  "flyfishing": {
+    "string": "Pesca a mosca"
+  },
+  "flying": {
+    "string": "Flying"
+  },
+  "foil": {
+    "string": "Florete"
+  },
+  "football": {
+    "string": "Fútbol"
+  },
+  "formularacing": {
+    "string": "Fórmula automóvil"
+  },
+  "formulawindsurfing": {
+    "string": "Formula windsurfing"
+  },
+  "fountain": {
+    "string": "Fuente"
+  },
+  "freediving": {
+    "string": "Apnea"
+  },
+  "freerideskiing": {
+    "string": "Esquí free ride"
+  },
+  "freeridesnowboarding": {
+    "string": "Snowboard free ride"
+  },
+  "freeridewindsurfing": {
+    "string": "Windsurf freeride"
+  },
+  "freestyleskiing": {
+    "string": "Esquí free style"
+  },
+  "freestylesnowboarding": {
+    "string": "Snowboard free style"
+  },
+  "freestylewindsurfing": {
+    "string": "Windsurf freestyle"
+  },
+  "frenchboxing": {
+    "string": "Boxeo francés"
+  },
+  "frescobol": {
+    "string": "Frescobol"
+  },
+  "freshwaterlurefishing": {
+    "string": "Pesca con señuelo en agua dulce"
+  },
+  "frisbee": {
+    "string": "Frisbee"
+  },
+  "frisbeegolf": {
+    "string": "Frisbee Golf"
+  },
+  "frontenis": {
+    "string": "Frontenis"
+  },
+  "fullcontact": {
+    "string": "Full contact"
+  },
+  "futsal": {
+    "string": "Futsal"
+  },
+  "gaugedive": {
+    "string": "Gauge Dive"
+  },
+  "gentlegym": {
+    "string": "Gimnasia suave"
+  },
+  "glacierhiking": {
+    "string": "Travesía glaciar"
+  },
+  "golf": {
+    "string": "Golf"
+  },
+  "grandchistera": {
+    "string": "Gran chistera"
+  },
+  "grappling": {
+    "string": "Grappling"
+  },
+  "gravel/unpaved cycling": {
+    "string": "Gravel/unpaved Cycling"
+  },
+  "gym": {
+    "string": "Gym"
+  },
+  "gym&fitnessequipment": {
+    "string": "Gym & Fitness Equipment"
+  },
+  "gymnastics": {
+    "string": "Gimnasia"
+  },
+  "gymtraining": {
+    "string": "Gimnasia voluntaria"
+  },
+  "hacking": {
+    "string": "Senderismo ecuestre"
+  },
+  "halfmarathon": {
+    "string": "Media maratón"
+  },
+  "hammer": {
+    "string": "Lanzamiento de martillo"
+  },
+  "handball": {
+    "string": "Balonmano"
+  },
+  "handbike": {
+    "string": "Handbike"
+  },
+  "handcycle": {
+    "string": "Handcycle"
+  },
+  "hanggliding": {
+    "string": "Hang Gliding"
+  },
+  "harnessracing": {
+    "string": "Concurso de trote"
+  },
+  "heptathlon": {
+    "string": "Heptatlón"
+  },
+  "highjump": {
+    "string": "Salto de altura"
+  },
+  "hike": {
+    "string": "Hike"
+  },
+  "hiking": {
+    "string": "Senderismo"
+  },
+  "hiphop": {
+    "string": "Hip hop"
+  },
+  "hockey": {
+    "string": "Hockey"
+  },
+  "hometrainer": {
+    "string": "Entrenador de casa"
+  },
+  "horsedrawncarriage": {
+    "string": "Tiro"
+  },
+  "horsebackriding": {
+    "string": "Horseback Riding"
+  },
+  "horseball": {
+    "string": "Horse ball"
+  },
+  "horseracing": {
+    "string": "Concurso de galope"
+  },
+  "horseriding": {
+    "string": "Equitación"
+  },
+  "house": {
+    "string": "Casa"
+  },
+  "hunting": {
+    "string": "Caza"
+  },
+  "hunting/fishing": {
+    "string": "Hunting/Fishing"
+  },
+  "huntingwithhounds": {
+    "string": "Montería"
+  },
+  "hybridcycling": {
+    "string": "Bicicleta senderismo"
+  },
+  "hydrospeed": {
+    "string": "Hydrospeed"
+  },
+  "iceclimbing": {
+    "string": "Escalada en hielo"
+  },
+  "icehockey": {
+    "string": "Hockey sobre hielo"
+  },
+  "iceskate": {
+    "string": "Ice Skate"
+  },
+  "iceskating": {
+    "string": "Patinaje sobre hielo"
+  },
+  "indoor": {
+    "string": "Indoor"
+  },
+  "indoorclimbing": {
+    "string": "Escalada indoor"
+  },
+  "indoorcycling": {
+    "string": "Indoor Cycling"
+  },
+  "indoorfitnessbike": {
+    "string": "Bicicleta estática"
+  },
+  "indoorfootball": {
+    "string": "Fútbol sala"
+  },
+  "indoorrowing": {
+    "string": "Indoor Rowing"
+  },
+  "indoorrunning": {
+    "string": "Indoor Running"
+  },
+  "indoorweighttraining": {
+    "string": "Pesas"
+  },
+  "inlineskate": {
+    "string": "Inline Skate"
+  },
+  "inlineskating": {
+    "string": "Patinaje"
+  },
+  "itinerantcamping": {
+    "string": "Travesía itinerante*"
+  },
+  "javelin": {
+    "string": "Lanzamiento de jabalina"
+  },
+  "jetski": {
+    "string": "Jet-ski"
+  },
+  "jigfishing": {
+    "string": "Pesca vertical (jigging)"
+  },
+  "jiujitsu": {
+    "string": "Jiu jitsu"
+  },
+  "jocari": {
+    "string": "Jocari"
+  },
+  "jokogarbi": {
+    "string": "Joko-garbi"
+  },
+  "judo": {
+    "string": "Judo"
+  },
+  "jumpingrope": {
+    "string": "Cuerda saltar"
+  },
+  "karate": {
+    "string": "Karate"
+  },
+  "karting": {
+    "string": "Karting"
+  },
+  "kayakfishing": {
+    "string": "Kayak de pesca "
+  },
+  "kayaking": {
+    "string": "Kayaking"
+  },
+  "kayaksurf": {
+    "string": "Kayak surf"
+  },
+  "kendo": {
+    "string": "Kendo"
+  },
+  "kettlebell": {
+    "string": "Kettlebell"
+  },
+  "kickboxing": {
+    "string": "Kick boxing"
+  },
+  "kitebuggy": {
+    "string": "Kitebuggy"
+  },
+  "kitesurf": {
+    "string": "Kitesurf"
+  },
+  "kitesurfing": {
+    "string": "Kite surf"
+  },
+  "kitesurfingkiting": {
+    "string": "Kitesurfing Kiting"
+  },
+  "kungfu": {
+    "string": "Kung fu"
+  },
+  "lacrosse": {
+    "string": "Lacrosse"
+  },
+  "landsailing": {
+    "string": "Carrovelismo"
+  },
+  "lasergame": {
+    "string": "Laser game"
+  },
+  "latindance": {
+    "string": "Baile latino"
+  },
+  "legs,bumsandtumstraining": {
+    "string": "Cintura abdominales glúteos"
+  },
+  "lia": {
+    "string": "LIA (aerobic de bajo impacto)"
+  },
+  "livebaitfishing": {
+    "string": "Pesca al vivo"
+  },
+  "longrangekayakingoutings": {
+    "string": "Kayak gran travesia"
+  },
+  "longboard": {
+    "string": "Long board"
+  },
+  "longjump": {
+    "string": "Salto de longitud"
+  },
+  "longtrailrunning(between40and80km)": {
+    "string": "Trail long (entre 40 et 80 Km)"
+  },
+  "lurecoursing": {
+    "string": "Lure coursing"
+  },
+  "marathon": {
+    "string": "Marathon"
+  },
+  "martialarts": {
+    "string": "Artes marciales"
+  },
+  "matchcrossbow": {
+    "string": "Ballesta match"
+  },
+  "matchfishing": {
+    "string": "Pesca a la inglesa"
+  },
+  "meal": {
+    "string": "Comida"
+  },
+  "migratorybirdhunting": {
+    "string": "Caza de aves migratorias"
+  },
+  "mixedclimbing": {
+    "string": "Carreras mixtas"
+  },
+  "mmamixedmartialarts": {
+    "string": "MMA: artes marciales mezcladas"
+  },
+  "modernjazzdance": {
+    "string": "Danza moderna/ jazz"
+  },
+  "monoskiing": {
+    "string": "Monoski"
+  },
+  "motocross": {
+    "string": "Motocross"
+  },
+  "motorboat": {
+    "string": "Barco motor"
+  },
+  "motorcycling": {
+    "string": "Moto"
+  },
+  "mototsports": {
+    "string": "Mototsports"
+  },
+  "mount": {
+    "string": "Montaña"
+  },
+  "mountainbiking": {
+    "string": "BTT"
+  },
+  "mountainboard": {
+    "string": "Mountain board"
+  },
+  "mountaineering": {
+    "string": "Alpinismo"
+  },
+  "multigasdive": {
+    "string": "Multi-gas Dive"
+  },
+  "multisport": {
+    "string": "Multisport"
+  },
+  "naturalbaittroutfishing": {
+    "string": "Pesca de truchas con cebo natural"
+  },
+  "netball": {
+    "string": "Netball"
+  },
+  "nordicskating": {
+    "string": "Esquí nórdico skating"
+  },
+  "nordicski": {
+    "string": "Nordic Ski"
+  },
+  "nordicskiing": {
+    "string": "Esquí nórdico"
+  },
+  "nordicwalking": {
+    "string": "Marcha nórdica"
+  },
+  "obedience": {
+    "string": "Obediencia"
+  },
+  "obstacleracing": {
+    "string": "Obstacle Racing"
+  },
+  "obstaclerunning": {
+    "string": "Obstacle Running"
+  },
+  "offroadrunning": {
+    "string": "Carrera a pie en la naturaleza"
+  },
+  "offshoregrinding": {
+    "string": "Offshore Grinding"
+  },
+  "offshoresurfcasting": {
+    "string": "Pesca a surfcasting océano"
+  },
+  "olympicwalking": {
+    "string": "Marcha olímpica"
+  },
+  "onshoregrinding": {
+    "string": "Onshore Grinding"
+  },
+  "openwaterswimming": {
+    "string": "Open water Swimming"
+  },
+  "orientaldance": {
+    "string": "Danza oriental"
+  },
+  "orientationracing": {
+    "string": "Carrera de orientación"
+  },
+  "orienteering": {
+    "string": "Orienteering"
+  },
+  "other": {
+    "string": "Other"
+  },
+  "other1": {
+    "string": "Other1"
+  },
+  "other2": {
+    "string": "Other2"
+  },
+  "other3": {
+    "string": "Other3"
+  },
+  "other4": {
+    "string": "Other4"
+  },
+  "other5": {
+    "string": "Other5"
+  },
+  "other6": {
+    "string": "Other6"
+  },
+  "outdoorgym": {
+    "string": "Outdoor Gym"
+  },
+  "paddling": {
+    "string": "Paddling"
+  },
+  "padel": {
+    "string": "Pádel"
+  },
+  "paintball": {
+    "string": "Paint-ball"
+  },
+  "palacuir": {
+    "string": "Pala"
+  },
+  "paragliding": {
+    "string": "Parapente"
+  },
+  "paramotor": {
+    "string": "Paramotor"
+  },
+  "parking": {
+    "string": "Aparcamiento"
+  },
+  "parkour": {
+    "string": "Parkour"
+  },
+  "pasaka": {
+    "string": "Pasaka"
+  },
+  "pelota": {
+    "string": "Pelota"
+  },
+  "pétanque": {
+    "string": "Petanca"
+  },
+  "peteca": {
+    "string": "Peteca"
+  },
+  "photo": {
+    "string": "Fotografía"
+  },
+  "pilates": {
+    "string": "Pilates"
+  },
+  "pistolshooting": {
+    "string": "Tiro con pistola"
+  },
+  "playbike": {
+    "string": "Playbike"
+  },
+  "pointofview": {
+    "string": "Punto de vista"
+  },
+  "polevault": {
+    "string": "Salto de pértiga"
+  },
+  "polo": {
+    "string": "Polo"
+  },
+  "ponygames": {
+    "string": "Poney games"
+  },
+  "pool": {
+    "string": "Billar americano"
+  },
+  "poolswimming": {
+    "string": "Pool Swimming"
+  },
+  "punchbagboxing": {
+    "string": "Golpeo punching ball"
+  },
+  "quadbiking": {
+    "string": "Quad"
+  },
+  "quadrollerskating": {
+    "string": "Patinaje quad"
+  },
+  "quivertip/feederfishing": {
+    "string": "Pesca quiver/feeder"
+  },
+  "rackandfield": {
+    "string": "Rack And Field"
+  },
+  "racquetball": {
+    "string": "Racquetball"
+  },
+  "rafting": {
+    "string": "Rafting"
+  },
+  "rallying": {
+    "string": "Rallye"
+  },
+  "rampskateboarding": {
+    "string": "Skate board rampe"
+  },
+  "rc/drone": {
+    "string": "Rc/Drone"
+  },
+  "rebot": {
+    "string": "Rebote"
+  },
+  "recumbent cycling": {
+    "string": "Recumbent Cycling"
+  },
+  "relay": {
+    "string": "Relevos"
+  },
+  "remonte": {
+    "string": "Remonte"
+  },
+  "rescue": {
+    "string": "Salvamento"
+  },
+  "resortskiing/snowboarding": {
+    "string": "Resort Skiing/Snowboarding"
+  },
+  "rhythmicgymnastics(rg)": {
+    "string": "Gimnasia rítmica (GR)"
+  },
+  "ride": {
+    "string": "Ride"
+  },
+  "rifleshooting": {
+    "string": "Tiro con carabina"
+  },
+  "ring": {
+    "string": "Ring"
+  },
+  "rinkhockey": {
+    "string": "Rink hockey"
+  },
+  "roadcycling": {
+    "string": "Bicicleta de carretera"
+  },
+  "roadrunning": {
+    "string": "Carrera a pie por carretera "
+  },
+  "rockclimbing": {
+    "string": "Carrera sobre rocas"
+  },
+  "rollerhockey": {
+    "string": "Roller hockey"
+  },
+  "rollerskating": {
+    "string": "Roller Skating"
+  },
+  "rollerski": {
+    "string": "Roller Ski"
+  },
+  "rollerskiing": {
+    "string": "Roller Skiing"
+  },
+  "rowing": {
+    "string": "Remo"
+  },
+  "rowingmachine": {
+    "string": "Máquina de remo"
+  },
+  "rugby": {
+    "string": "Rugby"
+  },
+  "rugbyleague": {
+    "string": "Rugby 13"
+  },
+  "rugbysevens": {
+    "string": "Rugby 7"
+  },
+  "rugbyunion": {
+    "string": "Rugby 15"
+  },
+  "run": {
+    "string": "Run"
+  },
+  "run&bike": {
+    "string": "Run & Bike"
+  },
+  "running": {
+    "string": "Carrera"
+  },
+  "runtobiketransition": {
+    "string": "Run to Bike Transition"
+  },
+  "sabre": {
+    "string": "Sable"
+  },
+  "sail": {
+    "string": "Sail"
+  },
+  "sailing": {
+    "string": "Vela"
+  },
+  "sandball": {
+    "string": "Sandball"
+  },
+  "scooter": {
+    "string": "Monopatín"
+  },
+  "scubadiving": {
+    "string": "Submarinismo botellas"
+  },
+  "sealurefishing": {
+    "string": "Pesca con señuelo en el mar"
+  },
+  "seasurfcasting": {
+    "string": "Pesca a surfcasting mar"
+  },
+  "selfdefense": {
+    "string": "Autodefensa"
+  },
+  "sheepdogwork": {
+    "string": "Trabajo con ovejas"
+  },
+  "shorelinefishing": {
+    "string": "Pesca marítima"
+  },
+  "shorttermkayakingoutings": {
+    "string": "Kayak pequeña travesia"
+  },
+  "shortandlongrangerollerskatingouting": {
+    "string": "Patinaje paseo y senderismo"
+  },
+  "shortboard": {
+    "string": "Shortboard"
+  },
+  "shorttrailrunning(lessthan40km)": {
+    "string": "Trail court (-40 Km)"
+  },
+  "shotput": {
+    "string": "Lanzamiento de peso"
+  },
+  "showjumping": {
+    "string": "Salto de obstáculos"
+  },
+  "singlegasdive": {
+    "string": "Single-gas Dive"
+  },
+  "skateboard": {
+    "string": "Skateboard"
+  },
+  "skateboarding": {
+    "string": "Skateboard"
+  },
+  "skating": {
+    "string": "Skating"
+  },
+  "skiing": {
+    "string": "Esquí"
+  },
+  "skimboard": {
+    "string": "Skim board"
+  },
+  "skittouring": {
+    "string": "Skit Touring"
+  },
+  "skydiving": {
+    "string": "Sky Diving"
+  },
+  "snooker": {
+    "string": "Snooker"
+  },
+  "snorkeling": {
+    "string": "Snorkeling"
+  },
+  "snorkelling": {
+    "string": "Senderismo subacuático"
+  },
+  "snowboard": {
+    "string": "Snowboard"
+  },
+  "snowboarding": {
+    "string": "Snowboard"
+  },
+  "snowkite": {
+    "string": "Snowkite"
+  },
+  "snowmobile": {
+    "string": "Moto de nieve"
+  },
+  "snowmobiling": {
+    "string": "Snowmobiling"
+  },
+  "snowscoot": {
+    "string": "Snowscoot"
+  },
+  "snowshoe": {
+    "string": "Snowshoe"
+  },
+  "snowshoeing": {
+    "string": "Montañismo con raquetas de nieve"
+  },
+  "soccer": {
+    "string": "Soccer"
+  },
+  "softball": {
+    "string": "Softball"
+  },
+  "spanishriding": {
+    "string": "Equitación española"
+  },
+  "spearfishing": {
+    "string": "Caza submarina"
+  },
+  "speedball": {
+    "string": "Speedball"
+  },
+  "speedminton": {
+    "string": "Speedminton"
+  },
+  "speedmotorcycling": {
+    "string": "Moto velocidad"
+  },
+  "speedrollerskating": {
+    "string": "Patinaje velocidad"
+  },
+  "speedsailing": {
+    "string": "Speedsail"
+  },
+  "speedskating": {
+    "string": "Patinaje de velocidad"
+  },
+  "speedwalking": {
+    "string": "Speed Walking"
+  },
+  "sportsandrhythmicgymnastics(srg)": {
+    "string": "Gimnasia rítmica y deportiva "
+  },
+  "sportswalking": {
+    "string": "Marcha deportiva"
+  },
+  "sprint": {
+    "string": "Sprint"
+  },
+  "squash": {
+    "string": "Squash"
+  },
+  "squatenton": {
+    "string": "Squatenton"
+  },
+  "stairstepper": {
+    "string": "Stair Stepper"
+  },
+  "standuppaddleboarding": {
+    "string": "Surf de remo"
+  },
+  "standuppaddling": {
+    "string": "Standup Paddling"
+  },
+  "stationarysmallgamehunting": {
+    "string": "Caza de presas pequeñas sedentaria"
+  },
+  "steeplechase": {
+    "string": "Steeple"
+  },
+  "steptraining": {
+    "string": "Steps"
+  },
+  "stillfishing": {
+    "string": "Pesca al coup"
+  },
+  "stopwatch": {
+    "string": "Stopwatch"
+  },
+  "streetbasketball": {
+    "string": "Street basket"
+  },
+  "streetrunning": {
+    "string": "Street Running"
+  },
+  "streetskateboarding": {
+    "string": "Skate board street"
+  },
+  "strengthtraining": {
+    "string": "Strength Training"
+  },
+  "stretching": {
+    "string": "Estiramientos"
+  },
+  "summerrollerskiing": {
+    "string": "Esquí roller verano"
+  },
+  "surfing": {
+    "string": "Surf"
+  },
+  "surfkayaking": {
+    "string": "Kayak surf"
+  },
+  "swim": {
+    "string": "Swim"
+  },
+  "swimming": {
+    "string": "Natación"
+  },
+  "swimmingwithfins": {
+    "string": "Natación con aletas"
+  },
+  "swimrun": {
+    "string": "Swimrun"
+  },
+  "swimtobiketransition": {
+    "string": "Swim to Bike Transition"
+  },
+  "synchronisedswimming": {
+    "string": "Natación sincronizada"
+  },
+  "tabletennis": {
+    "string": "Tenis de mesa"
+  },
+  "taekwondo": {
+    "string": "Tae kwon do"
+  },
+  "taichichuan": {
+    "string": "Tai chi chuan"
+  },
+  "tapdance": {
+    "string": "Claqué"
+  },
+  "targetarchery": {
+    "string": "Tiro con arco al blanco"
+  },
+  "telemarkskiing": {
+    "string": "Telemark"
+  },
+  "tennis": {
+    "string": "Tenis"
+  },
+  "thaiboxing": {
+    "string": "Boxeo tailandés"
+  },
+  "trackcycling": {
+    "string": "Ciclismo en pista"
+  },
+  "trackrunning": {
+    "string": "Carrera a pie por pista"
+  },
+  "trail": {
+    "string": "Montañismo"
+  },
+  "trailrunning": {
+    "string": "Trail Running"
+  },
+  "trampoline": {
+    "string": "Cama elástica"
+  },
+  "transition": {
+    "string": "Transition"
+  },
+  "treadmill": {
+    "string": "Cinta andadora"
+  },
+  "treadmillrunning": {
+    "string": "Treadmill Running"
+  },
+  "trekking": {
+    "string": "Trekking"
+  },
+  "trekkingriding": {
+    "string": "Trek ecuestre"
+  },
+  "trialmotorcycling": {
+    "string": "Moto trial"
+  },
+  "trialmtb": {
+    "string": "BTT Trial"
+  },
+  "triathlon": {
+    "string": "Triatlón"
+  },
+  "tricycledisabledsports": {
+    "string": "Tricycle handisport"
+  },
+  "triplejump": {
+    "string": "Triple salto"
+  },
+  "trolling": {
+    "string": "Pesca con traína"
+  },
+  "tumbling": {
+    "string": "Tumbling"
+  },
+  "twirling": {
+    "string": "Twirling"
+  },
+  "ultralighttroutfishing": {
+    "string": "Pesca de truchas lance ultraligero"
+  },
+  "ultrarunning": {
+    "string": "Ultra Running"
+  },
+  "ultratrailrunning(morethan80km)": {
+    "string": "Ultra trail (+80 Km)"
+  },
+  "undergrounddiving": {
+    "string": "Buceo en cuevas"
+  },
+  "underwaterdiving": {
+    "string": "Submarinismo"
+  },
+  "underwaterhockey": {
+    "string": "Hockey subacuático"
+  },
+  "unknown": {
+    "string": "Unknown"
+  },
+  "urbancycling": {
+    "string": "Bicicleta urbana"
+  },
+  "urbangoskating": {
+    "string": "Patinaje urbano"
+  },
+  "urbanwalking": {
+    "string": "Marcha urbana"
+  },
+  "velomobile": {
+    "string": "Velomobile"
+  },
+  "verticalfishing": {
+    "string": "Pesca"
+  },
+  "viaferrata": {
+    "string": "Via ferrata"
+  },
+  "virtualcycling": {
+    "string": "Virtual Cycling"
+  },
+  "virtualride": {
+    "string": "Virtual Ride"
+  },
+  "virtualrun": {
+    "string": "Virtual Run"
+  },
+  "virtualrunning": {
+    "string": "Virtual Running"
+  },
+  "volleyball": {
+    "string": "Vóleibol"
+  },
+  "wakeboard": {
+    "string": "Wakeboard"
+  },
+  "wakeboarding": {
+    "string": "Wakeboarding"
+  },
+  "wakesurf": {
+    "string": "Wake surf"
+  },
+  "walk": {
+    "string": "Walk"
+  },
+  "walking": {
+    "string": "Caminata"
+  },
+  "walking/indoor walking": {
+    "string": "Walking/indoor Walking"
+  },
+  "waterfowlhunting": {
+    "string": "Caza de presas de agua"
+  },
+  "waterpolo": {
+    "string": "Waterpolo"
+  },
+  "waterrescuework": {
+    "string": "Trabajo en el agua"
+  },
+  "waterskiing": {
+    "string": "Esquí náutico"
+  },
+  "waterskiing(monoski)": {
+    "string": "Monoski náutico"
+  },
+  "waterskiing(twoskis)": {
+    "string": "Bi-ski náutico"
+  },
+  "watersports": {
+    "string": "Water Sports"
+  },
+  "weightlifting": {
+    "string": "Halterofilia"
+  },
+  "weighttraining": {
+    "string": "Weight Training"
+  },
+  "weighttrainingathome": {
+    "string": "Musculación a domicilio"
+  },
+  "westernriding": {
+    "string": "Equitación western"
+  },
+  "wheelchair": {
+    "string": "Wheelchair"
+  },
+  "wheelchairracing": {
+    "string": "Carreras de sillas de ruedas"
+  },
+  "whitewaterkayaking": {
+    "string": "Kayak aguas vivas"
+  },
+  "whitewaterkayaking/rafting": {
+    "string": "Whitewater Kayaking/Rafting"
+  },
+  "wind/kitesurfing": {
+    "string": "Wind/Kite Surfing"
+  },
+  "windsurf": {
+    "string": "Windsurf"
+  },
+  "windsurfing": {
+    "string": "Windsurf"
+  },
+  "wingsuitflying": {
+    "string": "Wingsuit Flying"
+  },
+  "wintersports": {
+    "string": "Winter Sports"
+  },
+  "workout": {
+    "string": "Entrenamiento"
+  },
+  "wrestling": {
+    "string": "Lutte"
+  },
+  "xare": {
+    "string": "Share"
+  },
+  "yachting": {
+    "string": "Vela habitable"
+  },
+  "yoga": {
+    "string": "Yoga"
+  },
+  "zumba": {
+    "string": "Zumba"
+  }
+}

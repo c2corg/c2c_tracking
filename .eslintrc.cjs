@@ -20,6 +20,7 @@ module.exports = {
   rules: {
     'node/no-extraneous-import': ['error', { allowModules: ['pino'] }],
     'node/no-missing-import': 'off',
+    'node/no-unpublished-import': ['error', { allowModules: ['type-fest'] }],
     'node/no-unsupported-features/es-syntax': 'off',
     'import/no-named-as-default-member': 'off',
     'import/order': [

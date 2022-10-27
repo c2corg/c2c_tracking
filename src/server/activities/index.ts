@@ -1,10 +1,13 @@
 import Router from '@koa/router';
 
+import { validate } from '../validator';
+
 import { controller } from './activity.controller';
+import { activities } from './activity.validators';
 
 const router = new Router();
 
-router.get('/', controller.getUserActivities.bind(controller));
-router.get('/:activityId', controller.getUserActivity.bind(controller));
+router.get('/', validate(activities), controller.getUserActivities.bind(controller));
+router.get('/:activityId/geometry', controller.getUserActivityGeometry.bind(controller));
 
 export default router;

@@ -1,10 +1,16 @@
 import axios from 'axios';
 
+import log from '../../../../src/helpers/logger';
 import { GarminApi } from '../../../../src/server/garmin/garmin.api';
 
 jest.mock('axios');
 
 describe('Garmin API', () => {
+  beforeEach(() => {
+    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+  });
+
   describe('requestUnauthorizedRequestToken', () => {
     it(`throws if token isn't retrieved`, async () => {
       jest.mocked(axios).post.mockResolvedValueOnce({ data: 'whatever' });
