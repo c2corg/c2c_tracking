@@ -12,16 +12,16 @@
     "string": "22 long rifle shooting"
   },
   "3darchery": {
-    "string": "3-D Archery"
+    "string": "3-D archery"
   },
   "400mhurdles": {
     "string": "400 M Hurdles"
   },
   "adventureracing": {
-    "string": "Adventure Racing"
+    "string": "Adventure racing"
   },
   "adventureroute": {
-    "string": "Adventure Route"
+    "string": "Adventure route"
   },
   "aerobatics": {
     "string": "Aerobatics"
@@ -30,7 +30,7 @@
     "string": "Aerobics"
   },
   "africandance": {
-    "string": "African Dance"
+    "string": "African dance"
   },
   "aggressiveinlineskating(stunts)": {
     "string": "Aggressive in-line skating (stunts)"
@@ -435,7 +435,7 @@
     "string": "Elliptical"
   },
   "enduranceriding": {
-    "string": "enduranceriding"
+    "string": "Endurance riding"
   },
   "enduro": {
     "string": "Enduro "
@@ -450,7 +450,7 @@
     "string": "Epée"
   },
   "equestrianvaulting": {
-    "string": "equestrianvaulting"
+    "string": "Equestrian vaulting"
   },
   "eventing": {
     "string": "Eventing"
@@ -525,7 +525,7 @@
     "string": "Fountain"
   },
   "freediving": {
-    "string": "Freediving"
+    "string": "Free diving"
   },
   "freerideskiing": {
     "string": "Freeride skiing"
@@ -690,13 +690,13 @@
     "string": "Ice Skate"
   },
   "iceskating": {
-    "string": "Ice Skating"
+    "string": "Iceskating"
   },
   "indoor": {
     "string": "Indoor"
   },
   "indoorclimbing": {
-    "string": "Indoor Climbing"
+    "string": "Indoor climbing"
   },
   "indoorcycling": {
     "string": "Indoor Cycling"
@@ -720,7 +720,7 @@
     "string": "Inline Skate"
   },
   "inlineskating": {
-    "string": "Inline Skating"
+    "string": "Inline skating"
   },
   "itinerantcamping": {
     "string": "Itinerant camping"
@@ -813,7 +813,7 @@
     "string": "Long-range kayaking outings"
   },
   "longboard": {
-    "string": "Longboard"
+    "string": "Long board"
   },
   "longjump": {
     "string": "Long jump"
@@ -846,7 +846,7 @@
     "string": "Mixed climbing"
   },
   "mmamixedmartialarts": {
-    "string": "Mixed Martial Arts"
+    "string": "MMA: mixed martial arts"
   },
   "modernjazzdance": {
     "string": "Modern jazz dance"
@@ -870,7 +870,7 @@
     "string": "Mount"
   },
   "mountainbiking": {
-    "string": "Mountain Biking"
+    "string": "Mountain biking "
   },
   "mountainboard": {
     "string": "Mountain board"
@@ -900,7 +900,7 @@
     "string": "Nordic skiing"
   },
   "nordicwalking": {
-    "string": "Nordic Walking"
+    "string": "Nordic walking"
   },
   "obedience": {
     "string": "Obedience"
@@ -1044,7 +1044,7 @@
     "string": "Rack And Field"
   },
   "racquetball": {
-    "string": "Racquet Ball"
+    "string": "Racquetball"
   },
   "rafting": {
     "string": "Rafting"
@@ -1092,13 +1092,13 @@
     "string": "Rink hockey"
   },
   "roadcycling": {
-    "string": "Road Cycling"
+    "string": "Road cycling"
   },
   "roadrunning": {
     "string": "Road running"
   },
   "rockclimbing": {
-    "string": "Rock Climbing"
+    "string": "Rock climbing"
   },
   "rollerhockey": {
     "string": "Roller hockey"
@@ -1158,7 +1158,7 @@
     "string": "Scooter"
   },
   "scubadiving": {
-    "string": "Scubadiving"
+    "string": "Scuba-diving"
   },
   "sealurefishing": {
     "string": "Sea lure fishing"
@@ -1248,7 +1248,7 @@
     "string": "Snowshoe"
   },
   "snowshoeing": {
-    "string": "Snowshoeing"
+    "string": "Snow-shoeing"
   },
   "soccer": {
     "string": "Soccer"
@@ -1302,7 +1302,7 @@
     "string": "Stair Stepper"
   },
   "standuppaddleboarding": {
-    "string": "Stand Up Paddleboarding"
+    "string": "Stand up paddle boarding"
   },
   "standuppaddling": {
     "string": "Standup Paddling"
@@ -1389,10 +1389,10 @@
     "string": "Thai boxing"
   },
   "trackcycling": {
-    "string": "Track Cycling"
+    "string": "Track cycling"
   },
   "trackrunning": {
-    "string": "Track Running"
+    "string": "Track running"
   },
   "trail": {
     "string": "Trail"
@@ -1566,7 +1566,7 @@
     "string": "Windsurf"
   },
   "windsurfing": {
-    "string": "Windsurfing"
+    "string": "Wind surfing"
   },
   "wingsuitflying": {
     "string": "Wingsuit Flying"
@@ -1593,3 +1593,4 @@
     "string": "Zumba"
   }
 }
+
