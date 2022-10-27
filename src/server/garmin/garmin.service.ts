@@ -4,6 +4,7 @@ import dayjsPluginUTC from 'dayjs/plugin/utc';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -142,6 +143,7 @@ export class GarminService {
     for (const activity of activities) {
       const user = await userRepository.findByGarminToken(activity.userAccessToken);
       if (!user) {
+        promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'user_not_found' }).inc(1);
         log.warn(
           `Garmin activity webhook event for Garmin token ${activity.userAccessToken} couldn't be processed: unable to find matching user in DB`,
         );
@@ -172,7 +174,9 @@ export class GarminService {
       }
       try {
         await userService.addActivities(c2cId, ...activities.filter(({ geojson }) => !!geojson));
+        promWebhookCounter.labels({ vendor: 'garmin', subject: 'activity', event: 'create' });
       } catch (error: unknown) {
+        promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'processing_failed' }).inc(1);
         log.warn(
           `Garmin activity creation webhook event for user ${c2cId} couldn't be processed: unable to insert activity data`,
         );
@@ -184,16 +188,22 @@ export class GarminService {
     for (const { userAccessToken } of deregistrations) {
       const user = await userRepository.findByGarminToken(userAccessToken);
       if (!user) {
+        promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'user_not_found' }).inc(1);
         log.warn(
           `Garmin deauthorize webhook event for Garmin token ${userAccessToken} couldn't be processed: unable to find matching user in DB`,
         );
         continue;
       }
-      // clear user Garmin activities
-      await activityRepository.deleteByUserAndVendor(user.c2cId, 'garmin');
-      // clear user Garmin data
-      const { garmin, ...userWithoutData } = user;
-      await userRepository.update({ ...userWithoutData });
+      try {
+        // clear user Garmin activities
+        await activityRepository.deleteByUserAndVendor(user.c2cId, 'garmin');
+        // clear user Garmin data
+        const { garmin, ...userWithoutData } = user;
+        await userRepository.update({ ...userWithoutData });
+        promWebhookCounter.labels({ vendor: 'garmin', subject: 'user', event: 'delete' });
+      } catch (error: unknown) {
+        promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'processing_failed' }).inc(1);
+      }
     }
   }
 }

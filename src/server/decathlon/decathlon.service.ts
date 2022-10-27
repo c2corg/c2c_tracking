@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -124,6 +125,8 @@ export class DecathlonService {
       case 'activity_delete':
         await this.handleActivityDeleteEvent(event.event.ressource_id);
         break;
+      default:
+        promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'not_handled' }).inc(1);
     }
   }
 
@@ -134,6 +137,7 @@ export class DecathlonService {
   private async handleActivityCreateEvent(userDecathlonId: string, activityId: string): Promise<void> {
     const user = await userRepository.findByDecathlonId(userDecathlonId);
     if (!user) {
+      promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'user_not_found' }).inc(1);
       log.warn(
         `Decathlon activity creation webhook event for Decathlon user ${userDecathlonId} couldn't be processed: unable to find matching user in DB`,
       );
@@ -141,6 +145,7 @@ export class DecathlonService {
     }
     const token = await this.getTokenImpl(user.c2cId, user.decathlon);
     if (!token) {
+      promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to acquire valid token`,
       );
@@ -150,6 +155,7 @@ export class DecathlonService {
     try {
       activity = await decathlonApi.getActivity(token, activityId);
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
       );
@@ -166,7 +172,9 @@ export class DecathlonService {
         type: sport?.translatedNames?.['en'] || 'unknown',
         geojson: coordinates.length ? { type: 'LineString', coordinates } : undefined,
       });
+      promWebhookCounter.labels({ vendor: 'decathlon', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
       );
@@ -176,7 +184,9 @@ export class DecathlonService {
   private async handleActivityDeleteEvent(activityId: string): Promise<void> {
     try {
       await userService.deleteActivity('decathlon', activityId);
+      promWebhookCounter.labels({ vendor: 'decathlon', subject: 'activity', event: 'delete' });
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
       );

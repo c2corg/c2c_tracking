@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -153,6 +154,7 @@ export class StravaService {
 
   public async handleWebhookEvent(event: WebhookEvent): Promise<void> {
     if (!(await this.isWebhookEventvalid(event))) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'auth' }).inc(1);
       log.warn(`Invalid webhook event: subscription id ${event.subscription_id} doesn't match`);
       return;
     }
@@ -163,6 +165,7 @@ export class StravaService {
             event.updates?.['authorized'] === 'false' && (await this.handleAthleteDeleteEvent(event.owner_id));
             break;
           default:
+            promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'not_handled' }).inc(1);
             log.info(`Not handling event athlete/${event.aspect_type}`);
             break;
         }
@@ -177,6 +180,9 @@ export class StravaService {
             break;
           case 'delete':
             await this.handleActivityDeleteEvent(event.object_id.toString());
+            break;
+          default:
+            promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'not_handled' }).inc(1);
             break;
         }
     }
@@ -194,6 +200,7 @@ export class StravaService {
   private async handleAthleteDeleteEvent(userStravaId: number): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
       log.warn(
         `Strava athlete deletion webhook event for Strava user ${userStravaId} couldn't be processed: unable to find matching user in DB`,
       );
@@ -204,6 +211,7 @@ export class StravaService {
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
+    promWebhookCounter.labels({ vendor: 'strava', subject: 'user', event: 'delete' });
   }
 
   /*
@@ -213,6 +221,7 @@ export class StravaService {
   private async handleActivityCreateEvent(userStravaId: number, activityId: string): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
       log.warn(
         `Strava activity creation webhook event for Strava user ${userStravaId} couldn't be processed: unable to find matching user in DB`,
       );
@@ -220,6 +229,7 @@ export class StravaService {
     }
     const token = await this.getToken(user.c2cId);
     if (!token) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to acquire valid token`,
       );
@@ -229,6 +239,7 @@ export class StravaService {
     try {
       activity = await stravaApi.getActivity(token, activityId);
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
       );
@@ -242,7 +253,9 @@ export class StravaService {
         name: activity.name,
         type: activity.type,
       });
+      promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
       );
@@ -256,6 +269,7 @@ export class StravaService {
     // retrieve activity
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
       log.warn(
         `Strava activity update webhook event for Strava user ${userStravaId} couldn't be processed: unable to find matching user in DB`,
       );
@@ -263,6 +277,7 @@ export class StravaService {
     }
     const token = await this.getToken(user.c2cId);
     if (!token) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to acquire valid token`,
       );
@@ -272,6 +287,7 @@ export class StravaService {
     try {
       activity = await stravaApi.getActivity(token, activityId);
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
       );
@@ -285,7 +301,9 @@ export class StravaService {
         name: activity.name,
         type: activity.type,
       });
+      promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'update' });
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to update activity data in DB`,
       );
@@ -295,7 +313,9 @@ export class StravaService {
   private async handleActivityDeleteEvent(activityId: string): Promise<void> {
     try {
       await userService.deleteActivity('strava', activityId);
+      promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'delete' });
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
       );
