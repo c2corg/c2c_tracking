@@ -151,6 +151,7 @@ describe('Strava Service', () => {
     it('throws if no matching auth exists for user', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
+      jest.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
@@ -159,6 +160,7 @@ describe('Strava Service', () => {
 
       expect(userService.getStravaInfo).toBeCalledTimes(1);
       expect(userService.getStravaInfo).toBeCalledWith(1);
+      expect(userService.clearStravaTokens).toBeCalledTimes(1);
     });
 
     it('calls stravas API then updates DB', async () => {
@@ -251,6 +253,7 @@ describe('Strava Service', () => {
         expiresAt: 61,
       });
       jest.spyOn(stravaApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      jest.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       const result = await service.getToken(1);
@@ -258,6 +261,7 @@ describe('Strava Service', () => {
       expect(result).toBeUndefined();
       expect(stravaApi.refreshAuth).toBeCalledTimes(1);
       expect(stravaApi.refreshAuth).toBeCalledWith('refresh_token');
+      expect(userService.clearStravaTokens).toBeCalledTimes(1);
     });
   });
 

@@ -12,6 +12,8 @@ import type { GarminAuth } from './server/garmin/garmin.api';
 import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api';
 import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api';
 
+type Status = 'not-configured' | 'configured' | 'token-lost';
+
 const MAX_ACTIVITIES_PER_USER = 30;
 
 const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number => {
@@ -31,13 +33,13 @@ const isActivityToUpdate = (
 } => !!activity.id && !!activity.update;
 
 export class UserService {
-  public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: boolean }> {
+  public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: Status }> {
     const { strava, suunto, garmin, decathlon } = (await userRepository.findById(c2cId)) || {};
     return {
-      strava: !!strava,
-      suunto: !!suunto,
-      garmin: !!garmin,
-      decathlon: !!decathlon,
+      strava: !!strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+      suunto: !!suunto ? (suunto.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+      garmin: !!garmin ? 'configured' : 'not-configured',
+      decathlon: !!decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
     };
   }
 
@@ -85,6 +87,19 @@ export class UserService {
         refreshToken: auth.refresh_token,
       },
     };
+    await userRepository.update(user);
+  }
+
+  public async clearStravaTokens(c2cId: number): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.strava) {
+      return;
+    }
+    const { accessToken, refreshToken, expiresAt, ...strava } = user.strava;
+    user = { ...user, strava };
     await userRepository.update(user);
   }
 
@@ -137,6 +152,19 @@ export class UserService {
         refreshToken: auth.refresh_token,
       },
     };
+    await userRepository.update(user);
+  }
+
+  public async clearSuuntoTokens(c2cId: number): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.suunto) {
+      return;
+    }
+    const { accessToken, refreshToken, expiresAt, ...suunto } = user.suunto;
+    user = { ...user, suunto };
     await userRepository.update(user);
   }
 
@@ -225,6 +253,19 @@ export class UserService {
         webhookId: user.decathlon.webhookId,
       },
     };
+    await userRepository.update(user);
+  }
+
+  public async clearDecathlonTokens(c2cId: number): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.decathlon) {
+      return;
+    }
+    const { accessToken, refreshToken, expiresAt, ...decathlon } = user.decathlon;
+    user = { ...user, decathlon };
     await userRepository.update(user);
   }
 

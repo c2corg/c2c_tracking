@@ -264,6 +264,7 @@ describe('Suunto Service', () => {
         expiresAt: 61,
       });
       jest.spyOn(suuntoApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      jest.spyOn(userService, 'clearSuuntoTokens').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       const result = await service.getToken(1);
@@ -271,6 +272,7 @@ describe('Suunto Service', () => {
       expect(result).toBeUndefined();
       expect(suuntoApi.refreshAuth).toBeCalledTimes(1);
       expect(suuntoApi.refreshAuth).toBeCalledWith('refresh_token');
+      expect(userService.clearSuuntoTokens).toBeCalledTimes(1);
     });
   });
 

@@ -4,7 +4,7 @@ import dayjsPluginUTC from 'dayjs/plugin/utc';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
-import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
@@ -67,9 +67,11 @@ export class SuuntoService {
         return auth.access_token;
       } catch (error: unknown) {
         log.warn(`Suunto access token refresh failed for user ${c2cId}`);
-        return undefined;
       }
     }
+    promTokenRenewalErrorsCounter.labels({ vendor: 'suunto' }).inc(1);
+    // clear token, user needs to log again
+    await userService.clearSuuntoTokens(c2cId);
     return undefined;
   }
 

@@ -26,10 +26,10 @@ describe('User Controller', () => {
 
     it('responds with user activities summaries', async () => {
       jest.spyOn(userService, 'getUserInfo').mockResolvedValueOnce({
-        decathlon: false,
-        garmin: false,
-        strava: true,
-        suunto: true,
+        decathlon: 'configured',
+        garmin: 'not-configured',
+        strava: 'token-lost',
+        suunto: 'configured',
       });
 
       const response = await authenticated(request(app.callback()).get('/users/1/status'), 1);
@@ -37,10 +37,10 @@ describe('User Controller', () => {
       expect(response.status).toBe(200);
       expect(response.body).toMatchInlineSnapshot(`
         {
-          "decathlon": false,
-          "garmin": false,
-          "strava": true,
-          "suunto": true,
+          "decathlon": "configured",
+          "garmin": "not-configured",
+          "strava": "token-lost",
+          "suunto": "configured",
         }
       `);
       expect(userService.getUserInfo).toBeCalledTimes(1);
