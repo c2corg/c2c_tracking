@@ -66,6 +66,9 @@ describe('Activity Service', () => {
                 "hu": "Run",
               },
               {
+                "ru": "Run",
+              },
+              {
                 "sl": "Run",
               },
               {
