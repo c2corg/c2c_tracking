@@ -1,0 +1,1595 @@
+{
+  "100/110mhurdles": {
+    "string": "100/110 м с препятствиями"
+  },
+  "100km": {
+    "string": "Бег на 100 метров"
+  },
+  "10km": {
+    "string": "Бег на 10 000 метров"
+  },
+  "22longrifleshooting": {
+    "string": "Стрельба из 22lr"
+  },
+  "3darchery": {
+    "string": "3D-стрельба из лука"
+  },
+  "400mhurdles": {
+    "string": "400 м с препятствиями"
+  },
+  "adventureracing": {
+    "string": "Приключенческие гонки"
+  },
+  "adventureroute": {
+    "string": "Канатные парки"
+  },
+  "aerobatics": {
+    "string": "Аэробатика"
+  },
+  "aerobics": {
+    "string": "Аэробика"
+  },
+  "africandance": {
+    "string": "Африканские танцы"
+  },
+  "aggressiveinlineskating(stunts)": {
+    "string": "Акробатическое катание на роликовых коньках"
+  },
+  "aïkido": {
+    "string": "Айкидо"
+  },
+  "airrifleshooting": {
+    "string": "Стрельба из пневматического оружия"
+  },
+  "allmountainmtb": {
+    "string": "Легкий фрирайд (All mountain) по маунтинбайку"
+  },
+  "alpineski": {
+    "string": "Alpine Ski"
+  },
+  "alpineskiing": {
+    "string": "Горнолыжный спорт"
+  },
+  "alpinesnowboarding": {
+    "string": "Трассовое катание на сноуборде"
+  },
+  "alternativenordicskiing": {
+    "string": "Классические равнинные лыжи"
+  },
+  "americanfootball": {
+    "string": "Американский футбол"
+  },
+  "apnea": {
+    "string": "Apnea"
+  },
+  "apneahunt": {
+    "string": "Apnea Hunt"
+  },
+  "aquabike": {
+    "string": "Аквабайк"
+  },
+  "aquaboxing": {
+    "string": "Аквабоксинг"
+  },
+  "aquabuilding": {
+    "string": "Аквабилдинг"
+  },
+  "aquafitness": {
+    "string": "Аквафитнес"
+  },
+  "aquagym/aquafitness": {
+    "string": "Аквагимнастика/Аквафитнес"
+  },
+  "aquagymsessions": {
+    "string": "Аквагимнастика"
+  },
+  "aquajogging": {
+    "string": "Акваджоггинг"
+  },
+  "aquapump": {
+    "string": "Аквапамп"
+  },
+  "aquathlon": {
+    "string": "Aquathlon"
+  },
+  "archery": {
+    "string": "Стрельба из лука"
+  },
+  "artisticgymnastics(ag)": {
+    "string": "Спортивная гимнастика"
+  },
+  "artisticrollerskating": {
+    "string": "Фигурное катание на роликовых коньках"
+  },
+  "athletics": {
+    "string": "Легкая атлетика"
+  },
+  "atv": {
+    "string": "Atv"
+  },
+  "autoracing": {
+    "string": "Auto Racing"
+  },
+  "babyswimming": {
+    "string": "Водная гимнастика для малышей"
+  },
+  "backcountryski": {
+    "string": "Backcountry Ski"
+  },
+  "backcountryskiing": {
+    "string": "Лыжный альпинизм"
+  },
+  "backcountryskiing/snowboarding": {
+    "string": "Backcountry Skiing/Snowboarding"
+  },
+  "badminton": {
+    "string": "Бадминтон"
+  },
+  "ballet": {
+    "string": "Балет"
+  },
+  "ballgames": {
+    "string": "Ball Games"
+  },
+  "ballroomdance": {
+    "string": "Бальные танцы"
+  },
+  "baroquedance": {
+    "string": "Танцы барокко"
+  },
+  "baseball": {
+    "string": "Baseball"
+  },
+  "basketball": {
+    "string": "Баскетбол"
+  },
+  "basquepelota": {
+    "string": "Пелота баскская"
+  },
+  "beachrugby": {
+    "string": "Пляжное регби"
+  },
+  "beachsoccer": {
+    "string": "Пляжный футбол"
+  },
+  "beachvolley": {
+    "string": "Пляжный волейбол"
+  },
+  "bicycle": {
+    "string": "Велоспорт"
+  },
+  "bicycletouring": {
+    "string": "Велотуризм"
+  },
+  "bigboreshooting": {
+    "string": "Стрельба из крупнокалиберного оружия"
+  },
+  "biketoruntransition": {
+    "string": "Bike to Run Transition"
+  },
+  "billiards": {
+    "string": "Бильярд"
+  },
+  "blindhuntingforbiggame": {
+    "string": "Охота на крупную дичь из засады"
+  },
+  "blockclimbing": {
+    "string": "Боулдеринг"
+  },
+  "blowgun": {
+    "string": "Сарбакан"
+  },
+  "bmx": {
+    "string": "BMX"
+  },
+  "bmxrace": {
+    "string": "Гоночные BMX"
+  },
+  "bmxstreet": {
+    "string": "Уличные BMX"
+  },
+  "bmxtrial": {
+    "string": "Триал BMX"
+  },
+  "boating": {
+    "string": "Boating"
+  },
+  "bobsleigh": {
+    "string": "Бобслей"
+  },
+  "bodyboarding": {
+    "string": "Бодибординг"
+  },
+  "bodysurf": {
+    "string": "Бодисерфинг"
+  },
+  "bolognesefishing": {
+    "string": "Болонская ловля"
+  },
+  "bouldering": {
+    "string": "Bouldering"
+  },
+  "boules": {
+    "string": "Боулинг"
+  },
+  "bowhunting": {
+    "string": "Охота с луком"
+  },
+  "bowling": {
+    "string": "Боулинг"
+  },
+  "boxing": {
+    "string": "Бокс"
+  },
+  "breathwork": {
+    "string": "Breathwork"
+  },
+  "britishboxing": {
+    "string": "Английский бокс"
+  },
+  "bushcraft": {
+    "string": "Экстремальные походы"
+  },
+  "canihiking": {
+    "string": "Езда на санях, запряженных собаками"
+  },
+  "canicross": {
+    "string": "Каникросс"
+  },
+  "canoeing": {
+    "string": "Canoeing"
+  },
+  "canoeingandkayaking": {
+    "string": "Гребля на байдарках и каноэ"
+  },
+  "canoepolo": {
+    "string": "Кануполо"
+  },
+  "canyoning": {
+    "string": "Каньонинг"
+  },
+  "capoeira": {
+    "string": "Капоэйра"
+  },
+  "cardio": {
+    "string": "Cardio"
+  },
+  "cardioboxing": {
+    "string": "Кардиобокс"
+  },
+  "carombilliards": {
+    "string": "Французский бильярд"
+  },
+  "carpfishing": {
+    "string": "Ловля карпа"
+  },
+  "casualwalking": {
+    "string": "Casual Walking"
+  },
+  "catamaran": {
+    "string": "Катамаран"
+  },
+  "catfishfishing": {
+    "string": "Ловля сома"
+  },
+  "caving": {
+    "string": "Спелеологические экспедиции"
+  },
+  "ccrdive": {
+    "string": "Ccr Dive"
+  },
+  "cestapunta": {
+    "string": "Цеста-пунта"
+  },
+  "cheerleading": {
+    "string": "Cheerleading"
+  },
+  "circuittraining": {
+    "string": "Circuit Training"
+  },
+  "claypigeonshooting": {
+    "string": "Стендовая стрельба"
+  },
+  "climbing": {
+    "string": "Скалолазание"
+  },
+  "climbingmajorroutes": {
+    "string": "Мультипитч"
+  },
+  "combatsport": {
+    "string": "Combat Sport"
+  },
+  "contemporarydance": {
+    "string": "Современные танцы"
+  },
+  "countryactivities": {
+    "string": "Виды деятельности на открытом воздухе"
+  },
+  "countrydance": {
+    "string": "Народные танцы"
+  },
+  "countrysidedogwork": {
+    "string": "Расширенный ринг"
+  },
+  "cricket": {
+    "string": "Крикет"
+  },
+  "crosscountry": {
+    "string": "Кросс"
+  },
+  "crosscountryhorseracing": {
+    "string": "Конный кросс"
+  },
+  "crosscountrymtb": {
+    "string": "Кросс-кантри по маунтинбайку "
+  },
+  "crossbow": {
+    "string": "Арбалет"
+  },
+  "crosscountryclassicskiing": {
+    "string": "Cross Country Classic Skiing"
+  },
+  "crosscountryskateskiing": {
+    "string": "Cross Country Skate Skiing"
+  },
+  "crosscountryskiing": {
+    "string": "Cross Country Skiing"
+  },
+  "crossfit": {
+    "string": "Crossfit"
+  },
+  "crosstrainer": {
+    "string": "Эллиптический велотренажер"
+  },
+  "crosstraining": {
+    "string": "Cross training"
+  },
+  "curling": {
+    "string": "Керлинг"
+  },
+  "cycling": {
+    "string": "Cycling"
+  },
+  "cyclocross": {
+    "string": "Велокросс"
+  },
+  "dailyactivity": {
+    "string": "повседневной деятельности"
+  },
+  "dancing": {
+    "string": "Танцы"
+  },
+  "darts": {
+    "string": "Дартс"
+  },
+  "dartswithelectronicboards": {
+    "string": "Дартс с электронной мишенью"
+  },
+  "dartswithtraditionalboards": {
+    "string": "Дартс со стандартной мишенью"
+  },
+  "dayhiking": {
+    "string": "Однодневный поход"
+  },
+  "decathlon": {
+    "string": "Десятиборье"
+  },
+  "dinghysailing": {
+    "string": "Одноместный швербот"
+  },
+  "dirtmtb": {
+    "string": "Дёрт по маунтинбайку"
+  },
+  "disabledsports": {
+    "string": "Адаптивный спорт"
+  },
+  "discus": {
+    "string": "Метание диска"
+  },
+  "diving": {
+    "string": "Прыжки в воду"
+  },
+  "dogagility": {
+    "string": "Аджилити"
+  },
+  "dogsledandpulk": {
+    "string": "Гонки на собачьих упряжках и пулках"
+  },
+  "dogsledding": {
+    "string": "Езда на собачьих упряжках"
+  },
+  "dogsports": {
+    "string": "Виды спорта с участием собак"
+  },
+  "domavaquera": {
+    "string": "Выездка в стиле вакеро"
+  },
+  "downhillbiking": {
+    "string": "Downhill Biking"
+  },
+  "downhillmtb": {
+    "string": "Скоростной спуск (слоуп) по маунтинбайку"
+  },
+  "downhillskiing": {
+    "string": "Downhill Skiing"
+  },
+  "dressage": {
+    "string": "Дрессура"
+  },
+  "drivehuntingforbiggame": {
+    "string": "Охота облавой на крупную дичь"
+  },
+  "driving": {
+    "string": "Driving"
+  },
+  "duathlon": {
+    "string": "Двоеборье"
+  },
+  "esport": {
+    "string": "E-Sport"
+  },
+  "ebikeride": {
+    "string": "E-Bike Ride"
+  },
+  "elliptical": {
+    "string": "Elliptical"
+  },
+  "enduranceriding": {
+    "string": "Конные пробеги"
+  },
+  "enduro": {
+    "string": "Эндуро"
+  },
+  "enduromtb": {
+    "string": "Эндуро по маунтинбайку"
+  },
+  "englishbilliards": {
+    "string": "Английский бильярд"
+  },
+  "epée": {
+    "string": "Шпага"
+  },
+  "equestrianvaulting": {
+    "string": "Вольтижировка"
+  },
+  "eventing": {
+    "string": "Конные состязания по многоборью"
+  },
+  "exploration": {
+    "string": "Экспедиции"
+  },
+  "fencing": {
+    "string": "Фехтование"
+  },
+  "fieldarchery": {
+    "string": "Стрельба из лука на природе"
+  },
+  "fieldcrossbow": {
+    "string": "Арбалет, класс «филд» (полевой)"
+  },
+  "fieldhockey": {
+    "string": "Хоккей на траве"
+  },
+  "fieldtrial": {
+    "string": "Филд-трайл (проверка выучки)"
+  },
+  "figureskating": {
+    "string": "Фигурное катание"
+  },
+  "fishing": {
+    "string": "Рыбалка"
+  },
+  "fishingonfoot": {
+    "string": "Пешая рыбалка"
+  },
+  "fitness": {
+    "string": "Фитнес"
+  },
+  "fitnessbike,treadmillathome": {
+    "string": "Занятие на велотренажере/беговой дорожке дома"
+  },
+  "fitnessclass": {
+    "string": "Fitness Class"
+  },
+  "fives": {
+    "string": "Ручная пелота"
+  },
+  "floorball": {
+    "string": "Floorball"
+  },
+  "floorclimbing": {
+    "string": "Floor Climbing"
+  },
+  "flyball": {
+    "string": "Флайбол"
+  },
+  "flyfishing": {
+    "string": "Нахлыст"
+  },
+  "flying": {
+    "string": "Flying"
+  },
+  "foil": {
+    "string": "Рапира"
+  },
+  "football": {
+    "string": "Футбол"
+  },
+  "formularacing": {
+    "string": "Автогонки"
+  },
+  "formulawindsurfing": {
+    "string": "Формула виндсерфинг"
+  },
+  "fountain": {
+    "string": "Фонтан"
+  },
+  "freediving": {
+    "string": "Фридайвинг"
+  },
+  "freerideskiing": {
+    "string": "Лыжный фрирайд"
+  },
+  "freeridesnowboarding": {
+    "string": "Фрирайд на сноуборде"
+  },
+  "freeridewindsurfing": {
+    "string": "Фрирайд по виндсерфингу"
+  },
+  "freestyleskiing": {
+    "string": "Лыжный фристайл"
+  },
+  "freestylesnowboarding": {
+    "string": "Фристайл на сноуборде"
+  },
+  "freestylewindsurfing": {
+    "string": "Фристайл по виндсерфингу"
+  },
+  "frenchboxing": {
+    "string": "Французский бокс"
+  },
+  "frescobol": {
+    "string": "Фрескобол"
+  },
+  "freshwaterlurefishing": {
+    "string": "Ловля на блесну в пресной воде"
+  },
+  "frisbee": {
+    "string": "Фрисби"
+  },
+  "frisbeegolf": {
+    "string": "Frisbee Golf"
+  },
+  "frontenis": {
+    "string": "Фронтенис"
+  },
+  "fullcontact": {
+    "string": "Фулл-контакт"
+  },
+  "futsal": {
+    "string": "Футзал"
+  },
+  "gaugedive": {
+    "string": "Gauge Dive"
+  },
+  "gentlegym": {
+    "string": "Оздоровительная гимнастика"
+  },
+  "glacierhiking": {
+    "string": "Поход по ледникам"
+  },
+  "golf": {
+    "string": "Гольф"
+  },
+  "grandchistera": {
+    "string": "Гран-чистера"
+  },
+  "grappling": {
+    "string": "Грэпплинг"
+  },
+  "gravel/unpaved cycling": {
+    "string": "Gravel/unpaved Cycling"
+  },
+  "gym": {
+    "string": "Gym"
+  },
+  "gym&fitnessequipment": {
+    "string": "Gym & Fitness Equipment"
+  },
+  "gymnastics": {
+    "string": "Гимнастика"
+  },
+  "gymtraining": {
+    "string": "Произвольная гимнастика"
+  },
+  "hacking": {
+    "string": "Конный поход"
+  },
+  "halfmarathon": {
+    "string": "Полумарафон"
+  },
+  "hammer": {
+    "string": "Метание молота"
+  },
+  "handball": {
+    "string": "Гандбол"
+  },
+  "handbike": {
+    "string": "Адаптивный велоспорт"
+  },
+  "handcycle": {
+    "string": "Handcycle"
+  },
+  "hanggliding": {
+    "string": "Hang Gliding"
+  },
+  "harnessracing": {
+    "string": "Рысистый бег"
+  },
+  "heptathlon": {
+    "string": "Семиборье"
+  },
+  "highjump": {
+    "string": "Прыжок в высоту"
+  },
+  "hike": {
+    "string": "Hike"
+  },
+  "hiking": {
+    "string": "Поход"
+  },
+  "hiphop": {
+    "string": "Хип-хоп"
+  },
+  "hockey": {
+    "string": "Хоккей"
+  },
+  "hometrainer": {
+    "string": "домашний тренажер"
+  },
+  "horsedrawncarriage": {
+    "string": "Драйвинг"
+  },
+  "horsebackriding": {
+    "string": "Horseback Riding"
+  },
+  "horseball": {
+    "string": "Хорсбол"
+  },
+  "horseracing": {
+    "string": "Бег галопом"
+  },
+  "horseriding": {
+    "string": "Конный спорт"
+  },
+  "house": {
+    "string": "Дом"
+  },
+  "hunting": {
+    "string": "Охота"
+  },
+  "hunting/fishing": {
+    "string": "Hunting/Fishing"
+  },
+  "huntingwithhounds": {
+    "string": "Псовая охота"
+  },
+  "hybridcycling": {
+    "string": "Катание на горных велосипедах"
+  },
+  "hydrospeed": {
+    "string": "Гидроспид"
+  },
+  "iceclimbing": {
+    "string": "Ледолазание"
+  },
+  "icehockey": {
+    "string": "Хоккей на льду"
+  },
+  "iceskate": {
+    "string": "Ice Skate"
+  },
+  "iceskating": {
+    "string": "Катание на коньках"
+  },
+  "indoor": {
+    "string": "Indoor"
+  },
+  "indoorclimbing": {
+    "string": "Скалолазание на скалодроме"
+  },
+  "indoorcycling": {
+    "string": "Indoor Cycling"
+  },
+  "indoorfitnessbike": {
+    "string": "Занятие на велотренажере в спортзале"
+  },
+  "indoorfootball": {
+    "string": "Минифутбол"
+  },
+  "indoorrowing": {
+    "string": "Indoor Rowing"
+  },
+  "indoorrunning": {
+    "string": "Indoor Running"
+  },
+  "indoorweighttraining": {
+    "string": "Силовые тренировки в спортзале"
+  },
+  "inlineskate": {
+    "string": "Inline Skate"
+  },
+  "inlineskating": {
+    "string": "Катание на роликовых коньках"
+  },
+  "itinerantcamping": {
+    "string": "Многодневный туристический поход"
+  },
+  "javelin": {
+    "string": "Метание копья"
+  },
+  "jetski": {
+    "string": "Аквабайк"
+  },
+  "jigfishing": {
+    "string": "Ловля на джиг"
+  },
+  "jiujitsu": {
+    "string": "Джиу-джитсу"
+  },
+  "jocari": {
+    "string": "Жокари"
+  },
+  "jokogarbi": {
+    "string": "Пелота с короткой ловушкой (жоко-гарби)"
+  },
+  "judo": {
+    "string": "Дзюдо"
+  },
+  "jumpingrope": {
+    "string": "Пропускная веревка"
+  },
+  "karate": {
+    "string": "Карате"
+  },
+  "karting": {
+    "string": "Картинг"
+  },
+  "kayakfishing": {
+    "string": "Рыбалка на байдарках "
+  },
+  "kayaking": {
+    "string": "Kayaking"
+  },
+  "kayaksurf": {
+    "string": "Серфинг на байдарках"
+  },
+  "kendo": {
+    "string": "Кендо"
+  },
+  "kettlebell": {
+    "string": "Kettlebell"
+  },
+  "kickboxing": {
+    "string": "Кикбоксинг"
+  },
+  "kitebuggy": {
+    "string": "Кайтбаггинг"
+  },
+  "kitesurf": {
+    "string": "Kitesurf"
+  },
+  "kitesurfing": {
+    "string": "Кайтсерфинг"
+  },
+  "kitesurfingkiting": {
+    "string": "Kitesurfing Kiting"
+  },
+  "kungfu": {
+    "string": "Кунг-фу"
+  },
+  "lacrosse": {
+    "string": "Лакросс"
+  },
+  "landsailing": {
+    "string": "Буерный спорт"
+  },
+  "lasergame": {
+    "string": "Лазертаг"
+  },
+  "latindance": {
+    "string": "Латиноамериканские танцы"
+  },
+  "legs,bumsandtumstraining": {
+    "string": "Коррекция талии, пресса, ягодиц"
+  },
+  "lia": {
+    "string": "Низкоударная аэробика"
+  },
+  "livebaitfishing": {
+    "string": "Ловля на живца"
+  },
+  "longrangekayakingoutings": {
+    "string": "Походная байдарка"
+  },
+  "longboard": {
+    "string": "Лонгборд"
+  },
+  "longjump": {
+    "string": "Прыжок в длину"
+  },
+  "longtrailrunning(between40and80km)": {
+    "string": "Длинная дистанция трейл-раннинга (40-80 км)"
+  },
+  "lurecoursing": {
+    "string": "Курсинг"
+  },
+  "marathon": {
+    "string": "Марафон"
+  },
+  "martialarts": {
+    "string": "Боевые искусства"
+  },
+  "matchcrossbow": {
+    "string": "Арбалет, класс «матч»"
+  },
+  "matchfishing": {
+    "string": "Рыбалка с коротким удилищем"
+  },
+  "meal": {
+    "string": "Заведение питания"
+  },
+  "migratorybirdhunting": {
+    "string": "Охота на перелетных птиц"
+  },
+  "mixedclimbing": {
+    "string": "Бег по смешанным видам местности"
+  },
+  "mmamixedmartialarts": {
+    "string": "СБИ (ММА): смешанные боевые искусства "
+  },
+  "modernjazzdance": {
+    "string": "Танец модерн/джаз"
+  },
+  "monoskiing": {
+    "string": "Моноски"
+  },
+  "motocross": {
+    "string": "Мотокросс"
+  },
+  "motorboat": {
+    "string": "Яхтенный спорт"
+  },
+  "motorcycling": {
+    "string": "Мотоспорт"
+  },
+  "mototsports": {
+    "string": "Mototsports"
+  },
+  "mount": {
+    "string": "Гора"
+  },
+  "mountainbiking": {
+    "string": "Маунтинбайк"
+  },
+  "mountainboard": {
+    "string": "Маунтинборд"
+  },
+  "mountaineering": {
+    "string": "Альпинизм"
+  },
+  "multigasdive": {
+    "string": "Multi-gas Dive"
+  },
+  "multisport": {
+    "string": "Multisport"
+  },
+  "naturalbaittroutfishing": {
+    "string": "Ловля форели на приманку"
+  },
+  "netball": {
+    "string": "Нетбол"
+  },
+  "nordicskating": {
+    "string": "Коньковые равнинные лыжи"
+  },
+  "nordicski": {
+    "string": "Nordic Ski"
+  },
+  "nordicskiing": {
+    "string": "Равнинные лыжи"
+  },
+  "nordicwalking": {
+    "string": "Скандинавская ходьба "
+  },
+  "obedience": {
+    "string": "Обидиенс"
+  },
+  "obstacleracing": {
+    "string": "Obstacle Racing"
+  },
+  "obstaclerunning": {
+    "string": "Obstacle Running"
+  },
+  "offroadrunning": {
+    "string": "Бег по природному рельефу"
+  },
+  "offshoregrinding": {
+    "string": "Offshore Grinding"
+  },
+  "offshoresurfcasting": {
+    "string": "Прибойная ловля в океане"
+  },
+  "olympicwalking": {
+    "string": "Спортивная ходьба "
+  },
+  "onshoregrinding": {
+    "string": "Onshore Grinding"
+  },
+  "openwaterswimming": {
+    "string": "Open water Swimming"
+  },
+  "orientaldance": {
+    "string": "Восточные танцы"
+  },
+  "orientationracing": {
+    "string": "Спортивное ориентирование"
+  },
+  "orienteering": {
+    "string": "Orienteering"
+  },
+  "other": {
+    "string": "Other"
+  },
+  "other1": {
+    "string": "Other1"
+  },
+  "other2": {
+    "string": "Other2"
+  },
+  "other3": {
+    "string": "Other3"
+  },
+  "other4": {
+    "string": "Other4"
+  },
+  "other5": {
+    "string": "Other5"
+  },
+  "other6": {
+    "string": "Other6"
+  },
+  "outdoorgym": {
+    "string": "Outdoor Gym"
+  },
+  "paddling": {
+    "string": "Paddling"
+  },
+  "padel": {
+    "string": "Падель"
+  },
+  "paintball": {
+    "string": "Пейнтбол"
+  },
+  "palacuir": {
+    "string": "Пелота с кожаным мячом"
+  },
+  "paragliding": {
+    "string": "Параплан"
+  },
+  "paramotor": {
+    "string": "Полеты с парамотором"
+  },
+  "parking": {
+    "string": "Парковка"
+  },
+  "parkour": {
+    "string": "Parkour"
+  },
+  "pasaka": {
+    "string": "Пасака"
+  },
+  "pelota": {
+    "string": "Пелота"
+  },
+  "pétanque": {
+    "string": "Петанк"
+  },
+  "peteca": {
+    "string": "Петека"
+  },
+  "photo": {
+    "string": "Фото"
+  },
+  "pilates": {
+    "string": "Пилатес"
+  },
+  "pistolshooting": {
+    "string": "Стрельба из пистолета"
+  },
+  "playbike": {
+    "string": "Плейбайк"
+  },
+  "pointofview": {
+    "string": "Точка нахождения прибора"
+  },
+  "polevault": {
+    "string": "Прыжок с шестом"
+  },
+  "polo": {
+    "string": "Поло"
+  },
+  "ponygames": {
+    "string": "Пони-спорт"
+  },
+  "pool": {
+    "string": "Американский бильярд"
+  },
+  "poolswimming": {
+    "string": "Pool Swimming"
+  },
+  "punchbagboxing": {
+    "string": "Занятие на боксерской груше"
+  },
+  "quadbiking": {
+    "string": "Квадроцикл"
+  },
+  "quadrollerskating": {
+    "string": "Катание на роликовых квадах"
+  },
+  "quivertip/feederfishing": {
+    "string": "Ловля на квивер/фидер"
+  },
+  "rackandfield": {
+    "string": "Rack And Field"
+  },
+  "racquetball": {
+    "string": "Ракетбол"
+  },
+  "rafting": {
+    "string": "Рафтинг"
+  },
+  "rallying": {
+    "string": "Ралли"
+  },
+  "rampskateboarding": {
+    "string": "Скейтборд на рампе"
+  },
+  "rc/drone": {
+    "string": "Rc/Drone"
+  },
+  "rebot": {
+    "string": "Ребот"
+  },
+  "recumbent cycling": {
+    "string": "Recumbent Cycling"
+  },
+  "relay": {
+    "string": "Эстафета"
+  },
+  "remonte": {
+    "string": "Ремонта"
+  },
+  "rescue": {
+    "string": "Спасение"
+  },
+  "resortskiing/snowboarding": {
+    "string": "Resort Skiing/Snowboarding"
+  },
+  "rhythmicgymnastics(rg)": {
+    "string": "Художественная гимнастика"
+  },
+  "ride": {
+    "string": "Ride"
+  },
+  "rifleshooting": {
+    "string": "Стрельба из винтовки"
+  },
+  "ring": {
+    "string": "Ринг"
+  },
+  "rinkhockey": {
+    "string": "Хоккей на квадах"
+  },
+  "roadcycling": {
+    "string": "Шоссейный велоспорт"
+  },
+  "roadrunning": {
+    "string": "Бег по шоссе"
+  },
+  "rockclimbing": {
+    "string": "Бег по скалам"
+  },
+  "rollerhockey": {
+    "string": "Хоккей на роликовых коньках"
+  },
+  "rollerskating": {
+    "string": "Roller Skating"
+  },
+  "rollerski": {
+    "string": "Roller Ski"
+  },
+  "rollerskiing": {
+    "string": "Roller Skiing"
+  },
+  "rowing": {
+    "string": "Гребной спорт"
+  },
+  "rowingmachine": {
+    "string": "Гребной тренажер"
+  },
+  "rugby": {
+    "string": "Регби"
+  },
+  "rugbyleague": {
+    "string": "Регби-13"
+  },
+  "rugbysevens": {
+    "string": "Регби-7"
+  },
+  "rugbyunion": {
+    "string": "Регби-15"
+  },
+  "run": {
+    "string": "Run"
+  },
+  "run&bike": {
+    "string": "Ран-байк"
+  },
+  "running": {
+    "string": "Бег"
+  },
+  "runtobiketransition": {
+    "string": "Run to Bike Transition"
+  },
+  "sabre": {
+    "string": "Сабля"
+  },
+  "sail": {
+    "string": "Sail"
+  },
+  "sailing": {
+    "string": "Парусный спорт"
+  },
+  "sandball": {
+    "string": "Пляжный гандбол"
+  },
+  "scooter": {
+    "string": "Катание на самокатах"
+  },
+  "scubadiving": {
+    "string": "Дайвинг с баллоном"
+  },
+  "sealurefishing": {
+    "string": "Ловля на блесну в морской воде"
+  },
+  "seasurfcasting": {
+    "string": "Прибойная ловля в море"
+  },
+  "selfdefense": {
+    "string": "Самозащита"
+  },
+  "sheepdogwork": {
+    "string": "Пастушья служба"
+  },
+  "shorelinefishing": {
+    "string": "Прибрежная ловля"
+  },
+  "shorttermkayakingoutings": {
+    "string": "Прогулочная байдарка"
+  },
+  "shortandlongrangerollerskatingouting": {
+    "string": "Прогулочное катание и походы на роликовых коньках"
+  },
+  "shortboard": {
+    "string": "Шортборд"
+  },
+  "shorttrailrunning(lessthan40km)": {
+    "string": "Короткая дистанция трейл-раннинга (< 40 км)"
+  },
+  "shotput": {
+    "string": "Толкание ядра"
+  },
+  "showjumping": {
+    "string": "Прыжок через препятствия"
+  },
+  "singlegasdive": {
+    "string": "Single-gas Dive"
+  },
+  "skateboard": {
+    "string": "Skateboard"
+  },
+  "skateboarding": {
+    "string": "Скейтборд"
+  },
+  "skating": {
+    "string": "Skating"
+  },
+  "skiing": {
+    "string": "Лыжный спорт"
+  },
+  "skimboard": {
+    "string": "Скимбординг"
+  },
+  "skittouring": {
+    "string": "Skit Touring"
+  },
+  "skydiving": {
+    "string": "Sky Diving"
+  },
+  "snooker": {
+    "string": "Снукер"
+  },
+  "snorkeling": {
+    "string": "Snorkeling"
+  },
+  "snorkelling": {
+    "string": "Сноркелинг"
+  },
+  "snowboard": {
+    "string": "Snowboard"
+  },
+  "snowboarding": {
+    "string": "Сноуборд"
+  },
+  "snowkite": {
+    "string": "Сноукайтинг"
+  },
+  "snowmobile": {
+    "string": "Езда на снегоходах"
+  },
+  "snowmobiling": {
+    "string": "Snowmobiling"
+  },
+  "snowscoot": {
+    "string": "Сноускут"
+  },
+  "snowshoe": {
+    "string": "Snowshoe"
+  },
+  "snowshoeing": {
+    "string": "Катание на снегоступах"
+  },
+  "soccer": {
+    "string": "Soccer"
+  },
+  "softball": {
+    "string": "Softball"
+  },
+  "spanishriding": {
+    "string": "Испанская выездка"
+  },
+  "spearfishing": {
+    "string": "Подводная охота"
+  },
+  "speedball": {
+    "string": "Спидбол"
+  },
+  "speedminton": {
+    "string": "Спидминтон"
+  },
+  "speedmotorcycling": {
+    "string": "Мотогонки"
+  },
+  "speedrollerskating": {
+    "string": "Скоростной слалом на роликовых коньках"
+  },
+  "speedsailing": {
+    "string": "Спидсейл"
+  },
+  "speedskating": {
+    "string": "Конькобежный спорт"
+  },
+  "speedwalking": {
+    "string": "Speed Walking"
+  },
+  "sportsandrhythmicgymnastics(srg)": {
+    "string": "Спортивная и атлетическая гимнастика"
+  },
+  "sportswalking": {
+    "string": "Активная ходьба "
+  },
+  "sprint": {
+    "string": "Спринт"
+  },
+  "squash": {
+    "string": "Сквош"
+  },
+  "squatenton": {
+    "string": "Сквотентон"
+  },
+  "stairstepper": {
+    "string": "Stair Stepper"
+  },
+  "standuppaddleboarding": {
+    "string": "Стоячий серфинг с веслом"
+  },
+  "standuppaddling": {
+    "string": "Standup Paddling"
+  },
+  "stationarysmallgamehunting": {
+    "string": "Охота на оседлую мелкую дичь"
+  },
+  "steeplechase": {
+    "string": "Скачки с препятствиями"
+  },
+  "steptraining": {
+    "string": "Степ"
+  },
+  "stillfishing": {
+    "string": "Созерцательная рыбалка"
+  },
+  "stopwatch": {
+    "string": "Stopwatch"
+  },
+  "streetbasketball": {
+    "string": "Стритбол"
+  },
+  "streetrunning": {
+    "string": "Street Running"
+  },
+  "streetskateboarding": {
+    "string": "Уличный скейтборд"
+  },
+  "strengthtraining": {
+    "string": "Strength Training"
+  },
+  "stretching": {
+    "string": "Стретчинг"
+  },
+  "summerrollerskiing": {
+    "string": "Катание на роликовых лыжах"
+  },
+  "surfing": {
+    "string": "Серфинг"
+  },
+  "surfkayaking": {
+    "string": "Серфинг на байдарках"
+  },
+  "swim": {
+    "string": "Swim"
+  },
+  "swimming": {
+    "string": "Плавание"
+  },
+  "swimmingwithfins": {
+    "string": "Скоростное плавание в ластах"
+  },
+  "swimrun": {
+    "string": "Swimrun"
+  },
+  "swimtobiketransition": {
+    "string": "Swim to Bike Transition"
+  },
+  "synchronisedswimming": {
+    "string": "Синхронное плавание"
+  },
+  "tabletennis": {
+    "string": "Настольный теннис"
+  },
+  "taekwondo": {
+    "string": "Тхэквондо"
+  },
+  "taichichuan": {
+    "string": "Тайцзицюань"
+  },
+  "tapdance": {
+    "string": "Чечетка"
+  },
+  "targetarchery": {
+    "string": "Стрельба из лука по мишеням"
+  },
+  "telemarkskiing": {
+    "string": "Телемарк"
+  },
+  "tennis": {
+    "string": "Теннис"
+  },
+  "thaiboxing": {
+    "string": "Тайский бокс"
+  },
+  "trackcycling": {
+    "string": "Велотрековые гонки"
+  },
+  "trackrunning": {
+    "string": "Бег по треку"
+  },
+  "trail": {
+    "string": "Трейл"
+  },
+  "trailrunning": {
+    "string": "Trail Running"
+  },
+  "trampoline": {
+    "string": "Трамплин"
+  },
+  "transition": {
+    "string": "Transition"
+  },
+  "treadmill": {
+    "string": "Занятие на беговой дорожке в спортзале"
+  },
+  "treadmillrunning": {
+    "string": "Treadmill Running"
+  },
+  "trekking": {
+    "string": "Горный туристический поход"
+  },
+  "trekkingriding": {
+    "string": "Конный трек"
+  },
+  "trialmotorcycling": {
+    "string": "Мототриал"
+  },
+  "trialmtb": {
+    "string": "Велотриал по маунтинбайку"
+  },
+  "triathlon": {
+    "string": "Троеборье"
+  },
+  "tricycledisabledsports": {
+    "string": "Адаптивный велоспорт на трехколесных велосипедах"
+  },
+  "triplejump": {
+    "string": "Тройной прыжок"
+  },
+  "trolling": {
+    "string": "Троллинг"
+  },
+  "tumbling": {
+    "string": "Акробатика"
+  },
+  "twirling": {
+    "string": "Твирлинг"
+  },
+  "ultralighttroutfishing": {
+    "string": "Ловля форели на ультралайт"
+  },
+  "ultrarunning": {
+    "string": "Ultra Running"
+  },
+  "ultratrailrunning(morethan80km)": {
+    "string": "Сверхдлинная дистанция трейл-раннинга (> 80 км)"
+  },
+  "undergrounddiving": {
+    "string": "Спелеодайвинг"
+  },
+  "underwaterdiving": {
+    "string": "Ныряние"
+  },
+  "underwaterhockey": {
+    "string": "Подводный хоккей"
+  },
+  "unknown": {
+    "string": "Unknown"
+  },
+  "urbancycling": {
+    "string": "Катание на городских велосипедах"
+  },
+  "urbangoskating": {
+    "string": "Городской слалом на роликовых коньках"
+  },
+  "urbanwalking": {
+    "string": "Городская ходьба "
+  },
+  "velomobile": {
+    "string": "Velomobile"
+  },
+  "verticalfishing": {
+    "string": "Экологически рациональная рыбалка"
+  },
+  "viaferrata": {
+    "string": "Виа феррата"
+  },
+  "virtualcycling": {
+    "string": "Virtual Cycling"
+  },
+  "virtualride": {
+    "string": "Virtual Ride"
+  },
+  "virtualrun": {
+    "string": "Virtual Run"
+  },
+  "virtualrunning": {
+    "string": "Virtual Running"
+  },
+  "volleyball": {
+    "string": "Волейбол"
+  },
+  "wakeboard": {
+    "string": "Вейкбординг"
+  },
+  "wakeboarding": {
+    "string": "Wakeboarding"
+  },
+  "wakesurf": {
+    "string": "Вейксерфинг"
+  },
+  "walk": {
+    "string": "Walk"
+  },
+  "walking": {
+    "string": "Ходьба"
+  },
+  "walking/indoor walking": {
+    "string": "Walking/indoor Walking"
+  },
+  "waterfowlhunting": {
+    "string": "Охота на водоплавающих птиц"
+  },
+  "waterpolo": {
+    "string": "Водное поло"
+  },
+  "waterrescuework": {
+    "string": "Спасение на водах"
+  },
+  "waterskiing": {
+    "string": "Водные лыжи"
+  },
+  "waterskiing(monoski)": {
+    "string": "Водные моноски"
+  },
+  "waterskiing(twoskis)": {
+    "string": "Адаптивные водные лыжи"
+  },
+  "watersports": {
+    "string": "Water Sports"
+  },
+  "weightlifting": {
+    "string": "Тяжелая атлетика"
+  },
+  "weighttraining": {
+    "string": "Weight Training"
+  },
+  "weighttrainingathome": {
+    "string": "Силовые тренировки дома"
+  },
+  "westernriding": {
+    "string": "Выездка в стиле вестерн"
+  },
+  "wheelchair": {
+    "string": "Wheelchair"
+  },
+  "wheelchairracing": {
+    "string": "Бег на колясках"
+  },
+  "whitewaterkayaking": {
+    "string": "Байдарка для бурной воды"
+  },
+  "whitewaterkayaking/rafting": {
+    "string": "Whitewater Kayaking/Rafting"
+  },
+  "wind/kitesurfing": {
+    "string": "Wind/Kite Surfing"
+  },
+  "windsurf": {
+    "string": "Windsurf"
+  },
+  "windsurfing": {
+    "string": "Виндсерфинг"
+  },
+  "wingsuitflying": {
+    "string": "Wingsuit Flying"
+  },
+  "wintersports": {
+    "string": "Winter Sports"
+  },
+  "workout": {
+    "string": "Тренировка"
+  },
+  "wrestling": {
+    "string": "Борьба"
+  },
+  "xare": {
+    "string": "Ксаре"
+  },
+  "yachting": {
+    "string": "Парусная яхта"
+  },
+  "yoga": {
+    "string": "Йога"
+  },
+  "zumba": {
+    "string": "Zumba"
+  }
+}
