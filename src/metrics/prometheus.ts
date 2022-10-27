@@ -29,6 +29,18 @@ export const promResponseTimeSummary = new Summary({
   labelNames: ['method', 'name'],
 });
 
+export const promWebhookCounter = new Counter({
+  name: 'webhooks',
+  help: 'Webhooks Counter',
+  labelNames: ['vendor', 'subject', 'event'],
+});
+
+export const promWebhookErrorsCounter = new Counter({
+  name: 'webhooks_errors',
+  help: 'Webhook errors',
+  labelNames: ['vendor', 'cause'],
+});
+
 // service info
 const info = new Gauge({
   name: `service_info`,

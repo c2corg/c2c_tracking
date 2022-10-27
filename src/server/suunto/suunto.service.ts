@@ -4,6 +4,7 @@ import dayjsPluginUTC from 'dayjs/plugin/utc';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
@@ -78,11 +79,13 @@ export class SuuntoService {
 
   public async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
     if (!this.isWebhookHeaderValid(authHeader)) {
+      promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'auth' }).inc(1);
       log.warn(`Suunto workout webhook event for Suunto user ${event.username} couldn't be processed: bad auth`);
       return;
     }
     const user = await userRepository.findBySuuntoUsername(event.username);
     if (!user) {
+      promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'user_not_found' }).inc(1);
       log.warn(
         `Suunto workout webhook event for Suunto user ${event.username} couldn't be processed: unable to find matching user in DB`,
       );
@@ -90,6 +93,7 @@ export class SuuntoService {
     }
     const token = await this.getToken(user.c2cId);
     if (!token) {
+      promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Suunto workout webhook event for user ${user.c2cId} couldn't be processed: unable to acquire valid token`,
       );
@@ -99,6 +103,7 @@ export class SuuntoService {
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Suunto workout webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
       );
@@ -112,7 +117,9 @@ export class SuuntoService {
         name: workout.payload.workoutName ?? '',
         type: workoutTypes[workout.payload.activityId] || 'Unknown',
       });
+      promWebhookCounter.labels({ vendor: 'suunto', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
+      promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Suunto activity update/creation webhook event for user ${user.c2cId} couldn't be processed: unable to upsert activity data`,
       );
