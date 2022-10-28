@@ -17,11 +17,9 @@ import { Activity, StravaAuth, stravaApi, WebhookEvent, Subscription, StreamSet 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 
 export class StravaService {
-  public readonly subscriptionUrl: string;
   public readonly stravaWebhookSubscriptionVerifyToken: string;
 
   constructor() {
-    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
     this.stravaWebhookSubscriptionVerifyToken = config.get('trackers.strava.webhookSubscriptionVerifyToken');
   }
 

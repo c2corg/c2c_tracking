@@ -46,13 +46,11 @@ describe('Decathlon Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=auth-denied"`,
-      );
+      expect(response.status).toBe(403);
+      expect(response.text).toEqual('auth-denied');
     });
 
-    it('redirects if user setup fails', async () => {
+    it('throws if user setup fails', async () => {
       jest.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
@@ -62,13 +60,11 @@ describe('Decathlon Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=setup-failed"`,
-      );
+      expect(response.status).toBe(502);
+      expect(response.text).toEqual('setup-failed');
     });
 
-    it('setups user and redirects', async () => {
+    it('setups user', async () => {
       jest.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
@@ -78,8 +74,7 @@ describe('Decathlon Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toEqual(decathlonService.subscriptionUrl);
+      expect(response.status).toBe(204);
       expect(decathlonService.requestShortLivedAccessTokenAndSetupUser).toBeCalledTimes(1);
       expect(decathlonService.requestShortLivedAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
     });

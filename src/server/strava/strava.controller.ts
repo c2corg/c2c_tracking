@@ -1,7 +1,5 @@
 import type { Context } from 'koa';
 
-import { ExternalApiError } from '../../errors';
-
 import type { WebhookEvent, WebhookSubscription } from './strava.api';
 import { stravaService as service } from './strava.service';
 
@@ -10,8 +8,7 @@ class StravaController {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     if (ctx.query['error']) {
       ctx.log.info(`User ${c2cId} denied Strava authorization`);
-      ctx.redirect(`${service.subscriptionUrl}?error=auth-denied`);
-      return;
+      ctx.throw(403, 'auth-denied');
     }
 
     const authorizationCode = ctx.query['code'] as string;
@@ -19,16 +16,15 @@ class StravaController {
 
     if (!service.containsRequiredScopes(scopes)) {
       ctx.log.info('Strava authorization request failed, missing required scopes');
-      ctx.redirect(`${service.subscriptionUrl}?error=unsufficient-scopes`);
-      return;
+      ctx.throw(403, 'unsufficient-scopes');
     }
 
     try {
       await service.requestShortLivedAccessTokenAndSetupUser(c2cId, authorizationCode);
-      ctx.redirect(service.subscriptionUrl);
+      ctx.status = 204;
     } catch (error: unknown) {
       ctx.log.info(error);
-      ctx.redirect(`${service.subscriptionUrl}?error=setup-failed`);
+      ctx.throw(502, 'setup-failed');
     }
   }
 
@@ -41,7 +37,7 @@ class StravaController {
   public async webhookSubscription(ctx: Context): Promise<void> {
     const query = <WebhookSubscription>(ctx.request.query as unknown);
     if (query['hub.verify_token'] !== service.stravaWebhookSubscriptionVerifyToken) {
-      throw new ExternalApiError('Invalid verify token');
+      ctx.throw(502, 'Invalid verify token');
     }
     ctx.body = { 'hub.challenge': query['hub.challenge'] };
   }

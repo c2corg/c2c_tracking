@@ -8,17 +8,16 @@ class SuuntoController {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     if (ctx.query['error']) {
       ctx.log.info(`User ${c2cId} denied Suunto authorization`);
-      ctx.redirect(`${service.subscriptionUrl}?error=auth-denied`);
-      return;
+      ctx.throw(403, 'auth-denied');
     }
     const authorizationCode = ctx.query['code'] as string;
 
     try {
       await service.requestShortLivedAccessTokenAndSetupUser(c2cId, authorizationCode);
-      ctx.redirect(service.subscriptionUrl);
+      ctx.status = 204;
     } catch (error: unknown) {
       ctx.log.info(error);
-      ctx.redirect(`${service.subscriptionUrl}?error=setup-failed`);
+      ctx.throw(502, 'setup-failed');
     }
   }
 

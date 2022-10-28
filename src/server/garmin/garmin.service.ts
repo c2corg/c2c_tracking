@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
 
-import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
@@ -17,12 +16,6 @@ import { GarminActivity, garminApi, GarminAuth, GarminSample } from './garmin.ap
 dayjs.extend(dayjsPluginUTC);
 
 export class GarminService {
-  public readonly subscriptionUrl: string;
-
-  constructor() {
-    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
-  }
-
   public async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
     return await garminApi.requestUnauthorizedRequestToken();
   }
