@@ -15,7 +15,7 @@ ENV NODE_ENV production
 COPY --from=build-stage /usr/bin/dumb-init /usr/bin/dumb-init
 WORKDIR /usr/src/app
 COPY --from=build-stage --chown=node:node /usr/package.json ./
-COPY --from=build-stage --chown=node:node /usr/node_modules ./
+COPY --from=build-stage --chown=node:node /usr/node_modules ./node_modules
 COPY --from=build-stage --chown=node:node /usr/dist ./
 ENV PORT 8080
 ENV METRICS_PORT 8081
