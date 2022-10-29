@@ -1,21 +1,21 @@
 {
   "100/110mhurdles": {
-    "string": "100 / 110 M Hurdles "
+    "string": "100/110m obstacles"
   },
   "100km": {
-    "string": "100 KM"
+    "string": "100km"
   },
   "10km": {
-    "string": "10 KM"
+    "string": "10km"
   },
   "22longrifleshooting": {
     "string": "22 long rifle shooting"
   },
   "3darchery": {
-    "string": "3-D archery"
+    "string": "Tir amb arc 3D"
   },
   "400mhurdles": {
-    "string": "400 M Hurdles"
+    "string": "400m obstacles"
   },
   "adventureracing": {
     "string": "Adventure racing"
@@ -27,10 +27,10 @@
     "string": "Aerobatics"
   },
   "aerobics": {
-    "string": "Aerobics"
+    "string": "Aeròbic"
   },
   "africandance": {
-    "string": "African dance"
+    "string": "Dansa africana"
   },
   "aggressiveinlineskating(stunts)": {
     "string": "Aggressive in-line skating (stunts)"
@@ -42,22 +42,22 @@
     "string": "Air rifle shooting"
   },
   "allmountainmtb": {
-    "string": "All mountain MTB"
+    "string": "BTT"
   },
   "alpineski": {
-    "string": "Alpine Ski"
+    "string": "Esquí alpí"
   },
   "alpineskiing": {
-    "string": "Alpine skiing"
+    "string": "Esquí alpí"
   },
   "alpinesnowboarding": {
-    "string": "Alpine snowboarding"
+    "string": "Surf de neu alpí"
   },
   "alternativenordicskiing": {
-    "string": "Alternative Nordic skiing"
+    "string": "Esquí nòrdic alternatiu"
   },
   "americanfootball": {
-    "string": "American football"
+    "string": "Futbol americà"
   },
   "apnea": {
     "string": "Apnea"
@@ -93,7 +93,7 @@
     "string": "Aquathlon"
   },
   "archery": {
-    "string": "Archery"
+    "string": "Tir amb arc"
   },
   "artisticgymnastics(ag)": {
     "string": "Artistic gymnastics (AG)"
