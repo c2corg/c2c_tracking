@@ -32,23 +32,21 @@ class GarminController {
 
     if (verifier.toLocaleLowerCase() === 'null') {
       ctx.log.info(`User ${c2cId} denied Garmin authorization`);
-      ctx.redirect(`${service.subscriptionUrl}?error=auth-denied`);
-      return;
+      ctx.throw(403, 'auth-denied');
     }
 
     const tokenSecret = (await this.keyv.get(c2cId.toString())) as string;
     if (!tokenSecret) {
       ctx.log.info(`No token secret found in mem for user ${c2cId}: unable to request Garmin access token`);
-      ctx.redirect(`${service.subscriptionUrl}?error=setup-failed`);
-      return;
+      ctx.throw(502, 'setup-failed');
     }
 
     try {
       await service.requestAccessTokenAndSetupUser(c2cId, token, tokenSecret, verifier);
-      ctx.redirect(service.subscriptionUrl);
+      ctx.status = 204;
     } catch (error: unknown) {
       ctx.log.info(error);
-      ctx.redirect(`${service.subscriptionUrl}?error=setup-failed`);
+      ctx.throw(502, 'setup-failed');
     }
   }
 

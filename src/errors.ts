@@ -1,34 +1,28 @@
 import log from './helpers/logger';
 
 export class AppError extends Error {
-  public readonly code: number;
-  public readonly description?: string;
-
-  constructor(code: number, description?: string, cause?: Error, message?: string) {
+  constructor(public readonly code: number, message?: string, cause?: Error, public readonly body?: string) {
     super(message, { ...(cause && { cause }) });
-    if (description) {
-      this.message = description;
-    }
-    log.info(description);
+    log.warn(message);
     this.code = code;
   }
 }
 
 export class ExternalApiError extends AppError {
-  constructor(description: string, cause?: Error) {
-    super(502, description, cause);
+  constructor(message?: string, cause?: Error, body?: string) {
+    super(502, message, cause, body);
   }
 }
 
 export class NotFoundError extends AppError {
-  constructor(description?: string, cause?: Error) {
-    super(404, description, cause);
+  constructor(message?: string, cause?: Error, body?: string) {
+    super(404, message, cause, body);
   }
 }
 
 export class IOError extends AppError {
-  constructor(description: string, cause?: Error) {
-    super(500, description, cause);
+  constructor(message: string, cause?: Error, body?: string) {
+    super(500, message, cause, body);
   }
 }
 
@@ -39,13 +33,7 @@ export type FieldError = {
 };
 
 export class FieldValidationError extends AppError {
-  constructor(description: string, details: unknown, cause?: Error) {
-    super(400, description, cause, JSON.stringify(details, null, 2));
-  }
-}
-
-export class ForbiddenError extends AppError {
-  constructor() {
-    super(403);
+  constructor(message: string, details: unknown, cause?: Error) {
+    super(400, message, cause, JSON.stringify(details, null, 2));
   }
 }

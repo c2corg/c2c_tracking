@@ -45,13 +45,11 @@ describe('Suunto Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=auth-denied"`,
-      );
+      expect(response.status).toBe(403);
+      expect(response.text).toEqual('auth-denied');
     });
 
-    it('redirects if user setup fails', async () => {
+    it('throws if user setup fails', async () => {
       jest.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
@@ -59,13 +57,11 @@ describe('Suunto Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=setup-failed"`,
-      );
+      expect(response.status).toBe(502);
+      expect(response.text).toEqual('setup-failed');
     });
 
-    it('setups user and redirects', async () => {
+    it('setups user', async () => {
       jest.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
@@ -73,8 +69,7 @@ describe('Suunto Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toEqual(suuntoService.subscriptionUrl);
+      expect(response.status).toBe(204);
       expect(suuntoService.requestShortLivedAccessTokenAndSetupUser).toBeCalledTimes(1);
       expect(suuntoService.requestShortLivedAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
     });

@@ -15,12 +15,10 @@ import { SuuntoAuth, Workouts, workoutTypes, WebhookEvent, suuntoApi, WorkoutSum
 dayjs.extend(dayjsPluginUTC);
 
 export class SuuntoService {
-  public readonly subscriptionUrl: string;
   readonly #suuntoSubscriptionKey: string;
   readonly #suuntoWebhookSubscriptionToken: string;
 
   constructor() {
-    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
     this.#suuntoSubscriptionKey = config.get('trackers.suunto.subscriptionKey');
     this.#suuntoWebhookSubscriptionToken = config.get('trackers.suunto.webhookSubscriptionToken');
   }

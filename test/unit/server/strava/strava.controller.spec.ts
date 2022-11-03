@@ -48,25 +48,21 @@ describe('Strava Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=auth-denied"`,
-      );
+      expect(response.status).toBe(403);
+      expect(response.text).toEqual('auth-denied');
     });
 
-    it('redirects if unsufficient scopes are accepted', async () => {
+    it('throws if unsufficient scopes are accepted', async () => {
       const response = await authenticated(
         request(app.callback()).get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'toto' }),
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=unsufficient-scopes"`,
-      );
+      expect(response.status).toBe(403);
+      expect(response.text).toEqual('unsufficient-scopes');
     });
 
-    it('redirects if user setup fails', async () => {
+    it('throws if user setup fails', async () => {
       jest.spyOn(stravaService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
@@ -76,13 +72,11 @@ describe('Strava Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"http://localhost:8080/external-services?error=setup-failed"`,
-      );
+      expect(response.status).toBe(502);
+      expect(response.text).toEqual('setup-failed');
     });
 
-    it('setups user and redirects', async () => {
+    it('setups user', async () => {
       jest.spyOn(stravaService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
@@ -92,8 +86,7 @@ describe('Strava Controller', () => {
         1,
       );
 
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toEqual(stravaService.subscriptionUrl);
+      expect(response.status).toBe(204);
       expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toBeCalledTimes(1);
       expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
     });

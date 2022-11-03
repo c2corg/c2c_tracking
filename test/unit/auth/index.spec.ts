@@ -1,7 +1,6 @@
 import { createMockContext } from '@shopify/jest-koa-mocks';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth';
-import { ForbiddenError } from '../../../src/errors';
 import log from '../../../src/helpers/logger';
 import { AuthenticatedUserStrategy } from '../../utils';
 
@@ -44,10 +43,11 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
       customProperties: {
         params: { userId: '123' },
       },
+      throw: jest.fn(),
     });
-    await expect(ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined)).rejects.toBeInstanceOf(
-      ForbiddenError,
-    );
+    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
+    expect(ctx.throw).toBeCalledTimes(1);
+    expect(ctx.throw).toBeCalledWith(403);
   });
 
   it('rejects un-authenticated user', async () => {
@@ -56,9 +56,10 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
       customProperties: {
         params: { userId: '123' },
       },
+      throw: jest.fn(),
     });
-    await expect(ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined)).rejects.toBeInstanceOf(
-      ForbiddenError,
-    );
+    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
+    expect(ctx.throw).toBeCalledTimes(1);
+    expect(ctx.throw).toBeCalledWith(403);
   });
 });

@@ -1,5 +1,5 @@
 import type { Middleware } from '@koa/router';
-import type { Context } from 'koa';
+import { Context, HttpError } from 'koa';
 
 import { AppError } from '../errors';
 import log from '../helpers/logger';
@@ -11,7 +11,11 @@ export function defaultErrorHandler(): Middleware {
       await next();
     } catch (error: unknown) {
       if (error instanceof AppError) {
+        ctx.body = error.body;
         ctx.status = error.code;
+      } else if (error instanceof HttpError) {
+        ctx.body = error.message;
+        ctx.status = error.status;
       } else {
         log.warn(error, 'Unhandled error');
         promUnhandledErrorsCounter.inc(1);

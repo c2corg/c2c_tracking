@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 
-import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
@@ -15,12 +14,6 @@ import { Activity, decathlonApi, DecathlonAuth, WebhookEvent } from './decathlon
 import { sports } from './sports';
 
 export class DecathlonService {
-  public readonly subscriptionUrl: string;
-
-  constructor() {
-    this.subscriptionUrl = config.get('c2c.frontend.baseUrl') + config.get('c2c.frontend.subscriptionPath');
-  }
-
   public async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
     const auth = await decathlonApi.exchangeToken(authorizationCode);
     await this.setupUser(c2cId, auth);
