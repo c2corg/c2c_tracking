@@ -43,7 +43,7 @@ describe('Strava Service', () => {
         {
           id: 1,
           name: 'Morning run',
-          type: 'Run',
+          sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
           start_latlng: [1.0, 1.0],
           timezone: 'Europe/Paris',
@@ -270,7 +270,7 @@ describe('Strava Service', () => {
       jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
         id: 1,
         name: 'Morning Run',
-        type: 'Run',
+        sport_type: 'Run',
         start_date: '1970-01-01T00:00:01Z',
         timezone: 'Europe/Paris',
         start_latlng: [1.0, 1.0],
@@ -663,7 +663,7 @@ describe('Strava Service', () => {
         jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
-          type: 'Run',
+          sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
           start_latlng: [1.0, 1.0],
           timezone: 'Europe/Paris',
@@ -713,7 +713,7 @@ describe('Strava Service', () => {
         jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
-          type: 'Run',
+          sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
           start_latlng: [1.0, 1.0],
           timezone: 'Europe/Paris',
@@ -844,7 +844,7 @@ describe('Strava Service', () => {
         jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
-          type: 'Run',
+          sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
           start_latlng: [1.0, 1.0],
           timezone: 'Europe/Paris',
@@ -894,7 +894,7 @@ describe('Strava Service', () => {
         jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
-          type: 'Run',
+          sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
           start_latlng: [1.0, 1.0],
           timezone: 'Europe/Paris',

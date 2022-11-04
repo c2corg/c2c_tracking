@@ -434,6 +434,9 @@
   "elliptical": {
     "string": "Elliptical"
   },
+  "emountainbikeride": {
+    "string": "E-Mountainbike ride"
+  },
   "enduranceriding": {
     "string": "Endurance a cavallo"
   },
@@ -587,7 +590,10 @@
   "grappling": {
     "string": "Grappling"
   },
-  "gravel/unpaved cycling": {
+  "gravelride": {
+    "string": "Gravel ride"
+  },
+  "gravel/unpavedcycling": {
     "string": "Gravel/unpaved Cycling"
   },
   "gym": {
@@ -868,6 +874,9 @@
   },
   "mount": {
     "string": "Monte"
+  },
+  "mountainbikeride": {
+    "string": "Mountainbike"
   },
   "mountainbiking": {
     "string": "MTB"
@@ -1396,6 +1405,9 @@
   },
   "trail": {
     "string": "Trail"
+  },
+  "trailrun": {
+    "string": "Trail Running"
   },
   "trailrunning": {
     "string": "Trail Running"
