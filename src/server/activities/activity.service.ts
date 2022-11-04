@@ -19,10 +19,14 @@ export class ActivityService {
   ): Promise<(Omit<Activity, 'vendorId' | 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
     const langs: Lang[] = lang ? [lang] : Lang.options;
     return (await userService.getActivities(userId)).map(({ vendorId, geojson, type, ...keep }) => {
-      const translated = langs.map((l) => ({
-        // eslint-disable-next-line security/detect-object-injection
-        [l]: translations[l][this.i18nKey(type)]?.string ?? translations[l]['unknown']?.string ?? 'Unknown',
-      }));
+      const translated = langs.reduce(
+        (acc, l) => ({
+          ...acc,
+          // eslint-disable-next-line security/detect-object-injection
+          [l]: translations[l][this.i18nKey(type)]?.string ?? translations[l]['unknown']?.string ?? 'Unknown',
+        }),
+        {},
+      );
       return {
         ...keep,
         type: translated,
