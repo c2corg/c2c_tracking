@@ -429,10 +429,13 @@
     "string": "E-Sport"
   },
   "ebikeride": {
-    "string": "E-Bike Ride"
+    "string": "Vélo électrique"
   },
   "elliptical": {
-    "string": "Elliptical"
+    "string": "Vélo elliptique"
+  },
+  "emountainbikeride": {
+    "string": "VTT électrique"
   },
   "enduranceriding": {
     "string": "Endurance à cheval"
@@ -587,8 +590,11 @@
   "grappling": {
     "string": "Grappling"
   },
-  "gravel/unpaved cycling": {
-    "string": "Gravel/unpaved Cycling"
+  "gravelride": {
+    "string": "Gravel"
+  },
+  "gravel/unpavedcycling": {
+    "string": "Gravel"
   },
   "gym": {
     "string": "Gym"
@@ -618,7 +624,7 @@
     "string": "Handbike"
   },
   "handcycle": {
-    "string": "Handcycle"
+    "string": "Handbike"
   },
   "hanggliding": {
     "string": "Hang Gliding"
@@ -687,10 +693,10 @@
     "string": "Hockey sur glace"
   },
   "iceskate": {
-    "string": "Patinage sur glace"
+    "string": "Patin à glace"
   },
   "iceskating": {
-    "string": "Patinage sur glace"
+    "string": "Patin à glace"
   },
   "indoor": {
     "string": "Indoor"
@@ -717,7 +723,7 @@
     "string": "Musculation"
   },
   "inlineskate": {
-    "string": "Inline Skate"
+    "string": "Roller"
   },
   "inlineskating": {
     "string": "Roller"
@@ -868,6 +874,9 @@
   },
   "mount": {
     "string": "Mont"
+  },
+  "mountainbikeride": {
+    "string": "VTT"
   },
   "mountainbiking": {
     "string": "VTT"
@@ -1107,10 +1116,10 @@
     "string": "Roller Skating"
   },
   "rollerski": {
-    "string": "Roller Ski"
+    "string": "Ski à roulettes"
   },
   "rollerskiing": {
-    "string": "Roller Ski"
+    "string": "Ski à roulettes"
   },
   "rowing": {
     "string": "Aviron"
@@ -1197,10 +1206,10 @@
     "string": "Single-gas Dive"
   },
   "skateboard": {
-    "string": "Skate board"
+    "string": "Skateboard"
   },
   "skateboarding": {
-    "string": "Skate board"
+    "string": "Skateboard"
   },
   "skating": {
     "string": "Skating"
@@ -1299,13 +1308,13 @@
     "string": "Squatenton"
   },
   "stairstepper": {
-    "string": "Stair Stepper"
+    "string": "Simulateur d'escalier"
   },
   "standuppaddleboarding": {
-    "string": "Stand Up Paddle"
+    "string": "Stand up paddle"
   },
   "standuppaddling": {
-    "string": "Stand Up Paddle"
+    "string": "Stand up paddle"
   },
   "stationarysmallgamehunting": {
     "string": "Chasse du petit gibier sédentaire"
@@ -1397,6 +1406,9 @@
   "trail": {
     "string": "Trail"
   },
+  "trailrun": {
+    "string": "Trail"
+  },
   "trailrunning": {
     "string": "Trail"
   },
@@ -1473,7 +1485,7 @@
     "string": "Marche urbaine"
   },
   "velomobile": {
-    "string": "Velomobile"
+    "string": "Vélomobile"
   },
   "verticalfishing": {
     "string": "Pêche à soutenir"
@@ -1512,7 +1524,7 @@
     "string": "Marche"
   },
   "walking/indoor walking": {
-    "string": "Marche / marche en intérieur"
+    "string": "Marche"
   },
   "waterfowlhunting": {
     "string": "Chasse du gibier d'eau"
@@ -1539,19 +1551,19 @@
     "string": "Haltérophilie"
   },
   "weighttraining": {
-    "string": "Weight Training"
+    "string": "Entrainement aux poids"
   },
   "weighttrainingathome": {
-    "string": "Musculation à domicile"
+    "string": "Entrainement aux poids"
   },
   "westernriding": {
     "string": "Equitation western"
   },
   "wheelchair": {
-    "string": "Wheelchair"
+    "string": "Course en fauteuil"
   },
   "wheelchairracing": {
-    "string": "Course fauteuil"
+    "string": "Course en fauteuil"
   },
   "whitewaterkayaking": {
     "string": "Kayak en eaux vives"
@@ -1566,10 +1578,10 @@
     "string": "Windsurf"
   },
   "windsurfing": {
-    "string": "Planche à voile"
+    "string": "Windsurf"
   },
   "wingsuitflying": {
-    "string": "Wingsuit Flying"
+    "string": "Wingsuit"
   },
   "wintersports": {
     "string": "Sports d'hiver"

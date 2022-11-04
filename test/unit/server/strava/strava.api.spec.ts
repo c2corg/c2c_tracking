@@ -94,7 +94,7 @@ describe('Strava API', () => {
         {
           id: 123,
           name: 'Afternoon Run',
-          type: 'Run',
+          sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
           start_latlng: [1.0, 1.0],
           timezone: 'Paris/Europe',
@@ -114,13 +114,13 @@ describe('Strava API', () => {
               "summary_polyline": "abcd",
             },
             "name": "Afternoon Run",
+            "sport_type": "Run",
             "start_date": "2022-01-01T00:00:01Z",
             "start_latlng": [
               1,
               1,
             ],
             "timezone": "Paris/Europe",
-            "type": "Run",
           },
         ]
       `);
@@ -136,7 +136,7 @@ describe('Strava API', () => {
       const activity: Activity = {
         id: 123,
         name: 'Afternoon Run',
-        type: 'Run',
+        sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
         start_latlng: [1.0, 1.0],
         timezone: 'Paris/Europe',
@@ -154,13 +154,13 @@ describe('Strava API', () => {
             "summary_polyline": "abcd",
           },
           "name": "Afternoon Run",
+          "sport_type": "Run",
           "start_date": "2022-01-01T00:00:01Z",
           "start_latlng": [
             1,
             1,
           ],
           "timezone": "Paris/Europe",
-          "type": "Run",
         }
       `);
       expect(axios.get).toBeCalledTimes(1);

@@ -48,7 +48,7 @@ export class StravaService {
           vendorId: activity.id.toString(),
           date: activity.start_date,
           name: activity.name,
-          type: activity.type,
+          type: activity.sport_type,
         })),
       );
     } catch (error: unknown) {
@@ -251,7 +251,7 @@ export class StravaService {
         vendorId: activityId,
         date: activity.start_date,
         name: activity.name,
-        type: activity.type,
+        type: activity.sport_type,
       });
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
@@ -299,7 +299,7 @@ export class StravaService {
         vendorId: activityId,
         date: activity.start_date,
         name: activity.name,
-        type: activity.type,
+        type: activity.sport_type,
       });
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'update' });
     } catch (error: unknown) {

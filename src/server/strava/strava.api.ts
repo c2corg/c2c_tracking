@@ -22,20 +22,23 @@ export type StravaAuth = z.infer<typeof StravaAuth>;
 export const StravaRefreshAuth = StravaAuth.omit({ athlete: true });
 export type StravaRefreshAuth = z.infer<typeof StravaRefreshAuth>;
 
-export const ActivityType = z.enum([
+export const SportType = z.enum([
   'AlpineSki',
   'BackcountrySki',
   'Canoeing',
   'Crossfit',
   'EBikeRide',
   'Elliptical',
+  'EMountainBikeRide',
   'Golf',
+  'GravelRide',
   'Handcycle',
   'Hike',
   'IceSkate',
   'InlineSkate',
   'Kayaking',
   'Kitesurf',
+  'MountainBikeRide',
   'NordicSki',
   'Ride',
   'RockClimbing',
@@ -51,6 +54,7 @@ export const ActivityType = z.enum([
   'StandUpPaddling',
   'Surfing',
   'Swim',
+  'TrailRun',
   'Velomobile',
   'VirtualRide',
   'VirtualRun',
@@ -61,7 +65,7 @@ export const ActivityType = z.enum([
   'Workout',
   'Yoga',
 ]);
-export type ActivityType = z.infer<typeof ActivityType>;
+export type SportType = z.infer<typeof SportType>;
 
 export const PolylineMap = z.object({
   polyline: z.string().min(1).optional(),
@@ -72,7 +76,7 @@ export type PolylineMap = z.infer<typeof PolylineMap>;
 export const Activity = z.object({
   id: z.number().int().positive(),
   name: z.string(),
-  type: ActivityType,
+  sport_type: SportType,
   start_date: z.string().refine(isISO8601),
   timezone: z.string().min(1).max(50),
   start_latlng: z.array(z.number()),
