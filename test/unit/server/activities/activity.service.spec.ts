@@ -40,41 +40,19 @@ describe('Activity Service', () => {
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
-            "type": [
-              {
-                "fr": "Course à pied",
-              },
-              {
-                "en": "Run",
-              },
-              {
-                "ca": "Run",
-              },
-              {
-                "eu": "Run",
-              },
-              {
-                "it": "Run",
-              },
-              {
-                "de": "Run",
-              },
-              {
-                "es": "Run",
-              },
-              {
-                "hu": "Run",
-              },
-              {
-                "ru": "Run",
-              },
-              {
-                "sl": "Run",
-              },
-              {
-                "zh_CN": "Run",
-              },
-            ],
+            "type": {
+              "ca": "Run",
+              "de": "Run",
+              "en": "Run",
+              "es": "Run",
+              "eu": "Run",
+              "fr": "Course à pied",
+              "hu": "Run",
+              "it": "Run",
+              "ru": "Run",
+              "sl": "Run",
+              "zh_CN": "Run",
+            },
             "userId": 1,
             "vendor": "strava",
           },
@@ -106,11 +84,9 @@ describe('Activity Service', () => {
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
-            "type": [
-              {
-                "fr": "Course à pied",
-              },
-            ],
+            "type": {
+              "fr": "Course à pied",
+            },
             "userId": 1,
             "vendor": "strava",
           },
@@ -143,11 +119,9 @@ describe('Activity Service', () => {
           "date": "2022-01-01T00:00:01Z",
           "id": 1,
           "name": "name",
-          "type": [
-            {
-              "fr": "Inconnu",
-            },
-          ],
+          "type": {
+            "fr": "Inconnu",
+          },
           "userId": 1,
           "vendor": "strava",
         },
