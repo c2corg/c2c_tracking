@@ -30,6 +30,7 @@ describe('Decathlon Service', () => {
           name: 'Morning run',
           sport: '/v2/sports/381',
           startdate: '2022-01-01T00:00:01Z',
+          dataSummaries: { '18': 1.2, '5': 1.2, '24': 1.2 },
         },
       ]);
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
@@ -66,6 +67,9 @@ describe('Decathlon Service', () => {
         name: 'Morning run',
         type: 'Bicycle',
         date: '2022-01-01T00:00:01Z',
+        length: 1,
+        duration: 1,
+        heightDiffUp: 1,
       });
     });
 
@@ -86,6 +90,7 @@ describe('Decathlon Service', () => {
           name: 'Morning run',
           sport: '/v2/sports/381',
           startdate: '2022-01-01T00:00:01Z',
+          dataSummaries: {},
         },
       ]);
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
@@ -416,6 +421,7 @@ describe('Decathlon Service', () => {
         name: 'activity',
         sport: '/v2/sports/381',
         startdate: '1970-01-01T00:00:01Z',
+        dataSummaries: {},
       });
 
       const service = new DecathlonService();
@@ -430,6 +436,7 @@ describe('Decathlon Service', () => {
         name: 'activity',
         sport: '/v2/sports/381',
         startdate: '1970-01-01T00:00:01Z',
+        dataSummaries: {},
         locations: {
           '1': { latitude: 1.0, longitude: 1.0, elevation: 1.0 },
           '2': { latitude: 2.0, longitude: 2.0, elevation: 2.0 },
@@ -542,6 +549,7 @@ describe('Decathlon Service', () => {
           name: 'name',
           sport: '/v2/sports/381',
           startdate: '1970-01-01T00:00:01Z',
+          dataSummaries: {},
           locations: { '0': { latitude: 1.0, longitude: 1.0, elevation: 1.0 } },
         });
         jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
@@ -587,6 +595,7 @@ describe('Decathlon Service', () => {
           name: 'name',
           sport: '/v2/sports/381',
           startdate: '1970-01-01T00:00:01Z',
+          dataSummaries: {},
           locations: { '0': { latitude: 1.0, longitude: 1.0, elevation: 1.0 } },
         });
         jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);

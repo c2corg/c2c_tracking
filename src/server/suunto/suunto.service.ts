@@ -10,7 +10,7 @@ import { activityRepository } from '../../repository/activity.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { SuuntoAuth, Workouts, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary } from './suunto.api';
+import { SuuntoAuth, Workouts, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary, Workout } from './suunto.api';
 
 dayjs.extend(dayjsPluginUTC);
 
@@ -36,15 +36,7 @@ export class SuuntoService {
       if (!workouts.payload.length) {
         return;
       }
-      const activities: Omit<Activity, 'id' | 'userId'>[] = workouts.payload.map((workout) => ({
-        ...{
-          vendor: 'suunto' as Vendor,
-          vendorId: workout.workoutKey,
-          date: dayjs(workout.startTime).utc().format(),
-          type: workoutTypes[workout.activityId] || 'Unkown',
-        },
-        ...(workout.workoutName && { name: workout.workoutName }),
-      }));
+      const activities: Omit<Activity, 'id' | 'userId'>[] = workouts.payload.map(this.asRepositoryActivity);
       await userService.addActivities(c2cId, ...activities);
     } catch (err: unknown) {
       log.warn(err);
@@ -110,13 +102,7 @@ export class SuuntoService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, {
-        vendor: 'suunto' as Vendor,
-        vendorId: event.workoutid, // corresponds to workout key
-        date: dayjs(workout.payload.startTime).utc().format(),
-        name: workout.payload.workoutName ?? '',
-        type: workoutTypes[workout.payload.activityId] || 'Unknown',
-      });
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(workout.payload));
       promWebhookCounter.labels({ vendor: 'suunto', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
@@ -147,6 +133,19 @@ export class SuuntoService {
     // clear user Suunto data
     const { suunto, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
+  }
+
+  private asRepositoryActivity(workout: Workout): Omit<Activity, 'id' | 'userId'> {
+    return {
+      vendor: 'suunto' as Vendor,
+      vendorId: workout.workoutKey,
+      date: dayjs(workout.startTime).utc().format(),
+      type: workoutTypes[workout.activityId] || 'Unkown',
+      length: Math.round(workout.totalDistance),
+      duration: Math.round(workout.totalTime),
+      heightDiffUp: Math.round(workout.totalAscent),
+      ...(workout.workoutName && { name: workout.workoutName }),
+    };
   }
 }
 

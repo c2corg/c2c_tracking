@@ -14,6 +14,9 @@ export const Activity = z.object({
   date: z.string().refine(isISO8601),
   name: z.string().min(1).optional(),
   type: z.string().min(1),
+  length: z.number().nonnegative().optional(),
+  heightDiffUp: z.number().nonnegative().optional(),
+  duration: z.number().int().nonnegative().optional(),
   geojson: LineString.optional(),
 });
 

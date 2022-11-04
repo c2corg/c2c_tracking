@@ -5,7 +5,7 @@ import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import type { Vendor } from '../../repository/activity';
+import type { Activity as RepositoryActivity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import { stravaRepository } from '../../repository/strava.repository';
@@ -41,16 +41,7 @@ export class StravaService {
       if (!activities.length) {
         return;
       }
-      await userService.addActivities(
-        c2cId,
-        ...activities.map((activity) => ({
-          vendor: 'strava' as Vendor,
-          vendorId: activity.id.toString(),
-          date: activity.start_date,
-          name: activity.name,
-          type: activity.sport_type,
-        })),
-      );
+      await userService.addActivities(c2cId, ...activities.map(this.asRepositoryActivity));
     } catch (error: unknown) {
       // failing to retrieve activities should not break the registration process
       log.info(`Unable to retrieve Strava activities for user ${c2cId}`);
@@ -246,13 +237,7 @@ export class StravaService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, {
-        vendor: 'strava',
-        vendorId: activityId,
-        date: activity.start_date,
-        name: activity.name,
-        type: activity.sport_type,
-      });
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(activity));
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
@@ -294,13 +279,7 @@ export class StravaService {
       return;
     }
     try {
-      await userService.updateActivity(user.c2cId, {
-        vendor: 'strava',
-        vendorId: activityId,
-        date: activity.start_date,
-        name: activity.name,
-        type: activity.sport_type,
-      });
+      await userService.updateActivity(user.c2cId, this.asRepositoryActivity(activity));
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'update' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
@@ -320,6 +299,19 @@ export class StravaService {
         `Strava activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
       );
     }
+  }
+
+  private asRepositoryActivity(activity: Activity): Omit<RepositoryActivity, 'id' | 'userId'> {
+    return {
+      vendor: 'strava' as Vendor,
+      vendorId: activity.id.toString(),
+      date: activity.start_date,
+      name: activity.name,
+      type: activity.sport_type,
+      length: Math.round(activity.distance), // float in Strava API, integer in DB
+      heightDiffUp: Math.round(activity.total_elevation_gain), // float in Strava API, integer in DB
+      duration: activity.elapsed_time,
+    };
   }
 }
 
