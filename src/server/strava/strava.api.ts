@@ -78,8 +78,9 @@ export const Activity = z.object({
   name: z.string(),
   sport_type: SportType,
   start_date: z.string().refine(isISO8601),
-  timezone: z.string().min(1).max(50),
-  start_latlng: z.array(z.number()),
+  distance: z.number().nonnegative(), // in meters
+  elapsed_time: z.number().int().nonnegative(), // in seconds
+  total_elevation_gain: z.number().nonnegative(), // in meters
   map: PolylineMap,
 });
 export type Activity = z.infer<typeof Activity>;

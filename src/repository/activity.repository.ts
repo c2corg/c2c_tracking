@@ -12,6 +12,9 @@ type ActivityRow = {
   date: string;
   name: string | undefined | null;
   type: string;
+  length: number | undefined | null;
+  duration: number | undefined | null;
+  height_diff_up: number | undefined | null;
   geojson: LineString | undefined | null;
 };
 
@@ -140,6 +143,9 @@ export class ActivityRepository {
       date: row.date,
       type: row.type,
       ...(row.name && { name: row.name }),
+      ...(row.length && { length: row.length }),
+      ...(row.duration && { duration: row.duration }),
+      ...(row.height_diff_up && { heightDiffUp: row.height_diff_up }),
       ...(row.geojson && { geojson: row.geojson }),
     };
   }
@@ -153,6 +159,9 @@ export class ActivityRepository {
       date: activity.date,
       name: activity.name,
       geojson: activity.geojson,
+      length: activity.length,
+      duration: activity.duration,
+      height_diff_up: activity.heightDiffUp,
     };
   }
 }

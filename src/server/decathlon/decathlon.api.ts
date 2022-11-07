@@ -14,21 +14,16 @@ export const DecathlonAuth = z.object({
 });
 export type DecathlonAuth = z.infer<typeof DecathlonAuth>;
 
-export const ActivitySummary = z.object({
-  id: z.string().min(5).max(100),
-  name: z.string().max(100).optional(),
-  sport: z.string().regex(/^\/v2\/sports\/\d+$/),
-  startdate: z.string().refine(isISO8601),
-});
-export type ActivitySummary = z.infer<typeof ActivitySummary>;
-
-// note: couldn't manag to use ActivitySummay.extend and make locations an optional property...
-
+// note: couldn't manage to use ActivitySummary.extend and make locations an optional property...
+// as locations is still optional in full activity (and absent in summary), let's use a single Activity entity
 export const Activity = z.object({
   id: z.string().min(5).max(100),
   name: z.string().max(100).optional(),
   sport: z.string().regex(/^\/v2\/sports\/\d+$/),
   startdate: z.string().refine(isISO8601),
+  duration: z.number().nonnegative().optional(),
+  elevation: z.number().nonnegative().optional(),
+  dataSummaries: z.record(z.string(), z.number()),
   locations: z
     .record(
       z.string(),
@@ -41,6 +36,8 @@ export const Activity = z.object({
     .optional(),
 });
 export type Activity = z.infer<typeof Activity>;
+const ActivitySummary = Activity;
+type ActivitySummary = z.infer<typeof Activity>;
 
 export const WebhookSubscription = z.object({
   id: z.string(),

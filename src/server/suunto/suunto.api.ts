@@ -137,7 +137,9 @@ export const Workout = z.object({
   activityId: z.number().int().positive(), // Activity/workout type id. Activity mapping can be found in the FIT file activity id's document (check Suunto App column).
   description: z.string().max(5000),
   startTime: z.number().int().positive(), // e.g. 1625986322376 unix epoch with milliseconds
-  totalTime: z.number().positive(), // e.g. 6452.1
+  totalTime: z.number().nonnegative(), // e.g. 6452.1
+  totalAscent: z.number().nonnegative(), // meters, float
+  totalDistance: z.number().nonnegative(), // meters, float
   timeOffsetInMinutes: z.number().int(), // Timezone offset in minutes. 0 for UTC.
 });
 export type Workout = z.infer<typeof Workout>;

@@ -2,7 +2,6 @@ import axios from 'axios';
 
 import {
   Activity,
-  ActivitySummary,
   DecathlonApi,
   DecathlonAuth,
   WebhookSubscription,
@@ -90,12 +89,13 @@ describe('Decathlon API', () => {
 
   describe('getActivities', () => {
     it('calls decathlon API', async () => {
-      const activities: ActivitySummary[] = [
+      const activities: Activity[] = [
         {
           id: '12345',
           name: 'Afternoon Run',
           sport: '/v2/sports/381',
           startdate: '2022-01-01T00:00:01Z',
+          dataSummaries: {},
         },
       ];
       jest.mocked(axios).get.mockResolvedValueOnce({ data: activities });
@@ -106,6 +106,7 @@ describe('Decathlon API', () => {
       expect(result).toMatchInlineSnapshot(`
         [
           {
+            "dataSummaries": {},
             "id": "12345",
             "name": "Afternoon Run",
             "sport": "/v2/sports/381",
@@ -127,6 +128,7 @@ describe('Decathlon API', () => {
         name: 'Afternoon Run',
         sport: '/v2/sports/381',
         startdate: '2022-01-01T00:00:01Z',
+        dataSummaries: {},
         locations: {
           '1': { longitude: 1.0, latitude: 1.0, elevation: 1.0 },
         },
@@ -138,6 +140,7 @@ describe('Decathlon API', () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
+          "dataSummaries": {},
           "id": "12345",
           "locations": {
             "1": {

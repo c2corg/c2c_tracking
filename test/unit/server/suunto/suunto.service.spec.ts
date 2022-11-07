@@ -88,6 +88,8 @@ describe('Suunto Service', () => {
             description: 'description',
             startTime: 1,
             totalTime: 1,
+            totalAscent: 1.2,
+            totalDistance: 1.2,
             timeOffsetInMinutes: 0,
           },
         ],
@@ -115,6 +117,9 @@ describe('Suunto Service', () => {
         date: '1970-01-01T00:00:00Z',
         name: 'name',
         type: 'Running',
+        duration: 1,
+        heightDiffUp: 1,
+        length: 1,
       });
       expect(log.warn).toBeCalledTimes(1);
     });
@@ -166,6 +171,8 @@ describe('Suunto Service', () => {
             description: 'description',
             startTime: 1,
             totalTime: 1,
+            totalAscent: 1.2,
+            totalDistance: 1.2,
             timeOffsetInMinutes: 0,
           },
         ],
@@ -195,6 +202,9 @@ describe('Suunto Service', () => {
         date: '1970-01-01T00:00:00Z',
         name: 'name',
         type: 'Running',
+        duration: 1,
+        heightDiffUp: 1,
+        length: 1,
       });
       expect(log.warn).not.toBeCalled();
     });
@@ -371,6 +381,8 @@ describe('Suunto Service', () => {
           workoutName: 'name',
           startTime: 1,
           totalTime: 1,
+          totalAscent: 1,
+          totalDistance: 1,
           timeOffsetInMinutes: 0,
         },
         metadata: {},
@@ -406,6 +418,8 @@ describe('Suunto Service', () => {
           workoutName: 'name',
           startTime: 1,
           totalTime: 1,
+          totalAscent: 1,
+          totalDistance: 1,
           timeOffsetInMinutes: 0,
         },
         metadata: {},

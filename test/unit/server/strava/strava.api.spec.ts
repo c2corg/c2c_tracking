@@ -96,8 +96,9 @@ describe('Strava API', () => {
           name: 'Afternoon Run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
-          start_latlng: [1.0, 1.0],
-          timezone: 'Paris/Europe',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
           map: { summary_polyline: 'abcd' },
         },
       ];
@@ -109,6 +110,8 @@ describe('Strava API', () => {
       expect(result).toMatchInlineSnapshot(`
         [
           {
+            "distance": 1.2,
+            "elapsed_time": 1,
             "id": 123,
             "map": {
               "summary_polyline": "abcd",
@@ -116,11 +119,7 @@ describe('Strava API', () => {
             "name": "Afternoon Run",
             "sport_type": "Run",
             "start_date": "2022-01-01T00:00:01Z",
-            "start_latlng": [
-              1,
-              1,
-            ],
-            "timezone": "Paris/Europe",
+            "total_elevation_gain": 1.2,
           },
         ]
       `);
@@ -138,8 +137,9 @@ describe('Strava API', () => {
         name: 'Afternoon Run',
         sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
-        start_latlng: [1.0, 1.0],
-        timezone: 'Paris/Europe',
+        distance: 1.2,
+        elapsed_time: 1,
+        total_elevation_gain: 1.2,
         map: { summary_polyline: 'abcd' },
       };
       jest.mocked(axios).get.mockResolvedValueOnce({ data: activity });
@@ -149,6 +149,8 @@ describe('Strava API', () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
+          "distance": 1.2,
+          "elapsed_time": 1,
           "id": 123,
           "map": {
             "summary_polyline": "abcd",
@@ -156,11 +158,7 @@ describe('Strava API', () => {
           "name": "Afternoon Run",
           "sport_type": "Run",
           "start_date": "2022-01-01T00:00:01Z",
-          "start_latlng": [
-            1,
-            1,
-          ],
-          "timezone": "Paris/Europe",
+          "total_elevation_gain": 1.2,
         }
       `);
       expect(axios.get).toBeCalledTimes(1);

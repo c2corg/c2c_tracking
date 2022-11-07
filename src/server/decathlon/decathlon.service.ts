@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import type { Vendor } from '../../repository/activity';
+import type { Activity as RepositoryActivity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import type { DecathlonInfo } from '../../repository/user';
@@ -34,19 +34,7 @@ export class DecathlonService {
       if (!activities.length) {
         return;
       }
-      await userService.addActivities(
-        c2cId,
-        ...activities.map((activity) => {
-          const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
-          return {
-            vendor: 'decathlon' as Vendor,
-            vendorId: activity.id.toString(),
-            date: activity.startdate,
-            name: activity.name,
-            type: sport?.translatedNames?.['en'] || 'unknown',
-          };
-        }),
-      );
+      await userService.addActivities(c2cId, ...activities.map((activity) => this.asRepositoryActivity(activity)));
     } catch (error: unknown) {
       // not retrieving past activities should not block the registration process
       log.info(`Unable to retrieve Decathlon activities for user ${c2cId}`);
@@ -156,17 +144,8 @@ export class DecathlonService {
       );
       return;
     }
-    const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
-    const coordinates = this.locationsToGeoJson(activity);
     try {
-      await userService.addActivities(user.c2cId, {
-        vendor: 'decathlon',
-        vendorId: activityId,
-        date: activity.startdate,
-        name: activity.name,
-        type: sport?.translatedNames?.['en'] || 'unknown',
-        geojson: coordinates.length ? { type: 'LineString', coordinates } : undefined,
-      });
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(activity));
       promWebhookCounter.labels({ vendor: 'decathlon', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
@@ -199,6 +178,31 @@ export class DecathlonService {
         return [value.longitude, value.latitude, value.elevation, date];
       })
       .sort(([_lng1, _lat1, _ele1, d1], [_lng2, _lat2, _ele2, d2]) => d1 - d2);
+  }
+
+  private asRepositoryActivity(activity: Activity): Omit<RepositoryActivity, 'id' | 'userId'> {
+    const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
+    const coordinates = this.locationsToGeoJson(activity);
+    let duration = activity.duration;
+    if ((duration === undefined || duration === null) && activity.dataSummaries['24']) {
+      duration = activity.dataSummaries['24'];
+    }
+    let elevation = activity.elevation;
+    if ((elevation == undefined || elevation === null) && activity.dataSummaries['18']) {
+      elevation = activity.dataSummaries['18'];
+    }
+    const length = activity.dataSummaries['5'];
+    return {
+      vendor: 'decathlon' as Vendor,
+      vendorId: activity.id.toString(),
+      date: activity.startdate,
+      name: activity.name,
+      type: sport?.translatedNames?.['en'] || 'unknown',
+      ...(duration && { duration: Math.round(duration) }),
+      ...(elevation && { heightDiffUp: Math.round(elevation) }),
+      ...(length && { length: Math.round(length) }),
+      ...(coordinates.length && { geojson: { type: 'LineString', coordinates } }),
+    };
   }
 }
 

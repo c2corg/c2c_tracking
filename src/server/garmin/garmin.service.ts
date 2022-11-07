@@ -34,7 +34,7 @@ export class GarminService {
     await userService.configureGarmin(c2cId, auth);
     // retrieve activities from last 8 days
     const now = dayjs();
-    const activities: GarminActivity[] = (
+    const activities: Omit<Activity, 'id' | 'userId'>[] = (
       await Promise.allSettled(
         [...Array(8).keys()]
           .map((i) => now.subtract(i, 'day').toDate())
@@ -48,28 +48,14 @@ export class GarminService {
         return result;
       })
       .filter(this.isFullfilled)
-      .flatMap((result) => result.value);
+      .flatMap((result) => result.value)
+      .map((activity) => this.asRepositoryActivity(activity))
+      .filter(({ geojson }) => !!geojson);
     if (!activities.length) {
       return;
     }
     try {
-      await userService.addActivities(
-        c2cId,
-        ...activities
-          .map((activity) => {
-            const geojson = this.toGeoJSON(activity.samples);
-            return {
-              ...{
-                vendor: 'garmin' as Vendor,
-                vendorId: activity.activityId.toString(),
-                date: dayjs.unix(activity.summary.startTimeInSeconds).utc().format(),
-                type: activity.summary.activityType,
-              },
-              ...(geojson && { geojson }),
-            };
-          })
-          .filter(({ geojson }) => !!geojson),
-      );
+      await userService.addActivities(c2cId, ...activities);
     } catch (err: unknown) {
       // failing to retrieve activities should not break the registration process
       log.info(`Unable to retrieve Garmin activities for user ${c2cId}`);
@@ -142,31 +128,22 @@ export class GarminService {
         );
         continue;
       }
+      const repositoryActivity: Omit<Activity, 'id' | 'userId'> = this.asRepositoryActivity(activity);
+      if (!repositoryActivity.geojson) {
+        continue;
+      }
       if (!activityMap.has(user.c2cId)) {
         activityMap.set(user.c2cId, []);
       }
-      const geojson = this.toGeoJSON(activity.samples);
-      if (!geojson) {
-        continue;
-      }
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      activityMap.get(user.c2cId)!.push({
-        ...{
-          vendor: 'garmin',
-          vendorId: activity.activityId.toString(),
-          date: dayjs.unix(activity.summary.startTimeInSeconds).utc().format(),
-          name: '',
-          type: activity.summary.activityType,
-          geojson,
-        },
-      });
+      activityMap.get(user.c2cId)!.push(repositoryActivity);
     }
     for (const [c2cId, activities] of activityMap) {
       if (!activities.length) {
         continue;
       }
       try {
-        await userService.addActivities(c2cId, ...activities.filter(({ geojson }) => !!geojson));
+        await userService.addActivities(c2cId, ...activities);
         promWebhookCounter.labels({ vendor: 'garmin', subject: 'activity', event: 'create' });
       } catch (error: unknown) {
         promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'processing_failed' }).inc(1);
@@ -198,6 +175,22 @@ export class GarminService {
         promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'processing_failed' }).inc(1);
       }
     }
+  }
+
+  private asRepositoryActivity(activity: GarminActivity): Omit<Activity, 'id' | 'userId'> {
+    const geojson = this.toGeoJSON(activity.samples);
+    return {
+      vendor: 'garmin' as Vendor,
+      vendorId: activity.activityId.toString(),
+      date: dayjs.unix(activity.summary.startTimeInSeconds).utc().format(),
+      type: activity.summary.activityType,
+      ...(activity.summary.distanceInMeters && { length: Math.round(activity.summary.distanceInMeters) }),
+      ...(activity.summary.durationInSeconds && { duration: activity.summary.durationInSeconds }),
+      ...(activity.summary.totalElevationGainInMeters && {
+        heightDiffUp: Math.round(activity.summary.totalElevationGainInMeters),
+      }),
+      ...(geojson && { geojson }),
+    };
   }
 }
 

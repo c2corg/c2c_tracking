@@ -40,6 +40,9 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              distanceInMeters: 1.2,
+              durationInSeconds: 1,
+              totalElevationGainInMeters: 1.2,
             },
             samples: [
               {
@@ -47,6 +50,12 @@ describe('Garmin service', () => {
                 longitudeInDegree: 1.0,
                 elevationInMeters: 200,
                 startTimeInSeconds: 1,
+              },
+              {
+                latitudeInDegree: 2.0,
+                longitudeInDegree: 2.0,
+                elevationInMeters: 200,
+                startTimeInSeconds: 2,
               },
             ],
           },
@@ -67,7 +76,16 @@ describe('Garmin service', () => {
         vendorId: '1',
         date: '1970-01-01T00:00:01Z',
         type: 'RUNNING',
-        geojson: { type: 'LineString', coordinates: [[1, 1, 200, 1]] },
+        length: 1,
+        duration: 1,
+        heightDiffUp: 1,
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1, 1, 200, 1],
+            [2, 2, 200, 2],
+          ],
+        },
       });
     });
 
@@ -109,13 +127,12 @@ describe('Garmin service', () => {
           },
         ])
         .mockResolvedValue([]);
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userService, 'addActivities');
 
       const service = new GarminService();
       await service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier');
 
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(userService.addActivities).not.toBeCalled();
     });
 
     it('computes GeoJSON and returns undefined if samples are empty', async () => {
@@ -134,13 +151,12 @@ describe('Garmin service', () => {
           },
         ])
         .mockResolvedValue([]);
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userService, 'addActivities');
 
       const service = new GarminService();
       await service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier');
 
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(userService.addActivities).not.toBeCalled();
     });
 
     it('computes GeoJSON and returns undefined if samples are all filtered out', async () => {
@@ -164,13 +180,12 @@ describe('Garmin service', () => {
           },
         ])
         .mockResolvedValue([]);
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userService, 'addActivities');
 
       const service = new GarminService();
       await service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier');
 
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(userService.addActivities).not.toBeCalled();
     });
 
     it('computes GeoJSON and filters out samples missing coordinates', async () => {
@@ -332,7 +347,7 @@ describe('Garmin service', () => {
   });
 
   describe('handleActivityWebhook', () => {
-    it('adds activities for ach user', async () => {
+    it('adds activities for each user', async () => {
       jest
         .spyOn(userRepository, 'findByGarminToken')
         .mockResolvedValueOnce({ c2cId: 1 })
@@ -376,7 +391,6 @@ describe('Garmin service', () => {
           ],
           type: 'LineString',
         },
-        name: '',
         type: 'RUNNING',
         vendor: 'garmin',
         vendorId: '1',
@@ -390,7 +404,6 @@ describe('Garmin service', () => {
           ],
           type: 'LineString',
         },
-        name: '',
         type: 'BACKCOUNTRY SKIING/SNOWBOARDING',
         vendor: 'garmin',
         vendorId: '2',

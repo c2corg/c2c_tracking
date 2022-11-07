@@ -45,8 +45,9 @@ describe('Strava Service', () => {
           name: 'Morning run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
-          start_latlng: [1.0, 1.0],
-          timezone: 'Europe/Paris',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
           map: { summary_polyline: 'polyline' },
         },
       ]);
@@ -74,6 +75,9 @@ describe('Strava Service', () => {
         name: 'Morning run',
         type: 'Run',
         date: '2022-01-01T00:00:01Z',
+        length: 1,
+        duration: 1,
+        heightDiffUp: 1,
       });
     });
 
@@ -272,8 +276,9 @@ describe('Strava Service', () => {
         name: 'Morning Run',
         sport_type: 'Run',
         start_date: '1970-01-01T00:00:01Z',
-        timezone: 'Europe/Paris',
-        start_latlng: [1.0, 1.0],
+        distance: 1.2,
+        elapsed_time: 1,
+        total_elevation_gain: 1.2,
         map: {
           summary_polyline: 'poyline',
         },
@@ -665,8 +670,9 @@ describe('Strava Service', () => {
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
-          start_latlng: [1.0, 1.0],
-          timezone: 'Europe/Paris',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
           map: {
             summary_polyline: 'polyline',
           },
@@ -694,6 +700,9 @@ describe('Strava Service', () => {
           date: '1970-01-01T00:00:01Z',
           name: 'Morning Run',
           type: 'Run',
+          length: 1,
+          duration: 1,
+          heightDiffUp: 1,
         });
         expect(log.warn).toBeCalledTimes(1);
         expect(log.warn).toBeCalledWith(
@@ -715,8 +724,9 @@ describe('Strava Service', () => {
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
-          start_latlng: [1.0, 1.0],
-          timezone: 'Europe/Paris',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
           map: {
             summary_polyline: 'polyline',
           },
@@ -744,6 +754,9 @@ describe('Strava Service', () => {
           date: '1970-01-01T00:00:01Z',
           name: 'Morning Run',
           type: 'Run',
+          length: 1,
+          duration: 1,
+          heightDiffUp: 1,
         });
         expect(log.warn).not.toBeCalled();
 
@@ -846,8 +859,9 @@ describe('Strava Service', () => {
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
-          start_latlng: [1.0, 1.0],
-          timezone: 'Europe/Paris',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
           map: {
             summary_polyline: 'polyline',
           },
@@ -875,6 +889,9 @@ describe('Strava Service', () => {
           date: '1970-01-01T00:00:01Z',
           name: 'Morning Run',
           type: 'Run',
+          length: 1,
+          duration: 1,
+          heightDiffUp: 1,
         });
         expect(log.warn).toBeCalledTimes(1);
         expect(log.warn).toBeCalledWith(
@@ -896,8 +913,9 @@ describe('Strava Service', () => {
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
-          start_latlng: [1.0, 1.0],
-          timezone: 'Europe/Paris',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
           map: {
             summary_polyline: 'polyline',
           },
@@ -925,6 +943,9 @@ describe('Strava Service', () => {
           date: '1970-01-01T00:00:01Z',
           name: 'Morning Run',
           type: 'Run',
+          length: 1,
+          duration: 1,
+          heightDiffUp: 1,
         });
         expect(log.warn).not.toBeCalled();
 

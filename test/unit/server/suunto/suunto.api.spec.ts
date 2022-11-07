@@ -146,6 +146,8 @@ describe('Suunto API', () => {
               description: 'description',
               startTime: 1,
               totalTime: 1,
+              totalAscent: 1.2,
+              totalDistance: 1.2,
               timeOffsetInMinutes: 0,
             },
           ],
@@ -165,6 +167,8 @@ describe('Suunto API', () => {
               "description": "description",
               "startTime": 1,
               "timeOffsetInMinutes": 0,
+              "totalAscent": 1.2,
+              "totalDistance": 1.2,
               "totalTime": 1,
               "workoutId": 1,
               "workoutKey": "1",
@@ -177,7 +181,7 @@ describe('Suunto API', () => {
     });
   });
 
-  describe('getWorkouDetails', () => {
+  describe('getWorkoutDetails', () => {
     it('throws if request failed', async () => {
       jest.mocked(axios).get.mockRejectedValueOnce(undefined);
 
@@ -211,6 +215,8 @@ describe('Suunto API', () => {
             description: 'description',
             startTime: 1,
             totalTime: 1,
+            totalAscent: 1.2,
+            totalDistance: 1.2,
             timeOffsetInMinutes: 0,
           },
           metadata: {},
@@ -228,6 +234,8 @@ describe('Suunto API', () => {
             "description": "description",
             "startTime": 1,
             "timeOffsetInMinutes": 0,
+            "totalAscent": 1.2,
+            "totalDistance": 1.2,
             "totalTime": 1,
             "workoutId": 1,
             "workoutKey": "1",
