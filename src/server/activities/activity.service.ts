@@ -16,9 +16,9 @@ export class ActivityService {
   public async getActivities(
     userId: number,
     lang?: Lang,
-  ): Promise<(Omit<Activity, 'vendorId' | 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
+  ): Promise<(Omit<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
     const langs: Lang[] = lang ? [lang] : Lang.options;
-    return (await userService.getActivities(userId)).map(({ vendorId, geojson, type, ...keep }) => {
+    return (await userService.getActivities(userId)).map(({ geojson, type, ...keep }) => {
       const translated = langs.reduce(
         (acc, l) => ({
           ...acc,
