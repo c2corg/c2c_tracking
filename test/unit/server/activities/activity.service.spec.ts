@@ -55,6 +55,7 @@ describe('Activity Service', () => {
             },
             "userId": 1,
             "vendor": "strava",
+            "vendorId": "1",
           },
         ]
       `);
@@ -89,6 +90,7 @@ describe('Activity Service', () => {
             },
             "userId": 1,
             "vendor": "strava",
+            "vendorId": "1",
           },
         ]
       `);
@@ -124,6 +126,7 @@ describe('Activity Service', () => {
           },
           "userId": 1,
           "vendor": "strava",
+          "vendorId": "1",
         },
       ]
     `);

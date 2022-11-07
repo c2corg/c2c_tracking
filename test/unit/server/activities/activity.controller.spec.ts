@@ -40,6 +40,7 @@ describe('Activities Controller', () => {
           id: 1,
           userId: 1,
           vendor: 'strava',
+          vendorId: '1',
           date: '2022-01-01T00:00:01Z',
           type: { en: 'Run', fr: 'Course à pied' },
           name: 'name',
@@ -61,6 +62,7 @@ describe('Activities Controller', () => {
             },
             "userId": 1,
             "vendor": "strava",
+            "vendorId": "1",
           },
         ]
       `);
@@ -74,6 +76,7 @@ describe('Activities Controller', () => {
           id: 1,
           userId: 1,
           vendor: 'strava',
+          vendorId: '1',
           date: '2022-01-01T00:00:01Z',
           type: { en: 'Run' },
           name: 'name',
@@ -94,6 +97,7 @@ describe('Activities Controller', () => {
             },
             "userId": 1,
             "vendor": "strava",
+            "vendorId": "1",
           },
         ]
       `);
