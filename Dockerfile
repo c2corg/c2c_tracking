@@ -11,6 +11,8 @@ RUN npm prune --omit=dev
 
 # production stage
 FROM node:18-slim
+ARG version
+ENV npm_package_version=${version}
 ENV NODE_ENV production
 COPY --from=build-stage /usr/bin/dumb-init /usr/bin/dumb-init
 WORKDIR /usr/src/app
