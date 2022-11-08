@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 
 import { NotFoundError } from './errors';
-import log from './helpers/logger';
 import type { Optional } from './helpers/utils';
 import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
@@ -275,7 +274,6 @@ export class UserService {
   }
 
   public async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {
-    log.info(activities);
     const userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
     const newActivitiesKeys = new Set(activities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
