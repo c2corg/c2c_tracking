@@ -31,24 +31,6 @@ export class Database {
     return this.connection;
   }
 
-  public async getTransaction(): Promise<Knex.Transaction> {
-    const connection = await this.getConnection();
-
-    return new Promise<Knex.Transaction>((resolve, reject) => {
-      if (!connection) {
-        reject('No DB connection');
-        return;
-      }
-      try {
-        connection.transaction((trx: Knex.Transaction) => {
-          resolve(trx);
-        });
-      } catch (err) {
-        reject(err);
-      }
-    });
-  }
-
   public async closeDatabase(): Promise<void> {
     if (this.connection) {
       await this.connection.destroy();
