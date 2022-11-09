@@ -209,7 +209,7 @@ describe('Strava API', () => {
       `);
       expect(axios.get).toBeCalledTimes(1);
       expect(axios.get).toBeCalledWith(
-        'https://www.strava.com/api/v3/activities/1/streams?keys=time,latlng,altitude&key_by_type=true',
+        'https://www.strava.com/api/v3/activities/1/streams?keys=time,latlng,altitude&key_by_type=',
         {
           headers: { Authorization: 'Bearer access_token' },
         },
