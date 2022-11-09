@@ -1,17 +1,13 @@
 import Keyv from 'keyv';
 import type { Context } from 'koa';
 
-import config from '../../config';
-
 import type { GarminActivity } from './garmin.api';
 import { garminService as service } from './garmin.service';
 
 class GarminController {
-  private readonly exchangeTokenUrl;
   private readonly keyv;
 
   constructor() {
-    this.exchangeTokenUrl = `${config.get('server.baseUrl')}garmin/exchange-token`;
     this.keyv = new Keyv();
   }
 
@@ -19,9 +15,8 @@ class GarminController {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     const { token, tokenSecret } = await service.requestUnauthorizedRequestToken();
     await this.keyv.set(c2cId.toString(), tokenSecret, 1000 * 60 * 60); // 1 hour TTL
-    ctx.redirect(
-      `https://connect.garmin.com/oauthConfirm?oauth_token=${token}&oauth_callback=${this.exchangeTokenUrl}/${c2cId}`,
-    );
+    ctx.body = { token };
+    ctx.status = 200;
   }
 
   public async exchangeToken(ctx: Context): Promise<void> {

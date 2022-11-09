@@ -30,7 +30,7 @@ describe('Garmin Controller', () => {
       expect(response.status).toBe(403);
     });
 
-    it('stores retrieved token secret in memory with 1 hour TTL and redirects', async () => {
+    it('stores retrieved token secret in memory with 1 hour TTL and returns token', async () => {
       jest
         .spyOn(garminService, 'requestUnauthorizedRequestToken')
         .mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
@@ -38,10 +38,7 @@ describe('Garmin Controller', () => {
       const response = await authenticated(request(app.callback()).get('/garmin/request-token/1'), 1);
 
       expect(await (garminController['keyv'] as Keyv).get('1')).toBe('tokenSecret');
-      expect(response.redirect).toBeTruthy();
-      expect(response.headers['location']).toMatchInlineSnapshot(
-        `"https://connect.garmin.com/oauthConfirm?oauth_token=token&oauth_callback=http://localhost:3000/garmin/exchange-token/1"`,
-      );
+      expect(response.body).toEqual({ token: 'token' });
     });
   });
 
