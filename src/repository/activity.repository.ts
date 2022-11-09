@@ -78,23 +78,26 @@ export class ActivityRepository {
     activitiesToInsert: Omit<Activity, 'id'>[],
     activitiesToDelete: Activity[],
   ): Promise<void> {
-    const trx = await db.getTransaction();
-    if (activitiesToUpdate.length) {
-      activitiesToUpdate.forEach(async (activity) => {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+    await conn.transaction(async (trx) => {
+      for (const activity of activitiesToUpdate) {
         await trx<ActivityRow>(this.#TABLE).update(this.activityToRecord(activity)).where({ id: activity.id });
-      });
-    }
-    if (activitiesToInsert.length) {
-      await trx(this.#TABLE).insert(activitiesToInsert.map(this.activityToRecord));
-    }
-    if (activitiesToDelete.length) {
-      await trx<ActivityRow>(this.#TABLE)
-        .delete()
-        .whereIn(
-          'id',
-          activitiesToDelete.map(({ id }) => id),
-        );
-    }
+      }
+      if (activitiesToInsert.length) {
+        await trx(this.#TABLE).insert(activitiesToInsert.map(this.activityToRecord));
+      }
+      if (activitiesToDelete.length) {
+        await trx<ActivityRow>(this.#TABLE)
+          .delete()
+          .whereIn(
+            'id',
+            activitiesToDelete.map(({ id }) => id),
+          );
+      }
+    });
   }
 
   public async delete(id: number): Promise<void> {
