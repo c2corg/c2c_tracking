@@ -131,11 +131,10 @@ export const Position = z.object({
 export type Position = z.infer<typeof Position>;
 
 export const Workout = z.object({
-  workoutId: z.number().int().positive(),
+  workoutId: z.number().int().nonnegative(),
   workoutKey: z.string().min(1).max(255), // Workout unique id
   workoutName: z.string().min(1).max(255).optional(),
-  activityId: z.number().int().positive(), // Activity/workout type id. Activity mapping can be found in the FIT file activity id's document (check Suunto App column).
-  description: z.string().max(5000),
+  activityId: z.number().int().nonnegative(), // Activity/workout type id. Activity mapping can be found in the FIT file activity id's document (check Suunto App column).
   startTime: z.number().int().positive(), // e.g. 1625986322376 unix epoch with milliseconds
   totalTime: z.number().nonnegative(), // e.g. 6452.1
   totalAscent: z.number().nonnegative(), // meters, float
@@ -228,7 +227,7 @@ export class SuuntoApi {
       });
       return Workouts.parse(response.data);
     } catch (error: unknown) {
-      throw handleExternalApiError('suunto', 'Error on Strava getWorkouts request', error);
+      throw handleExternalApiError('suunto', 'Error on Suunto getWorkouts request', error);
     }
   }
 
@@ -240,7 +239,7 @@ export class SuuntoApi {
       });
       return WorkoutSummary.parse(response.data);
     } catch (error: unknown) {
-      throw handleExternalApiError('suunto', 'Error on Strava getWorkoutDetails request', error);
+      throw handleExternalApiError('suunto', 'Error on Suunto getWorkoutDetails request', error);
     }
   }
 

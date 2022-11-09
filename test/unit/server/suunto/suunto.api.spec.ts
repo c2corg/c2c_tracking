@@ -118,7 +118,7 @@ describe('Suunto API', () => {
       const api = new SuuntoApi();
 
       await expect(api.getWorkouts('token', 'subscription')).rejects.toMatchInlineSnapshot(
-        `[Error: Error on Strava getWorkouts request]`,
+        `[Error: Error on Suunto getWorkouts request]`,
       );
       expect(axios.get).toBeCalledTimes(1);
     });
@@ -129,7 +129,7 @@ describe('Suunto API', () => {
       const api = new SuuntoApi();
 
       await expect(api.getWorkouts('token', 'subscription')).rejects.toMatchInlineSnapshot(
-        `[Error: Error on Strava getWorkouts request]`,
+        `[Error: Error on Suunto getWorkouts request]`,
       );
       expect(axios.get).toBeCalledTimes(1);
     });
@@ -143,7 +143,6 @@ describe('Suunto API', () => {
               workoutKey: '1',
               workoutName: 'name',
               activityId: 1,
-              description: 'description',
               startTime: 1,
               totalTime: 1,
               totalAscent: 1.2,
@@ -164,7 +163,6 @@ describe('Suunto API', () => {
           "payload": [
             {
               "activityId": 1,
-              "description": "description",
               "startTime": 1,
               "timeOffsetInMinutes": 0,
               "totalAscent": 1.2,
@@ -188,7 +186,7 @@ describe('Suunto API', () => {
       const api = new SuuntoApi();
 
       await expect(api.getWorkoutDetails('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
-        `[Error: Error on Strava getWorkoutDetails request]`,
+        `[Error: Error on Suunto getWorkoutDetails request]`,
       );
       expect(axios.get).toBeCalledTimes(1);
     });
@@ -199,7 +197,7 @@ describe('Suunto API', () => {
       const api = new SuuntoApi();
 
       await expect(api.getWorkoutDetails('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
-        `[Error: Error on Strava getWorkoutDetails request]`,
+        `[Error: Error on Suunto getWorkoutDetails request]`,
       );
       expect(axios.get).toBeCalledTimes(1);
     });
@@ -212,7 +210,6 @@ describe('Suunto API', () => {
             workoutKey: '1',
             workoutName: 'name',
             activityId: 1,
-            description: 'description',
             startTime: 1,
             totalTime: 1,
             totalAscent: 1.2,
@@ -231,7 +228,6 @@ describe('Suunto API', () => {
           "metadata": {},
           "payload": {
             "activityId": 1,
-            "description": "description",
             "startTime": 1,
             "timeOffsetInMinutes": 0,
             "totalAscent": 1.2,

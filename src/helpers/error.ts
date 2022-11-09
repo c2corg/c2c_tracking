@@ -15,13 +15,15 @@ export function handleExternalApiError(vendor: Vendor, message: string, error: u
     promApiErrorsCounter
       .labels({ vendor, ...(error.config && { name: error.config?.url }), ...(error.code && { code: error.code }) })
       .inc(1);
-    log.error(error);
+    log.warn(error);
     throw new ExternalApiError(message, error);
   }
   if (error instanceof Error) {
+    log.warn(error);
     throw new AppError(500, message, error);
   }
   if (typeof error === 'string') {
+    log.warn(error);
     throw new AppError(500, message, new Error(error));
   }
   throw new AppError(500, message);
