@@ -255,17 +255,6 @@ describe('Suunto API', () => {
       expect(axios.get).toBeCalledTimes(1);
     });
 
-    it('throws if request response is invalid', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({});
-
-      const api = new SuuntoApi();
-
-      await expect(api.getFIT('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
-        `[Error: Error on Suunto getFIT request]`,
-      );
-      expect(axios.get).toBeCalledTimes(1);
-    });
-
     it('returns FIT', async () => {
       jest.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 

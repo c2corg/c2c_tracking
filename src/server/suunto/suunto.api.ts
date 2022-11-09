@@ -246,11 +246,11 @@ export class SuuntoApi {
   // Id is workout id or key
   public async getFIT(id: string, token: string, subscriptionKey: string): Promise<ArrayBuffer> {
     try {
-      const response = await axios.get(`${this.baseUrl}workout/exportFit/${id}`, {
+      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}workout/exportFit/${id}`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
-      return z.instanceof(ArrayBuffer).parse(response.data);
+      return response.data;
     } catch (error: unknown) {
       throw handleExternalApiError('suunto', 'Error on Suunto getFIT request', error);
     }
