@@ -40,7 +40,7 @@ async function closeGracefully(signal: string, server: Server): Promise<void> {
 
   app.context['shuttingDown'] = true;
 
-  const shutdown = [closeServer(server), db.closeDatabase()];
+  const shutdown = [closeServer(server), db.closeDatabase(), metricsServer.close()];
 
   for (const s of shutdown) {
     try {
