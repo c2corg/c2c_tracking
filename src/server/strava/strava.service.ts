@@ -12,7 +12,7 @@ import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { Activity, StravaAuth, stravaApi, WebhookEvent, Subscription, StreamSet } from './strava.api';
+import { Activity, StravaAuth, stravaApi, WebhookEvent, StreamSet } from './strava.api';
 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 
@@ -126,9 +126,9 @@ export class StravaService {
 
   private async requestWebhookSubscription(): Promise<void> {
     log.info('Requesting new Strava webhook subscription');
-    let subscription: Subscription;
+    let subscriptionId: number;
     try {
-      subscription = await stravaApi.requestSubscriptionCreation(
+      subscriptionId = await stravaApi.requestSubscriptionCreation(
         webhookCallbackUrl,
         this.stravaWebhookSubscriptionVerifyToken,
       );
@@ -137,7 +137,7 @@ export class StravaService {
       return;
     }
     try {
-      await stravaRepository.setSubscription(subscription.id);
+      await stravaRepository.setSubscription(subscriptionId);
     } catch (error: unknown) {
       log.warn(`Strava subscription couldn't be stored in DB`);
     }

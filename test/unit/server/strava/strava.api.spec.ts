@@ -219,27 +219,12 @@ describe('Strava API', () => {
 
   describe('requestSubscriptionCreation', () => {
     it('calls strava API', async () => {
-      const subscription: Subscription = {
-        id: 123,
-        application_id: 1234,
-        callback_url: 'http://redirect.to',
-        created_at: '2022-01-01T00:00:01Z',
-        updated_at: '2022-01-01T00:00:01Z',
-      };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: subscription });
+      jest.mocked(axios).post.mockResolvedValueOnce({ data: { id: 123 } });
 
       const api = new StravaApi();
       const result = await api.requestSubscriptionCreation('http://redirect.to', 'verify_token');
 
-      expect(result).toMatchInlineSnapshot(`
-        {
-          "application_id": 1234,
-          "callback_url": "http://redirect.to",
-          "created_at": "2022-01-01T00:00:01Z",
-          "id": 123,
-          "updated_at": "2022-01-01T00:00:01Z",
-        }
-      `);
+      expect(result).toEqual(123);
       expect(axios.post).toBeCalledTimes(1);
       expect(axios.post).toBeCalledWith(
         'https://www.strava.com/api/v3/push_subscriptions',

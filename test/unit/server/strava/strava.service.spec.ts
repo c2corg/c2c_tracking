@@ -446,13 +446,7 @@ describe('Strava Service', () => {
     });
 
     it('logs if subscription cannot be stored in DB', async () => {
-      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce({
-        id: 1,
-        application_id: 1,
-        created_at: '1970-01-01T00:00:01Z',
-        updated_at: '1970-01-01T00:00:01Z',
-        callback_url: 'http://localhost:3000/strava/webhook',
-      });
+      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce(1);
       jest.spyOn(stravaRepository, 'setSubscription').mockRejectedValueOnce(undefined);
 
       const service = new StravaService();
@@ -466,13 +460,7 @@ describe('Strava Service', () => {
     });
 
     it('creates new subscription', async () => {
-      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce({
-        id: 1,
-        application_id: 1,
-        created_at: '1970-01-01T00:00:01Z',
-        updated_at: '1970-01-01T00:00:01Z',
-        callback_url: 'http://localhost:3000/strava/webhook',
-      });
+      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce(1);
       jest.spyOn(stravaRepository, 'setSubscription').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();

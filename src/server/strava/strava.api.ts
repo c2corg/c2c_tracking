@@ -240,7 +240,7 @@ export class StravaApi {
     }
   }
 
-  public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<Subscription> {
+  public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<number> {
     try {
       const response = await axios.post(
         `${this.baseUrl}push_subscriptions`,
@@ -254,7 +254,7 @@ export class StravaApi {
           headers: { 'Content-Type': 'multipart/form-data' },
         },
       );
-      return Subscription.parse(response.data);
+      return z.object({ id: z.number().int().positive() }).parse(response.data).id;
     } catch (error: unknown) {
       throw handleExternalApiError('strava', 'Error on Strava requestSubscriptionCreation request', error);
     }
