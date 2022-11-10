@@ -485,6 +485,9 @@
   "fitness": {
     "string": "健身"
   },
+  "fitnessequipment": {
+    "string": "Fitness equipment"
+  },
   "fitnessbike,treadmillathome": {
     "string": "家庭健身自行车，跑步机"
   },
@@ -595,9 +598,6 @@
   },
   "gym": {
     "string": "Gym"
-  },
-  "gym&fitnessequipment": {
-    "string": "Gym & Fitness Equipment"
   },
   "gymnastics": {
     "string": "体操"
