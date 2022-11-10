@@ -62,9 +62,6 @@
   "apnea": {
     "string": "Apnea"
   },
-  "apneadiving": {
-    "string": "Apnea"
-  },
   "apneahunt": {
     "string": "Apnea Hunt"
   },
@@ -122,7 +119,7 @@
   "backcountryskiing": {
     "string": "越野滑雪"
   },
-  "backcountryskiingsnowboardingws": {
+  "backcountryskiing/snowboarding": {
     "string": "Backcountry Skiing/Snowboarding"
   },
   "badminton": {
@@ -254,6 +251,9 @@
   "capoeira": {
     "string": "巴西卡波耶拉舞"
   },
+  "cardio": {
+    "string": "Cardio"
+  },
   "cardioboxing": {
     "string": "有氧拳击"
   },
@@ -326,8 +326,11 @@
   "crossbow": {
     "string": "弩"
   },
-  "crosscountryskiingws": {
+  "crosscountryclassicskiing": {
     "string": "Cross Country Classic Skiing"
+  },
+  "crosscountryskateskiing": {
+    "string": "Cross Country Skate Skiing"
   },
   "crosscountryskiing": {
     "string": "Cross Country Skiing"
@@ -416,7 +419,7 @@
   "drivehuntingforbiggame": {
     "string": "大型猎物驱赶式狩猎"
   },
-  "drivinggeneral": {
+  "driving": {
     "string": "Driving"
   },
   "duathlon": {
@@ -569,7 +572,7 @@
   "futsal": {
     "string": "五人制室内足球"
   },
-  "gaugediving": {
+  "gaugedive": {
     "string": "Gauge Dive"
   },
   "gentlegym": {
@@ -590,7 +593,7 @@
   "gravelride": {
     "string": "Gravel ride"
   },
-  "gravelcycling": {
+  "gravel/unpavedcycling": {
     "string": "Gravel/unpaved Cycling"
   },
   "gym": {
@@ -671,7 +674,7 @@
   "hunting": {
     "string": "狩猎"
   },
-  "huntingfishing": {
+  "hunting/fishing": {
     "string": "Hunting/Fishing"
   },
   "huntingwithhounds": {
@@ -697,9 +700,6 @@
   },
   "indoor": {
     "string": "Indoor"
-  },
-  "indoorcardio": {
-    "string": "Indoor cardio"
   },
   "indoorclimbing": {
     "string": "室内攀岩"
@@ -799,9 +799,6 @@
   },
   "landsailing": {
     "string": "沙滩帆车"
-  },
-  "lapswimming": {
-    "string": "Lap swimming"
   },
   "lasergame": {
     "string": "激光游戏"
@@ -920,7 +917,7 @@
   "obstacleracing": {
     "string": "Obstacle Racing"
   },
-  "obstaclerun": {
+  "obstaclerunning": {
     "string": "Obstacle Running"
   },
   "offroadrunning": {
@@ -1037,6 +1034,9 @@
   "pool": {
     "string": "美式桌球"
   },
+  "poolswimming": {
+    "string": "Pool Swimming"
+  },
   "punchbagboxing": {
     "string": "沙袋击打"
   },
@@ -1064,13 +1064,13 @@
   "rampskateboarding": {
     "string": "上坡滑板"
   },
-  "rcdrone": {
+  "rc/drone": {
     "string": "Rc/Drone"
   },
   "rebot": {
     "string": "Rebot室外回力球"
   },
-  "recumbentcycling": {
+  "recumbent cycling": {
     "string": "Recumbent Cycling"
   },
   "relay": {
@@ -1082,7 +1082,7 @@
   "rescue": {
     "string": "搜救赛"
   },
-  "resortskiingsnowboardingws": {
+  "resortskiing/snowboarding": {
     "string": "Resort Skiing/Snowboarding"
   },
   "rhythmicgymnastics(rg)": {
@@ -1099,9 +1099,6 @@
   },
   "rinkhockey": {
     "string": "冰球"
-  },
-  "roadbiking": {
-    "string": "公路自行车"
   },
   "roadcycling": {
     "string": "公路自行车"
@@ -1217,12 +1214,6 @@
   "skating": {
     "string": "Skating"
   },
-  "skatingws": {
-    "string": "Patinage"
-  },
-  "skateskiingws": {
-    "string": "Skating"
-  },
   "skiing": {
     "string": "滑雪"
   },
@@ -1256,19 +1247,16 @@
   "snowmobile": {
     "string": "雪地摩托车"
   },
-  "snowmobilingws": {
+  "snowmobiling": {
     "string": "Snowmobiling"
   },
   "snowscoot": {
     "string": "雪地滑板车"
   },
   "snowshoe": {
-    "string": "雪鞋"
+    "string": "Snowshoe"
   },
   "snowshoeing": {
-    "string": "雪鞋"
-  },
-  "snowshoews": {
     "string": "雪鞋"
   },
   "soccer": {
@@ -1318,9 +1306,6 @@
   },
   "squatenton": {
     "string": "Squatenton网球"
-  },
-  "stairclimbing": {
-    "string": "Stair climbing"
   },
   "stairstepper": {
     "string": "Stair Stepper"
@@ -1472,7 +1457,7 @@
   "ultralighttroutfishing": {
     "string": "超轻鱼杆钓鳟"
   },
-  "ultrarun": {
+  "ultrarunning": {
     "string": "Ultra Running"
   },
   "ultratrailrunning(morethan80km)": {
@@ -1517,6 +1502,9 @@
   "virtualrun": {
     "string": "Virtual Run"
   },
+  "virtualrunning": {
+    "string": "Virtual Running"
+  },
   "volleyball": {
     "string": "排球"
   },
@@ -1534,6 +1522,9 @@
   },
   "walking": {
     "string": "步行"
+  },
+  "walking/indoor walking": {
+    "string": "Walking/indoor Walking"
   },
   "waterfowlhunting": {
     "string": "水域野禽狩猎"
@@ -1577,10 +1568,10 @@
   "whitewaterkayaking": {
     "string": "皮划艇漂流"
   },
-  "whitewaterraftingkayaking": {
+  "whitewaterkayaking/rafting": {
     "string": "Whitewater Kayaking/Rafting"
   },
-  "windkitesurfing": {
+  "wind/kitesurfing": {
     "string": "Wind/Kite Surfing"
   },
   "windsurf": {
