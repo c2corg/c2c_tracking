@@ -17,7 +17,7 @@ export const GarminAuth = z.object({
 });
 export type GarminAuth = z.infer<typeof GarminAuth>;
 
-export const GarminActivityType = z.enum([
+const activityTypes = [
   'RUNNING',
   'INDOOR_RUNNING',
   'OBSTACLE_RUN',
@@ -109,7 +109,14 @@ export const GarminActivityType = z.enum([
   'SKATING_WS',
   'SNOW_SHOE_WS',
   'SNOWMOBILING_WS',
-]);
+];
+export const GarminActivityType = z.preprocess((val) => {
+  const s = String(val).toUpperCase();
+  if (activityTypes.includes(s)) {
+    return s;
+  }
+  return 'UNKNOWN';
+}, z.string());
 export type GarminActivityType = z.infer<typeof GarminActivityType>;
 
 export const GarminActivitySummary = z.object({
