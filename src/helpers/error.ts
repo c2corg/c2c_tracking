@@ -16,6 +16,7 @@ export function handleExternalApiError(vendor: Vendor, message: string, error: u
       .labels({ vendor, ...(error.config && { name: error.config?.url }), ...(error.code && { code: error.code }) })
       .inc(1);
     log.warn(error);
+    log.warn(error.response?.data);
     throw new ExternalApiError(message, error);
   }
   if (error instanceof Error) {
