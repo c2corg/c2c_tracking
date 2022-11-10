@@ -1,3 +1,5 @@
+import type { ServerResponse } from 'http';
+
 import cors from '@koa/cors';
 import Router from '@koa/router';
 import rTracer from 'cls-rtracer';
@@ -83,6 +85,12 @@ app
     logger({
       logger: log,
       level: logLevel,
+      customLogLevel: (res: ServerResponse, error: Error): LevelWithSilent => {
+        if (!error && res.req?.url === '/health') {
+          return 'silent';
+        }
+        return 'info';
+      },
     }),
   )
   .use(passport.initialize())
