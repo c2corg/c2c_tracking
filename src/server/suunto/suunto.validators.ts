@@ -11,6 +11,7 @@ export const exchangeToken: ValidationSchema = {
 };
 
 export const webhook: ValidationSchema = {
+  // Note: application/x-www-form-urlencoded
   body: z.object({
     username: z.string().min(1).max(50),
     workoutid: z.string().min(1).max(50),
