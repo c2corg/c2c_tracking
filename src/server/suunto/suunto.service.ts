@@ -113,7 +113,7 @@ export class SuuntoService {
   }
 
   private isWebhookHeaderValid(authHeader: string | undefined): boolean {
-    return authHeader === `Bearer: ${this.#suuntoWebhookSubscriptionToken}`;
+    return authHeader === `Bearer ${this.#suuntoWebhookSubscriptionToken}`;
   }
 
   public async deauthorize(c2cId: number): Promise<void> {

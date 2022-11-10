@@ -312,7 +312,7 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.handleWebhookEvent(
         { username: 'user', workoutid: '1' },
-        `Bearer: 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
+        `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
       expect(log.warn).toBeCalledTimes(1);
@@ -331,7 +331,7 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.handleWebhookEvent(
         { username: 'user', workoutid: '1' },
-        `Bearer: 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
+        `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
       expect(log.warn).toBeCalledTimes(1);
@@ -353,7 +353,7 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.handleWebhookEvent(
         { username: 'user', workoutid: '1' },
-        `Bearer: 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
+        `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
       expect(log.warn).toBeCalledTimes(1);
@@ -389,7 +389,7 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.handleWebhookEvent(
         { username: 'user', workoutid: '1' },
-        `Bearer: 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
+        `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
       expect(log.warn).toBeCalledTimes(1);
@@ -425,7 +425,7 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.handleWebhookEvent(
         { username: 'user', workoutid: '1' },
-        `Bearer: 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
+        `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
       expect(log.warn).not.toBeCalled();
