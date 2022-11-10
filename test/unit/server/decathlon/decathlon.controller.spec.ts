@@ -124,7 +124,7 @@ describe('Decathlon Controller', () => {
       jest.spyOn(decathlonService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
 
       const event: WebhookEvent = {
-        userId: '1',
+        user_id: '1',
         event: {
           name: 'activity_create',
           ressource_id: 'id',
