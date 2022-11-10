@@ -48,7 +48,7 @@ export const WebhookSubscription = z.object({
 export type WebhookSubscription = z.infer<typeof WebhookSubscription>;
 
 export const WebhookEvent = z.object({
-  userId: z.string().min(1),
+  user_id: z.string().min(1),
   event: z.object({
     name: z.enum(['activity_create', 'activity_delete']),
     ressource_id: z.string(),

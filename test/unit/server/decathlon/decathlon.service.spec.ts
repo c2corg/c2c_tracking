@@ -475,7 +475,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
@@ -492,7 +492,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
@@ -519,7 +519,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
@@ -556,7 +556,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
@@ -602,7 +602,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
@@ -629,7 +629,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_delete', ressource_id: 'activityId', event_time: 1 },
         });
 
@@ -644,7 +644,7 @@ describe('Decathlon Service', () => {
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
-          userId: 'userId',
+          user_id: 'userId',
           event: { name: 'activity_delete', ressource_id: 'activityId', event_time: 1 },
         });
 

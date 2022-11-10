@@ -103,7 +103,7 @@ export class DecathlonService {
   public async handleWebhookEvent(event: WebhookEvent): Promise<void> {
     switch (event.event.name) {
       case 'activity_create':
-        await this.handleActivityCreateEvent(event.userId, event.event.ressource_id);
+        await this.handleActivityCreateEvent(event.user_id, event.event.ressource_id);
         break;
       case 'activity_delete':
         await this.handleActivityDeleteEvent(event.event.ressource_id);
