@@ -197,7 +197,7 @@ export class DecathlonService {
       vendorId: activity.id.toString(),
       date: activity.startdate,
       name: activity.name,
-      type: sport?.translatedNames?.['en'] || 'unknown',
+      type: sport?.translatedNames?.['en'] || 'Unknown',
       ...(duration && { duration: Math.round(duration) }),
       ...(elevation && { heightDiffUp: Math.round(elevation) }),
       ...(length && { length: Math.round(length) }),

@@ -62,6 +62,9 @@
   "apnea": {
     "string": "Apnea"
   },
+  "apneadiving": {
+    "string": "Apnea"
+  },
   "apneahunt": {
     "string": "Apnea Hunt"
   },
@@ -119,7 +122,7 @@
   "backcountryskiing": {
     "string": "Sci escursionismo"
   },
-  "backcountryskiing/snowboarding": {
+  "backcountryskiingsnowboardingws": {
     "string": "Backcountry Skiing/Snowboarding"
   },
   "badminton": {
@@ -251,9 +254,6 @@
   "capoeira": {
     "string": "Capoeira"
   },
-  "cardio": {
-    "string": "Cardio"
-  },
   "cardioboxing": {
     "string": "Cardio Boxing"
   },
@@ -326,11 +326,8 @@
   "crossbow": {
     "string": "Balestra"
   },
-  "crosscountryclassicskiing": {
+  "crosscountryskiingws": {
     "string": "Cross Country Classic Skiing"
-  },
-  "crosscountryskateskiing": {
-    "string": "Cross Country Skate Skiing"
   },
   "crosscountryskiing": {
     "string": "Cross Country Skiing"
@@ -419,7 +416,7 @@
   "drivehuntingforbiggame": {
     "string": "Caccia alla grossa selvaggina in battuta"
   },
-  "driving": {
+  "drivinggeneral": {
     "string": "Driving"
   },
   "duathlon": {
@@ -487,6 +484,9 @@
   },
   "fitness": {
     "string": "Fitness"
+  },
+  "fitnessequipment": {
+    "string": "Fitness equipment"
   },
   "fitnessbike,treadmillathome": {
     "string": "Ciclismo, tapis roulant a domicilio"
@@ -572,7 +572,7 @@
   "futsal": {
     "string": "Futsal"
   },
-  "gaugedive": {
+  "gaugediving": {
     "string": "Gauge Dive"
   },
   "gentlegym": {
@@ -593,14 +593,11 @@
   "gravelride": {
     "string": "Gravel ride"
   },
-  "gravel/unpavedcycling": {
+  "gravelcycling": {
     "string": "Gravel/unpaved Cycling"
   },
   "gym": {
     "string": "Gym"
-  },
-  "gym&fitnessequipment": {
-    "string": "Gym & Fitness Equipment"
   },
   "gymnastics": {
     "string": "Ginnastica"
@@ -674,7 +671,7 @@
   "hunting": {
     "string": "Caccia"
   },
-  "hunting/fishing": {
+  "huntingfishing": {
     "string": "Hunting/Fishing"
   },
   "huntingwithhounds": {
@@ -700,6 +697,9 @@
   },
   "indoor": {
     "string": "Indoor"
+  },
+  "indoorcardio": {
+    "string": "Indoor cardio"
   },
   "indoorclimbing": {
     "string": "Arrampicata indoor"
@@ -799,6 +799,9 @@
   },
   "landsailing": {
     "string": "Land sailing"
+  },
+  "lapswimming": {
+    "string": "Lap swimming"
   },
   "lasergame": {
     "string": "Laser game"
@@ -917,7 +920,7 @@
   "obstacleracing": {
     "string": "Obstacle Racing"
   },
-  "obstaclerunning": {
+  "obstaclerun": {
     "string": "Obstacle Running"
   },
   "offroadrunning": {
@@ -1034,9 +1037,6 @@
   "pool": {
     "string": "Biliardo americano"
   },
-  "poolswimming": {
-    "string": "Pool Swimming"
-  },
   "punchbagboxing": {
     "string": "Colpi al sacco"
   },
@@ -1064,13 +1064,13 @@
   "rampskateboarding": {
     "string": "Skateboard rampa"
   },
-  "rc/drone": {
+  "rcdrone": {
     "string": "Rc/Drone"
   },
   "rebot": {
     "string": "Rebote"
   },
-  "recumbent cycling": {
+  "recumbentcycling": {
     "string": "Recumbent Cycling"
   },
   "relay": {
@@ -1082,7 +1082,7 @@
   "rescue": {
     "string": "Salvataggio"
   },
-  "resortskiing/snowboarding": {
+  "resortskiingsnowboardingws": {
     "string": "Resort Skiing/Snowboarding"
   },
   "rhythmicgymnastics(rg)": {
@@ -1099,6 +1099,9 @@
   },
   "rinkhockey": {
     "string": "Hockey su pista"
+  },
+  "roadbiking": {
+    "string": "Ciclismo su strada"
   },
   "roadcycling": {
     "string": "Ciclismo su strada"
@@ -1214,6 +1217,12 @@
   "skating": {
     "string": "Skating"
   },
+  "skatingws": {
+    "string": "Patinage"
+  },
+  "skateskiingws": {
+    "string": "Skating"
+  },
   "skiing": {
     "string": "Sci"
   },
@@ -1247,16 +1256,19 @@
   "snowmobile": {
     "string": "Moto neve"
   },
-  "snowmobiling": {
+  "snowmobilingws": {
     "string": "Snowmobiling"
   },
   "snowscoot": {
     "string": "Snowscoot"
   },
   "snowshoe": {
-    "string": "Snowshoe"
+    "string": "Racchette da neve"
   },
   "snowshoeing": {
+    "string": "Racchette da neve"
+  },
+  "snowshoews": {
     "string": "Racchette da neve"
   },
   "soccer": {
@@ -1306,6 +1318,9 @@
   },
   "squatenton": {
     "string": "Squatenton"
+  },
+  "stairclimbing": {
+    "string": "Stair climbing"
   },
   "stairstepper": {
     "string": "Stair Stepper"
@@ -1457,7 +1472,7 @@
   "ultralighttroutfishing": {
     "string": "Pesca della trota con attrezzature ultralight"
   },
-  "ultrarunning": {
+  "ultrarun": {
     "string": "Ultra Running"
   },
   "ultratrailrunning(morethan80km)": {
@@ -1502,9 +1517,6 @@
   "virtualrun": {
     "string": "Virtual Run"
   },
-  "virtualrunning": {
-    "string": "Virtual Running"
-  },
   "volleyball": {
     "string": "Pallavolo"
   },
@@ -1522,9 +1534,6 @@
   },
   "walking": {
     "string": "Camminata sportiva"
-  },
-  "walking/indoor walking": {
-    "string": "Walking/indoor Walking"
   },
   "waterfowlhunting": {
     "string": "Caccia agli uccelli acquatici"
@@ -1568,10 +1577,10 @@
   "whitewaterkayaking": {
     "string": "Kayak acque vive"
   },
-  "whitewaterkayaking/rafting": {
+  "whitewaterraftingkayaking": {
     "string": "Whitewater Kayaking/Rafting"
   },
-  "wind/kitesurfing": {
+  "windkitesurfing": {
     "string": "Wind/Kite Surfing"
   },
   "windsurf": {

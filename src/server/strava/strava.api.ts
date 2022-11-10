@@ -22,7 +22,7 @@ export type StravaAuth = z.infer<typeof StravaAuth>;
 export const StravaRefreshAuth = StravaAuth.omit({ athlete: true });
 export type StravaRefreshAuth = z.infer<typeof StravaRefreshAuth>;
 
-export const SportType = z.enum([
+const sportTypes = [
   'AlpineSki',
   'BackcountrySki',
   'Canoeing',
@@ -64,7 +64,14 @@ export const SportType = z.enum([
   'Windsurf',
   'Workout',
   'Yoga',
-]);
+];
+export const SportType = z.preprocess((val) => {
+  const s = String(val);
+  if (sportTypes.includes(s)) {
+    return s;
+  }
+  return 'Unknown';
+}, z.string());
 export type SportType = z.infer<typeof SportType>;
 
 export const PolylineMap = z.object({

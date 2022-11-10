@@ -140,7 +140,7 @@ export class SuuntoService {
       vendor: 'suunto' as Vendor,
       vendorId: workout.workoutKey,
       date: dayjs(workout.startTime).utc().format(),
-      type: workoutTypes[workout.activityId] || 'Unkown',
+      type: workoutTypes[workout.activityId] || 'Unknown',
       length: Math.round(workout.totalDistance),
       duration: Math.round(workout.totalTime),
       heightDiffUp: Math.round(workout.totalAscent),
