@@ -139,7 +139,7 @@ export class SuuntoService {
     return {
       vendor: 'suunto' as Vendor,
       vendorId: workout.workoutKey,
-      date: dayjs(workout.startTime).utc().format(),
+      date: dayjs(workout.startTime).utcOffset(workout.timeOffsetInMinutes).format(),
       type: workoutTypes[workout.activityId] || 'Unknown',
       length: Math.round(workout.totalDistance),
       duration: Math.round(workout.totalTime),

@@ -1,5 +1,6 @@
 import { toGeoJSON } from '@mapbox/polyline';
 import dayjs from 'dayjs';
+import dayjsPluginUTC from 'dayjs/plugin/utc';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
@@ -13,6 +14,8 @@ import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
 import { Activity, StravaAuth, stravaApi, WebhookEvent, StreamSet } from './strava.api';
+
+dayjs.extend(dayjsPluginUTC);
 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 
@@ -41,7 +44,7 @@ export class StravaService {
       if (!activities.length) {
         return;
       }
-      await userService.addActivities(c2cId, ...activities.map(this.asRepositoryActivity));
+      await userService.addActivities(c2cId, ...activities.map((activity) => this.asRepositoryActivity(activity)));
     } catch (error: unknown) {
       // failing to retrieve activities should not break the registration process
       log.info(`Unable to retrieve Strava activities for user ${c2cId}`);
@@ -305,13 +308,19 @@ export class StravaService {
     return {
       vendor: 'strava' as Vendor,
       vendorId: activity.id.toString(),
-      date: activity.start_date,
+      date: this.localDate(activity),
       name: activity.name,
       type: activity.sport_type,
       length: Math.round(activity.distance), // float in Strava API, integer in DB
       heightDiffUp: Math.round(activity.total_elevation_gain), // float in Strava API, integer in DB
       duration: activity.elapsed_time,
     };
+  }
+
+  private localDate(activity: Activity): string {
+    const startDate = dayjs(activity.start_date);
+    const startDateLocal = dayjs(activity.start_date_local);
+    return startDate.utcOffset(startDateLocal.diff(startDate, 'hours')).format();
   }
 }
 
