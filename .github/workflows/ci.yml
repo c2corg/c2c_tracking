@@ -62,17 +62,6 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/psql/lcov.info
-      - name: Retrieve version from package.json
-        id: package_json_version
-        if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
-        run: |
-          content=`cat package.json`
-          # the following lines are only required for multi line json
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          # end of optional handling for multi line json
-          echo "::set-output name=packageJson::$content"
       - name: Docker meta
         id: docker_meta
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
@@ -80,6 +69,11 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: ${{ github.repository }}
+          # specify docker tags list so that git tags have precedence over branch
+          # first tag will be used as version
+          tags: |
+            type=ref,event=tag,priority=610
+            type=ref,event=branch,priority=600
       - name: Login to DockerHub
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
         uses: docker/login-action@v2
@@ -93,7 +87,7 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
-          build-args: version=${{ fromJson(steps.package_json_version.outputs.packageJson).version }}
+          build-args: version=${{ fromJSON(steps.docker_meta.outputs.json).labels['org.opencontainers.image.version'] }}
 
   create-release:
     needs: build
