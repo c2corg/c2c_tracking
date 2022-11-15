@@ -89,7 +89,7 @@ describe('Suunto Service', () => {
             totalTime: 1,
             totalAscent: 1.2,
             totalDistance: 1.2,
-            timeOffsetInMinutes: 0,
+            timeOffsetInMinutes: 60,
           },
         ],
         metadata: {},
@@ -113,7 +113,7 @@ describe('Suunto Service', () => {
       expect(userService.addActivities).toBeCalledWith(1, {
         vendor: 'suunto',
         vendorId: '1',
-        date: '1970-01-01T00:00:00Z',
+        date: '1970-01-01T01:00:00+01:00',
         name: 'name',
         type: 'Running',
         duration: 1,

@@ -85,6 +85,7 @@ export const Activity = z.object({
   name: z.string(),
   sport_type: SportType,
   start_date: z.string().refine(isISO8601),
+  start_date_local: z.string().refine(isISO8601),
   distance: z.number().nonnegative(), // in meters
   elapsed_time: z.number().int().nonnegative(), // in seconds
   total_elevation_gain: z.number().nonnegative(), // in meters

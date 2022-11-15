@@ -40,6 +40,7 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              startTimeOffsetInSeconds: -3600,
               distanceInMeters: 1.2,
               durationInSeconds: 1,
               totalElevationGainInMeters: 1.2,
@@ -74,7 +75,7 @@ describe('Garmin service', () => {
       expect(userService.addActivities).toBeCalledWith(1, {
         vendor: 'garmin',
         vendorId: '1',
-        date: '1970-01-01T00:00:01Z',
+        date: '1969-12-31T23:00:01-01:00',
         type: 'RUNNING',
         length: 1,
         duration: 1,
@@ -123,6 +124,7 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              startTimeOffsetInSeconds: 0,
             },
           },
         ])
@@ -146,6 +148,7 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              startTimeOffsetInSeconds: 0,
             },
             samples: [],
           },
@@ -170,6 +173,7 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              startTimeOffsetInSeconds: 0,
             },
             samples: [
               {
@@ -199,6 +203,7 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              startTimeOffsetInSeconds: 0,
             },
             samples: [
               {
@@ -247,6 +252,7 @@ describe('Garmin service', () => {
             summary: {
               activityType: 'RUNNING',
               startTimeInSeconds: 1,
+              startTimeOffsetInSeconds: 0,
             },
             samples: [
               {
@@ -360,7 +366,7 @@ describe('Garmin service', () => {
           userId: '1',
           userAccessToken: 'user1Token',
           activityId: 1,
-          summary: { activityType: 'RUNNING', startTimeInSeconds: 1 },
+          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
           samples: [
             { latitudeInDegree: 1.0, longitudeInDegree: 1.0, startTimeInSeconds: 1 },
             { latitudeInDegree: 2.0, longitudeInDegree: 2.0, startTimeInSeconds: 2 },
@@ -370,7 +376,11 @@ describe('Garmin service', () => {
           userId: '2',
           userAccessToken: 'user2Token',
           activityId: 2,
-          summary: { activityType: 'BACKCOUNTRY SKIING/SNOWBOARDING', startTimeInSeconds: 1 },
+          summary: {
+            activityType: 'BACKCOUNTRY SKIING/SNOWBOARDING',
+            startTimeInSeconds: 1,
+            startTimeOffsetInSeconds: 0,
+          },
           samples: [
             { latitudeInDegree: 1.0, longitudeInDegree: 1.0, startTimeInSeconds: 1 },
             { latitudeInDegree: 2.0, longitudeInDegree: 2.0, startTimeInSeconds: 2 },
@@ -420,7 +430,7 @@ describe('Garmin service', () => {
           userId: '1',
           userAccessToken: 'user1Token',
           activityId: 1,
-          summary: { activityType: 'RUNNING', startTimeInSeconds: 1 },
+          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
         },
       ]);
 
@@ -439,7 +449,7 @@ describe('Garmin service', () => {
           userId: '1',
           userAccessToken: 'user1TokenNotMatchingInDb',
           activityId: 1,
-          summary: { activityType: 'RUNNING', startTimeInSeconds: 1 },
+          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
         },
       ]);
 
@@ -460,7 +470,7 @@ describe('Garmin service', () => {
           userId: '1',
           userAccessToken: 'user1TokenNotMatchingInDb',
           activityId: 1,
-          summary: { activityType: 'RUNNING', startTimeInSeconds: 1 },
+          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
           samples: [
             { latitudeInDegree: 1.0, longitudeInDegree: 1.0, startTimeInSeconds: 1 },
             { latitudeInDegree: 2.0, longitudeInDegree: 2.0, startTimeInSeconds: 2 },

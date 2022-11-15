@@ -182,7 +182,10 @@ export class GarminService {
     return {
       vendor: 'garmin' as Vendor,
       vendorId: activity.activityId.toString(),
-      date: dayjs.unix(activity.summary.startTimeInSeconds).utc().format(),
+      date: dayjs
+        .unix(activity.summary.startTimeInSeconds)
+        .utcOffset(activity.summary.startTimeOffsetInSeconds / 60)
+        .format(),
       type: activity.summary.activityType,
       ...(activity.summary.distanceInMeters && { length: Math.round(activity.summary.distanceInMeters) }),
       ...(activity.summary.durationInSeconds && { duration: activity.summary.durationInSeconds }),

@@ -96,6 +96,7 @@ describe('Strava API', () => {
           name: 'Afternoon Run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
+          start_date_local: '2022-01-01T01:00:01Z',
           distance: 1.2,
           elapsed_time: 1,
           total_elevation_gain: 1.2,
@@ -119,6 +120,7 @@ describe('Strava API', () => {
             "name": "Afternoon Run",
             "sport_type": "Run",
             "start_date": "2022-01-01T00:00:01Z",
+            "start_date_local": "2022-01-01T01:00:01Z",
             "total_elevation_gain": 1.2,
           },
         ]
@@ -137,6 +139,7 @@ describe('Strava API', () => {
         name: 'Afternoon Run',
         sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
+        start_date_local: '2022-01-01T00:00:01Z',
         distance: 1.2,
         elapsed_time: 1,
         total_elevation_gain: 1.2,
@@ -158,6 +161,7 @@ describe('Strava API', () => {
           "name": "Afternoon Run",
           "sport_type": "Run",
           "start_date": "2022-01-01T00:00:01Z",
+          "start_date_local": "2022-01-01T00:00:01Z",
           "total_elevation_gain": 1.2,
         }
       `);
