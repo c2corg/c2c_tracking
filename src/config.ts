@@ -153,7 +153,7 @@ const config = convict({
       subscriptionPath: {
         doc: 'Path (appended to base URL) for subscription URL',
         format: String,
-        default: 'external-services',
+        default: 'trackers',
       },
     },
   },
@@ -211,7 +211,7 @@ const config = convict({
       redirectPath: {
         doc: 'Path (appended to c2c.frontend.baseUrl) to define URL to redirect to',
         format: String,
-        default: 'external-services/suunto/exchange-token',
+        default: 'trackers/suunto/exchange-token',
         env: 'SUUNTO_REDIRECT_URI',
       },
     },
