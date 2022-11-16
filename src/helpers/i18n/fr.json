@@ -408,7 +408,7 @@
     "string": "VTT de descente"
   },
   "downhillskiing": {
-    "string": "Downhill Skiing"
+    "string": "Ski alpin"
   },
   "dressage": {
     "string": "Dressage équestre"
@@ -729,7 +729,7 @@
     "string": "Roller"
   },
   "itinerantcamping": {
-    "string": "Camp itinérant"
+    "string": "Camping itinérant"
   },
   "javelin": {
     "string": "Lancer de javelot"
@@ -789,7 +789,7 @@
     "string": "Kitesurf"
   },
   "kitesurfingkiting": {
-    "string": "Kitesurfing Kiting"
+    "string": "Kitesurf"
   },
   "kungfu": {
     "string": "Kung fu"
@@ -855,7 +855,7 @@
     "string": "Courses mixtes"
   },
   "mmamixedmartialarts": {
-    "string": "MMA: mixed martial arts"
+    "string": "MMA"
   },
   "modernjazzdance": {
     "string": "Danse moderne/jazz"
@@ -1101,13 +1101,13 @@
     "string": "Rink hockey"
   },
   "roadbiking": {
-    "string": "Vélo sur route"
+    "string": "Vélo"
   },
   "roadcycling": {
-    "string": "Vélo sur route"
+    "string": "Vélo"
   },
   "roadrunning": {
-    "string": "Course à pied sur route"
+    "string": "Course à pied"
   },
   "rockclimbing": {
     "string": "Escalade"
@@ -1332,7 +1332,7 @@
     "string": "Stand up paddle"
   },
   "stationarysmallgamehunting": {
-    "string": "Chasse du petit gibier sédentaire"
+    "string": "Chasse au petit gibier sédentaire"
   },
   "steeplechase": {
     "string": "Steeple"
@@ -1362,7 +1362,7 @@
     "string": "Stretching"
   },
   "summerrollerskiing": {
-    "string": "Ski roller été"
+    "string": "Ski roue"
   },
   "surfing": {
     "string": "Surf"
@@ -1440,7 +1440,7 @@
     "string": "Tapis de course"
   },
   "trekking": {
-    "string": "Trekking"
+    "string": "Randonnée"
   },
   "trekkingriding": {
     "string": "Trek équestre"
