@@ -1,3 +1,4 @@
+import config from '../config';
 import { database as db } from '../db';
 import { IOError, NotFoundError } from '../errors';
 
@@ -19,7 +20,7 @@ type ActivityRow = {
 };
 
 export class ActivityRepository {
-  readonly #TABLE = 'activities';
+  readonly #TABLE = config.get('db.schema') + '.activities';
 
   public async findByUser(userId: number): Promise<Activity[]> {
     try {

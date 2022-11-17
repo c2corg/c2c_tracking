@@ -1,3 +1,4 @@
+import config from '../config';
 import { database as db } from '../db';
 import { IOError } from '../errors';
 
@@ -6,7 +7,7 @@ type StravaRow = {
   subscription_id: number;
 };
 export class StravaRepository {
-  readonly #TABLE = 'strava';
+  readonly #TABLE = config.get('db.schema') + '.strava';
 
   public async findSubscription(): Promise<number | undefined> {
     try {

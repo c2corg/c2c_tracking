@@ -124,6 +124,12 @@ const config = convict({
       env: 'DB_PASSWORD',
       sensitive: true,
     },
+    schema: {
+      doc: 'Database schema',
+      format: 'notEmptyString',
+      default: 'public',
+      env: 'DB_SCHEMA',
+    },
     crypto: {
       doc: 'Secret key for encoding and decoding tokens',
       format: 'notEmptyString',
@@ -254,7 +260,6 @@ const config = convict({
     },
   },
 });
-
 config.validate({ allowed: 'strict' });
 
 export default config;

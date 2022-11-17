@@ -1,7 +1,9 @@
 import type { Knex } from 'knex';
 
+const schema = process.env['DB_SCHEMA'] || 'public';
+
 export function up(db: Knex): Knex.SchemaBuilder {
-  return db.schema.alterTable('users', (table) => {
+  return db.schema.withSchema(schema).alterTable('users', (table) => {
     table.string('decathlon_id');
     table.string('decathlon_access_token', 4096);
     table.timestamp('decathlon_expires_at');
@@ -11,7 +13,7 @@ export function up(db: Knex): Knex.SchemaBuilder {
 }
 
 export function down(db: Knex): Knex.SchemaBuilder {
-  return db.schema.alterTable('users', (table) => {
+  return db.schema.withSchema(schema).alterTable('users', (table) => {
     table.dropColumns(
       'decathlon_id',
       'decathlon_access_token',
