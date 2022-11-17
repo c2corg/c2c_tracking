@@ -50,7 +50,7 @@ export class Database {
   }
 
   private async createConnection(): Promise<Knex> {
-    const config: Knex.Config = {
+    const dbConfig: Knex.Config = {
       client: 'pg',
       connection: {
         host: this.config.host,
@@ -62,10 +62,11 @@ export class Database {
       debug: this.config.debug,
       migrations: {
         tableName: 'migrations',
+        schemaName: config.get('db.schema'),
       },
     };
 
-    const db = knex(config);
+    const db = knex(dbConfig);
 
     // Test database connectivity
     await db.raw('select 1');

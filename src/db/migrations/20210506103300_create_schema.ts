@@ -1,7 +1,10 @@
 import type { Knex } from 'knex';
 
+const schema = process.env['DB_SCHEMA'] || 'public';
+
 export function up(db: Knex): Knex.SchemaBuilder {
   return db.schema
+    .withSchema(schema)
     .createTable('users', (table) => {
       table.integer('c2c_id').primary();
       table.integer('strava_id').unique();
@@ -15,7 +18,13 @@ export function up(db: Knex): Knex.SchemaBuilder {
     })
     .createTable('activities', (table) => {
       table.increments('id').primary();
-      table.integer('user_id').notNullable().unsigned().references('c2c_id').inTable('users').onDelete('CASCADE');
+      table
+        .integer('user_id')
+        .notNullable()
+        .unsigned()
+        .references('c2c_id')
+        .inTable(`${schema}.users`)
+        .onDelete('CASCADE');
       table.string('vendor').notNullable();
       table.string('vendor_id').notNullable();
       table.string('name');
@@ -29,5 +38,5 @@ export function up(db: Knex): Knex.SchemaBuilder {
 }
 
 export function down(db: Knex): Knex.SchemaBuilder {
-  return db.schema.dropTable('users').dropTable('activities').dropTable('strava');
+  return db.schema.withSchema(schema).dropTable('users').dropTable('activities').dropTable('strava');
 }

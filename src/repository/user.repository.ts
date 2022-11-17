@@ -28,7 +28,7 @@ type UserRow = {
 };
 
 export class UserRepository {
-  readonly #TABLE = 'users';
+  readonly #TABLE = config.get('db.schema') + '.users';
   readonly #cryptoSecret = config.get('db.crypto');
 
   public async findById(c2cId: number): Promise<User | undefined> {
