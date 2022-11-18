@@ -1,10 +1,9 @@
-import aes from 'crypto-js/aes';
-import encUtf8 from 'crypto-js/enc-utf8';
 import dayjs from 'dayjs';
 
 import config from '../config';
 import { database as db } from '../db';
 import { IOError } from '../errors';
+import { decrypt, encrypt } from '../helpers/utils';
 
 import type { User } from './user';
 
@@ -25,11 +24,12 @@ type UserRow = {
   decathlon_expires_at: Date | undefined | null;
   decathlon_refresh_token: string | undefined | null;
   decathlon_webhook_id: string | undefined | null;
+  polar_id: number | undefined | null;
+  polar_token: string | undefined | null;
 };
 
 export class UserRepository {
   readonly #TABLE = config.get('db.schema') + '.users';
-  readonly #cryptoSecret = config.get('db.crypto');
 
   public async findById(c2cId: number): Promise<User | undefined> {
     try {
@@ -113,6 +113,22 @@ export class UserRepository {
     }
   }
 
+  public async findByPolarId(polarId: number): Promise<User | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      const row = await conn(this.#TABLE).where({ polar_id: polarId }).first();
+      if (!row) {
+        return undefined;
+      }
+      return this.rowToUser(row);
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   public async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
@@ -140,9 +156,9 @@ export class UserRepository {
         row.strava_refresh_token && {
           strava: {
             id: row.strava_id,
-            accessToken: this.decrypt(row.strava_access_token),
+            accessToken: decrypt(row.strava_access_token),
             expiresAt: dayjs(row.strava_expires_at).unix(),
-            refreshToken: this.decrypt(row.strava_refresh_token),
+            refreshToken: decrypt(row.strava_refresh_token),
           },
         }),
       ...(row.suunto_username &&
@@ -151,16 +167,16 @@ export class UserRepository {
         row.suunto_refresh_token && {
           suunto: {
             username: row.suunto_username,
-            accessToken: this.decrypt(row.suunto_access_token),
+            accessToken: decrypt(row.suunto_access_token),
             expiresAt: dayjs(row.suunto_expires_at).unix(),
-            refreshToken: this.decrypt(row.suunto_refresh_token),
+            refreshToken: decrypt(row.suunto_refresh_token),
           },
         }),
       ...(row.garmin_token &&
         row.garmin_token_secret && {
           garmin: {
             token: row.garmin_token,
-            tokenSecret: this.decrypt(row.garmin_token_secret),
+            tokenSecret: decrypt(row.garmin_token_secret),
           },
         }),
       ...(row.decathlon_id &&
@@ -170,10 +186,17 @@ export class UserRepository {
         row.decathlon_webhook_id && {
           decathlon: {
             id: row.decathlon_id,
-            accessToken: this.decrypt(row.decathlon_access_token),
+            accessToken: decrypt(row.decathlon_access_token),
             expiresAt: dayjs(row.decathlon_expires_at).unix(),
-            refreshToken: this.decrypt(row.decathlon_refresh_token),
+            refreshToken: decrypt(row.decathlon_refresh_token),
             webhookId: row.decathlon_webhook_id,
+          },
+        }),
+      ...(row.polar_id &&
+        row.polar_token && {
+          polar: {
+            id: row.polar_id,
+            token: decrypt(row.polar_token),
           },
         }),
     };
@@ -185,9 +208,9 @@ export class UserRepository {
       | undefined = user.strava
       ? {
           strava_id: user.strava.id,
-          strava_access_token: user.strava.accessToken ? this.encrypt(user.strava.accessToken) : null,
+          strava_access_token: user.strava.accessToken ? encrypt(user.strava.accessToken) : null,
           strava_expires_at: user.strava.expiresAt ? dayjs.unix(user.strava.expiresAt).toDate() : null,
-          strava_refresh_token: user.strava.refreshToken ? this.encrypt(user.strava.refreshToken) : null,
+          strava_refresh_token: user.strava.refreshToken ? encrypt(user.strava.refreshToken) : null,
         }
       : {
           strava_id: null,
@@ -200,9 +223,9 @@ export class UserRepository {
       | undefined = user.suunto
       ? {
           suunto_username: user.suunto.username,
-          suunto_access_token: user.suunto.accessToken ? this.encrypt(user.suunto.accessToken) : null,
+          suunto_access_token: user.suunto.accessToken ? encrypt(user.suunto.accessToken) : null,
           suunto_expires_at: user.suunto.expiresAt ? dayjs.unix(user.suunto.expiresAt).toDate() : null,
-          suunto_refresh_token: user.suunto.refreshToken ? this.encrypt(user.suunto.refreshToken) : null,
+          suunto_refresh_token: user.suunto.refreshToken ? encrypt(user.suunto.refreshToken) : null,
         }
       : {
           suunto_username: null,
@@ -213,7 +236,7 @@ export class UserRepository {
     const garmin: Pick<UserRow, 'garmin_token' | 'garmin_token_secret'> | undefined = user.garmin
       ? {
           garmin_token: user.garmin.token,
-          garmin_token_secret: this.encrypt(user.garmin.tokenSecret),
+          garmin_token_secret: encrypt(user.garmin.tokenSecret),
         }
       : {
           garmin_token: null,
@@ -231,9 +254,9 @@ export class UserRepository {
       | undefined = user.decathlon
       ? {
           decathlon_id: user.decathlon.id,
-          decathlon_access_token: user.decathlon.accessToken ? this.encrypt(user.decathlon.accessToken) : null,
+          decathlon_access_token: user.decathlon.accessToken ? encrypt(user.decathlon.accessToken) : null,
           decathlon_expires_at: user.decathlon.expiresAt ? dayjs.unix(user.decathlon.expiresAt).toDate() : null,
-          decathlon_refresh_token: user.decathlon.refreshToken ? this.encrypt(user.decathlon.refreshToken) : null,
+          decathlon_refresh_token: user.decathlon.refreshToken ? encrypt(user.decathlon.refreshToken) : null,
           decathlon_webhook_id: user.decathlon.webhookId,
         }
       : {
@@ -243,21 +266,23 @@ export class UserRepository {
           decathlon_refresh_token: null,
           decathlon_webhook_id: null,
         };
+    const polar: Pick<UserRow, 'polar_id' | 'polar_token'> | undefined = user.polar
+      ? {
+          polar_id: user.polar.id,
+          polar_token: user.polar.token ? encrypt(user.polar.token) : null,
+        }
+      : {
+          polar_id: null,
+          polar_token: null,
+        };
     return {
       c2c_id: user.c2cId,
       ...(strava && { ...strava }),
       ...(suunto && { ...suunto }),
       ...(garmin && { ...garmin }),
       ...(decathlon && { ...decathlon }),
+      ...(polar && { ...polar }),
     };
-  }
-
-  private encrypt(token: string): string {
-    return aes.encrypt(token, this.#cryptoSecret).toString();
-  }
-
-  private decrypt(token: string): string {
-    return aes.decrypt(token, this.#cryptoSecret).toString(encUtf8);
   }
 }
 

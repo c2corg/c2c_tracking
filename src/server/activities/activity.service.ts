@@ -1,8 +1,8 @@
-import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
 import dayjs from 'dayjs';
 
 import { AppError, ExternalApiError, NotFoundError } from '../../errors';
 import { Lang, translations } from '../../helpers/i18n';
+import { fitToGeoJSON } from '../../helpers/utils';
 import type { Activity } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -82,14 +82,9 @@ export class ActivityService {
         } catch (error: unknown) {
           throw new NotFoundError('Unable to retrieve geometry', error instanceof Error ? error : undefined);
         }
-        let geojson: LineString | undefined;
-        try {
-          geojson = this.fitToGeoJSON(fit);
-        } catch (error: unknown) {
-          throw new NotFoundError(
-            'Unable to convert Suunto FIT file to geometry',
-            error instanceof Error ? error : undefined,
-          );
+        const geojson: LineString | undefined = fitToGeoJSON(fit);
+        if (!geojson) {
+          throw new NotFoundError('Unable to convert Suunto FIT file to geometry');
         }
         this.saveGeometry(activity, geojson);
         return geojson;
@@ -115,15 +110,10 @@ export class ActivityService {
       case 'garmin':
         // should contain data in db and be returned above
         throw new AppError(500, `Unable to acquire Garmin geometry`);
+      case 'polar':
+        // should contain data in db and be returned above
+        throw new AppError(500, `Unable to acquire Polar geometry`);
     }
-  }
-
-  private fitToGeoJSON(fit: ArrayBuffer): LineString {
-    const coordinates = extractGeometry(new Uint8Array(fit));
-    if (!coordinates.length) {
-      throw new NotFoundError('Available data cannot be converted to a valid geometry');
-    }
-    return { coordinates, type: 'LineString' };
   }
 
   private stravaStreamSetToGeoJSON(activity: Activity, stream: StreamSet): LineString {

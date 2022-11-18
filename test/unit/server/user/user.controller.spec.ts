@@ -30,6 +30,7 @@ describe('User Controller', () => {
         garmin: 'not-configured',
         strava: 'token-lost',
         suunto: 'configured',
+        polar: 'configured',
       });
 
       const response = await authenticated(request(app.callback()).get('/users/1/status'), 1);
@@ -39,6 +40,7 @@ describe('User Controller', () => {
         {
           "decathlon": "configured",
           "garmin": "not-configured",
+          "polar": "configured",
           "strava": "token-lost",
           "suunto": "configured",
         }

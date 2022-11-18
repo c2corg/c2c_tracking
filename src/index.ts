@@ -9,6 +9,7 @@ import config from './config';
 import { database as db } from './db';
 import log from './helpers/logger';
 import { metricsServer } from './metrics';
+import { polarService } from './server/polar/polar.service';
 import { stravaService } from './server/strava/strava.service';
 
 async function closeServer(server: Server): Promise<void> {
@@ -80,6 +81,7 @@ export async function start(): Promise<void> {
     const server = app.listen(port, () => {
       log.info(`Server is running on port ${port}`);
       stravaService.setupWebhook();
+      polarService.setupWebhook();
     });
 
     // Export metrics for prometheus

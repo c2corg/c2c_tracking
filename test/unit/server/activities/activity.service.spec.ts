@@ -1,7 +1,6 @@
-import * as fitParser from '@c2corg/fit-parser-extract-geometry';
-
 import { NotFoundError } from '../../../../src/errors';
 import log from '../../../../src/helpers/logger';
+import * as utils from '../../../../src/helpers/utils';
 import type { Activity } from '../../../../src/repository/activity';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { ActivityService } from '../../../../src/server/activities/activity.service';
@@ -10,7 +9,7 @@ import { stravaService } from '../../../../src/server/strava/strava.service';
 import { suuntoService } from '../../../../src/server/suunto/suunto.service';
 import { userService } from '../../../../src/user.service';
 
-jest.mock('@c2corg/fit-parser-extract-geometry');
+jest.mock('../../../../src/helpers/utils');
 
 describe('Activity Service', () => {
   beforeEach(() => {
@@ -97,41 +96,41 @@ describe('Activity Service', () => {
       expect(userService.getActivities).toBeCalledTimes(1);
       expect(userService.getActivities).toBeCalledWith(1);
     });
-  });
 
-  it('defaults to unknown if i18n key is not found', async () => {
-    jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
-      {
-        id: 1,
-        userId: 1,
-        vendor: 'strava',
-        vendorId: '1',
-        date: '2022-01-01T00:00:01Z',
-        type: 'whut?',
-        name: 'name',
-      },
-    ]);
-
-    const service = new ActivityService();
-    const response = await service.getActivities(1, 'fr');
-
-    expect(response).toMatchInlineSnapshot(`
-      [
+    it('defaults to unknown if i18n key is not found', async () => {
+      jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
         {
-          "date": "2022-01-01T00:00:01Z",
-          "id": 1,
-          "name": "name",
-          "type": {
-            "fr": "Inconnu",
-          },
-          "userId": 1,
-          "vendor": "strava",
-          "vendorId": "1",
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'whut?',
+          name: 'name',
         },
-      ]
-    `);
-    expect(userService.getActivities).toBeCalledTimes(1);
-    expect(userService.getActivities).toBeCalledWith(1);
+      ]);
+
+      const service = new ActivityService();
+      const response = await service.getActivities(1, 'fr');
+
+      expect(response).toMatchInlineSnapshot(`
+        [
+          {
+            "date": "2022-01-01T00:00:01Z",
+            "id": 1,
+            "name": "name",
+            "type": {
+              "fr": "Inconnu",
+            },
+            "userId": 1,
+            "vendor": "strava",
+            "vendorId": "1",
+          },
+        ]
+      `);
+      expect(userService.getActivities).toBeCalledTimes(1);
+      expect(userService.getActivities).toBeCalledWith(1);
+    });
   });
 
   describe('getActivityGeometry', () => {
@@ -273,8 +272,8 @@ describe('Activity Service', () => {
       jest.spyOn(stravaService, 'getToken');
       jest.spyOn(suuntoService, 'getToken').mockResolvedValueOnce('token');
       jest.spyOn(suuntoService, 'getFIT').mockResolvedValue(fitBin);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const fitToGeoJSONMock = jest.spyOn(ActivityService.prototype as any, 'fitToGeoJSON').mockReturnValueOnce({
+
+      jest.mocked(utils).fitToGeoJSON.mockReturnValueOnce({
         type: 'LineString',
         coordinates: [[0.0, 0.0, 220]],
       });
@@ -300,10 +299,6 @@ describe('Activity Service', () => {
       expect(suuntoService.getToken).toBeCalledWith(1);
       expect(suuntoService.getToken).toBeCalledTimes(1);
       expect(suuntoService.getToken).toBeCalledWith(1);
-      expect(fitToGeoJSONMock).toBeCalledTimes(1);
-      expect(fitToGeoJSONMock).toBeCalledWith(fitBin);
-
-      fitToGeoJSONMock.mockRestore();
     });
 
     it('throws if no token can be retrieved', async () => {
@@ -358,12 +353,7 @@ describe('Activity Service', () => {
       jest.spyOn(stravaService, 'getToken');
       jest.spyOn(suuntoService, 'getToken').mockResolvedValueOnce('token');
       jest.spyOn(suuntoService, 'getFIT').mockResolvedValue(fitBin);
-      const fitToGeoJSONMock = jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(ActivityService.prototype as any, 'fitToGeoJSON')
-        .mockImplementationOnce(() => {
-          throw new Error();
-        });
+      jest.mocked(utils).fitToGeoJSON.mockReturnValueOnce(undefined);
       jest.spyOn(userService, 'getActivity').mockResolvedValueOnce({
         id: 1,
         userId: 1,
@@ -381,9 +371,6 @@ describe('Activity Service', () => {
       expect(suuntoService.getToken).toBeCalledWith(1);
       expect(suuntoService.getToken).toBeCalledTimes(1);
       expect(suuntoService.getToken).toBeCalledWith(1);
-      expect(fitToGeoJSONMock).toHaveBeenCalledTimes(1);
-
-      fitToGeoJSONMock.mockRestore();
     });
 
     it('retrieves geojson from decathlon', async () => {
@@ -484,6 +471,27 @@ describe('Activity Service', () => {
       expect(suuntoService.getToken).not.toHaveBeenCalled();
     });
 
+    it('throws if geojson is not present for polar activity', async () => {
+      jest.spyOn(stravaService, 'getToken');
+      jest.spyOn(suuntoService, 'getToken');
+      jest.spyOn(userService, 'getActivity').mockResolvedValueOnce({
+        id: 1,
+        userId: 1,
+        vendor: 'polar',
+        vendorId: '1234',
+        type: 'RUN',
+        date: '2022-01-01T00:00:01Z',
+      });
+
+      const service = new ActivityService();
+      await expect(service.getActivityGeometry(1, 1)).rejects.toMatchInlineSnapshot(
+        '[Error: Unable to acquire Polar geometry]',
+      );
+
+      expect(stravaService.getToken).not.toHaveBeenCalled();
+      expect(suuntoService.getToken).not.toHaveBeenCalled();
+    });
+
     it('does not fail if geojson cannot be saved in db', async () => {
       const activity: Activity = {
         id: 1,
@@ -509,38 +517,6 @@ describe('Activity Service', () => {
         coordinates: [[0.0, 0.0, 220]],
       });
       expect(activityRepository.update).toBeCalledTimes(1);
-    });
-  });
-
-  describe('suuntoFitToGeoJSON', () => {
-    it('throws if FIT activity has no records', async () => {
-      jest.mocked(fitParser).extractGeometry.mockReturnValueOnce([]);
-      const service = new ActivityService();
-      expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).fitToGeoJSON(new ArrayBuffer(0));
-      }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
-    });
-
-    it('retrieves geometry from FIT', () => {
-      const service = new ActivityService();
-      jest.mocked(fitParser).extractGeometry.mockReturnValueOnce([[1, 2, 3, 4]]);
-      expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (service as any).fitToGeoJSON(new ArrayBuffer(0)),
-      ).toMatchInlineSnapshot(`
-        {
-          "coordinates": [
-            [
-              1,
-              2,
-              3,
-              4,
-            ],
-          ],
-          "type": "LineString",
-        }
-      `);
     });
   });
 

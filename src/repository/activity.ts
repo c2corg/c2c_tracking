@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { LineString } from './geojson';
 
-export const Vendor = z.enum(['strava', 'suunto', 'garmin', 'decathlon']);
+export const Vendor = z.enum(['strava', 'suunto', 'garmin', 'decathlon', 'polar']);
 export type Vendor = z.infer<typeof Vendor>;
 
 export const Activity = z.object({
@@ -11,7 +11,9 @@ export const Activity = z.object({
   userId: z.number().int().positive(),
   vendor: Vendor,
   vendorId: z.string().min(1),
-  date: z.string().refine(isISO8601),
+  date: z.string().refine(isISO8601, {
+    message: 'String must be an ISO-8601 date',
+  }),
   name: z.string().min(1).optional(),
   type: z.string().min(1),
   length: z.number().nonnegative().optional(),

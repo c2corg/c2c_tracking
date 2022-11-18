@@ -3,8 +3,8 @@ import Router from '@koa/router';
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
 import { validate } from '../validator';
 
-import { controller } from './decathlon.controller';
-import { exchangeToken, webhook } from './decathlon.validators';
+import { controller } from './polar.controller';
+import { exchangeToken, webhook } from './polar.validators';
 
 const router = new Router();
 

@@ -17,7 +17,7 @@ describe('Strava API', () => {
   });
 
   describe('exchangeToken', () => {
-    it('call strava API', async () => {
+    it('calls strava API', async () => {
       const auth: StravaAuth = {
         athlete: { id: 1 },
         access_token: 'access_token',
