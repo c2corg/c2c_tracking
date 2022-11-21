@@ -22,8 +22,13 @@ export class ActivityService {
       const translated = langs.reduce(
         (acc, l) => ({
           ...acc,
-          // eslint-disable-next-line security/detect-object-injection
-          [l]: translations[l][this.i18nKey(type)]?.string ?? translations[l]['unknown']?.string ?? 'Unknown',
+          [l]:
+            // eslint-disable-next-line security/detect-object-injection
+            translations[l][this.i18nKey(type)]?.string ??
+            translations['en'][this.i18nKey(type)]?.string ??
+            // eslint-disable-next-line security/detect-object-injection
+            translations[l]['unknown']?.string ??
+            'Unknown',
         }),
         {},
       );
@@ -35,7 +40,7 @@ export class ActivityService {
   }
 
   private i18nKey(key: string): string {
-    return key.replaceAll(/[:_\- ]/g, '').toLowerCase();
+    return key.replaceAll(/[:_\-, ]/g, '').toLowerCase();
   }
 
   public async getActivityGeometry(userId: number, activityId: number): Promise<LineString | undefined> {
