@@ -141,9 +141,9 @@ export class SuuntoService {
       vendorId: workout.workoutKey,
       date: dayjs(workout.startTime).utcOffset(workout.timeOffsetInMinutes).format(),
       type: workoutTypes[workout.activityId] || 'Unknown',
-      length: Math.round(workout.totalDistance),
-      duration: Math.round(workout.totalTime),
-      heightDiffUp: Math.round(workout.totalAscent),
+      ...(workout.totalDistance && { length: Math.round(workout.totalDistance) }),
+      ...(workout.totalTime && { duration: Math.round(workout.totalTime) }),
+      ...(workout.totalAscent && { heightDiffUp: Math.round(workout.totalAscent) }),
       ...(workout.workoutName && { name: workout.workoutName }),
     };
   }
