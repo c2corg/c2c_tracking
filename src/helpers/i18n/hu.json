@@ -95,6 +95,9 @@
   "aquathlon": {
     "string": "Aquathlon"
   },
+  "aquatics": {
+    "string": "Aquafitness"
+  },
   "archery": {
     "string": "Íjászat"
   },
@@ -131,11 +134,17 @@
   "ballet": {
     "string": "Klasszikus tánc"
   },
+  "balletdancing": {
+    "string": "Klasszikus tánc"
+  },
   "ballgames": {
     "string": "Ball Games"
   },
   "ballroomdance": {
     "string": "Szalontánc"
+  },
+  "ballroomdancing": {
+    "string": "Ballroom"
   },
   "baroquedance": {
     "string": "Barokk tánc"
@@ -157,6 +166,12 @@
   },
   "beachvolley": {
     "string": "Strandröplabda"
+  },
+  "beachvolleyball": {
+    "string": "Strandröplabda"
+  },
+  "biathlon": {
+    "string": "Biathlon"
   },
   "bicycle": {
     "string": "Kerékpározás"
@@ -200,6 +215,9 @@
   "bobsleigh": {
     "string": "Bobsleigh"
   },
+  "bodyandmind": {
+    "string": "Body & Mind"
+  },
   "bodyboarding": {
     "string": "Bodyboard"
   },
@@ -208,6 +226,9 @@
   },
   "bolognesefishing": {
     "string": "Bolognai horgászat"
+  },
+  "bootcamp": {
+    "string": "Bootcamp"
   },
   "bouldering": {
     "string": "Bouldering"
@@ -302,6 +323,9 @@
   "contemporarydance": {
     "string": "Kortárs tánc"
   },
+  "core": {
+    "string": "Core"
+  },
   "countryactivities": {
     "string": "Természeti tevékenységek"
   },
@@ -326,6 +350,9 @@
   "crossbow": {
     "string": "Számszeríj"
   },
+  "crosscountryrunning": {
+    "string": "Cross-country running"
+  },
   "crosscountryskiingws": {
     "string": "Cross Country Classic Skiing"
   },
@@ -339,7 +366,7 @@
     "string": "elliptikus kerékpár"
   },
   "crosstraining": {
-    "string": "Cross training"
+    "string": "elliptikus kerékpár"
   },
   "curling": {
     "string": "Curling"
@@ -422,8 +449,17 @@
   "duathlon": {
     "string": "Duatlon"
   },
+  "duathloncycling": {
+    "string": "Cycling"
+  },
+  "duathlonrunning": {
+    "string": "Futás"
+  },
   "esport": {
     "string": "E-Sport"
+  },
+  "ebike": {
+    "string": "E-Bike Ride"
   },
   "ebikeride": {
     "string": "E-Bike Ride"
@@ -476,6 +512,9 @@
   "figureskating": {
     "string": "Műkorcsolya"
   },
+  "finnishbaseball": {
+    "string": "Finnish baseball"
+  },
   "fishing": {
     "string": "Halászat"
   },
@@ -493,6 +532,15 @@
   },
   "fitnessclass": {
     "string": "Fitness Class"
+  },
+  "fitnessdancing": {
+    "string": "Fitness dancing"
+  },
+  "fitnessmartialarts": {
+    "string": "Fitness martial arts"
+  },
+  "fitnessstep": {
+    "string": "Step workout"
   },
   "fives": {
     "string": "Puszta kézzel "
@@ -529,6 +577,9 @@
   },
   "freediving": {
     "string": "Szabadtüdőzés"
+  },
+  "freemultisport": {
+    "string": "Multisport"
   },
   "freerideskiing": {
     "string": "Ski free ride"
@@ -569,6 +620,9 @@
   "fullcontact": {
     "string": "Full contact"
   },
+  "functionaltraining": {
+    "string": "Functional training"
+  },
   "futsal": {
     "string": "Futsal"
   },
@@ -596,8 +650,14 @@
   "gravelcycling": {
     "string": "Gravel/unpaved Cycling"
   },
+  "groupexercise": {
+    "string": "Group exercise"
+  },
   "gym": {
     "string": "Gym"
+  },
+  "gymnastick": {
+    "string": "Torna"
   },
   "gymnastics": {
     "string": "Torna"
@@ -634,6 +694,9 @@
   },
   "highjump": {
     "string": "Magasugrás"
+  },
+  "hiit": {
+    "string": "High-intensity interval training"
   },
   "hike": {
     "string": "Hike"
@@ -734,6 +797,9 @@
   "javelin": {
     "string": "Gerelyhajítás"
   },
+  "jazzdancing": {
+    "string": "Jazz"
+  },
   "jetski": {
     "string": "Jet-ski"
   },
@@ -746,10 +812,16 @@
   "jocari": {
     "string": "Jocari"
   },
+  "jogging": {
+    "string": "Jogging"
+  },
   "jokogarbi": {
     "string": "Joko-garbi"
   },
   "judo": {
+    "string": "Dzsúdó"
+  },
+  "judomartialarts": {
     "string": "Dzsúdó"
   },
   "jumpingrope": {
@@ -778,6 +850,9 @@
   },
   "kickboxing": {
     "string": "Kick boxing"
+  },
+  "kickboxingmartialarts": {
+    "string": "Kickboxing"
   },
   "kitebuggy": {
     "string": "Sand kite"
@@ -809,8 +884,59 @@
   "latindance": {
     "string": "Latin tánc"
   },
-  "legs,bumsandtumstraining": {
+  "latindancing": {
+    "string": "Latin"
+  },
+  "legsbumsandtumstraining": {
     "string": "Derék has fenék "
+  },
+  "lesmillsbarre": {
+    "string": "LES MILLS BARRE"
+  },
+  "lesmillsbodyattack": {
+    "string": "LES MILLS BODYATTACK"
+  },
+  "lesmillsbodybalance": {
+    "string": "LES MILLS BODYBALANCE"
+  },
+  "lesmillsbodycombat": {
+    "string": "LES MILLS BODYCOMBAT"
+  },
+  "lesmillsbodyjam": {
+    "string": "LES MILLS BODYJAM"
+  },
+  "lesmillsbodypump": {
+    "string": "LES MILLS BODYPUMP"
+  },
+  "lesmillsbodystep": {
+    "string": "LES MILLS BODYSTEP"
+  },
+  "lesmillscxworks": {
+    "string": "LES MILLS CXWORX"
+  },
+  "lesmillsgritathletic": {
+    "string": "LES MILLS GRIT Athletic"
+  },
+  "lesmillsgritcardio": {
+    "string": "LES MILLS GRIT Cardio"
+  },
+  "lesmillsgritstrength": {
+    "string": "LES MILLS GRIT Strength"
+  },
+  "lesmillsrpm": {
+    "string": "LES MILLS RPM"
+  },
+  "lesmillsshbam": {
+    "string": "LES MILLS SH'BAM"
+  },
+  "lesmillssprint": {
+    "string": "LES MILLS SPRINT"
+  },
+  "lesmillstone": {
+    "string": "LES MILLS TONE"
+  },
+  "lesmillstrip": {
+    "string": "LES MILLS TRIP"
   },
   "lia": {
     "string": "LIA"
@@ -857,6 +983,15 @@
   "mmamixedmartialarts": {
     "string": "MMA: vegyes harcművészet"
   },
+  "mobilitydynamic": {
+    "string": "Mobility (dynamic)"
+  },
+  "mobilitystatic": {
+    "string": "Mobility (static)"
+  },
+  "moderndancing": {
+    "string": "Modern"
+  },
   "modernjazzdance": {
     "string": "Modern tánc/jazz"
   },
@@ -871,6 +1006,24 @@
   },
   "motorcycling": {
     "string": "Motor"
+  },
+  "motorsportscarracing": {
+    "string": "Car racing"
+  },
+  "motorsportsenduro": {
+    "string": "Enduro"
+  },
+  "motorsportshardenduro": {
+    "string": "Hard Enduro"
+  },
+  "motorsportsmotocross": {
+    "string": "Moto cross"
+  },
+  "motorsportsroadracing": {
+    "string": "Road racing"
+  },
+  "motorsportssnocross": {
+    "string": "Snocross"
   },
   "mototsports": {
     "string": "Mototsports"
@@ -923,6 +1076,27 @@
   "obstaclerun": {
     "string": "Obstacle Running"
   },
+  "offroadduathlon": {
+    "string": "Off-road duathlon"
+  },
+  "offroadduathloncycling": {
+    "string": "Mountain biking"
+  },
+  "offroadduathlonrunning": {
+    "string": "Trail running"
+  },
+  "offroadtriathlon": {
+    "string": "Off-road triathlon"
+  },
+  "offroadtriathloncycling": {
+    "string": "Mountain biking"
+  },
+  "offroadtriathlonrunning": {
+    "string": "Trail running"
+  },
+  "offroadtriathlonswimming": {
+    "string": "Open water swimming"
+  },
   "offroadrunning": {
     "string": "Terepfutás"
   },
@@ -950,8 +1124,20 @@
   "orienteering": {
     "string": "Orienteering"
   },
+  "orienteeringmtb": {
+    "string": "Mountain bike orienteering"
+  },
+  "orienteeringski": {
+    "string": "Ski orienteering"
+  },
   "other": {
     "string": "Other"
+  },
+  "otherindoor": {
+    "string": "Other indoor"
+  },
+  "otheroutdoor": {
+    "string": "Other outdoor"
   },
   "other1": {
     "string": "Other1"
@@ -991,6 +1177,9 @@
   },
   "paramotor": {
     "string": "Paramotor "
+  },
+  "parasportswheelchair": {
+    "string": "Kerekesszékes futás"
   },
   "parking": {
     "string": "Parkoló"
@@ -1036,6 +1225,9 @@
   },
   "pool": {
     "string": "Amerikai billiárd"
+  },
+  "poolswimming": {
+    "string": "Úszás"
   },
   "punchbagboxing": {
     "string": "Zsákolás"
@@ -1091,6 +1283,9 @@
   "ride": {
     "string": "Ride"
   },
+  "riding": {
+    "string": "Riding"
+  },
   "rifleshooting": {
     "string": "Lövészet"
   },
@@ -1112,6 +1307,9 @@
   "rockclimbing": {
     "string": "Sziklafutás"
   },
+  "rollerblading": {
+    "string": "Roller skating"
+  },
   "rollerhockey": {
     "string": "Görhoki"
   },
@@ -1123,6 +1321,12 @@
   },
   "rollerskiing": {
     "string": "Roller Skiing"
+  },
+  "rollerskiingclassic": {
+    "string": "Classic roller skiing"
+  },
+  "rollerskiingfreestyle": {
+    "string": "Freestyle roller skiing"
   },
   "rowing": {
     "string": "Evezés"
@@ -1202,6 +1406,9 @@
   "shotput": {
     "string": "Súlydobás"
   },
+  "showdancing": {
+    "string": "Show"
+  },
   "showjumping": {
     "string": "Akadályugratás "
   },
@@ -1268,6 +1475,9 @@
   "snowshoeing": {
     "string": "Hótalp"
   },
+  "snowshoetrekking": {
+    "string": "Snowshoe trekking"
+  },
   "snowshoews": {
     "string": "Hótalp"
   },
@@ -1303,6 +1513,9 @@
   },
   "speedwalking": {
     "string": "Speed Walking"
+  },
+  "spinning": {
+    "string": "Spinning"
   },
   "sportsandrhythmicgymnastics(srg)": {
     "string": "Ritmikus és sportgimnasztika (GRS) "
@@ -1349,6 +1562,9 @@
   "streetbasketball": {
     "string": "utcai kosárlabda"
   },
+  "streetdancing": {
+    "string": "Street"
+  },
   "streetrunning": {
     "string": "Street Running"
   },
@@ -1363,6 +1579,9 @@
   },
   "summerrollerskiing": {
     "string": "Nyári görsíelés"
+  },
+  "sup": {
+    "string": "SUP"
   },
   "surfing": {
     "string": "Szörf"
@@ -1394,6 +1613,9 @@
   "taekwondo": {
     "string": "Taekwondo"
   },
+  "taekwondomartialarts": {
+    "string": "Taekwondo"
+  },
   "taichichuan": {
     "string": "Tai chi"
   },
@@ -1417,6 +1639,9 @@
   },
   "trackrunning": {
     "string": "Futás "
+  },
+  "trackandfieldrunning": {
+    "string": "Track & field running"
   },
   "trail": {
     "string": "Túra"
@@ -1454,6 +1679,15 @@
   "triathlon": {
     "string": "Triatlon"
   },
+  "triathloncycling": {
+    "string": "Cycling"
+  },
+  "triathlonrunning": {
+    "string": "Futás"
+  },
+  "triathlonswimming": {
+    "string": "Open water swimming"
+  },
   "tricycledisabledsports": {
     "string": "Mozgássérült háromkerekű "
   },
@@ -1462,6 +1696,9 @@
   },
   "trolling": {
     "string": "Trolling "
+  },
+  "trotting": {
+    "string": "Trotting"
   },
   "tumbling": {
     "string": "Bukfenc"
@@ -1474,6 +1711,9 @@
   },
   "ultrarun": {
     "string": "Ultra Running"
+  },
+  "ultrarunningrunning": {
+    "string": "Ultra running"
   },
   "ultratrailrunning(morethan80km)": {
     "string": "Ultra trail (+80 km)"
@@ -1505,6 +1745,12 @@
   "verticalfishing": {
     "string": "Tartós horgászat "
   },
+  "verticalsportswallclimbing": {
+    "string": "Terem sziklamászás"
+  },
+  "verticalsportsoutclimbing": {
+    "string": "Sziklamászás"
+  },
   "viaferrata": {
     "string": "Via ferrata"
   },
@@ -1535,6 +1781,9 @@
   "walking": {
     "string": "Gyaloglás"
   },
+  "waterexercise": {
+    "string": "Water sports"
+  },
   "waterfowlhunting": {
     "string": "Vízivad vadászat "
   },
@@ -1543,6 +1792,9 @@
   },
   "waterrescuework": {
     "string": "Vízi munka "
+  },
+  "waterrunning": {
+    "string": "Water running"
   },
   "waterskiing": {
     "string": "Vízisí"
@@ -1555,6 +1807,30 @@
   },
   "watersports": {
     "string": "Water Sports"
+  },
+  "watersportscanoeing": {
+    "string": "Canoeing"
+  },
+  "watersportskayaking": {
+    "string": "Kayaking"
+  },
+  "watersportskitesurfing": {
+    "string": "Kitesurfing"
+  },
+  "watersportssailing": {
+    "string": "Vitorlázás"
+  },
+  "watersportssurfing": {
+    "string": "Szörf"
+  },
+  "watersportswakeboarding": {
+    "string": "Wakeboarding"
+  },
+  "watersportswaterski": {
+    "string": "Vízisí"
+  },
+  "watersportswindsurfing": {
+    "string": "Windsurfing"
   },
   "weightlifting": {
     "string": "Súlyemelés"
@@ -1603,6 +1879,12 @@
   },
   "xare": {
     "string": "A xare "
+  },
+  "xcskiingclassic": {
+    "string": "Classic XC skiing"
+  },
+  "xcskiingfreestyle": {
+    "string": "Freestyle XC skiing"
   },
   "yachting": {
     "string": "Lakható vitorlás"
