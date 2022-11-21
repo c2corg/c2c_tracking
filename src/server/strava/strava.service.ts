@@ -311,9 +311,9 @@ export class StravaService {
       date: this.localDate(activity),
       name: activity.name,
       type: activity.sport_type,
-      length: Math.round(activity.distance), // float in Strava API, integer in DB
-      heightDiffUp: Math.round(activity.total_elevation_gain), // float in Strava API, integer in DB
       duration: activity.elapsed_time,
+      ...(activity.distance && { length: Math.round(activity.distance) }), // float in Strava API, integer in DB
+      ...(activity.total_elevation_gain && { heightDiffUp: Math.round(activity.total_elevation_gain) }), // float in Strava API, integer in DB
     };
   }
 
