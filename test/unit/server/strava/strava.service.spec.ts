@@ -5,7 +5,7 @@ import { activityRepository } from '../../../../src/repository/activity.reposito
 import { stravaRepository } from '../../../../src/repository/strava.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
 import { stravaApi } from '../../../../src/server/strava/strava.api';
-import { stravaService, StravaService } from '../../../../src/server/strava/strava.service';
+import { StravaService } from '../../../../src/server/strava/strava.service';
 import { userService } from '../../../../src/user.service';
 
 jest.mock('@mapbox/polyline');
@@ -606,7 +606,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(log.warn).toBeCalledTimes(1);
         expect(log.warn).toBeCalledWith(
           `Strava activity creation webhook event for user 1 couldn't be processed: unable to acquire valid token`,
@@ -636,7 +636,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledWith('access_token', '1');
         expect(log.warn).toBeCalledTimes(1);
@@ -681,7 +681,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledWith('access_token', '1');
         expect(userService.addActivities).toBeCalledTimes(1);
@@ -736,7 +736,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledWith('access_token', '1');
         expect(userService.addActivities).toBeCalledTimes(1);
@@ -797,7 +797,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(log.warn).toBeCalledTimes(1);
         expect(log.warn).toBeCalledWith(
           `Strava activity update webhook event for user 1 couldn't be processed: unable to acquire valid token`,
@@ -827,7 +827,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledWith('access_token', '1');
         expect(log.warn).toBeCalledTimes(1);
@@ -872,7 +872,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledWith('access_token', '1');
         expect(userService.updateActivity).toBeCalledTimes(1);
@@ -927,7 +927,7 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(stravaService.getToken).toBeCalledTimes(1);
+        expect(service.getToken).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledTimes(1);
         expect(stravaApi.getActivity).toBeCalledWith('access_token', '1');
         expect(userService.updateActivity).toBeCalledTimes(1);
