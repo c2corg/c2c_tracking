@@ -9,3 +9,4 @@ process.env['SUUNTO_WEBHOOK_SUBSCRIPTION_TOKEN'] = '2fbbd34d-4dc3-44fc-8a47-9ba1
 process.env['GARMIN_CONSUMER_SECRET'] = 'secret';
 process.env['DECATHLON_CLIENT_SECRET'] = 'c2VjcmV0';
 process.env['DECATHLON_API_KEY'] = '9ccc19db-faaa-49ab-b1e1-8ab30cc7761d';
+process.env['POLAR_CLIENT_SECRET'] = '902d20cc-c2a8-4536-89a9-41e0f7626977';

@@ -194,7 +194,7 @@ export class GarminApi {
       const timestamp = dayjs().unix();
       const nonce = randomBytes(16).toString('hex');
       const signature = encodeURIComponent(
-        this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
+        this.generateexchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
       );
       const authorization = `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${
         this.#consumerKey
@@ -213,7 +213,7 @@ export class GarminApi {
     }
   }
 
-  private generateExchangeTokenSignature(
+  private generateexchangeTokenSignature(
     timestamp: number,
     nonce: string,
     token: string,

@@ -4,7 +4,7 @@ import type { WebhookEvent } from './suunto.api';
 import { suuntoService as service } from './suunto.service';
 
 class SuuntoController {
-  public async exchangeTokens(ctx: Context): Promise<void> {
+  public async exchangeToken(ctx: Context): Promise<void> {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     if (ctx.query['error']) {
       ctx.log.info(`User ${c2cId} denied Suunto authorization`);
@@ -22,7 +22,7 @@ class SuuntoController {
   }
 
   public async webhook(ctx: Context): Promise<void> {
-    const event = <WebhookEvent>(ctx.request.body as unknown);
+    const event = <WebhookEvent>ctx.request.body;
     const auth = ctx.request.header.authorization;
     service.handleWebhookEvent(event, auth); // async handling
     ctx.status = 200; // acknowledge event

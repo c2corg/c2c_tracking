@@ -13,7 +13,7 @@ router.get(
   ensureAuthenticated,
   ensureUserFromParamsMatchesAuthUser,
   validate(exchangeToken),
-  controller.exchangeTokens.bind(controller),
+  controller.exchangeToken.bind(controller),
 );
 router.post(
   '/deauthorize/:userId',

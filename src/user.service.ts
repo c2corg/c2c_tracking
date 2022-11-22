@@ -8,6 +8,7 @@ import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './
 import { userRepository } from './repository/user.repository';
 import type { DecathlonAuth } from './server/decathlon/decathlon.api';
 import type { GarminAuth } from './server/garmin/garmin.api';
+import type { PolarAuth } from './server/polar/polar.api';
 import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api';
 import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api';
 
@@ -33,12 +34,13 @@ const isActivityToUpdate = (
 
 export class UserService {
   public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: Status }> {
-    const { strava, suunto, garmin, decathlon } = (await userRepository.findById(c2cId)) || {};
+    const { strava, suunto, garmin, decathlon, polar } = (await userRepository.findById(c2cId)) || {};
     return {
       strava: !!strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
       suunto: !!suunto ? (suunto.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
       garmin: !!garmin ? 'configured' : 'not-configured',
       decathlon: !!decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+      polar: !!polar ? 'configured' : 'not-configured',
     };
   }
 
@@ -271,6 +273,29 @@ export class UserService {
   public async getDecathlonInfo(c2cId: number): Promise<DecathlonInfo | undefined> {
     const user = await userRepository.findById(c2cId);
     return user?.decathlon;
+  }
+
+  public async configurePolar(c2cId: number, auth: PolarAuth): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (user) {
+      user = {
+        ...user,
+        polar: {
+          id: auth.x_user_id,
+          token: auth.access_token,
+        },
+      };
+      await userRepository.update(user);
+    } else {
+      user = {
+        c2cId,
+        polar: {
+          id: auth.x_user_id,
+          token: auth.access_token,
+        },
+      };
+      await userRepository.insert(user);
+    }
   }
 
   public async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {

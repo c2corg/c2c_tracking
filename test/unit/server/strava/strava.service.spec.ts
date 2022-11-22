@@ -168,7 +168,7 @@ describe('Strava Service', () => {
       expect(userService.clearStravaTokens).toBeCalledTimes(1);
     });
 
-    it('calls stravas API then updates DB', async () => {
+    it('calls strava API then updates DB', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,

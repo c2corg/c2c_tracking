@@ -5,6 +5,7 @@ import { activityRepository } from '../../src/repository/activity.repository';
 import { userRepository } from '../../src/repository/user.repository';
 import type { DecathlonAuth } from '../../src/server/decathlon/decathlon.api';
 import type { GarminAuth } from '../../src/server/garmin/garmin.api';
+import type { PolarAuth } from '../../src/server/polar/polar.api';
 import type { StravaAuth } from '../../src/server/strava/strava.api';
 import type { SuuntoAuth } from '../../src/server/suunto/suunto.api';
 import { UserService } from '../../src/user.service';
@@ -24,7 +25,7 @@ describe('User service', () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
-        suunto: { username: 'usernam' },
+        suunto: { username: 'username' },
       });
 
       const service = new UserService();
@@ -34,6 +35,7 @@ describe('User service', () => {
         {
           "decathlon": "not-configured",
           "garmin": "not-configured",
+          "polar": "not-configured",
           "strava": "configured",
           "suunto": "token-lost",
         }
@@ -52,6 +54,7 @@ describe('User service', () => {
         {
           "decathlon": "not-configured",
           "garmin": "not-configured",
+          "polar": "not-configured",
           "strava": "not-configured",
           "suunto": "not-configured",
         }
@@ -67,6 +70,7 @@ describe('User service', () => {
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
         strava: { id: 1 },
         suunto: { username: 'username' },
+        polar: { id: 1, token: 'token' },
       });
 
       const service = new UserService();
@@ -76,6 +80,7 @@ describe('User service', () => {
         {
           "decathlon": "token-lost",
           "garmin": "configured",
+          "polar": "configured",
           "strava": "token-lost",
           "suunto": "token-lost",
         }
@@ -97,6 +102,7 @@ describe('User service', () => {
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
         suunto: { username: 'username', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
+        polar: { id: 1, token: 'token' },
       });
 
       const service = new UserService();
@@ -106,6 +112,7 @@ describe('User service', () => {
         {
           "decathlon": "configured",
           "garmin": "configured",
+          "polar": "configured",
           "strava": "configured",
           "suunto": "configured",
         }
@@ -890,6 +897,62 @@ describe('User service', () => {
 
       const service = new UserService();
       expect(await service.getDecathlonInfo(1)).toMatchInlineSnapshot(`undefined`);
+    });
+  });
+
+  describe('configurePolar', () => {
+    it('creates user info', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      const auth: PolarAuth = {
+        x_user_id: 1,
+        access_token: 'access_token',
+        token_type: 'bearer',
+      };
+      await service.configurePolar(1, auth);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.insert).toBeCalledTimes(1);
+      expect(userRepository.insert).toBeCalledWith({
+        c2cId: 1,
+        polar: {
+          id: 1,
+          token: 'access_token',
+        },
+      });
+    });
+
+    it('updates user info', async () => {
+      jest
+        .spyOn(userRepository, 'findById')
+        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      const auth: PolarAuth = {
+        x_user_id: 1,
+        access_token: 'access_token',
+        token_type: 'bearer',
+      };
+      await service.configurePolar(1, auth);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        polar: {
+          id: 1,
+          token: 'access_token',
+        },
+        garmin: {
+          token: 'token',
+          tokenSecret: 'tokenSecret',
+        },
+      });
     });
   });
 

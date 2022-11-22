@@ -151,7 +151,7 @@ describe('Strava Controller', () => {
   });
 
   describe('POST /strava/webhook', () => {
-    it('validtes input', async () => {
+    it('validates input', async () => {
       const response = await request(app.callback()).post('/strava/webhook').query({ what: 'ever' });
 
       expect(response.status).toBe(400);

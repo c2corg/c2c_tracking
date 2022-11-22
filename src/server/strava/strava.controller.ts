@@ -4,7 +4,7 @@ import type { WebhookEvent, WebhookSubscription } from './strava.api';
 import { stravaService as service } from './strava.service';
 
 class StravaController {
-  public async exchangeTokens(ctx: Context): Promise<void> {
+  public async exchangeToken(ctx: Context): Promise<void> {
     const c2cId = Number.parseInt(ctx['params'].userId, 10);
     if (ctx.query['error']) {
       ctx.log.info(`User ${c2cId} denied Strava authorization`);
@@ -43,7 +43,7 @@ class StravaController {
   }
 
   public async webhook(ctx: Context): Promise<void> {
-    const event = <WebhookEvent>(ctx.request.body as unknown);
+    const event = <WebhookEvent>ctx.request.body;
     service.handleWebhookEvent(event); // async handling
     ctx.status = 200; // acknowledge event
   }

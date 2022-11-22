@@ -258,6 +258,21 @@ const config = convict({
         sensitive: true,
       },
     },
+    polar: {
+      clientId: {
+        doc: 'Polar client ID',
+        format: 'uuid4',
+        default: '5a9f9ddd-fc15-48d2-bc56-86b43d491cc9',
+        env: 'POLAR_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'Polar client secret',
+        format: 'uuid4',
+        default: '',
+        env: 'POLAR_CLIENT_SECRET',
+        sensitive: true,
+      },
+    },
   },
 });
 config.validate({ allowed: 'strict' });

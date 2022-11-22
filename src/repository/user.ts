@@ -31,11 +31,18 @@ export const DecathlonInfo = z.object({
 });
 export type DecathlonInfo = z.infer<typeof DecathlonInfo>;
 
+export const PolarInfo = z.object({
+  id: z.number().int().positive(),
+  token: z.string().min(10).max(50),
+});
+export type PolarInfo = z.infer<typeof PolarInfo>;
+
 export const User = z.object({
   c2cId: z.number().int().positive(),
   strava: StravaInfo.optional(),
   suunto: SuuntoInfo.optional(),
   garmin: GarminInfo.optional(),
   decathlon: DecathlonInfo.optional(),
+  polar: PolarInfo.optional(),
 });
 export type User = z.infer<typeof User>;

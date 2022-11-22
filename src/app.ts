@@ -18,6 +18,7 @@ import decathlon from './server/decathlon';
 import { defaultErrorHandler } from './server/error-handler';
 import garmin from './server/garmin';
 import health from './server/health';
+import polar from './server/polar';
 import strava from './server/strava';
 import suunto from './server/suunto';
 import users from './server/users';
@@ -30,6 +31,7 @@ router.use('/strava', strava.routes(), strava.allowedMethods());
 router.use('/suunto', suunto.routes(), suunto.allowedMethods());
 router.use('/garmin', garmin.routes(), garmin.allowedMethods());
 router.use('/decathlon', decathlon.routes(), decathlon.allowedMethods());
+router.use('/polar', polar.routes(), polar.allowedMethods());
 router.use(
   '/users/:userId/activities',
   ensureAuthenticated,

@@ -84,8 +84,12 @@ export const Activity = z.object({
   id: z.number().int().positive(),
   name: z.string(),
   sport_type: SportType,
-  start_date: z.string().refine(isISO8601),
-  start_date_local: z.string().refine(isISO8601),
+  start_date: z.string().refine(isISO8601, {
+    message: 'String must be an ISO-8601 date',
+  }),
+  start_date_local: z.string().refine(isISO8601, {
+    message: 'String must be an ISO-8601 date',
+  }),
   distance: z.number().nonnegative(), // in meters
   elapsed_time: z.number().int().nonnegative(), // in seconds
   total_elevation_gain: z.number().nonnegative(), // in meters
@@ -132,8 +136,12 @@ export const Subscription = z.object({
   id: z.number().int().positive(),
   application_id: z.number().int().positive(),
   callback_url: z.string().url(),
-  created_at: z.string().refine(isISO8601),
-  updated_at: z.string().refine(isISO8601),
+  created_at: z.string().refine(isISO8601, {
+    message: 'String must be an ISO-8601 date',
+  }),
+  updated_at: z.string().refine(isISO8601, {
+    message: 'String must be an ISO-8601 date',
+  }),
 });
 export type Subscription = z.infer<typeof Subscription>;
 
