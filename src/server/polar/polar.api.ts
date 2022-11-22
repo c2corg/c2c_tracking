@@ -245,7 +245,7 @@ const Exercise = z.object({
 export type Exercise = z.infer<typeof Exercise>;
 
 export class PolarApi {
-  private readonly baseUrl = 'https://www.polaraccesslink.com/';
+  private readonly baseUrl = 'https://www.polaraccesslink.com/v3/';
   private readonly redirectUrl: string;
   public readonly webhookCallbackUrl: string;
   readonly #clientId: string;
@@ -261,7 +261,7 @@ export class PolarApi {
 
   public async exchangeToken(code: string): Promise<PolarAuth> {
     try {
-      const response = await axios.post(`${this.baseUrl}v2/oauth/token`, null, {
+      const response = await axios.post('https://polarremote.com/v2/oauth2/token', null, {
         auth: { username: this.#clientId, password: this.#clientSecret },
         params: {
           code,
@@ -278,7 +278,7 @@ export class PolarApi {
   public async registerUser(token: string, userId: number): Promise<void> {
     try {
       await axios.post(
-        `${this.baseUrl}v3/users`,
+        `${this.baseUrl}users`,
         { 'member-id': userId.toString() },
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -289,7 +289,7 @@ export class PolarApi {
 
   public async deleteUser(token: string, userId: number): Promise<void> {
     try {
-      await axios.delete(`${this.baseUrl}v3/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`${this.baseUrl}users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
     } catch (error: unknown) {
       throw handleExternalApiError('polar', 'Error on Polar delete user request', error);
     }
@@ -297,7 +297,7 @@ export class PolarApi {
 
   public async getExercise(token: string, exerciseId: string): Promise<Exercise> {
     try {
-      const response = await axios.get(`${this.baseUrl}v3/exercises/${exerciseId}`, {
+      const response = await axios.get(`${this.baseUrl}exercises/${exerciseId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return Exercise.parse(response.data);
@@ -308,7 +308,7 @@ export class PolarApi {
 
   public async getExerciseFit(token: string, exerciseId: string): Promise<ArrayBuffer> {
     try {
-      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}v3/exercises/${exerciseId}/fit`, {
+      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}exercises/${exerciseId}/fit`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -321,7 +321,7 @@ export class PolarApi {
   public async createWebhook(): Promise<string> {
     try {
       const response = await axios.post(
-        `${this.baseUrl}v3/webhooks`,
+        `${this.baseUrl}webhooks`,
         {
           events: ['EXERCISE'],
           url: this.webhookCallbackUrl,
@@ -336,7 +336,7 @@ export class PolarApi {
 
   public async getWebhook(): Promise<WebhookInfo> {
     try {
-      const response = await axios.get(`${this.baseUrl}v3/webhooks`, {
+      const response = await axios.get(`${this.baseUrl}webhooks`, {
         auth: { username: this.#clientId, password: this.#clientSecret },
       });
       return WebhookInfo.parse(response.data);

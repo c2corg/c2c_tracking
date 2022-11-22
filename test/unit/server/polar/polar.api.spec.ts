@@ -36,7 +36,7 @@ describe('Polar API', () => {
       const result = await api.exchangeToken('code');
 
       expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith('https://www.polaraccesslink.com/v2/oauth/token', null, {
+      expect(axios.post).toBeCalledWith('https://polarremote.com/v2/oauth2/token', null, {
         auth: { username: '5a9f9ddd-fc15-48d2-bc56-86b43d491cc9', password: '902d20cc-c2a8-4536-89a9-41e0f7626977' },
         params: expect.objectContaining({ code: 'code' }),
       });
