@@ -67,7 +67,10 @@ describe('Decathlon API', () => {
       expect(axios.postForm).toBeCalledWith(
         'https://api-global.decathlon.net/connect/oauth/token',
         { grant_type: 'refresh_token', refresh_token: 'refresh_token' },
-        { headers: expect.objectContaining({ Authorization: expect.stringMatching(/^Basic \w+$/) }) },
+        {
+          auth: { username: 'b708af3b-fd46-41ab-af73-5176a0a56f92', password: 'c2VjcmV0' },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
       );
     });
   });
