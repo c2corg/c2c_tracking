@@ -58,11 +58,11 @@ export class PolarService {
     }
     try {
       const webhookResponse = (await polarApi.getWebhook()).data;
-      if (Array.isArray(webhookResponse)) {
+      if (webhookResponse.length !== 1 || !webhookResponse[0]) {
         log.info('No matching Polar webhook subscription found');
         return false;
       }
-      const foundCurrent = webhookResponse.url === polarApi.webhookCallbackUrl;
+      const foundCurrent = webhookResponse[0].url === polarApi.webhookCallbackUrl;
       log.info(
         foundCurrent ? 'Found matching Polar webhook subscription' : 'No matching Polar webhook subscription found',
       );

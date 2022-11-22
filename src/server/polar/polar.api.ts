@@ -33,14 +33,16 @@ export type CreatedWebhookInfo = z.infer<typeof CreatedWebhookInfo>;
 
 const WebhookInfo = z.object({
   data: z
-    .object({
-      id: z.string(),
-      events: z.array(WebhookType),
-      url: z.string().refine(isURL, {
-        message: 'String must be an URL',
+    .array(
+      z.object({
+        id: z.string(),
+        events: z.array(WebhookType),
+        url: z.string().refine(isURL, {
+          message: 'String must be an URL',
+        }),
       }),
-    })
-    .or(z.array(z.any())), // empty array anyway
+    )
+    .max(1),
 });
 export type WebhookInfo = z.infer<typeof WebhookInfo>;
 

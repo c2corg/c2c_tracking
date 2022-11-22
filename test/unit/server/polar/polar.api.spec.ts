@@ -220,11 +220,13 @@ describe('Polar API', () => {
 
     it('calls polar API', async () => {
       const webhookInfo: WebhookInfo = {
-        data: {
-          id: '1',
-          events: ['EXERCISE'],
-          url: 'http://perdu.com',
-        },
+        data: [
+          {
+            id: '1',
+            events: ['EXERCISE'],
+            url: 'http://perdu.com',
+          },
+        ],
       };
       jest.mocked(axios).get.mockResolvedValueOnce({ data: webhookInfo });
 
@@ -233,13 +235,15 @@ describe('Polar API', () => {
 
       expect(result).toMatchInlineSnapshot(`
         {
-          "data": {
-            "events": [
-              "EXERCISE",
-            ],
-            "id": "1",
-            "url": "http://perdu.com",
-          },
+          "data": [
+            {
+              "events": [
+                "EXERCISE",
+              ],
+              "id": "1",
+              "url": "http://perdu.com",
+            },
+          ],
         }
       `);
       expect(axios.get).toBeCalledTimes(1);

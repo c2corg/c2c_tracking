@@ -78,11 +78,13 @@ describe('Polar Service', () => {
     it('handles existing subscription', async () => {
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getWebhook').mockResolvedValueOnce({
-        data: {
-          id: '1',
-          url: 'http://localhost:3000/polar/webhook',
-          events: ['EXERCISE'],
-        },
+        data: [
+          {
+            id: '1',
+            url: 'http://localhost:3000/polar/webhook',
+            events: ['EXERCISE'],
+          },
+        ],
       });
       jest.spyOn(polarApi, 'createWebhook');
 
@@ -141,11 +143,13 @@ describe('Polar Service', () => {
     it('handles not matching polar subscription', async () => {
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getWebhook').mockResolvedValueOnce({
-        data: {
-          id: '1',
-          url: 'not a matching url',
-          events: ['EXERCISE'],
-        },
+        data: [
+          {
+            id: '1',
+            url: 'not a matching url',
+            events: ['EXERCISE'],
+          },
+        ],
       });
       const requestWebhookSpy = jest
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
