@@ -78,7 +78,7 @@ app
       allowMethods: ['GET', 'POST'],
       allowHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
       maxAge: 1728000,
-      origin: config.get('c2c.frontend.baseUrl').slice(0, 1),
+      origin: config.get('c2c.frontend.baseUrl').slice(0, -1),
     }),
   )
   .use(bodyParser())
