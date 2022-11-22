@@ -27,7 +27,7 @@ export const exchangeToken: ValidationSchema = {
 
 export const webhook: ValidationSchema = {
   headers: z.object({
-    'polar-webhook-signature': z.string().min(1).max(100),
+    'polar-webhook-signature': z.string().min(1).max(100).optional(),
   }),
   body: WebhookEvent,
 };
