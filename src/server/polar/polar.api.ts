@@ -261,14 +261,18 @@ export class PolarApi {
 
   public async exchangeToken(code: string): Promise<PolarAuth> {
     try {
-      const response = await axios.post('https://polarremote.com/v2/oauth2/token', null, {
-        auth: { username: this.#clientId, password: this.#clientSecret },
-        params: {
+      const response = await axios.post(
+        'https://polarremote.com/v2/oauth2/token',
+        {
           code,
           grant_type: 'authorization_code',
           redirect_url: this.redirectUrl,
         },
-      });
+        {
+          auth: { username: this.#clientId, password: this.#clientSecret },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
+      );
       return PolarAuth.parse(response.data);
     } catch (error: unknown) {
       throw handleExternalApiError('polar', 'Error on Polar token exchange request', error);

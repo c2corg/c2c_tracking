@@ -100,10 +100,8 @@ export class DecathlonApi {
           refresh_token: refreshToken,
         },
         {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: 'Basic ' + Buffer.from(`${this.#clientId}:${this.#clientSecret}`).toString('base64'),
-          },
+          auth: { username: this.#clientId, password: this.#clientSecret },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         },
       );
       return DecathlonAuth.parse(response.data);
