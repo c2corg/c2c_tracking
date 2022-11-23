@@ -41,7 +41,7 @@ describe('Polar API', () => {
         {
           code: 'code',
           grant_type: 'authorization_code',
-          redirect_url: 'http://localhost:8080/trackers/polar/exchange-token',
+          redirect_uri: 'http://localhost:8080/trackers/polar/exchange-token',
         },
         {
           auth: { username: '5a9f9ddd-fc15-48d2-bc56-86b43d491cc9', password: '902d20cc-c2a8-4536-89a9-41e0f7626977' },

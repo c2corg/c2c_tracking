@@ -266,7 +266,7 @@ export class PolarApi {
         {
           code,
           grant_type: 'authorization_code',
-          redirect_url: this.redirectUrl,
+          redirect_uri: this.redirectUrl,
         },
         {
           auth: { username: this.#clientId, password: this.#clientSecret },
