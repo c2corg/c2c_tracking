@@ -77,7 +77,7 @@ describe('Polar API', () => {
         isAxiosError: true,
       } as AxiosError;
       jest.mocked(axios).post.mockRejectedValueOnce(error);
-      jest.mocked(axios).isAxiosError.mockReturnValue(true);
+      jest.mocked(axios).isAxiosError.mockReturnValueOnce(true);
 
       const api = new PolarApi();
       await api.registerUser('token', 1);
