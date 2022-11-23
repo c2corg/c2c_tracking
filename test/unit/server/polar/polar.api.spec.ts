@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 import log from '../../../../src/helpers/logger';
 import { CreatedWebhookInfo, Exercise, PolarApi, PolarAuth, WebhookInfo } from '../../../../src/server/polar/polar.api';
@@ -68,6 +68,26 @@ describe('Polar API', () => {
         `[Error: Error on Polar register user request]`,
       );
       expect(axios.post).toBeCalledTimes(1);
+    });
+
+    it('ignore 409 error', async () => {
+      const error = {
+        status: 409,
+        message: 'User userid:1 with membertag 1 has already registered with partner camptocamp.org',
+        isAxiosError: true,
+      } as AxiosError;
+      jest.mocked(axios).post.mockRejectedValueOnce(error);
+      jest.mocked(axios).isAxiosError.mockReturnValue(true);
+
+      const api = new PolarApi();
+      await api.registerUser('token', 1);
+
+      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toBeCalledWith(
+        'https://www.polaraccesslink.com/v3/users',
+        { 'member-id': '1' },
+        { headers: { Authorization: `Bearer token` } },
+      );
     });
 
     it('calls polar API', async () => {
