@@ -284,13 +284,14 @@ export class PolarApi {
       await axios.post(
         `${this.baseUrl}users`,
         { 'member-id': userId.toString() },
-        { headers: { Authorization: `Bearer ${token}` } },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          validateStatus(status) {
+            return status === 200 || status === 409; // 409: already registered
+          },
+        },
       );
     } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.status === 409 && error.message.includes('has already registered')) {
-        // conflict, user is already registered, all is fine
-        return;
-      }
       throw handleExternalApiError('polar', 'Error on Polar register user request', error);
     }
   }
