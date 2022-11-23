@@ -1,6 +1,6 @@
 {
   "name": "c2c_tracking",
-  "version": "1.0.0-rc.22",
+  "version": "1.0.0-rc.23",
   "engines": {
     "node": ">=18.0.0"
   },
