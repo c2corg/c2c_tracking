@@ -1,5 +1,3 @@
-import polyline from '@mapbox/polyline';
-
 import log from '../../../../src/helpers/logger';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { stravaRepository } from '../../../../src/repository/strava.repository';
@@ -7,8 +5,6 @@ import { userRepository } from '../../../../src/repository/user.repository';
 import { stravaApi } from '../../../../src/server/strava/strava.api';
 import { StravaService } from '../../../../src/server/strava/strava.service';
 import { userService } from '../../../../src/user.service';
-
-jest.mock('@mapbox/polyline');
 
 describe('Strava Service', () => {
   beforeEach(() => {
@@ -49,7 +45,6 @@ describe('Strava Service', () => {
           distance: 1.2,
           elapsed_time: 1,
           total_elevation_gain: 1.2,
-          map: { summary_polyline: 'polyline' },
         },
       ]);
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
@@ -267,43 +262,6 @@ describe('Strava Service', () => {
       expect(stravaApi.refreshAuth).toBeCalledTimes(1);
       expect(stravaApi.refreshAuth).toBeCalledWith('refresh_token');
       expect(userService.clearStravaTokens).toBeCalledTimes(1);
-    });
-  });
-
-  describe('getActivityLine', () => {
-    it('calls strava API', async () => {
-      jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
-        id: 1,
-        name: 'Morning Run',
-        sport_type: 'Run',
-        start_date: '1970-01-01T00:00:01Z',
-        start_date_local: '1970-01-01T00:00:01Z',
-        distance: 1.2,
-        elapsed_time: 1,
-        total_elevation_gain: 1.2,
-        map: {
-          summary_polyline: 'poyline',
-        },
-      });
-      jest
-        .mocked(polyline)
-        .toGeoJSON.mockResolvedValue({ type: 'LineString', coordinates: [[1.0, 1.0, 200]] } as never); // why is cast to never needed? no clue...
-
-      const service = new StravaService();
-      const result = await service.getActivityLine('access_token', '1');
-
-      expect(result).toMatchInlineSnapshot(`
-        {
-          "coordinates": [
-            [
-              1,
-              1,
-              200,
-            ],
-          ],
-          "type": "LineString",
-        }
-      `);
     });
   });
 
@@ -664,9 +622,6 @@ describe('Strava Service', () => {
           distance: 1.2,
           elapsed_time: 1,
           total_elevation_gain: 1.2,
-          map: {
-            summary_polyline: 'polyline',
-          },
         });
         jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
@@ -719,9 +674,6 @@ describe('Strava Service', () => {
           distance: 1.2,
           elapsed_time: 1,
           total_elevation_gain: 1.2,
-          map: {
-            summary_polyline: 'polyline',
-          },
         });
         jest.spyOn(userService, 'addActivities');
 
@@ -855,9 +807,6 @@ describe('Strava Service', () => {
           distance: 1.2,
           elapsed_time: 1,
           total_elevation_gain: 1.2,
-          map: {
-            summary_polyline: 'polyline',
-          },
         });
         jest.spyOn(userService, 'updateActivity').mockRejectedValueOnce(undefined);
 
@@ -910,9 +859,6 @@ describe('Strava Service', () => {
           distance: 1.2,
           elapsed_time: 1,
           total_elevation_gain: 1.2,
-          map: {
-            summary_polyline: 'polyline',
-          },
         });
         jest.spyOn(userService, 'updateActivity');
 

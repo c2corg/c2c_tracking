@@ -1,4 +1,3 @@
-import { toGeoJSON } from '@mapbox/polyline';
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
 
@@ -8,7 +7,6 @@ import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Activity as RepositoryActivity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
 import { stravaRepository } from '../../repository/strava.repository';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
@@ -90,11 +88,6 @@ export class StravaService {
     // clear token, user needs to log again
     await userService.clearStravaTokens(c2cId);
     return undefined;
-  }
-
-  public async getActivityLine(token: string, id: string): Promise<LineString> {
-    const { map } = await stravaApi.getActivity(token, id);
-    return toGeoJSON(map.polyline || map.summary_polyline);
   }
 
   public async getActivityStream(token: string, id: string): Promise<StreamSet> {
