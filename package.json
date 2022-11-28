@@ -62,7 +62,7 @@
   "devDependencies": {
     "@shopify/jest-koa-mocks": "5.0.1",
     "@tsconfig/node18-strictest": "1.0.0",
-    "@types/async": "3.2.15",
+    "@types/async": "3.2.16",
     "@types/convict": "6.1.1",
     "@types/crypto-js": "4.1.1",
     "@types/jest": "29.2.3",
