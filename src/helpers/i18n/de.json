@@ -144,7 +144,7 @@
     "string": "Salontanz"
   },
   "ballroomdancing": {
-    "string": "Ballroom"
+    "string": "Tanzsaal"
   },
   "baroquedance": {
     "string": "Barocktanz"
@@ -324,7 +324,7 @@
     "string": "Zeitgenössischer Tanz "
   },
   "core": {
-    "string": "Core"
+    "string": "Kern"
   },
   "countryactivities": {
     "string": "Naturaktivitäten"
