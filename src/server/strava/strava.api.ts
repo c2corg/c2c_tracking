@@ -74,12 +74,6 @@ export const SportType = z.preprocess((val) => {
 }, z.string());
 export type SportType = z.infer<typeof SportType>;
 
-export const PolylineMap = z.object({
-  polyline: z.string().min(1).optional(),
-  summary_polyline: z.string().min(1),
-});
-export type PolylineMap = z.infer<typeof PolylineMap>;
-
 export const Activity = z.object({
   id: z.number().int().positive(),
   name: z.string(),
@@ -93,7 +87,6 @@ export const Activity = z.object({
   distance: z.number().nonnegative(), // in meters
   elapsed_time: z.number().int().nonnegative(), // in seconds
   total_elevation_gain: z.number().nonnegative(), // in meters
-  map: PolylineMap,
 });
 export type Activity = z.infer<typeof Activity>;
 

@@ -141,7 +141,7 @@ export class ActivityService {
       ? 'XYM'
       : 'XY';
     const startDate = activity.date ? dayjs(activity.date).unix() : 0;
-    const coordinates: GeoJSON.Position[] = [];
+    const coordinates: number[][] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
       // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
       const coordinate: number[] = latlngStream.data[i]!.reverse();
