@@ -324,7 +324,7 @@
     "string": "Zeitgenössischer Tanz "
   },
   "core": {
-    "string": "Kern"
+    "string": "Körpermitte"
   },
   "countryactivities": {
     "string": "Naturaktivitäten"
@@ -351,7 +351,7 @@
     "string": "Armbrust"
   },
   "crosscountryrunning": {
-    "string": "Cross-country running"
+    "string": "Crosslauf"
   },
   "crosscountryskiingws": {
     "string": "Cross Country Classic Skiing"
@@ -513,7 +513,7 @@
     "string": "Eiskunstlauf"
   },
   "finnishbaseball": {
-    "string": "Finnish baseball"
+    "string": "Finnisch Baseball"
   },
   "fishing": {
     "string": "Angeln"
@@ -534,13 +534,13 @@
     "string": "Fitness Class"
   },
   "fitnessdancing": {
-    "string": "Fitness dancing"
+    "string": "Tanzfitness"
   },
   "fitnessmartialarts": {
-    "string": "Fitness martial arts"
+    "string": "Kampfkunst"
   },
   "fitnessstep": {
-    "string": "Step workout"
+    "string": "Step Training"
   },
   "fives": {
     "string": "Pelota mit bloßer Hand"
@@ -621,7 +621,7 @@
     "string": "Full Contact Karate"
   },
   "functionaltraining": {
-    "string": "Functional training"
+    "string": "Funktionelles Training"
   },
   "futsal": {
     "string": "Futsal"
@@ -651,7 +651,7 @@
     "string": "Gravel/unpaved Cycling"
   },
   "groupexercise": {
-    "string": "Group exercise"
+    "string": "Gruppentraining"
   },
   "gym": {
     "string": "Gym"
@@ -696,7 +696,7 @@
     "string": "Hochsprung"
   },
   "hiit": {
-    "string": "High-intensity interval training"
+    "string": "Hochintensives Intervalltraining"
   },
   "hike": {
     "string": "Hike"
@@ -813,7 +813,7 @@
     "string": "Jokari"
   },
   "jogging": {
-    "string": "Jogging"
+    "string": "Joggen"
   },
   "jokogarbi": {
     "string": "Joko-garbi"
@@ -852,7 +852,7 @@
     "string": "Kickboxen"
   },
   "kickboxingmartialarts": {
-    "string": "Kickboxing"
+    "string": "Kickboxen"
   },
   "kitebuggy": {
     "string": "Buggykiting"
@@ -885,7 +885,7 @@
     "string": "Lateinamerikanischer Tanz"
   },
   "latindancing": {
-    "string": "Latin"
+    "string": "Lateintanz"
   },
   "legsbumsandtumstraining": {
     "string": "Taille-Bauchmuskeln-Gesäßmuskeln "
@@ -909,7 +909,7 @@
     "string": "LES MILLS BODYPUMP"
   },
   "lesmillsbodystep": {
-    "string": "LES MILLS BODYSTEP"
+    "string": "LMI STEP"
   },
   "lesmillscxworks": {
     "string": "LES MILLS CXWORX"
@@ -984,10 +984,10 @@
     "string": "MMA: Mixed Martial Arts"
   },
   "mobilitydynamic": {
-    "string": "Mobility (dynamic)"
+    "string": "Beweglichkeit (dynamisch)"
   },
   "mobilitystatic": {
-    "string": "Mobility (static)"
+    "string": "Beweglichkeit (statisch)"
   },
   "moderndancing": {
     "string": "Modern"
@@ -1008,7 +1008,7 @@
     "string": "Supersportler "
   },
   "motorsportscarracing": {
-    "string": "Car racing"
+    "string": "Autorennen"
   },
   "motorsportsenduro": {
     "string": "Enduro"
@@ -1020,7 +1020,7 @@
     "string": "Motocross"
   },
   "motorsportsroadracing": {
-    "string": "Road racing"
+    "string": "Straßenrennen"
   },
   "motorsportssnocross": {
     "string": "Snocross"
@@ -1077,25 +1077,25 @@
     "string": "Obstacle Running"
   },
   "offroadduathlon": {
-    "string": "Off-road duathlon"
+    "string": "Cross Duathlon"
   },
   "offroadduathloncycling": {
-    "string": "Mountain biking"
+    "string": "Mountainbiking"
   },
   "offroadduathlonrunning": {
-    "string": "Trail running"
+    "string": "Traillauf"
   },
   "offroadtriathlon": {
-    "string": "Off-road triathlon"
+    "string": "Cross triathlon"
   },
   "offroadtriathloncycling": {
-    "string": "Mountain biking"
+    "string": "Mountainbiking"
   },
   "offroadtriathlonrunning": {
-    "string": "Trail running"
+    "string": "Traillauf"
   },
   "offroadtriathlonswimming": {
-    "string": "Open water swimming"
+    "string": "Freiwasserschwimmen"
   },
   "offroadrunning": {
     "string": "Lauftraining in der Natur"
@@ -1125,19 +1125,19 @@
     "string": "Orienteering"
   },
   "orienteeringmtb": {
-    "string": "Mountain bike orienteering"
+    "string": "Mountainbike Orientieren"
   },
   "orienteeringski": {
-    "string": "Ski orienteering"
+    "string": "Ski-Orientierungslauf"
   },
   "other": {
     "string": "Other"
   },
   "otherindoor": {
-    "string": "Other indoor"
+    "string": "Sonstiges Indoor"
   },
   "otheroutdoor": {
-    "string": "Other outdoor"
+    "string": "Sonstiges Outdoor"
   },
   "other1": {
     "string": "Other1"
@@ -1284,7 +1284,7 @@
     "string": "Ride"
   },
   "riding": {
-    "string": "Riding"
+    "string": "Reiten"
   },
   "rifleshooting": {
     "string": "Karabinerschießen"
@@ -1308,7 +1308,7 @@
     "string": "Felsenklettern"
   },
   "rollerblading": {
-    "string": "Roller skating"
+    "string": "Rollschuhlaufen"
   },
   "rollerhockey": {
     "string": "Inlinehockey"
@@ -1323,7 +1323,7 @@
     "string": "Roller Skiing"
   },
   "rollerskiingclassic": {
-    "string": "Classic roller skiing"
+    "string": "Rollerski classic"
   },
   "rollerskiingfreestyle": {
     "string": "Freestyle roller skiing"
@@ -1686,7 +1686,7 @@
     "string": "Laufsport"
   },
   "triathlonswimming": {
-    "string": "Open water swimming"
+    "string": "Freiwasserschwimmen"
   },
   "tricycledisabledsports": {
     "string": "Dreirad Behindertensport"
