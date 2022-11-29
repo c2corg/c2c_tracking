@@ -1323,7 +1323,7 @@
     "string": "Roller Skiing"
   },
   "rollerskiingclassic": {
-    "string": "Rollerski classic"
+    "string": "Classic Rollerski "
   },
   "rollerskiingfreestyle": {
     "string": "Freestyle Rollerski"
@@ -1881,10 +1881,10 @@
     "string": "Xare"
   },
   "xcskiingclassic": {
-    "string": "Classic XC skiing"
+    "string": "Classic Langlaufen"
   },
   "xcskiingfreestyle": {
-    "string": "Freestyle XC skiing"
+    "string": "Freestyle Langlaufen"
   },
   "yachting": {
     "string": "Kajütensegelboot"
