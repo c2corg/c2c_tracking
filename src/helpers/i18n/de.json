@@ -1326,7 +1326,7 @@
     "string": "Rollerski classic"
   },
   "rollerskiingfreestyle": {
-    "string": "Freestyle roller skiing"
+    "string": "Freestyle Rollerski"
   },
   "rowing": {
     "string": "Rudern"
@@ -1476,7 +1476,7 @@
     "string": "Schneeschuhwandern"
   },
   "snowshoetrekking": {
-    "string": "Snowshoe trekking"
+    "string": "Schneeschuhlaufen"
   },
   "snowshoews": {
     "string": "Schneeschuhwandern"
@@ -1515,7 +1515,7 @@
     "string": "Speed Walking"
   },
   "spinning": {
-    "string": "Spinning"
+    "string": "Indoor Cycling"
   },
   "sportsandrhythmicgymnastics(srg)": {
     "string": "Rhythmische Sportgymnastik (RSG)"
@@ -1563,7 +1563,7 @@
     "string": "Street Basketball"
   },
   "streetdancing": {
-    "string": "Street"
+    "string": "Straße"
   },
   "streetrunning": {
     "string": "Street Running"
@@ -1641,7 +1641,7 @@
     "string": "Lauftraining auf der Bahn"
   },
   "trackandfieldrunning": {
-    "string": "Track & field running"
+    "string": "Leichtathletik"
   },
   "trail": {
     "string": "Traillauf"
@@ -1698,7 +1698,7 @@
     "string": "Schleppfischen"
   },
   "trotting": {
-    "string": "Trotting"
+    "string": "Trab"
   },
   "tumbling": {
     "string": "Tumbling"
@@ -1713,7 +1713,7 @@
     "string": "Ultra Running"
   },
   "ultrarunningrunning": {
-    "string": "Ultra running"
+    "string": "Ultramarathon"
   },
   "ultratrailrunning(morethan80km)": {
     "string": "Ultra Trail (+80 (km)"
@@ -1782,7 +1782,7 @@
     "string": "Walking"
   },
   "waterexercise": {
-    "string": "Water sports"
+    "string": "Wassersporte"
   },
   "waterfowlhunting": {
     "string": "Jagd auf Wasserwild"
@@ -1794,7 +1794,7 @@
     "string": "Wasserrettungsarbeit "
   },
   "waterrunning": {
-    "string": "Water running"
+    "string": "Aqua Running"
   },
   "waterskiing": {
     "string": "Wasserski"
