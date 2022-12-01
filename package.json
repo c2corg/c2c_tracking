@@ -73,7 +73,7 @@
     "@types/koa-bodyparser": "4.3.10",
     "@types/koa-passport": "4.0.3",
     "@types/koa-pino-logger": "3.0.1",
-    "@types/node": "18.11.9",
+    "@types/node": "18.11.10",
     "@types/passport-jwt": "3.0.7",
     "@types/pg": "8.6.5",
     "@types/supertest": "2.0.12",
