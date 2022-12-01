@@ -138,6 +138,14 @@ const config = convict({
       sensitive: true,
     },
   },
+  keyv: {
+    connectionUri: {
+      doc: 'Connection string in case keyv should be backed up by a specific storage. Currently supports only Redis',
+      format: String,
+      default: '',
+      env: 'KEYV_CONNECTION_URI',
+    },
+  },
   auth: {
     jwtSecret: {
       doc: 'JWT auth secret key',
