@@ -1,5 +1,8 @@
+import KeyvRedis from '@keyv/redis';
 import Keyv from 'keyv';
 import type { Context } from 'koa';
+
+import config from '../../config';
 
 import type { GarminActivity } from './garmin.api';
 import { garminService as service } from './garmin.service';
@@ -8,7 +11,11 @@ class GarminController {
   private readonly keyv;
 
   constructor() {
-    this.keyv = new Keyv();
+    const connectionUri = config.get('keyv.connectionUri');
+    this.keyv = new Keyv(connectionUri ? { store: new KeyvRedis(connectionUri), namespace: 'tracking' } : undefined);
+    this.keyv.on('error', () => {
+      throw new Error('Unable to connect to Redis instance with URI ' + connectionUri);
+    });
   }
 
   public async requestUnauthorizedRequestToken(ctx: Context): Promise<void> {
