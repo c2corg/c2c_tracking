@@ -130,6 +130,11 @@ const config = convict({
       default: 'public',
       env: 'DB_SCHEMA',
     },
+    ssl: {
+      doc: 'Boolean to specify to enable SSL for connection',
+      default: false,
+      env: 'DB_ENABLE_SSL',
+    },
     crypto: {
       doc: 'Secret key for encoding and decoding tokens',
       format: 'notEmptyString',

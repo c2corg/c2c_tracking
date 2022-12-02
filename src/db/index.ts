@@ -11,6 +11,7 @@ export type Configuration = {
   user: string;
   password: string;
   database: string;
+  ssl: boolean;
   debug: boolean;
 };
 
@@ -58,6 +59,7 @@ export class Database {
         user: this.config.user,
         password: this.config.password,
         database: this.config.database,
+        ...(this.config.ssl && { ssl: { rejectUnauthorized: false } }),
       },
       debug: this.config.debug,
       migrations: {
@@ -111,5 +113,6 @@ export const database = new Database({
   port: config.get('db.port'),
   user: config.get('db.user'),
   password: config.get('db.password'),
+  ssl: config.get('db.ssl'),
   debug: false, // config.get('env') !== 'production'
 });
