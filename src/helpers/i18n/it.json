@@ -144,7 +144,7 @@
     "string": "Ballo da sala"
   },
   "ballroomdancing": {
-    "string": "Ballroom"
+    "string": "Sala di ballo"
   },
   "baroquedance": {
     "string": "Danza barocca"
@@ -216,7 +216,7 @@
     "string": "Bob"
   },
   "bodyandmind": {
-    "string": "Body & Mind"
+    "string": "Corpo & Mente"
   },
   "bodyboarding": {
     "string": "Bodyboard"
@@ -228,7 +228,7 @@
     "string": "Pesca alla bolognese"
   },
   "bootcamp": {
-    "string": "Bootcamp"
+    "string": "Campo di addestramento"
   },
   "bouldering": {
     "string": "Bouldering"
@@ -351,7 +351,7 @@
     "string": "Balestra"
   },
   "crosscountryrunning": {
-    "string": "Cross-country running"
+    "string": "Corsa campestre"
   },
   "crosscountryskiingws": {
     "string": "Cross Country Classic Skiing"
@@ -513,7 +513,7 @@
     "string": "Pattinaggio artistico"
   },
   "finnishbaseball": {
-    "string": "Finnish baseball"
+    "string": "Pesäpallo"
   },
   "fishing": {
     "string": "Pesca"
@@ -534,13 +534,13 @@
     "string": "Fitness Class"
   },
   "fitnessdancing": {
-    "string": "Fitness dancing"
+    "string": "Ballo fitness"
   },
   "fitnessmartialarts": {
     "string": "Fitness martial arts"
   },
   "fitnessstep": {
-    "string": "Step workout"
+    "string": "Allenamento tramite step"
   },
   "fives": {
     "string": "pallamano basca"
@@ -621,7 +621,7 @@
     "string": "Full contact"
   },
   "functionaltraining": {
-    "string": "Functional training"
+    "string": "Allenamento funzionale"
   },
   "futsal": {
     "string": "Futsal"
@@ -651,7 +651,7 @@
     "string": "Gravel/unpaved Cycling"
   },
   "groupexercise": {
-    "string": "Group exercise"
+    "string": "Esercizio di gruppo"
   },
   "gym": {
     "string": "Gym"
@@ -885,7 +885,7 @@
     "string": "Balli latini"
   },
   "latindancing": {
-    "string": "Latin"
+    "string": "Latino"
   },
   "legsbumsandtumstraining": {
     "string": "Vita addominali glutei"
@@ -1008,13 +1008,13 @@
     "string": "Motociclismo"
   },
   "motorsportscarracing": {
-    "string": "Car racing"
+    "string": "Gara automobilistica"
   },
   "motorsportsenduro": {
     "string": "Enduro"
   },
   "motorsportshardenduro": {
-    "string": "Hard Enduro"
+    "string": "Enduro country"
   },
   "motorsportsmotocross": {
     "string": "Motocross"
@@ -1023,7 +1023,7 @@
     "string": "Road racing"
   },
   "motorsportssnocross": {
-    "string": "Snocross"
+    "string": "Motoslitte"
   },
   "mototsports": {
     "string": "Mototsports"
@@ -1080,7 +1080,7 @@
     "string": "Off-road duathlon"
   },
   "offroadduathloncycling": {
-    "string": "Mountain biking"
+    "string": "Ciclismo di montagna"
   },
   "offroadduathlonrunning": {
     "string": "Trail running"
@@ -1089,13 +1089,13 @@
     "string": "Off-road triathlon"
   },
   "offroadtriathloncycling": {
-    "string": "Mountain biking"
+    "string": "Ciclismo di montagna"
   },
   "offroadtriathlonrunning": {
     "string": "Trail running"
   },
   "offroadtriathlonswimming": {
-    "string": "Open water swimming"
+    "string": "Nuoto di fondo"
   },
   "offroadrunning": {
     "string": "Trail running"
@@ -1308,7 +1308,7 @@
     "string": "Corse sulle rocce"
   },
   "rollerblading": {
-    "string": "Roller skating"
+    "string": "Pattinaggio a rotelle"
   },
   "rollerhockey": {
     "string": "Roller hockey"
@@ -1407,7 +1407,7 @@
     "string": "Lancio del peso"
   },
   "showdancing": {
-    "string": "Show"
+    "string": "Spettacolo"
   },
   "showjumping": {
     "string": "Salto degli ostacoli"
@@ -1476,7 +1476,7 @@
     "string": "Racchette da neve"
   },
   "snowshoetrekking": {
-    "string": "Snowshoe trekking"
+    "string": "Trekking con ciaspole"
   },
   "snowshoews": {
     "string": "Racchette da neve"
@@ -1563,7 +1563,7 @@
     "string": "Street basket"
   },
   "streetdancing": {
-    "string": "Street"
+    "string": "Strada"
   },
   "streetrunning": {
     "string": "Street Running"
@@ -1686,7 +1686,7 @@
     "string": "Running"
   },
   "triathlonswimming": {
-    "string": "Open water swimming"
+    "string": "Nuoto di fondo"
   },
   "tricycledisabledsports": {
     "string": "Triciclo handisport"
@@ -1698,7 +1698,7 @@
     "string": "Pesca alla traina"
   },
   "trotting": {
-    "string": "Trotting"
+    "string": "Trotto"
   },
   "tumbling": {
     "string": "Tumbling"
@@ -1782,7 +1782,7 @@
     "string": "Camminata sportiva"
   },
   "waterexercise": {
-    "string": "Water sports"
+    "string": "Sport acquatici"
   },
   "waterfowlhunting": {
     "string": "Caccia agli uccelli acquatici"
@@ -1794,7 +1794,7 @@
     "string": "Attività con l'acqua"
   },
   "waterrunning": {
-    "string": "Water running"
+    "string": "Acquarunning"
   },
   "waterskiing": {
     "string": "Sci nautico"
