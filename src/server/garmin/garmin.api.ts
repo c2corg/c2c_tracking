@@ -239,7 +239,7 @@ export class GarminApi {
       });
       return z.array(GarminActivity).parse(response.data);
     } catch (error: unknown) {
-      throw handleExternalApiError('garmin', 'Unable to rtrieve Garmin activities for day', error);
+      throw handleExternalApiError('garmin', 'Unable to retrieve Garmin activities for day', error);
     }
   }
 
