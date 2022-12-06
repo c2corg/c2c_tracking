@@ -41,7 +41,7 @@
     "cls-rtracer": "2.6.2",
     "convict": "6.2.3",
     "crypto-js": "4.1.1",
-    "dayjs": "1.11.6",
+    "dayjs": "1.11.7",
     "dotenv": "16.0.3",
     "dotenv-expand": "9.0.0",
     "iso8601-duration": "2.1.1",
