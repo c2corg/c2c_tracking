@@ -696,7 +696,7 @@
     "string": "Salo in alto"
   },
   "hiit": {
-    "string": "High-intensity interval training"
+    "string": "High Intensity Interval Training"
   },
   "hike": {
     "string": "Hike"
@@ -1077,7 +1077,7 @@
     "string": "Obstacle Running"
   },
   "offroadduathlon": {
-    "string": "Off-road duathlon"
+    "string": "Duathlon off road"
   },
   "offroadduathloncycling": {
     "string": "Ciclismo di montagna"
@@ -1086,7 +1086,7 @@
     "string": "Trail running"
   },
   "offroadtriathlon": {
-    "string": "Off-road triathlon"
+    "string": "Triathlon off road"
   },
   "offroadtriathloncycling": {
     "string": "Ciclismo di montagna"
@@ -1881,10 +1881,10 @@
     "string": "Xare"
   },
   "xcskiingclassic": {
-    "string": "Classic XC skiing"
+    "string": "Sci di fondo in tecnica classica"
   },
   "xcskiingfreestyle": {
-    "string": "Freestyle XC skiing"
+    "string": "Sci di fondo in tecnica libera"
   },
   "yachting": {
     "string": "Vela abitabile"
