@@ -22,6 +22,17 @@ jobs:
         if: always() && (steps.lint_pr_title.outputs.error_message != null)
         with:
           header: pr-title-lint-error
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            chore
+            revert
+            i18n
           message: |
             Hey there and thank you for opening this pull request! 👋🏼
             
