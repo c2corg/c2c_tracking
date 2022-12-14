@@ -52,6 +52,6 @@ jobs:
       # Add label corresponding to conventional commit type
       - uses: srvaroa/labeler@v0.9
         with:
-          config_path: .github/semantics-labels.yml
+          config_path: .github/semantic-labels.yml
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
