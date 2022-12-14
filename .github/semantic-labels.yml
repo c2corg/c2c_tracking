@@ -1,11 +1,11 @@
 version: 1
 appendOnly: true
 labels:
-- label: "feat"
+- label: "enhancement"
   title[(:]: "^feat[(:].*"
-- label: "fix"
+- label: "bug"
   title: "^fix[(:].*"
-- label: "docs"
+- label: "documentation"
   title: "^docs[(:].*"
 - label: "style"
   title: "^style[(:].*"
