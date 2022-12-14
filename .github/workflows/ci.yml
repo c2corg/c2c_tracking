@@ -64,6 +64,7 @@ jobs:
           coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/psql/lcov.info
       - name: Format coverage report
         uses: ArtiomTr/jest-coverage-report-action@v2
+        if: "!contains(github.ref, 'refs/tags/') || github.ref != 'refs/heads/main'"
         id: coverage
         with:
           coverage-file: ./reports/coverage/coverage-final.json
@@ -71,6 +72,7 @@ jobs:
           output: report-markdown
       - name: Add coverage report comment
         uses: marocchino/sticky-pull-request-comment@v2
+        if: "!contains(github.ref, 'refs/tags/') || github.ref != 'refs/heads/main'"
         with:
           header: pr-coverage
           message: ${{ steps.coverage.outputs.report }}
