@@ -6,4 +6,9 @@ export default {
     '^.+\\.tsx?$': ['ts-jest'],
   },
   setupFiles: ['<rootDir>/test/environment/env-vars.mjs'],
+  coverageThreshold: {
+    global: {
+      lines: 80,
+    },
+  },
 };
