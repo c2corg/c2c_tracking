@@ -43,7 +43,7 @@
     "crypto-js": "4.1.1",
     "dayjs": "1.11.7",
     "dotenv": "16.0.3",
-    "dotenv-expand": "9.0.0",
+    "dotenv-expand": "10.0.0",
     "iso8601-duration": "2.1.1",
     "keyv": "4.5.2",
     "knex": "2.3.0",
