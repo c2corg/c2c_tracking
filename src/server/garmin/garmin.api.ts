@@ -229,17 +229,16 @@ export class GarminApi {
     return createHmac('sha1', `${this.#consumerSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64');
   }
 
-  public async getActivitiesForDay(date: Date, token: string, tokenSecret: string): Promise<GarminActivity[]> {
+  public async backfillActivities(days: number, token: string, tokenSecret: string): Promise<void> {
     try {
-      const url = `${this.apiUrl}wellness-api/rest/activityDetails`;
-      const end = dayjs(date).utc().endOf('day').unix();
-      const start = dayjs(date).utc().startOf('day').unix();
-      const response = await axios.get(`${url}?uploadStartTimeInSeconds=${start}&uploadEndTimeInSeconds=${end}`, {
+      const url = `${this.apiUrl}wellness-api/rest/backfill/activityDetails`;
+      const end = dayjs().utc().endOf('day').unix();
+      const start = dayjs().utc().startOf('day').subtract(days, 'day').unix();
+      await axios.get(`${url}?summaryStartTimeInSeconds=${start}&summaryEndTimeInSeconds=${end}`, {
         headers: { Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, start, end) },
       });
-      return z.array(GarminActivity).parse(response.data);
     } catch (error: unknown) {
-      throw handleExternalApiError('garmin', 'Unable to retrieve Garmin activities for day', error);
+      throw handleExternalApiError('garmin', 'Unable to request Garmin summary activity backfill', error);
     }
   }
 
