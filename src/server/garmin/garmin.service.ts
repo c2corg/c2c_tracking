@@ -32,39 +32,9 @@ export class GarminService {
 
   private async setupUser(c2cId: number, auth: GarminAuth): Promise<void> {
     await userService.configureGarmin(c2cId, auth);
-    // retrieve activities from last 8 days
-    const now = dayjs();
-    const activities: Omit<Activity, 'id' | 'userId'>[] = (
-      await Promise.allSettled(
-        [...Array(8).keys()]
-          .map((i) => now.subtract(i, 'day').toDate())
-          .flatMap(async (date) => await garminApi.getActivitiesForDay(date, auth.token, auth.tokenSecret)),
-      )
-    )
-      .map((result) => {
-        if (!this.isFullfilled(result)) {
-          log.warn('Unable to retrieve some Garmin activities summary: ' + JSON.stringify(result.reason, null, 2));
-        }
-        return result;
-      })
-      .filter(this.isFullfilled)
-      .flatMap((result) => result.value)
-      .map((activity) => this.asRepositoryActivity(activity))
-      .filter(({ geojson }) => !!geojson);
-    if (!activities.length) {
-      return;
-    }
-    try {
-      await userService.addActivities(c2cId, ...activities);
-    } catch (err: unknown) {
-      // failing to retrieve activities should not break the registration process
-      log.info(`Unable to retrieve Garmin activities for user ${c2cId}`);
-    }
+    // request backfill for activities from last 30 days (async)
+    garminApi.backfillActivities(30, auth.token, auth.tokenSecret);
   }
-
-  private isFullfilled = (
-    settled: PromiseSettledResult<GarminActivity[]>,
-  ): settled is PromiseFulfilledResult<GarminActivity[]> => settled.status === 'fulfilled';
 
   private toGeoJSON(samples?: GarminSample[]): LineString | undefined {
     if (!samples?.length) {

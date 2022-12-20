@@ -53,17 +53,24 @@ describe('Garmin API', () => {
     });
   });
 
-  describe('getActivitiesForDay', () => {
-    it('retrieves activities from given day', async () => {
+  describe('backfillActivities', () => {
+    beforeEach(() => {
+      jest.useFakeTimers({ now: new Date('2020-03-31T21:12:01Z') });
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('requests activities backfill', async () => {
       jest.mocked(axios).get.mockResolvedValueOnce({ data: [] });
 
       const api = new GarminApi();
-      const result = await api.getActivitiesForDay(new Date('1970-01-01T00:00:01Z'), 'token', 'tokenSecret');
+      await api.backfillActivities(30, 'token', 'tokenSecret');
 
-      expect(result).toEqual([]);
       expect(jest.mocked(axios).get).toBeCalledTimes(1);
       expect(jest.mocked(axios).get).toBeCalledWith(
-        `https://apis.garmin.com/wellness-api/rest/activityDetails?uploadStartTimeInSeconds=0&uploadEndTimeInSeconds=86399`,
+        `https://apis.garmin.com/wellness-api/rest/backfill/activityDetails?summaryStartTimeInSeconds=1583020800&summaryEndTimeInSeconds=1585699199`,
         expect.anything(),
       );
     });
