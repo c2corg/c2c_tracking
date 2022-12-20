@@ -269,7 +269,7 @@ export class GarminApi {
       this.#consumerKey
     }&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
     if (start != undefined && end != undefined) {
-      normalizedParameters += `&summaryEndTimeInSeconds=${end}&summayStartTimeInSeconds=${start}`;
+      normalizedParameters += `&summaryEndTimeInSeconds=${end}&summaryStartTimeInSeconds=${start}`;
     }
     const signatureBaseString = `${method}&${encodeURIComponent(url)}&${encodeURIComponent(normalizedParameters)}`;
     const signature = encodeURIComponent(
