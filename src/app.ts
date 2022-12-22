@@ -81,7 +81,11 @@ app
       origin: config.get('c2c.frontend.baseUrl').slice(0, -1),
     }),
   )
-  .use(bodyParser())
+  .use(
+    bodyParser({
+      jsonLimit: config.get('server.payload.limit'),
+    }),
+  )
   .use(helmet())
   .use(rTracer.koaMiddleware())
   .use(

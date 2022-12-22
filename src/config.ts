@@ -71,6 +71,14 @@ const config = convict({
       env: 'PORT',
       arg: 'port',
     },
+    payload: {
+      limit: {
+        doc: 'The JSON payload size limit',
+        format: 'notEmptyString',
+        default: '50mb',
+        env: 'SERVER_PAYLOAD_MAX_SIZE',
+      },
+    },
     baseUrl: {
       doc: 'Base URL the server binds to',
       format: 'baseUrl',
