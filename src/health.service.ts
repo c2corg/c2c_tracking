@@ -9,6 +9,11 @@ export type Status = {
   version: string;
   startTime: string;
   upTime: string;
+  strava: boolean;
+  suunto: boolean;
+  garmin: boolean;
+  decathlon: boolean;
+  polar: boolean;
 };
 
 export class HealthService {
@@ -23,6 +28,11 @@ export class HealthService {
       version: config.get('version'),
       startTime: new Date(this.startTime).toISOString(),
       upTime: dayjs(this.startTime).fromNow(true),
+      strava: config.get('trackers.strava.enabled'),
+      suunto: config.get('trackers.suunto.enabled'),
+      garmin: config.get('trackers.garmin.enabled'),
+      decathlon: config.get('trackers.decathlon.enabled'),
+      polar: config.get('trackers.polar.enabled'),
     };
   }
 }

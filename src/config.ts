@@ -186,6 +186,11 @@ const config = convict({
   },
   trackers: {
     strava: {
+      enabled: {
+        doc: 'Boolean to specify whether to enable connection with Strava',
+        default: true,
+        env: 'STRAVA_ENABLED',
+      },
       clientId: {
         doc: 'Strava client ID',
         format: 'notEmptyString',
@@ -208,6 +213,11 @@ const config = convict({
       },
     },
     suunto: {
+      enabled: {
+        doc: 'Boolean to specify whether to enable connection with Suunto',
+        default: true,
+        env: 'SUUNTO_ENABLED',
+      },
       clientId: {
         doc: 'Suunto client ID',
         format: 'uuid4',
@@ -243,6 +253,11 @@ const config = convict({
       },
     },
     garmin: {
+      enabled: {
+        doc: 'Boolean to specify whether to enable connection with Garmin',
+        default: true,
+        env: 'GARMIN_ENABLED',
+      },
       consumerKey: {
         doc: 'Garmin consumer key',
         format: 'uuid4',
@@ -258,6 +273,11 @@ const config = convict({
       },
     },
     decathlon: {
+      enabled: {
+        doc: 'Boolean to specify whether to enable connection with Decathlon',
+        default: true,
+        env: 'DECATHLON_ENABLED',
+      },
       clientId: {
         doc: 'Decathlon client ID',
         format: 'uuid4',
@@ -280,6 +300,11 @@ const config = convict({
       },
     },
     polar: {
+      enabled: {
+        doc: 'Boolean to specify whether to enable connection with Polar',
+        default: true,
+        env: 'POLAR_ENABLED',
+      },
       clientId: {
         doc: 'Polar client ID',
         format: 'uuid4',
