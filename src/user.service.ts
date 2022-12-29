@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 
+import config from './config';
 import { NotFoundError } from './errors';
 import type { Optional } from './helpers/utils';
 import type { Activity, Vendor } from './repository/activity';
@@ -32,15 +33,27 @@ const isActivityToUpdate = (
   update?: boolean;
 } => !!activity.id && !!activity.update;
 
+const stravaEnabled = config.get('trackers.strava.enabled');
+const suuntoEnabled = config.get('trackers.suunto.enabled');
+const garminEnabled = config.get('trackers.garmin.enabled');
+const decathlonEnabled = config.get('trackers.decathlon.enabled');
+const polarEnabled = config.get('trackers.polar.enabled');
+
 export class UserService {
-  public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]: Status }> {
+  public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]?: Status }> {
     const { strava, suunto, garmin, decathlon, polar } = (await userRepository.findById(c2cId)) || {};
     return {
-      strava: !!strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
-      suunto: !!suunto ? (suunto.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
-      garmin: !!garmin ? 'configured' : 'not-configured',
-      decathlon: !!decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
-      polar: !!polar ? 'configured' : 'not-configured',
+      ...(stravaEnabled && {
+        strava: !!strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+      }),
+      ...(suuntoEnabled && {
+        suunto: !!suunto ? (suunto.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+      }),
+      ...(garminEnabled && { garmin: !!garmin ? 'configured' : 'not-configured' }),
+      ...(decathlonEnabled && {
+        decathlon: !!decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+      }),
+      ...(polarEnabled && { polar: !!polar ? 'configured' : 'not-configured' }),
     };
   }
 

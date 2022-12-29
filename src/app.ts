@@ -11,6 +11,7 @@ import type { LevelWithSilent } from 'pino';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth';
 import config from './config';
+import enabledIf from './helpers/enabled-if';
 import log from './helpers/logger';
 import { promResponseTimeSummary } from './metrics/prometheus';
 import activities from './server/activities';
@@ -27,11 +28,16 @@ const app = new Koa();
 const router = new Router();
 
 router.use('/health', health.routes(), health.allowedMethods());
-router.use('/strava', strava.routes(), strava.allowedMethods());
-router.use('/suunto', suunto.routes(), suunto.allowedMethods());
-router.use('/garmin', garmin.routes(), garmin.allowedMethods());
-router.use('/decathlon', decathlon.routes(), decathlon.allowedMethods());
-router.use('/polar', polar.routes(), polar.allowedMethods());
+router.use('/strava', enabledIf(config.get('trackers.strava.enabled')), strava.routes(), strava.allowedMethods());
+router.use('/suunto', enabledIf(config.get('trackers.suunto.enabled')), suunto.routes(), suunto.allowedMethods());
+router.use('/garmin', enabledIf(config.get('trackers.garmin.enabled')), garmin.routes(), garmin.allowedMethods());
+router.use(
+  '/decathlon',
+  enabledIf(config.get('trackers.decathlon.enabled')),
+  decathlon.routes(),
+  decathlon.allowedMethods(),
+);
+router.use('/polar', enabledIf(config.get('trackers.polar.enabled')), polar.routes(), polar.allowedMethods());
 router.use(
   '/users/:userId/activities',
   ensureAuthenticated,
