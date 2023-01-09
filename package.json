@@ -39,7 +39,7 @@
     "async": "3.2.4",
     "axios": "1.2.2",
     "cls-rtracer": "2.6.2",
-    "convict": "6.2.3",
+    "convict": "6.2.4",
     "crypto-js": "4.1.1",
     "dayjs": "1.11.7",
     "dotenv": "16.0.3",
