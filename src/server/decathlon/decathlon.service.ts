@@ -34,7 +34,23 @@ export class DecathlonService {
       if (!activities.length) {
         return;
       }
-      await userService.addActivities(c2cId, ...activities.map((activity) => this.asRepositoryActivity(activity)));
+      const geometries = (
+        await Promise.allSettled(
+          activities.map((activity) => this.retrieveActivityGeometry(auth.access_token, activity.id)),
+        )
+      ).map((result, i) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        log.info(`Unable to retrieve geometry for Decathlon activity ${activities[i]!.id} for user ${c2cId}`);
+        return undefined;
+      });
+      const repositoryActivities = activities
+        // eslint-disable-next-line security/detect-object-injection
+        .map((activity, i) => ({ activity, geojson: geometries?.[i] }))
+        .map(({ activity, geojson }) => this.asRepositoryActivity(activity, geojson));
+      await userService.addActivities(c2cId, ...repositoryActivities);
     } catch (error: unknown) {
       // not retrieving past activities should not block the registration process
       log.info(`Unable to retrieve Decathlon activities for user ${c2cId}`);
@@ -94,10 +110,18 @@ export class DecathlonService {
     return undefined;
   }
 
-  public async getActivityGeometry(accessToken: string, activityId: string): Promise<LineString | undefined> {
-    const activity = await decathlonApi.getActivity(accessToken, activityId);
-    const coordinates = this.locationsToGeoJson(activity);
-    return coordinates.length ? { type: 'LineString', coordinates } : undefined;
+  private async retrieveActivityGeometry(accessToken: string, activityId: string): Promise<LineString | undefined> {
+    try {
+      const activity = await decathlonApi.getActivity(accessToken, activityId);
+      const coordinates = this.locationsToGeoJson(activity);
+      return coordinates.length ? { type: 'LineString', coordinates } : undefined;
+    } catch (error: unknown) {
+      log.info(
+        `Unable to retrieve Decahtlon geometry for activity ${activityId}`,
+        error instanceof Error ? error : undefined,
+      );
+      return undefined;
+    }
   }
 
   public async handleWebhookEvent(event: WebhookEvent): Promise<void> {
@@ -135,8 +159,10 @@ export class DecathlonService {
       return;
     }
     let activity: Activity;
+    let geojson: LineString | undefined = undefined;
     try {
       activity = await decathlonApi.getActivity(token, activityId);
+      geojson = await this.retrieveActivityGeometry(token, activityId);
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
@@ -145,7 +171,7 @@ export class DecathlonService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, this.asRepositoryActivity(activity));
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(activity, geojson));
       promWebhookCounter.labels({ vendor: 'decathlon', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
@@ -180,7 +206,7 @@ export class DecathlonService {
       .sort(([_lng1, _lat1, _ele1, d1], [_lng2, _lat2, _ele2, d2]) => d1 - d2);
   }
 
-  private asRepositoryActivity(activity: Activity): Omit<RepositoryActivity, 'id' | 'userId'> {
+  private asRepositoryActivity(activity: Activity, geojson?: LineString): Omit<RepositoryActivity, 'id' | 'userId'> {
     const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
     const coordinates = this.locationsToGeoJson(activity);
     let duration = activity.duration;
@@ -202,6 +228,7 @@ export class DecathlonService {
       ...(elevation && { heightDiffUp: Math.round(elevation) }),
       ...(length && { length: Math.round(length) }),
       ...(coordinates.length && { geojson: { type: 'LineString', coordinates } }),
+      ...(geojson && { geojson }),
     };
   }
 }

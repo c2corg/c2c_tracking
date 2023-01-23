@@ -4,9 +4,11 @@ import dayjsPluginUTC from 'dayjs/plugin/utc';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
+import { fitToGeoJSON } from '../../helpers/utils';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import type { Activity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
+import type { LineString } from '../../repository/geojson';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
@@ -36,7 +38,24 @@ export class SuuntoService {
       if (!workouts.payload.length) {
         return;
       }
-      const activities: Omit<Activity, 'id' | 'userId'>[] = workouts.payload.map(this.asRepositoryActivity);
+
+      const geometries = (
+        await Promise.allSettled(
+          workouts.payload.map((workout) => this.retrieveActivityGeometry(auth.access_token, workout.workoutId)),
+        )
+      ).map((result, i) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        log.info(`Unable to retrieve geometry for Suunto activity ${workouts.payload[i]!.workoutId} for user ${c2cId}`);
+        return undefined;
+      });
+
+      const activities = workouts.payload
+        // eslint-disable-next-line security/detect-object-injection
+        .map((workout, i) => ({ workout, geojson: geometries?.[i] }))
+        .map(({ workout, geojson }) => this.asRepositoryActivity(workout, geojson));
       await userService.addActivities(c2cId, ...activities);
     } catch (err: unknown) {
       log.warn(err);
@@ -65,8 +84,20 @@ export class SuuntoService {
     return undefined;
   }
 
-  public async getFIT(token: string, vendorId: string): Promise<ArrayBuffer> {
-    return suuntoApi.getFIT(vendorId, token, this.#suuntoSubscriptionKey);
+  private async retrieveActivityGeometry(token: string, activityId: number): Promise<LineString | undefined> {
+    let fit: ArrayBuffer | undefined;
+    try {
+      fit = await suuntoApi.getFIT(activityId.toString(), token, this.#suuntoSubscriptionKey);
+    } catch (error: unknown) {
+      log.info(`Unable to retrieve Suunto geometry for ${activityId}`, error instanceof Error ? error : undefined);
+      return undefined;
+    }
+    const geojson: LineString | undefined = fitToGeoJSON(fit);
+    if (!geojson) {
+      log.info(`Unable to convert Suunto FIT file to geometry for ${activityId}`);
+      return undefined;
+    }
+    return geojson;
   }
 
   public async handleWebhookEvent(event: WebhookEvent, authHeader: string | undefined): Promise<void> {
@@ -92,8 +123,10 @@ export class SuuntoService {
       return;
     }
     let workout: WorkoutSummary;
+    let geojson: LineString | undefined = undefined;
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
+      geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutId);
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(
@@ -102,7 +135,7 @@ export class SuuntoService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, this.asRepositoryActivity(workout.payload));
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(workout.payload, geojson));
       promWebhookCounter.labels({ vendor: 'suunto', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
@@ -135,7 +168,7 @@ export class SuuntoService {
     await userRepository.update({ ...userWithoutData });
   }
 
-  private asRepositoryActivity(workout: Workout): Omit<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(workout: Workout, geojson?: LineString): Omit<Activity, 'id' | 'userId'> {
     return {
       vendor: 'suunto' as Vendor,
       vendorId: workout.workoutKey,
@@ -145,6 +178,7 @@ export class SuuntoService {
       ...(workout.totalTime && { duration: Math.round(workout.totalTime) }),
       ...(workout.totalAscent && { heightDiffUp: Math.round(workout.totalAscent) }),
       ...(workout.workoutName && { name: workout.workoutName }),
+      ...(geojson && { geojson }),
     };
   }
 }
