@@ -675,7 +675,7 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(userService, 'addActivities');
+        jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
         const service = new StravaService();
         await service.handleWebhookEvent({
