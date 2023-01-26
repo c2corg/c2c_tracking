@@ -692,11 +692,14 @@
   "heptathlon": {
     "string": "Heptatlón"
   },
+  "highintensityintervaltraining": {
+    "string": "HIIT"
+  },
   "highjump": {
     "string": "Salto de altura"
   },
   "hiit": {
-    "string": "High-intensity interval training"
+    "string": "HIIT"
   },
   "hike": {
     "string": "Hike"
@@ -1201,6 +1204,9 @@
   },
   "photo": {
     "string": "Fotografía"
+  },
+  "pickleball": {
+    "string": "Pickleball"
   },
   "pilates": {
     "string": "Pilates"
@@ -1759,6 +1765,9 @@
   },
   "virtualride": {
     "string": "Virtual Ride"
+  },
+  "virtualrow": {
+    "string": "Virtual Row"
   },
   "virtualrun": {
     "string": "Virtual Run"

@@ -692,11 +692,14 @@
   "heptathlon": {
     "string": "女子七项全能"
   },
+  "highintensityintervaltraining": {
+    "string": "HIIT"
+  },
   "highjump": {
     "string": "跳高"
   },
   "hiit": {
-    "string": "High-intensity interval training"
+    "string": "HIIT"
   },
   "hike": {
     "string": "Hike"
@@ -1201,6 +1204,9 @@
   },
   "photo": {
     "string": "照片"
+  },
+  "pickleball": {
+    "string": "Pickleball"
   },
   "pilates": {
     "string": "普拉特健身操"
@@ -1759,6 +1765,9 @@
   },
   "virtualride": {
     "string": "Virtual Ride"
+  },
+  "virtualrow": {
+    "string": "Virtual Row"
   },
   "virtualrun": {
     "string": "Virtual Run"
