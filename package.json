@@ -15,8 +15,8 @@
     "prepare": "husky install",
     "test": "npm run test:unit && npm run test:psql",
     "test:ci": "npm run test:ci:unit && npm run test:ci:psql",
-    "test:unit": "jest --runInBand",
-    "test:ci:unit": "jest --config jest.config.ci.mjs --runInBand",
+    "test:unit": "jest --runInBand --detectOpenHandles",
+    "test:ci:unit": "jest --config jest.config.ci.mjs --runInBand --detectOpenHandles",
     "test:psql": "jest --config jest.config.psql.mjs --runInBand",
     "test:ci:psql": "npm run test:ci:psql:init && jest --config jest.config.psql.ci.mjs --runInBand",
     "test:ci:psql:init": "ts-node test/environment/init-db.ts"
