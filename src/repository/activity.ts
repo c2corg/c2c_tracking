@@ -20,6 +20,7 @@ export const Activity = z.object({
   heightDiffUp: z.number().nonnegative().optional(),
   duration: z.number().int().nonnegative().optional(),
   geojson: LineString.optional(),
+  miniature: z.string().length(28).optional(),
 });
 
 export type Activity = z.infer<typeof Activity>;

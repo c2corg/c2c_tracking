@@ -4,6 +4,7 @@ import type { Except } from 'type-fest';
 import config from './config';
 import { NotFoundError } from './errors';
 import type { Optional } from './helpers/utils';
+import { miniatureService } from './miniature.service';
 import type { Activity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
 import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
@@ -312,7 +313,10 @@ export class UserService {
     }
   }
 
-  public async addActivities(c2cId: number, ...activities: Except<Activity, 'id' | 'userId'>[]): Promise<void> {
+  public async addActivities(
+    c2cId: number,
+    ...activities: Except<Activity, 'id' | 'userId' | 'miniature'>[]
+  ): Promise<void> {
     const userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
     const newActivitiesKeys = new Set(activities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
@@ -346,6 +350,19 @@ export class UserService {
 
     const activitiesToInsert = mergedActivities.slice(0, MAX_ACTIVITIES_PER_USER).filter((act) => !act.id);
     const activitiesToDelete = mergedActivities.slice(MAX_ACTIVITIES_PER_USER).filter(isInDb);
+
+    await Promise.allSettled(
+      activitiesToDelete.map((act) => act.miniature && miniatureService.deleteMiniature(act.miniature)),
+    );
+    await Promise.allSettled(
+      [...activitiesToUpdate, ...activitiesToInsert].map(async (act) => {
+        if (!act.geojson) {
+          return;
+        }
+        const miniature = await miniatureService.generateMiniature(act.geojson);
+        act.miniature = miniature;
+      }),
+    );
     await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
   }
 
