@@ -161,6 +161,7 @@ describe('Decathlon Service', () => {
       jest.spyOn(decathlonApi, 'getUserId').mockRejectedValueOnce(new Error('test'));
       jest.spyOn(decathlonApi, 'getExistingWebhookSubscription');
       jest.spyOn(userService, 'configureDecathlon');
+      jest.spyOn(decathlonApi, 'getActivities');
 
       const service = new DecathlonService();
       await expect(
