@@ -692,11 +692,14 @@
   "heptathlon": {
     "string": "Heptathlon"
   },
+  "highintensityintervaltraining": {
+    "string": "HIIT"
+  },
   "highjump": {
     "string": "Saut en hauteur"
   },
   "hiit": {
-    "string": "Entraînement"
+    "string": "HIIT"
   },
   "hike": {
     "string": "Randonnée"
@@ -1201,6 +1204,9 @@
   },
   "photo": {
     "string": "Photo"
+  },
+  "pickleball": {
+    "string": "Pickleball"
   },
   "pilates": {
     "string": "Pilates"
@@ -1760,8 +1766,11 @@
   "virtualride": {
     "string": "Home trainer"
   },
+  "virtualrow": {
+    "string": "Aviron indoor"
+  },
   "virtualrun": {
-    "string": "Course à pied virtuelle"
+    "string": "Course à pied indoor"
   },
   "volleyball": {
     "string": "Volleyball"
