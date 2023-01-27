@@ -32,12 +32,12 @@ export class DecathlonService {
     try {
       // retrieve last 30 outings
       const activities = await decathlonApi.getActivities(auth.access_token);
-      if (!activities.length) {
-        return;
-      }
       const geometries = (
         await Promise.allSettled(
-          activities.map((activity) => this.retrieveActivityGeometry(auth.access_token, activity.id)),
+          activities.map(async (activity) => {
+            const fullActivity = await decathlonApi.getActivity(auth.access_token, activity.id);
+            return this.retrieveActivityGeometry(fullActivity);
+          }),
         )
       ).map((result, i) => {
         if (result.status === 'fulfilled') {
@@ -50,6 +50,7 @@ export class DecathlonService {
       const repositoryActivities = activities
         // eslint-disable-next-line security/detect-object-injection
         .map((activity, i) => ({ activity, geojson: geometries?.[i] }))
+        .filter(({ geojson }) => !!geojson)
         .map(({ activity, geojson }) => this.asRepositoryActivity(activity, geojson));
       await userService.addActivities(c2cId, ...repositoryActivities);
     } catch (error: unknown) {
@@ -111,14 +112,13 @@ export class DecathlonService {
     return undefined;
   }
 
-  private async retrieveActivityGeometry(accessToken: string, activityId: string): Promise<LineString | undefined> {
+  private async retrieveActivityGeometry(activity: Activity): Promise<LineString | undefined> {
     try {
-      const activity = await decathlonApi.getActivity(accessToken, activityId);
       const coordinates = this.locationsToGeoJson(activity);
       return coordinates.length ? { type: 'LineString', coordinates } : undefined;
     } catch (error: unknown) {
       log.info(
-        `Unable to retrieve Decahtlon geometry for activity ${activityId}`,
+        `Unable to retrieve Decathlon geometry for activity ${activity.id}`,
         error instanceof Error ? error : undefined,
       );
       return undefined;
@@ -163,7 +163,10 @@ export class DecathlonService {
     let geojson: LineString | undefined = undefined;
     try {
       activity = await decathlonApi.getActivity(token, activityId);
-      geojson = await this.retrieveActivityGeometry(token, activityId);
+      geojson = await this.retrieveActivityGeometry(activity);
+      if (!geojson) {
+        return;
+      }
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(

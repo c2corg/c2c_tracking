@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const os = require('os');
+
 process.env['SERVER_BASE_URL'] = 'http://localhost:3000/';
 process.env['DB_CRYPTO'] = 'secret';
 process.env['JWT_SECRET_KEY'] = 'secret';
@@ -10,3 +13,6 @@ process.env['GARMIN_CONSUMER_SECRET'] = 'secret';
 process.env['DECATHLON_CLIENT_SECRET'] = 'c2VjcmV0';
 process.env['DECATHLON_API_KEY'] = '9ccc19db-faaa-49ab-b1e1-8ab30cc7761d';
 process.env['POLAR_CLIENT_SECRET'] = '902d20cc-c2a8-4536-89a9-41e0f7626977';
+process.env['MAPBOX_TOKEN'] = 'mapbox-token';
+process.env['STORAGE_BACKEND'] = 'local';
+process.env['LOCAL_STORAGE_FOLDER'] = `${os.tmpdir()}/miniatures`;

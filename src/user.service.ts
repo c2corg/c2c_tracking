@@ -317,12 +317,16 @@ export class UserService {
     c2cId: number,
     ...activities: Except<Activity, 'id' | 'userId' | 'miniature'>[]
   ): Promise<void> {
+    const newActivities = activities.filter(({ geojson }) => !!geojson);
+    if (!newActivities.length) {
+      return;
+    }
     const userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
-    const newActivitiesKeys = new Set(activities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
+    const newActivitiesKeys = new Set(newActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
     const mergedActivities: (Optional<Activity, 'id'> & { update?: boolean })[] = [
       ...userActivities.filter((activity) => !newActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)),
-      ...activities
+      ...newActivities
         .map((activity) => {
           if (userActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)) {
             // replace

@@ -36,9 +36,6 @@ export class SuuntoService {
       await userService.configureSuunto(c2cId, auth);
       // retrieve last 30 outings
       const workouts: Workouts = await suuntoApi.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
-      if (!workouts.payload.length) {
-        return;
-      }
 
       const geometries = (
         await Promise.allSettled(
@@ -56,6 +53,7 @@ export class SuuntoService {
       const activities = workouts.payload
         // eslint-disable-next-line security/detect-object-injection
         .map((workout, i) => ({ workout, geojson: geometries?.[i] }))
+        .filter(({ geojson }) => !!geojson)
         .map(({ workout, geojson }) => this.asRepositoryActivity(workout, geojson));
       await userService.addActivities(c2cId, ...activities);
     } catch (err: unknown) {
@@ -128,6 +126,9 @@ export class SuuntoService {
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
       geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutId);
+      if (!geojson) {
+        return;
+      }
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(

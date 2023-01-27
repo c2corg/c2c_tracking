@@ -51,9 +51,7 @@ export class StravaService {
     try {
       // retrieve last 30 outings
       const activities: Activity[] = await stravaApi.getAthleteActivities(auth.access_token);
-      if (!activities.length) {
-        return;
-      }
+
       const geometries = (
         await Promise.allSettled(
           activities.map((activity) =>
@@ -76,6 +74,7 @@ export class StravaService {
       const repositoryActivities = activities
         // eslint-disable-next-line security/detect-object-injection
         .map((activity, i) => ({ activity, geojson: geometries?.[i] }))
+        .filter(({ geojson }) => !!geojson)
         .map(({ activity, geojson }) => this.asRepositoryActivity(activity, geojson));
       await userService.addActivities(c2cId, ...repositoryActivities);
     } catch (error: unknown) {
@@ -139,7 +138,7 @@ export class StravaService {
     }
   }
 
-  private streamSetToGeoJSON(stream: StreamSet, startDate: number): LineString {
+  private streamSetToGeoJSON(stream: StreamSet, startDate: number): LineString | undefined {
     const distanceStream: DistanceStream | undefined = stream.find(StravaService.isDistanceStream);
     const timeStream: TimeStream | undefined = stream.find(StravaService.isTimeStream);
     const latlngStream: LatLngStream | undefined = stream.find(StravaService.isLatLngStream);
@@ -170,6 +169,9 @@ export class StravaService {
         coordinate.push(startDate + timeStream!.data[i]!);
       }
       coordinates.push(coordinate);
+    }
+    if (coordinates.length < 2) {
+      return undefined;
     }
     return {
       type: 'LineString',
@@ -330,6 +332,9 @@ export class StravaService {
         activityId,
         this.localDate(activity.start_date, activity.start_date_local),
       );
+      if (!geojson) {
+        return;
+      }
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(

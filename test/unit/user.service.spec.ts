@@ -1,5 +1,6 @@
 import { NotFoundError } from '../../src/errors';
 import log from '../../src/helpers/logger';
+import { miniatureService } from '../../src/miniature.service';
 import type { Activity } from '../../src/repository/activity';
 import { activityRepository } from '../../src/repository/activity.repository';
 import { userRepository } from '../../src/repository/user.repository';
@@ -957,6 +958,20 @@ describe('User service', () => {
   });
 
   describe('addActivities', () => {
+    it('filters out activities without geometry', async () => {
+      jest.spyOn(activityRepository, 'upsert');
+
+      const service = new UserService();
+      await service.addActivities(1, {
+        vendor: 'strava',
+        vendorId: '1000',
+        date: '2022-06-06T00:00:01Z',
+        type: 'RUN',
+      });
+
+      expect(activityRepository.upsert).not.toBeCalled();
+    });
+
     it('sorts activities and keep only the most recent ones', async () => {
       const activities: Activity[] = [...Array(30).keys()]
         .map((k) => k + 1)
@@ -967,6 +982,14 @@ describe('User service', () => {
           vendorId: k.toString(),
           date: '2022-01-' + k.toString().padStart(2, '0') + 'T00:00:01Z',
           type: 'RUN',
+          geojson: {
+            type: 'LineString',
+            coordinates: [
+              [1.0, 1.0],
+              [2.0, 2.0],
+            ],
+          },
+          miniature: `${k}.png`,
         }));
       jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
       jest.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
@@ -977,8 +1000,72 @@ describe('User service', () => {
         vendorId: '1000',
         date: '2022-06-06T00:00:01Z',
         type: 'RUN',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
       });
 
+      expect(activityRepository.upsert).toBeCalledTimes(1);
+      expect(activityRepository.upsert).toBeCalledWith(
+        [],
+        expect.arrayContaining([expect.objectContaining({ vendorId: '1000' })]),
+        expect.arrayContaining([expect.objectContaining({ vendorId: '1' })]),
+      );
+    });
+
+    it('computes miniature for new activities, deletes for deleted ones', async () => {
+      const activities: Activity[] = [...Array(30).keys()]
+        .map((k) => k + 1)
+        .map((k) => ({
+          id: k,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: k.toString(),
+          date: '2022-01-' + k.toString().padStart(2, '0') + 'T00:00:01Z',
+          type: 'RUN',
+          geojson: {
+            type: 'LineString',
+            coordinates: [
+              [1.0, 1.0],
+              [2.0, 2.0],
+            ],
+          },
+          miniature: `${k}.png`,
+        }));
+      jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
+      jest.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('toto.png');
+      jest.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new UserService();
+      await service.addActivities(1, {
+        vendor: 'strava',
+        vendorId: '1000',
+        date: '2022-06-06T00:00:01Z',
+        type: 'RUN',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('1.png');
+      expect(miniatureService.generateMiniature).toBeCalledTimes(1);
+      expect(miniatureService.generateMiniature).toBeCalledWith({
+        type: 'LineString',
+        coordinates: [
+          [1.0, 1.0],
+          [2.0, 2.0],
+        ],
+      });
       expect(activityRepository.upsert).toBeCalledTimes(1);
       expect(activityRepository.upsert).toBeCalledWith(
         [],
@@ -1007,6 +1094,13 @@ describe('User service', () => {
         date: '2022-01-01T00:00:01Z',
         name: 'newname',
         type: 'FLY',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
       });
 
       expect(activityRepository.upsert).toBeCalledTimes(1);
@@ -1020,6 +1114,13 @@ describe('User service', () => {
             date: '2022-01-01T00:00:01Z',
             type: 'FLY',
             name: 'newname',
+            geojson: {
+              type: 'LineString',
+              coordinates: [
+                [1.0, 1.0],
+                [2.0, 2.0],
+              ],
+            },
           },
         ],
         [],
