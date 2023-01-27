@@ -1,3 +1,5 @@
+import type { Except } from 'type-fest';
+
 import { NotFoundError } from '../../errors';
 import { Lang, translations } from '../../helpers/i18n';
 import type { Activity } from '../../repository/activity';
@@ -8,7 +10,7 @@ export class ActivityService {
   public async getActivities(
     userId: number,
     lang?: Lang,
-  ): Promise<(Omit<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
+  ): Promise<(Except<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
     const langs: Lang[] = lang ? [lang] : Lang.options;
     return (await userService.getActivities(userId)).map(({ geojson, type, ...keep }) => {
       const translated = langs.reduce(

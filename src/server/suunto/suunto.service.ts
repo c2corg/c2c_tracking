@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
+import type { Except } from 'type-fest';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
@@ -168,7 +169,7 @@ export class SuuntoService {
     await userRepository.update({ ...userWithoutData });
   }
 
-  private asRepositoryActivity(workout: Workout, geojson?: LineString): Omit<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(workout: Workout, geojson?: LineString): Except<Activity, 'id' | 'userId'> {
     return {
       vendor: 'suunto' as Vendor,
       vendorId: workout.workoutKey,

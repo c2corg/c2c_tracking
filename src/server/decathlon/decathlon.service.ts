@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import type { Except } from 'type-fest';
 
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
@@ -206,7 +207,7 @@ export class DecathlonService {
       .sort(([_lng1, _lat1, _ele1, d1], [_lng2, _lat2, _ele2, d2]) => d1 - d2);
   }
 
-  private asRepositoryActivity(activity: Activity, geojson?: LineString): Omit<RepositoryActivity, 'id' | 'userId'> {
+  private asRepositoryActivity(activity: Activity, geojson?: LineString): Except<RepositoryActivity, 'id' | 'userId'> {
     const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
     const coordinates = this.locationsToGeoJson(activity);
     let duration = activity.duration;

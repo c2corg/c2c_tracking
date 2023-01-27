@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import type { Except } from 'type-fest';
 
 import config from './config';
 import { NotFoundError } from './errors';
@@ -311,7 +312,7 @@ export class UserService {
     }
   }
 
-  public async addActivities(c2cId: number, ...activities: Omit<Activity, 'id' | 'userId'>[]): Promise<void> {
+  public async addActivities(c2cId: number, ...activities: Except<Activity, 'id' | 'userId'>[]): Promise<void> {
     const userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
     const newActivitiesKeys = new Set(activities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
@@ -348,7 +349,7 @@ export class UserService {
     await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
   }
 
-  public async updateActivity(c2cId: number, activity: Omit<Activity, 'id' | 'userId'>): Promise<void> {
+  public async updateActivity(c2cId: number, activity: Except<Activity, 'id' | 'userId'>): Promise<void> {
     const savedActivity = (await activityRepository.findByUser(c2cId)).find(
       (act) => act.vendor === activity.vendor && act.vendorId === activity.vendorId,
     );

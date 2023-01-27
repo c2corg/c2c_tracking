@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { parse } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
+import type { Except } from 'type-fest';
 
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
@@ -164,7 +165,7 @@ export class PolarService {
     return signature === createHmac('sha256', webhookSecret).update(rawEvent).digest('hex');
   }
 
-  private asRepositoryActivity(exercise: Exercise): Omit<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(exercise: Exercise): Except<Activity, 'id' | 'userId'> {
     return {
       vendor: 'polar' as Vendor,
       vendorId: exercise.id,
