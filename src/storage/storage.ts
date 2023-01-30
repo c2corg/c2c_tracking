@@ -114,7 +114,7 @@ export class S3Storage implements Storage {
   }
 
   public get baseUrl(): string {
-    return `${this.#endpoint}/${this.#bucketName}`;
+    return `${this.#endpoint}${this.#bucketName}`;
   }
 }
 
