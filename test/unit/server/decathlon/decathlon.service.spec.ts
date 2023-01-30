@@ -12,6 +12,10 @@ describe('Decathlon Service', () => {
     jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('requestShortLivedAccessTokenAndSetupUser', () => {
     it('calls API then setups user', async () => {
       jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
@@ -33,6 +37,17 @@ describe('Decathlon Service', () => {
           dataSummaries: { '18': 1.2, '5': 1.2, '24': 1.2 },
         },
       ]);
+      jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+        id: 'activityId',
+        name: 'activity',
+        sport: '/v2/sports/381',
+        startdate: '1970-01-01T00:00:01Z',
+        dataSummaries: {},
+        locations: {
+          '1': { latitude: 1.0, longitude: 1.0, elevation: 1.0 },
+          '2': { latitude: 2.0, longitude: 2.0, elevation: 2.0 },
+        },
+      });
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
@@ -60,6 +75,8 @@ describe('Decathlon Service', () => {
       );
       expect(decathlonApi.getActivities).toBeCalledTimes(1);
       expect(decathlonApi.getActivities).toBeCalledWith('access_token');
+      expect(decathlonApi.getActivity).toBeCalledTimes(1);
+      expect(decathlonApi.getActivity).toBeCalledWith('access_token', '1');
       expect(userService.addActivities).toBeCalledTimes(1);
       expect(userService.addActivities).toBeCalledWith(1, {
         vendor: 'decathlon',
@@ -69,6 +86,13 @@ describe('Decathlon Service', () => {
         date: '2022-01-01T00:00:01Z',
         length: 1,
         duration: 1,
+        geojson: {
+          coordinates: [
+            [1, 1, 1, 2],
+            [2, 2, 2, 3],
+          ],
+          type: 'LineString',
+        },
         heightDiffUp: 1,
       });
     });
@@ -117,19 +141,9 @@ describe('Decathlon Service', () => {
         'userId',
         'webhookId',
       );
-      expect(decathlonApi.getActivities).toBeCalledTimes(1);
-      expect(decathlonApi.getActivities).toBeCalledWith('access_token');
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
-        vendor: 'decathlon',
-        vendorId: '1',
-        name: 'Morning run',
-        type: 'Bicycle',
-        date: '2022-01-01T00:00:01Z',
-      });
     });
 
-    it('stores activities only if there are some', async () => {
+    it('filters out activities without geometry', async () => {
       jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
@@ -148,7 +162,8 @@ describe('Decathlon Service', () => {
 
       expect(userService.configureDecathlon).toBeCalledTimes(1);
       expect(decathlonApi.getActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).not.toBeCalled();
+      expect(userService.addActivities).toBeCalledTimes(1);
+      expect(userService.addActivities).toBeCalledWith(1);
     });
 
     it('throws if user id cannot be retrieved', async () => {
@@ -406,69 +421,6 @@ describe('Decathlon Service', () => {
     });
   });
 
-  describe('getActivityGeometry', () => {
-    it('throws if geometry cannot be retrieved', async () => {
-      jest.spyOn(decathlonApi, 'getActivity').mockRejectedValueOnce(new Error('test'));
-
-      const service = new DecathlonService();
-      await expect(
-        service.getActivityGeometry('access_token', 'activityId'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
-    });
-
-    it('returns undefined if geometry has no locations', async () => {
-      jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
-        id: 'activityId',
-        name: 'activity',
-        sport: '/v2/sports/381',
-        startdate: '1970-01-01T00:00:01Z',
-        dataSummaries: {},
-      });
-
-      const service = new DecathlonService();
-      const result = await service.getActivityGeometry('access_token', 'activityId');
-
-      expect(result).toBeUndefined();
-    });
-
-    it('returns geometry', async () => {
-      jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
-        id: 'activityId',
-        name: 'activity',
-        sport: '/v2/sports/381',
-        startdate: '1970-01-01T00:00:01Z',
-        dataSummaries: {},
-        locations: {
-          '1': { latitude: 1.0, longitude: 1.0, elevation: 1.0 },
-          '2': { latitude: 2.0, longitude: 2.0, elevation: 2.0 },
-        },
-      });
-
-      const service = new DecathlonService();
-      const result = await service.getActivityGeometry('access_token', 'activityId');
-
-      expect(result).toMatchInlineSnapshot(`
-        {
-          "coordinates": [
-            [
-              1,
-              1,
-              1,
-              2,
-            ],
-            [
-              2,
-              2,
-              2,
-              3,
-            ],
-          ],
-          "type": "LineString",
-        }
-      `);
-    });
-  });
-
   describe('handleWebhookEvent', () => {
     describe('activity create event', () => {
       it('warns if no matching user is found', async () => {
@@ -578,6 +530,40 @@ describe('Decathlon Service', () => {
         expect(log.warn).toBeCalledWith(
           `Decathlon activity creation webhook event for user 1 couldn't be processed: unable to insert activity data`,
         );
+      });
+
+      it('ignores activity without geometry', async () => {
+        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
+          c2cId: 1,
+          decathlon: {
+            id: 'userId',
+            accessToken: 'access_token',
+            expiresAt: 999999999999,
+            refreshToken: 'refresh_token',
+            webhookId: 'webhookId',
+          },
+        });
+        jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+          id: 'activityId',
+          name: 'name',
+          sport: '/v2/sports/381',
+          startdate: '1970-01-01T00:00:01Z',
+          dataSummaries: {},
+          locations: {},
+        });
+        jest.spyOn(userService, 'addActivities');
+
+        const service = new DecathlonService();
+        await service.handleWebhookEvent({
+          user_id: 'userId',
+          event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
+        });
+
+        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
+        expect(decathlonApi.getActivity).toBeCalledTimes(1);
+        expect(decathlonApi.getActivity).toBeCalledWith('access_token', 'activityId');
+        expect(userService.addActivities).not.toBeCalled();
       });
 
       it('saves event activity', async () => {

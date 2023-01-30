@@ -4,13 +4,12 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { parse } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
-import type { Except } from 'type-fest';
 
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { fitToGeoJSON } from '../../helpers/utils';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import type { Activity, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import { polarRepository } from '../../repository/polar.repository';
@@ -151,7 +150,7 @@ export class PolarService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise));
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise, geojson));
       promWebhookCounter.labels({ vendor: 'polar', subject: 'activity', event: 'create' });
     } catch (error: unknown) {
       promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
@@ -165,12 +164,13 @@ export class PolarService {
     return signature === createHmac('sha256', webhookSecret).update(rawEvent).digest('hex');
   }
 
-  private asRepositoryActivity(exercise: Exercise): Except<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(exercise: Exercise, geojson: LineString): NewActivityWithGeometry {
     return {
       vendor: 'polar' as Vendor,
       vendorId: exercise.id,
       date: this.localDate(exercise),
       type: exercise.sport,
+      geojson,
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
       ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API
     };

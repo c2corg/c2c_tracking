@@ -468,6 +468,10 @@ describe('Polar Service', () => {
       expect(userService.addActivities).toBeCalledWith(1, {
         date: '1970-01-01T00:00:01Z+02:45',
         duration: 1,
+        geojson: {
+          coordinates: [[0, 0, 220]],
+          type: 'LineString',
+        },
         length: 1,
         type: 'RUNNING',
         vendor: 'polar',

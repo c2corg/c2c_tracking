@@ -226,7 +226,7 @@ export class StravaApi {
     }
   }
 
-  public async getActivity(accessToken: string, id: string): Promise<Activity> {
+  public async getActivity(accessToken: string, id: number): Promise<Activity> {
     try {
       const response = await axios.get(`${this.baseUrl}activities/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -237,7 +237,7 @@ export class StravaApi {
     }
   }
 
-  public async getActivityStream(accessToken: string, id: string): Promise<StreamSet> {
+  public async getActivityStream(accessToken: string, id: number): Promise<StreamSet> {
     try {
       const response = await axios.get(
         `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=`,

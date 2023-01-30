@@ -143,7 +143,7 @@ describe('Strava API', () => {
       jest.mocked(axios).get.mockResolvedValueOnce({ data: activity });
 
       const api = new StravaApi();
-      const result = await api.getActivity('access_token', '123');
+      const result = await api.getActivity('access_token', 123);
 
       expect(result).toMatchInlineSnapshot(`
         {
@@ -181,7 +181,7 @@ describe('Strava API', () => {
       jest.mocked(axios).get.mockResolvedValueOnce({ data: streamSet });
 
       const api = new StravaApi();
-      const result = await api.getActivityStream('access_token', '1');
+      const result = await api.getActivityStream('access_token', 1);
 
       expect(result).toMatchInlineSnapshot(`
         [

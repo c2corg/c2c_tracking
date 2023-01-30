@@ -1,11 +1,10 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
-import type { Except } from 'type-fest';
 
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import type { Activity, Vendor } from '../../repository/activity';
+import { hasGeometry, NewActivity, NewActivityWithGeometry, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import type { GarminInfo } from '../../repository/user';
@@ -89,7 +88,7 @@ export class GarminService {
   public async handleActivityWebhook(
     activities: (GarminActivity & { userId: string; userAccessToken: string })[],
   ): Promise<void> {
-    const activityMap: Map<number, Except<Activity, 'id' | 'userId'>[]> = new Map();
+    const activityMap: Map<number, NewActivityWithGeometry[]> = new Map();
     for (const activity of activities) {
       const user = await userRepository.findByGarminToken(activity.userAccessToken);
       if (!user) {
@@ -99,8 +98,8 @@ export class GarminService {
         );
         continue;
       }
-      const repositoryActivity: Except<Activity, 'id' | 'userId'> = this.asRepositoryActivity(activity);
-      if (!repositoryActivity.geojson) {
+      const repositoryActivity: NewActivity = this.asRepositoryActivity(activity);
+      if (!hasGeometry(repositoryActivity)) {
         continue;
       }
       if (!activityMap.has(user.c2cId)) {
@@ -148,7 +147,7 @@ export class GarminService {
     }
   }
 
-  private asRepositoryActivity(activity: GarminActivity): Except<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(activity: GarminActivity): NewActivity {
     const geojson = this.toGeoJSON(activity.samples);
     return {
       vendor: 'garmin' as Vendor,
