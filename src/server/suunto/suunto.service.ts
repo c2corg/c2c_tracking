@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
+import type { Except } from 'type-fest';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
@@ -36,7 +37,7 @@ export class SuuntoService {
       if (!workouts.payload.length) {
         return;
       }
-      const activities: Omit<Activity, 'id' | 'userId'>[] = workouts.payload.map(this.asRepositoryActivity);
+      const activities: Except<Activity, 'id' | 'userId'>[] = workouts.payload.map(this.asRepositoryActivity);
       await userService.addActivities(c2cId, ...activities);
     } catch (err: unknown) {
       log.warn(err);
@@ -135,7 +136,7 @@ export class SuuntoService {
     await userRepository.update({ ...userWithoutData });
   }
 
-  private asRepositoryActivity(workout: Workout): Omit<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(workout: Workout): Except<Activity, 'id' | 'userId'> {
     return {
       vendor: 'suunto' as Vendor,
       vendorId: workout.workoutKey,

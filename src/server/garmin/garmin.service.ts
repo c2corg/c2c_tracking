@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
+import type { Except } from 'type-fest';
 
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
@@ -88,7 +89,7 @@ export class GarminService {
   public async handleActivityWebhook(
     activities: (GarminActivity & { userId: string; userAccessToken: string })[],
   ): Promise<void> {
-    const activityMap: Map<number, Omit<Activity, 'id' | 'userId'>[]> = new Map();
+    const activityMap: Map<number, Except<Activity, 'id' | 'userId'>[]> = new Map();
     for (const activity of activities) {
       const user = await userRepository.findByGarminToken(activity.userAccessToken);
       if (!user) {
@@ -98,7 +99,7 @@ export class GarminService {
         );
         continue;
       }
-      const repositoryActivity: Omit<Activity, 'id' | 'userId'> = this.asRepositoryActivity(activity);
+      const repositoryActivity: Except<Activity, 'id' | 'userId'> = this.asRepositoryActivity(activity);
       if (!repositoryActivity.geojson) {
         continue;
       }
@@ -147,7 +148,7 @@ export class GarminService {
     }
   }
 
-  private asRepositoryActivity(activity: GarminActivity): Omit<Activity, 'id' | 'userId'> {
+  private asRepositoryActivity(activity: GarminActivity): Except<Activity, 'id' | 'userId'> {
     const geojson = this.toGeoJSON(activity.samples);
     return {
       vendor: 'garmin' as Vendor,

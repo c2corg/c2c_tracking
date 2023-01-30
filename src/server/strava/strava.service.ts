@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
+import type { Except } from 'type-fest';
 
 import config from '../../config';
 import { NotFoundError } from '../../errors';
@@ -297,7 +298,7 @@ export class StravaService {
     }
   }
 
-  private asRepositoryActivity(activity: Activity): Omit<RepositoryActivity, 'id' | 'userId'> {
+  private asRepositoryActivity(activity: Activity): Except<RepositoryActivity, 'id' | 'userId'> {
     return {
       vendor: 'strava' as Vendor,
       vendorId: activity.id.toString(),

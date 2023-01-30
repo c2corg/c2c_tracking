@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import type { Except } from 'type-fest';
 
 import { AppError, ExternalApiError, NotFoundError } from '../../errors';
 import { Lang, translations } from '../../helpers/i18n';
@@ -16,7 +17,7 @@ export class ActivityService {
   public async getActivities(
     userId: number,
     lang?: Lang,
-  ): Promise<(Omit<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
+  ): Promise<(Except<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
     const langs: Lang[] = lang ? [lang] : Lang.options;
     return (await userService.getActivities(userId)).map(({ geojson, type, ...keep }) => {
       const translated = langs.reduce(

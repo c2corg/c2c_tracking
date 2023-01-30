@@ -2,11 +2,12 @@ import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
 import aes from 'crypto-js/aes';
 import encUtf8 from 'crypto-js/enc-utf8';
 import { parse } from 'iso8601-duration';
+import type { Except } from 'type-fest';
 
 import config from '../config';
 import type { LineString } from '../repository/geojson';
 
-export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Except<T, K>;
 
 export const semverRegex =
   // eslint-disable-next-line security/detect-unsafe-regex
