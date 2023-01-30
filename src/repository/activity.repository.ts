@@ -1,3 +1,5 @@
+import type { Except } from 'type-fest';
+
 import config from '../config';
 import { database as db } from '../db';
 import { IOError, NotFoundError } from '../errors';
@@ -54,7 +56,7 @@ export class ActivityRepository {
     }
   }
 
-  public async insert(activity: Omit<Activity, 'id'>): Promise<Activity> {
+  public async insert(activity: Except<Activity, 'id'>): Promise<Activity> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
@@ -76,7 +78,7 @@ export class ActivityRepository {
 
   public async upsert(
     activitiesToUpdate: Activity[],
-    activitiesToInsert: Omit<Activity, 'id'>[],
+    activitiesToInsert: Except<Activity, 'id'>[],
     activitiesToDelete: Activity[],
   ): Promise<void> {
     const conn = await db.getConnection();
@@ -152,7 +154,7 @@ export class ActivityRepository {
     };
   }
 
-  private activityToRecord(activity: Omit<Activity, 'id'>): Omit<ActivityRow, 'id'> {
+  private activityToRecord(activity: Except<Activity, 'id'>): Except<ActivityRow, 'id'> {
     return {
       type: activity.type,
       user_id: activity.userId,
