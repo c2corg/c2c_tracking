@@ -37,7 +37,7 @@ export class SuuntoService {
       const workouts: Workouts = await suuntoApi.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
       const geometries = (
         await Promise.allSettled(
-          workouts.payload.map((workout) => this.retrieveActivityGeometry(auth.access_token, workout.workoutId)),
+          workouts.payload.map((workout) => this.retrieveActivityGeometry(auth.access_token, workout.workoutKey)),
         )
       ).map((result, i) => {
         if (result.status === 'fulfilled') {
@@ -81,17 +81,17 @@ export class SuuntoService {
     return undefined;
   }
 
-  public async retrieveActivityGeometry(token: string, activityId: number): Promise<LineString | undefined> {
+  public async retrieveActivityGeometry(token: string, workoutKey: string): Promise<LineString | undefined> {
     let fit: ArrayBuffer | undefined;
     try {
-      fit = await suuntoApi.getFIT(activityId.toString(), token, this.#suuntoSubscriptionKey);
+      fit = await suuntoApi.getFIT(workoutKey.toString(), token, this.#suuntoSubscriptionKey);
     } catch (error: unknown) {
-      log.info(`Unable to retrieve Suunto geometry for ${activityId}`, error instanceof Error ? error : undefined);
+      log.info(`Unable to retrieve Suunto geometry for ${workoutKey}`, error instanceof Error ? error : undefined);
       return undefined;
     }
     const geojson: LineString | undefined = fitToGeoJSON(fit);
     if (!geojson) {
-      log.info(`Unable to convert Suunto FIT file to geometry for ${activityId}`);
+      log.info(`Unable to convert Suunto FIT file to geometry for ${workoutKey}`);
       return undefined;
     }
     return geojson;
@@ -123,7 +123,7 @@ export class SuuntoService {
     let geojson: LineString | undefined = undefined;
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
-      geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutId);
+      geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutKey);
       if (!geojson) {
         return;
       }

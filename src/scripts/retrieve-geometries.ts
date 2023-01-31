@@ -60,7 +60,7 @@ const retrieveGeometry = async (activity: Activity): Promise<void> => {
       }
       let geojson: LineString | undefined;
       try {
-        geojson = await suuntoService.retrieveActivityGeometry(token, Number.parseInt(activity.vendorId, 10));
+        geojson = await suuntoService.retrieveActivityGeometry(token, activity.vendorId);
         if (!geojson) {
           throw new Error('No valid geometry');
         }
