@@ -105,3 +105,5 @@ const saveGeometry = async (activity: Activity, geojson: LineString): Promise<vo
     // an error should not prevent returning geojson to the request
   }
 };
+
+start();
