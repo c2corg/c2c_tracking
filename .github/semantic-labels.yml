@@ -2,7 +2,7 @@ version: 1
 appendOnly: true
 labels:
 - label: "enhancement"
-  title[(:]: "^feat[(:].*"
+  title: "^feat[(:].*"
 - label: "bug"
   title: "^fix[(:].*"
 - label: "documentation"
