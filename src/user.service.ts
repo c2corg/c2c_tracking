@@ -1,10 +1,9 @@
 import dayjs from 'dayjs';
-import type { Except } from 'type-fest';
 
 import config from './config';
 import { NotFoundError } from './errors';
 import type { Optional } from './helpers/utils';
-import type { Activity, Vendor } from './repository/activity';
+import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
 import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
@@ -312,13 +311,16 @@ export class UserService {
     }
   }
 
-  public async addActivities(c2cId: number, ...activities: Except<Activity, 'id' | 'userId'>[]): Promise<void> {
+  public async addActivities(c2cId: number, ...newActivities: NewActivityWithGeometry[]): Promise<void> {
+    if (!newActivities.length) {
+      return;
+    }
     const userActivities: Optional<Activity, 'id'>[] = await activityRepository.findByUser(c2cId);
     const userActivitiesKeys = new Set(userActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
-    const newActivitiesKeys = new Set(activities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
+    const newActivitiesKeys = new Set(newActivities.map((activity) => `${activity.vendor}_${activity.vendorId}`));
     const mergedActivities: (Optional<Activity, 'id'> & { update?: boolean })[] = [
       ...userActivities.filter((activity) => !newActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)),
-      ...activities
+      ...newActivities
         .map((activity) => {
           if (userActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)) {
             // replace
@@ -349,7 +351,7 @@ export class UserService {
     await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
   }
 
-  public async updateActivity(c2cId: number, activity: Except<Activity, 'id' | 'userId'>): Promise<void> {
+  public async updateActivity(c2cId: number, activity: UpdateActivity): Promise<void> {
     const savedActivity = (await activityRepository.findByUser(c2cId)).find(
       (act) => act.vendor === activity.vendor && act.vendorId === activity.vendorId,
     );
@@ -358,9 +360,13 @@ export class UserService {
     }
     await activityRepository.update({
       ...savedActivity,
-      date: activity.date,
-      type: activity.type,
+      ...(activity.date && { date: activity.date }),
+      ...(activity.type && { type: activity.type }),
       ...(activity.name && { name: activity.name }),
+      ...(activity.length && { length: activity.length }),
+      ...(activity.heightDiffUp && { heightDiffUp: activity.heightDiffUp }),
+      ...(activity.duration && { duration: activity.duration }),
+      ...(activity.geojson && { geojson: activity.geojson }),
     });
   }
 

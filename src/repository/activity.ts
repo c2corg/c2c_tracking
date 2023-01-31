@@ -1,3 +1,4 @@
+import type { Except, SetOptional, SetRequired } from 'type-fest';
 import isISO8601 from 'validator/lib/isISO8601';
 import { z } from 'zod';
 
@@ -23,3 +24,14 @@ export const Activity = z.object({
 });
 
 export type Activity = z.infer<typeof Activity>;
+
+export type NewActivity = Except<Activity, 'id' | 'userId'>;
+
+export type NewActivityWithGeometry = SetRequired<NewActivity, 'geojson'>;
+
+export const hasGeometry = (activity: NewActivity): activity is NewActivityWithGeometry => !!activity.geojson;
+
+export type UpdateActivity = SetOptional<
+  Pick<Activity, 'vendor' | 'vendorId' | 'date' | 'type' | 'name' | 'length' | 'heightDiffUp' | 'duration' | 'geojson'>,
+  'date' | 'type' | 'name' | 'length' | 'heightDiffUp' | 'duration' | 'geojson'
+>;

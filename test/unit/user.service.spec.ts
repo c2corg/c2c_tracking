@@ -967,6 +967,13 @@ describe('User service', () => {
           vendorId: k.toString(),
           date: '2022-01-' + k.toString().padStart(2, '0') + 'T00:00:01Z',
           type: 'RUN',
+          geojson: {
+            type: 'LineString',
+            coordinates: [
+              [1.0, 1.0],
+              [2.0, 2.0],
+            ],
+          },
         }));
       jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
       jest.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
@@ -977,6 +984,13 @@ describe('User service', () => {
         vendorId: '1000',
         date: '2022-06-06T00:00:01Z',
         type: 'RUN',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
       });
 
       expect(activityRepository.upsert).toBeCalledTimes(1);
@@ -1007,6 +1021,13 @@ describe('User service', () => {
         date: '2022-01-01T00:00:01Z',
         name: 'newname',
         type: 'FLY',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
       });
 
       expect(activityRepository.upsert).toBeCalledTimes(1);
@@ -1020,6 +1041,13 @@ describe('User service', () => {
             date: '2022-01-01T00:00:01Z',
             type: 'FLY',
             name: 'newname',
+            geojson: {
+              type: 'LineString',
+              coordinates: [
+                [1.0, 1.0],
+                [2.0, 2.0],
+              ],
+            },
           },
         ],
         [],

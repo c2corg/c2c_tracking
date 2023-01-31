@@ -1,3 +1,6 @@
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
 import log from '../../../../src/helpers/logger';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
@@ -11,6 +14,10 @@ describe('Suunto Service', () => {
     jest.spyOn(log, 'debug').mockImplementation(() => Promise.resolve());
     jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
     jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('requestShortLivedAccessTokenAndSetupUser', () => {
@@ -94,6 +101,9 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
+      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new SuuntoService();
@@ -117,13 +127,20 @@ describe('Suunto Service', () => {
         name: 'name',
         type: 'Running',
         duration: 1,
+        geojson: {
+          coordinates: [
+            [5.825548013672233, 44.972592014819384, 1503, 1670140122],
+            [5.825552036985755, 44.97256896458566, 1503, 1670140124],
+          ],
+          type: 'LineString',
+        },
         heightDiffUp: 1,
         length: 1,
       });
       expect(log.warn).toBeCalledTimes(1);
     });
 
-    it('does not call addActivities if none are retrieved', async () => {
+    it('filters out activities without geometry', async () => {
       jest.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
@@ -132,8 +149,25 @@ describe('Suunto Service', () => {
         user: 'user',
       });
       jest.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
-      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({ payload: [], metadata: {} });
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
+        payload: [
+          {
+            workoutId: 1,
+            workoutKey: '1',
+            activityId: 1,
+            workoutName: 'name',
+            startTime: 1,
+            totalTime: 1,
+            totalAscent: 1.2,
+            totalDistance: 1.2,
+            timeOffsetInMinutes: 60,
+          },
+        ],
+        metadata: {},
+      });
+      const fit = new Uint8Array();
+      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -148,7 +182,7 @@ describe('Suunto Service', () => {
       });
       expect(suuntoApi.getWorkouts).toBeCalledTimes(1);
       expect(suuntoApi.getWorkouts).toBeCalledWith('access_token', expect.any(String));
-      expect(userService.addActivities).not.toBeCalled();
+      expect(userService.addActivities).toBeCalledWith(1);
     });
 
     it('calls API then setups user', async () => {
@@ -176,9 +210,10 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => {
-        return Promise.resolve();
-      });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
+      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -201,6 +236,13 @@ describe('Suunto Service', () => {
         name: 'name',
         type: 'Running',
         duration: 1,
+        geojson: {
+          coordinates: [
+            [5.825548013672233, 44.972592014819384, 1503, 1670140122],
+            [5.825552036985755, 44.97256896458566, 1503, 1670140124],
+          ],
+          type: 'LineString',
+        },
         heightDiffUp: 1,
         length: 1,
       });
@@ -281,18 +323,6 @@ describe('Suunto Service', () => {
       expect(suuntoApi.refreshAuth).toBeCalledTimes(1);
       expect(suuntoApi.refreshAuth).toBeCalledWith('refresh_token');
       expect(userService.clearSuuntoTokens).toBeCalledTimes(1);
-    });
-  });
-
-  describe('getFIT', () => {
-    it('calls API', async () => {
-      const fit = new Uint8Array();
-      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
-
-      const service = new SuuntoService();
-      const response = await service.getFIT('token', '1');
-
-      expect(response).toBe(fit);
     });
   });
 
@@ -384,6 +414,9 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
+      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new SuuntoService();
@@ -396,6 +429,41 @@ describe('Suunto Service', () => {
       expect(log.warn).toBeCalledWith(
         `Suunto activity update/creation webhook event for user 1 couldn't be processed: unable to upsert activity data`,
       );
+
+      getTokenSpy.mockRestore();
+    });
+
+    it('ignores activity without geometry', async () => {
+      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(SuuntoService.prototype as any, 'getToken')
+        .mockResolvedValueOnce('token');
+      jest.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
+        payload: {
+          workoutId: 1,
+          workoutKey: '1',
+          activityId: 1,
+          workoutName: 'name',
+          startTime: 1,
+          totalTime: 1,
+          totalAscent: 1,
+          totalDistance: 1,
+          timeOffsetInMinutes: 0,
+        },
+        metadata: {},
+      });
+      jest.spyOn(suuntoApi, 'getFIT').mockRejectedValueOnce(undefined);
+      jest.spyOn(userService, 'addActivities');
+
+      const service = new SuuntoService();
+      await service.handleWebhookEvent(
+        { username: 'user', workoutid: '1' },
+        `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
+      );
+
+      expect(log.warn).not.toBeCalled();
+      expect(userService.addActivities).not.toHaveBeenCalled();
 
       getTokenSpy.mockRestore();
     });
@@ -420,6 +488,9 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
+      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
