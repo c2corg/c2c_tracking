@@ -72,7 +72,7 @@ jobs:
         uses: codacy/codacy-coverage-reporter-action@v1
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/psql/lcov.info
+          coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/psql/lcov.info,reports/coverage/s3/lcov.info
       - name: Docker meta
         id: docker_meta
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
