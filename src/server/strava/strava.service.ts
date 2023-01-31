@@ -122,7 +122,7 @@ export class StravaService {
     return undefined;
   }
 
-  private async retrieveActivityGeometry(
+  public async retrieveActivityGeometry(
     token: string,
     activityId: number,
     startDateLocal: string,

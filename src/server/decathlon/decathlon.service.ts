@@ -111,7 +111,7 @@ export class DecathlonService {
     return undefined;
   }
 
-  private async retrieveActivityGeometry(activity: Activity): Promise<LineString | undefined> {
+  public async retrieveActivityGeometry(activity: Activity): Promise<LineString | undefined> {
     try {
       const coordinates = this.locationsToGeoJson(activity);
       return coordinates.length ? { type: 'LineString', coordinates } : undefined;
