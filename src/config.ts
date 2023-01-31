@@ -48,6 +48,14 @@ convict.addFormats({
       }
     },
   },
+  storageBackend: {
+    coerce: (v) => v.toString(),
+    validate: (value: string) => {
+      if (!['s3', 'local'].includes(value.trim().toLocaleLowerCase())) {
+        throw new Error('must be one of local and s3');
+      }
+    },
+  },
 });
 
 const config = convict({
@@ -320,7 +328,79 @@ const config = convict({
       },
     },
   },
+  miniatures: {
+    size: {
+      doc: 'Miniatures size in pixels',
+      format: 'nat',
+      default: 300,
+      env: 'MINIATURES_SIZE',
+    },
+    mapbox: {
+      token: {
+        doc: 'Access token to MapBox API',
+        format: 'notEmptyString',
+        default: '',
+        env: 'MAPBOX_TOKEN',
+        sensitive: true,
+      },
+    },
+    storage: {
+      backend: {
+        doc: 'Whether to use local or S3 storage',
+        format: 'storageBackend',
+        default: 's3',
+        env: 'STORAGE_BACKEND',
+      },
+      s3: {
+        endpoint: {
+          format: 'baseUrl',
+          default: 'http://localhost:9000/',
+          env: 'S3_ENDPOINT',
+        },
+        region: {
+          format: 'notEmptyString',
+          default: 'ch-dk-2',
+          env: 'S3_REGION',
+        },
+        bucket: {
+          doc: 's3 bucket name (required for s3)',
+          format: String,
+          default: '',
+          env: 'S3_BUCKET',
+        },
+        accessKeyId: {
+          format: String,
+          default: '',
+          sensitive: true,
+          env: 'S3_ACCESS_KEY_ID',
+        },
+        secretKey: {
+          format: String,
+          default: '',
+          sensitive: true,
+          env: 'S3_SECRET_KEY',
+        },
+      },
+      local: {
+        folder: {
+          doc: 'local storage folder (required for local)',
+          format: String,
+          default: '',
+          env: 'LOCAL_STORAGE_FOLDER',
+        },
+      },
+    },
+  },
 });
+
 config.validate({ allowed: 'strict' });
+
+// additional validation
+if (config.get('miniatures.storage.backend') === 's3' && !config.get('miniatures.storage.s3.bucket')) {
+  throw new Error('Bucket must be defined for S3 storage.');
+}
+if (config.get('miniatures.storage.backend') === 'local' && !config.get('miniatures.storage.local.folder')) {
+  throw new Error('Folder must be defined for loal storage');
+}
 
 export default config;

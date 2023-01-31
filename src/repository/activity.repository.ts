@@ -56,13 +56,13 @@ export class ActivityRepository {
     }
   }
 
-  public async findWithoutGeoJSON(): Promise<Activity[]> {
+  public async findWithoutMiniature(): Promise<Activity[]> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const rows = await conn<ActivityRow>(this.#TABLE).whereNull('geojson');
+      const rows = await conn<ActivityRow>(this.#TABLE).whereNotNull('geojson').whereNull('miniature');
 
       return rows?.map((row) => this.rowToActivity(row));
     } catch (err) {

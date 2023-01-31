@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import config from './config';
 import { NotFoundError } from './errors';
 import type { Optional } from './helpers/utils';
+import { miniatureService } from './miniature.service';
 import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity';
 import { activityRepository } from './repository/activity.repository';
 import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
@@ -348,6 +349,23 @@ export class UserService {
 
     const activitiesToInsert = mergedActivities.slice(0, MAX_ACTIVITIES_PER_USER).filter((act) => !act.id);
     const activitiesToDelete = mergedActivities.slice(MAX_ACTIVITIES_PER_USER).filter(isInDb);
+
+    await Promise.allSettled(
+      activitiesToDelete.map(async (act) => {
+        if (act.miniature) {
+          await miniatureService.deleteMiniature(act.miniature);
+        }
+      }),
+    );
+    await Promise.allSettled(
+      [...activitiesToUpdate, ...activitiesToInsert].map(async (act) => {
+        if (!act.geojson) {
+          return;
+        }
+        const miniature = await miniatureService.generateMiniature(act.geojson);
+        act.miniature = miniature;
+      }),
+    );
     await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
   }
 
