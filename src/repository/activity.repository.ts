@@ -56,20 +56,6 @@ export class ActivityRepository {
     }
   }
 
-  public async findWithoutGeoJSON(): Promise<Activity[]> {
-    try {
-      const conn = await db.getConnection();
-      if (!conn) {
-        throw new IOError('No connection to database');
-      }
-      const rows = await conn<ActivityRow>(this.#TABLE).whereNull('geojson');
-
-      return rows?.map((row) => this.rowToActivity(row));
-    } catch (err) {
-      return [];
-    }
-  }
-
   public async insert(activity: Except<Activity, 'id'>): Promise<Activity> {
     const conn = await db.getConnection();
     if (!conn) {

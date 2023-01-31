@@ -81,7 +81,7 @@ export class SuuntoService {
     return undefined;
   }
 
-  public async retrieveActivityGeometry(token: string, workoutKey: string): Promise<LineString | undefined> {
+  private async retrieveActivityGeometry(token: string, workoutKey: string): Promise<LineString | undefined> {
     let fit: ArrayBuffer | undefined;
     try {
       fit = await suuntoApi.getFIT(workoutKey.toString(), token, this.#suuntoSubscriptionKey);
