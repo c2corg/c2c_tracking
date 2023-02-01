@@ -15,11 +15,15 @@ export async function start(): Promise<void> {
       }
       const miniature = await miniatureService.generateMiniature(activity.geojson);
       await activityRepository.update({ ...activity, miniature });
+      log.info('✔');
     } catch {
-      log.warn(`Failed generating & saving miniature for ${activity.id}`);
+      log.warn(`❌ Failed generating & saving miniature for ${activity.id}`);
     }
     await new Promise((resolve) => setTimeout(resolve, 1000)); // wait between each API call
   }
+  log.info('Done');
+  // eslint-disable-next-line no-process-exit
+  process.exit(0);
 }
 
 start();
