@@ -19,6 +19,7 @@ type ActivityRow = {
   duration: number | undefined | null;
   height_diff_up: number | undefined | null;
   geojson: LineString | undefined | null;
+  miniature: string | undefined | null;
 };
 
 export class ActivityRepository {
@@ -165,6 +166,7 @@ export class ActivityRepository {
       ...(row.duration && { duration: row.duration }),
       ...(row.height_diff_up && { heightDiffUp: row.height_diff_up }),
       ...(row.geojson && { geojson: row.geojson }),
+      ...(row.miniature && { miniature: row.miniature }),
     };
   }
 
@@ -180,6 +182,7 @@ export class ActivityRepository {
       length: activity.length,
       duration: activity.duration,
       height_diff_up: activity.heightDiffUp,
+      miniature: activity.miniature,
     };
   }
 }

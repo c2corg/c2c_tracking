@@ -43,6 +43,7 @@ describe('Activity Repository', () => {
         type: 'LineString',
         coordinates: [[1.0, 1.0, 1.0]],
       },
+      miniature: 'miniature.png',
     });
 
     expect(activity2).toEqual({
@@ -57,6 +58,7 @@ describe('Activity Repository', () => {
         type: 'LineString',
         coordinates: [[1.0, 1.0, 1.0]],
       },
+      miniature: 'miniature.png',
     });
 
     const activity3 = await repository.insert({
