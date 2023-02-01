@@ -4,6 +4,7 @@ import dayjsPluginUTC from 'dayjs/plugin/utc';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { miniatureService } from '../../miniature.service';
 import { hasGeometry, NewActivity, NewActivityWithGeometry, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -79,7 +80,20 @@ export class GarminService {
     await garminApi.deauthorize(auth.token, auth.tokenSecret);
 
     // clear user Garmin activities
+    const miniatures: string[] = [];
+    try {
+      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'garmin')));
+    } catch (error: unknown) {
+      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor garmin`);
+    }
     await activityRepository.deleteByUserAndVendor(c2cId, 'garmin');
+    for (const miniature of miniatures) {
+      try {
+        await miniatureService.deleteMiniature(miniature);
+      } catch (error: unknown) {
+        log.warn(`Failed deleting miniature ${miniature}`);
+      }
+    }
     // clear user Garmin data
     const { garmin, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });

@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 
 import config from './config';
 import { NotFoundError } from './errors';
+import log from './helpers/logger';
 import type { Optional } from './helpers/utils';
 import { miniatureService } from './miniature.service';
 import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity';
@@ -325,12 +326,15 @@ export class UserService {
         .map((activity) => {
           if (userActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)) {
             // replace
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const userActivity = userActivities.find(
+              ({ vendor, vendorId }) => vendor === activity.vendor && vendorId === activity.vendorId,
+            )!;
+
             return {
-              id: userActivities.find(
-                ({ vendor, vendorId }) => vendor === activity.vendor && vendorId === activity.vendorId,
-              )?.id,
-              update: true,
+              ...userActivity,
               ...activity,
+              update: true,
             };
           }
           return activity;
@@ -389,7 +393,20 @@ export class UserService {
   }
 
   public async deleteActivity(vendor: Vendor, vendorId: string): Promise<void> {
+    let miniature: string | undefined;
+    try {
+      miniature = await activityRepository.getMiniatureByVendorId(vendor, vendorId);
+    } catch (error: unknown) {
+      log.warn(`Failed retrieving miniature info for ${vendorId}`);
+    }
     await activityRepository.deleteByVendorId(vendor, vendorId);
+    if (miniature) {
+      try {
+        await miniatureService.deleteMiniature(miniature);
+      } catch (error: unknown) {
+        log.warn(`Failed deleting miniature ${miniature}`);
+      }
+    }
   }
 
   public async getActivities(c2cId: number): Promise<Activity[]> {

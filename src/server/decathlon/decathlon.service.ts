@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { miniatureService } from '../../miniature.service';
 import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -76,7 +77,20 @@ export class DecathlonService {
     // clear webhook
     await decathlonApi.deleteWebhookSubscription(user.decathlon.webhookId, token);
     // clear user Decathlon activities
+    const miniatures: string[] = [];
+    try {
+      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'decathlon')));
+    } catch (error: unknown) {
+      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor decathlon`);
+    }
     await activityRepository.deleteByUserAndVendor(c2cId, 'decathlon');
+    for (const miniature of miniatures) {
+      try {
+        await miniatureService.deleteMiniature(miniature);
+      } catch (error: unknown) {
+        log.warn(`Failed deleting miniature ${miniature}`);
+      }
+    }
     // clear user Decathlon data
     const { decathlon, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });

@@ -6,6 +6,7 @@ import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { fitToGeoJSON } from '../../helpers/utils';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { miniatureService } from '../../miniature.service';
 import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -162,7 +163,20 @@ export class SuuntoService {
     await suuntoApi.deauthorize(token);
 
     // clear user Suunto activities
+    const miniatures: string[] = [];
+    try {
+      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'suunto')));
+    } catch (error: unknown) {
+      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor suunto`);
+    }
     await activityRepository.deleteByUserAndVendor(c2cId, 'suunto');
+    for (const miniature of miniatures) {
+      try {
+        await miniatureService.deleteMiniature(miniature);
+      } catch (error: unknown) {
+        log.warn(`Failed deleting miniature ${miniature}`);
+      }
+    }
     // clear user Suunto data
     const { suunto, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });

@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import log from '../../../../src/helpers/logger';
+import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
 import { suuntoApi } from '../../../../src/server/suunto/suunto.api';
@@ -547,16 +548,21 @@ describe('Suunto Service', () => {
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
       jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
       jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      jest.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
 
       expect(suuntoApi.deauthorize).toBeCalledTimes(1);
       expect(suuntoApi.deauthorize).toBeCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
       expect(userRepository.update).toBeCalledTimes(1);
       expect(userRepository.update).toBeCalledWith({
         c2cId: 1,
@@ -567,6 +573,163 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
       });
+
+      getTokenSpy.mockRestore();
+    });
+
+    it('warns if no miniature info could be retrieved', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        suunto: {
+          username: 'user',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+        strava: {
+          id: 1,
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+      const getTokenSpy = jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(SuuntoService.prototype as any, 'getToken')
+        .mockResolvedValueOnce('token');
+      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      jest.spyOn(miniatureService, 'deleteMiniature');
+
+      const service = new SuuntoService();
+      await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
+
+      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
+      expect(suuntoApi.deauthorize).toBeCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor suunto`);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        strava: {
+          id: 1,
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+
+      getTokenSpy.mockRestore();
+    });
+
+    it('warns if miniature could not be deleted', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        suunto: {
+          username: 'user',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+        strava: {
+          id: 1,
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+      const getTokenSpy = jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(SuuntoService.prototype as any, 'getToken')
+        .mockResolvedValueOnce('token');
+      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+
+      const service = new SuuntoService();
+      await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
+
+      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
+      expect(suuntoApi.deauthorize).toBeCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        strava: {
+          id: 1,
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+
+      getTokenSpy.mockRestore();
+    });
+
+    it('deletes miniatures', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        suunto: {
+          username: 'user',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+        strava: {
+          id: 1,
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+      const getTokenSpy = jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(SuuntoService.prototype as any, 'getToken')
+        .mockResolvedValueOnce('token');
+      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new SuuntoService();
+      await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
+
+      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
+      expect(suuntoApi.deauthorize).toBeCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        strava: {
+          id: 1,
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+      expect(log.warn).not.toBeCalled();
 
       getTokenSpy.mockRestore();
     });

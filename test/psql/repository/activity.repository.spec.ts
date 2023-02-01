@@ -84,10 +84,22 @@ describe('Activity Repository', () => {
     await expect(repository.findByUser(2)).resolves.toEqual([activity2]);
     await expect(repository.findByUser(99)).resolves.toHaveLength(0);
 
+    await expect(repository.getMiniature(activity2.id)).resolves.toEqual('miniature.png');
+    await expect(repository.getMiniature(activity3.id)).resolves.toBeUndefined();
+    await expect(repository.getMiniature(999)).resolves.toBeUndefined();
+
     await expect(repository.findByUserAndId(1, activity1.id)).resolves.toEqual(activity1);
     await expect(repository.findByUserAndId(1, activity2.id)).resolves.toBeUndefined();
     await expect(repository.findByUserAndId(1, 99)).resolves.toBeUndefined();
     await expect(repository.findByUserAndId(2, activity2.id)).resolves.toEqual(activity2);
+
+    await expect(repository.getMiniatureByVendorId('suunto', 'suunto1')).resolves.toEqual('miniature.png');
+    await expect(repository.getMiniatureByVendorId('strava', 'strava1')).resolves.toBeUndefined();
+    await expect(repository.getMiniatureByVendorId('suunto', 'suunto5')).resolves.toBeUndefined();
+
+    await expect(repository.getMiniaturesByUserAndVendor(2, 'suunto')).resolves.toEqual(['miniature.png']);
+    await expect(repository.getMiniaturesByUserAndVendor(1, 'strava')).resolves.toEqual([]);
+    await expect(repository.getMiniaturesByUserAndVendor(1, 'suunto')).resolves.toEqual([]);
 
     await expect(repository.update({ ...activity1, type: 'Mountain Bike' })).resolves.toEqual({
       ...activity1,

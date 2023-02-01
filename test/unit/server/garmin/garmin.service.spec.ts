@@ -1,4 +1,5 @@
 import log from '../../../../src/helpers/logger';
+import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
 import { garminApi, type GarminAuth } from '../../../../src/server/garmin/garmin.api';
@@ -100,8 +101,10 @@ describe('Garmin service', () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
       jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new GarminService();
       await service.deauthorize(1);
@@ -110,8 +113,93 @@ describe('Garmin service', () => {
       expect(userService.getGarminInfo).toBeCalledWith(1);
       expect(garminApi.deauthorize).toBeCalledTimes(1);
       expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+    });
+
+    it('warns if no miniature info could be retrieved', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature');
+
+      const service = new GarminService();
+      await service.deauthorize(1);
+
+      expect(userService.getGarminInfo).toBeCalledTimes(1);
+      expect(userService.getGarminInfo).toBeCalledWith(1);
+      expect(garminApi.deauthorize).toBeCalledTimes(1);
+      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor garmin`);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+    });
+
+    it('warns if miniature could not be deleted', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+
+      const service = new GarminService();
+      await service.deauthorize(1);
+
+      expect(userService.getGarminInfo).toBeCalledTimes(1);
+      expect(userService.getGarminInfo).toBeCalledWith(1);
+      expect(garminApi.deauthorize).toBeCalledTimes(1);
+      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+    });
+
+    it('deletes miniatures', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new GarminService();
+      await service.deauthorize(1);
+
+      expect(userService.getGarminInfo).toBeCalledTimes(1);
+      expect(userService.getGarminInfo).toBeCalledWith(1);
+      expect(garminApi.deauthorize).toBeCalledTimes(1);
+      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).not.toBeCalled();
       expect(userRepository.update).toBeCalledTimes(1);
       expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
     });

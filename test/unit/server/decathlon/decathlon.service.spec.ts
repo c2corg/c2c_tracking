@@ -1,4 +1,5 @@
 import log from '../../../../src/helpers/logger';
+import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
 import { decathlonApi } from '../../../../src/server/decathlon/decathlon.api';
@@ -327,7 +328,9 @@ describe('Decathlon Service', () => {
         },
       });
       jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(miniatureService, 'deleteMiniature');
       jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new DecathlonService();
@@ -335,8 +338,111 @@ describe('Decathlon Service', () => {
 
       expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
       expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+    });
+
+    it('warns if no miniature info could be retrieved', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: {
+          id: 'userId',
+          accessToken: 'access_token',
+          refreshToken: 'refreshSecret',
+          expiresAt: 99999999999,
+          webhookId: 'webhookId',
+        },
+      });
+      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(miniatureService, 'deleteMiniature');
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new DecathlonService();
+      await service.deauthorize(1);
+
+      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor decathlon`);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+    });
+
+    it('warns if miniature could not be deleted', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: {
+          id: 'userId',
+          accessToken: 'access_token',
+          refreshToken: 'refreshSecret',
+          expiresAt: 99999999999,
+          webhookId: 'webhookId',
+        },
+      });
+      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new DecathlonService();
+      await service.deauthorize(1);
+
+      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+    });
+
+    it('deletes miniatures', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        decathlon: {
+          id: 'userId',
+          accessToken: 'access_token',
+          refreshToken: 'refreshSecret',
+          expiresAt: 99999999999,
+          webhookId: 'webhookId',
+        },
+      });
+      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new DecathlonService();
+      await service.deauthorize(1);
+
+      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).not.toBeCalled();
       expect(userRepository.update).toBeCalledTimes(1);
       expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
     });

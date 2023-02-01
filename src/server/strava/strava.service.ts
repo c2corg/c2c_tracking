@@ -5,6 +5,7 @@ import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { miniatureService } from '../../miniature.service';
 import type { NewActivityWithGeometry, UpdateActivity, Vendor } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
@@ -94,7 +95,20 @@ export class StravaService {
     await stravaApi.deauthorize(token);
 
     // clear user Strava activities
+    const miniatures: string[] = [];
+    try {
+      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'strava')));
+    } catch (error: unknown) {
+      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor strava`);
+    }
     await activityRepository.deleteByUserAndVendor(c2cId, 'strava');
+    for (const miniature of miniatures) {
+      try {
+        await miniatureService.deleteMiniature(miniature);
+      } catch (error: unknown) {
+        log.warn(`Failed deleting miniature ${miniature}`);
+      }
+    }
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });

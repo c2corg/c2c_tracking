@@ -1,5 +1,6 @@
 import log from '../../../../src/helpers/logger';
 import * as utils from '../../../../src/helpers/utils';
+import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { polarRepository } from '../../../../src/repository/polar.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
@@ -60,7 +61,77 @@ describe('Polar Service', () => {
     it('calls polar API then updates DB', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
       jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature');
+
+      const service = new PolarService();
+      await service.deauthorize(1);
+      expect(polarApi.deleteUser).toBeCalledTimes(1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+    });
+
+    it('warns if no miniature info could be retrieved', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature');
+
+      const service = new PolarService();
+      await service.deauthorize(1);
+      expect(polarApi.deleteUser).toBeCalledTimes(1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor polar`);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+    });
+
+    it('warns if miniature could not be deleted', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new PolarService();
+      await service.deauthorize(1);
+      expect(polarApi.deleteUser).toBeCalledTimes(1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+    });
+
+    it('deletes miniatures', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new PolarService();
@@ -69,6 +140,9 @@ describe('Polar Service', () => {
       expect(polarApi.deleteUser).toBeCalledWith('token', 1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).not.toBeCalled();
       expect(userRepository.update).toBeCalledTimes(1);
       expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
     });
