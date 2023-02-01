@@ -22,6 +22,8 @@ type ActivityRow = {
   miniature: string | undefined | null;
 };
 
+const isDefined = (s: string | undefined | null): s is string => !!s;
+
 export class ActivityRepository {
   readonly #TABLE = config.get('db.schema') + '.activities';
 
@@ -118,6 +120,21 @@ export class ActivityRepository {
     });
   }
 
+  public async getMiniature(id: number): Promise<string | undefined> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+
+    const result = await conn<ActivityRow>(this.#TABLE).where({ id });
+
+    if (!result.length) {
+      return undefined;
+    }
+
+    return result[0]?.miniature ?? undefined;
+  }
+
   public async delete(id: number): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
@@ -131,6 +148,17 @@ export class ActivityRepository {
     }
   }
 
+  public async getMiniaturesByUserAndVendor(c2cId: number, vendor: Vendor): Promise<string[]> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+
+    const result = await conn<ActivityRow>(this.#TABLE).where({ vendor, user_id: c2cId });
+
+    return result.map((row) => row.miniature).filter(isDefined);
+  }
+
   public async deleteByUserAndVendor(c2cId: number, vendor: Vendor): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {
@@ -138,6 +166,21 @@ export class ActivityRepository {
     }
 
     await conn<ActivityRow>(this.#TABLE).delete().where({ vendor, user_id: c2cId });
+  }
+
+  public async getMiniatureByVendorId(vendor: Vendor, vendorId: string): Promise<string | undefined> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+
+    const result = await conn<ActivityRow>(this.#TABLE).where({ vendor, vendor_id: vendorId });
+
+    if (!result.length) {
+      return undefined;
+    }
+
+    return result[0]?.miniature ?? undefined;
   }
 
   public async deleteByVendorId(vendor: Vendor, vendorId: string): Promise<void> {

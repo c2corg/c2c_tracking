@@ -1,4 +1,5 @@
 import log from '../../../../src/helpers/logger';
+import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { stravaRepository } from '../../../../src/repository/strava.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
@@ -215,8 +216,10 @@ describe('Strava Service', () => {
         expiresAt: 99999999999,
       });
       jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new StravaService();
       await service.deauthorize(1);
@@ -225,10 +228,110 @@ describe('Strava Service', () => {
       expect(userService.getStravaInfo).toBeCalledWith(1);
       expect(stravaApi.deauthorize).toBeCalledTimes(1);
       expect(stravaApi.deauthorize).toBeCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
       expect(userRepository.update).toBeCalledTimes(1);
       expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+    });
+
+    it('warns if no miniature info could be retrieved', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+        id: 1,
+        accessToken: 'access_token',
+        refreshToken: 'refreshSecret',
+        expiresAt: 99999999999,
+      });
+      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature');
+
+      const service = new StravaService();
+      await service.deauthorize(1);
+
+      expect(userService.getStravaInfo).toBeCalledTimes(1);
+      expect(userService.getStravaInfo).toBeCalledWith(1);
+      expect(stravaApi.deauthorize).toBeCalledTimes(1);
+      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor strava`);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+    });
+
+    it('warns if miniature could not be deleted', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+        id: 1,
+        accessToken: 'access_token',
+        refreshToken: 'refreshSecret',
+        expiresAt: 99999999999,
+      });
+      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+
+      const service = new StravaService();
+      await service.deauthorize(1);
+
+      expect(userService.getStravaInfo).toBeCalledTimes(1);
+      expect(userService.getStravaInfo).toBeCalledWith(1);
+      expect(stravaApi.deauthorize).toBeCalledTimes(1);
+      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+    });
+
+    it('deletes miniatures', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+        id: 1,
+        accessToken: 'access_token',
+        refreshToken: 'refreshSecret',
+        expiresAt: 99999999999,
+      });
+      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new StravaService();
+      await service.deauthorize(1);
+
+      expect(userService.getStravaInfo).toBeCalledTimes(1);
+      expect(userService.getStravaInfo).toBeCalledWith(1);
+      expect(stravaApi.deauthorize).toBeCalledTimes(1);
+      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+      expect(log.warn).not.toBeCalled();
     });
   });
 
