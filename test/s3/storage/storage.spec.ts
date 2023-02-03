@@ -8,7 +8,6 @@ import config from '../../../src/config';
 import { S3Storage } from '../../../src/storage/storage';
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';
-// eslint-disable-next-line security/detect-non-literal-fs-filename
 const buffer = readFileSync(resolve(__dirname, '../../resources/piano.png'));
 
 describe('S3 storage', () => {
