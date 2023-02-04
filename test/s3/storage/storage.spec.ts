@@ -30,9 +30,10 @@ describe('S3 storage', () => {
   it('handles files', async () => {
     await expect(storage.exists(key)).resolves.toBe(false);
 
-    // put file in temp storage for processing
+    // put file in storage for processing
     await storage.put(key, buffer);
     await expect(storage.exists(key)).resolves.toBe(true);
+    await expect(storage.get(key)).resolves.toEqual(buffer);
 
     // ensure that the file is public
     await request(storage.baseUrl).get(`/${key}`).expect(200).expect('Content-Type', 'image/png');
