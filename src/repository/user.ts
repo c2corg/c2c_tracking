@@ -32,7 +32,7 @@ export const DecathlonInfo = z.object({
 export type DecathlonInfo = z.infer<typeof DecathlonInfo>;
 
 export const PolarInfo = z.object({
-  id: z.number().int().positive(),
+  id: z.bigint(),
   token: z.string().min(10).max(50),
 });
 export type PolarInfo = z.infer<typeof PolarInfo>;

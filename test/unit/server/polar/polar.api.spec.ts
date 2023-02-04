@@ -28,7 +28,7 @@ describe('Polar API', () => {
       const auth: PolarAuth = {
         access_token: 'access_token',
         token_type: 'bearer',
-        x_user_id: 1,
+        x_user_id: 1n,
       };
       jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
@@ -52,7 +52,7 @@ describe('Polar API', () => {
         {
           "access_token": "access_token",
           "token_type": "bearer",
-          "x_user_id": 1,
+          "x_user_id": 1n,
         }
       `);
     });
@@ -64,7 +64,7 @@ describe('Polar API', () => {
 
       const api = new PolarApi();
 
-      await expect(api.registerUser('token', 1)).rejects.toMatchInlineSnapshot(
+      await expect(api.registerUser('token', 1n)).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar register user request]`,
       );
       expect(axios.post).toBeCalledTimes(1);
@@ -74,7 +74,7 @@ describe('Polar API', () => {
       jest.mocked(axios).post.mockResolvedValueOnce(undefined);
 
       const api = new PolarApi();
-      await api.registerUser('token', 1);
+      await api.registerUser('token', 1n);
 
       expect(axios.post).toBeCalledTimes(1);
       expect(axios.post).toBeCalledWith(
@@ -91,7 +91,7 @@ describe('Polar API', () => {
 
       const api = new PolarApi();
 
-      await expect(api.deleteUser('token', 1)).rejects.toMatchInlineSnapshot(
+      await expect(api.deleteUser('token', 1n)).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar delete user request]`,
       );
       expect(axios.delete).toBeCalledTimes(1);
@@ -101,7 +101,7 @@ describe('Polar API', () => {
       jest.mocked(axios).delete.mockResolvedValueOnce(undefined);
 
       const api = new PolarApi();
-      await api.deleteUser('token', 1);
+      await api.deleteUser('token', 1n);
 
       expect(axios.delete).toBeCalledTimes(1);
       expect(axios.delete).toBeCalledWith('https://www.polaraccesslink.com/v3/users/1', {

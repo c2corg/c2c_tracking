@@ -21,7 +21,7 @@ describe('Polar Service', () => {
     it('calls API and setups user', async () => {
       jest
         .spyOn(polarApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', x_user_id: 1, token_type: 'bearer' });
+        .mockResolvedValueOnce({ access_token: 'access_token', x_user_id: 1n, token_type: 'bearer' });
       jest.spyOn(polarApi, 'registerUser').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(userService, 'configurePolar').mockImplementationOnce(() => Promise.resolve());
 
@@ -31,11 +31,11 @@ describe('Polar Service', () => {
       expect(polarApi.exchangeToken).toBeCalledTimes(1);
       expect(polarApi.exchangeToken).toBeCalledWith('code');
       expect(polarApi.registerUser).toBeCalledTimes(1);
-      expect(polarApi.registerUser).toBeCalledWith('access_token', 1);
+      expect(polarApi.registerUser).toBeCalledWith('access_token', 1n);
       expect(userService.configurePolar).toBeCalledTimes(1);
       expect(userService.configurePolar).toBeCalledWith(1, {
         access_token: 'access_token',
-        x_user_id: 1,
+        x_user_id: 1n,
         token_type: 'bearer',
       });
     });
@@ -59,7 +59,7 @@ describe('Polar Service', () => {
     });
 
     it('calls polar API then updates DB', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -69,7 +69,7 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.deauthorize(1);
       expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
       expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
@@ -80,7 +80,7 @@ describe('Polar Service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -90,7 +90,7 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.deauthorize(1);
       expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
       expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
       expect(log.warn).toBeCalledTimes(1);
@@ -103,7 +103,7 @@ describe('Polar Service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -113,7 +113,7 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.deauthorize(1);
       expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
       expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
@@ -127,7 +127,7 @@ describe('Polar Service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
       jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -137,7 +137,7 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.deauthorize(1);
       expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1);
+      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
       expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
       expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
@@ -327,7 +327,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'signature';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
@@ -348,7 +350,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'signature';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
 
       const service = new PolarService();
@@ -369,7 +373,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'c811b6bd84e9fb0212d95f3190d539e510ecb7f6a0cef924785fe2d0d6b93fc2';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
 
       const service = new PolarService();
@@ -392,7 +398,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getExercise').mockRejectedValueOnce('error');
 
@@ -416,7 +424,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
@@ -448,7 +458,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
@@ -481,7 +493,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
@@ -518,7 +532,9 @@ describe('Polar Service', () => {
       const raw = JSON.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1, token: 'token' } });
+      jest
+        .spyOn(userRepository, 'findByPolarId')
+        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
       jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
       jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
