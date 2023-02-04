@@ -71,7 +71,7 @@ describe('User service', () => {
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
         strava: { id: 1 },
         suunto: { username: 'username' },
-        polar: { id: 1, token: 'token' },
+        polar: { id: 1n, token: 'token' },
       });
 
       const service = new UserService();
@@ -103,7 +103,7 @@ describe('User service', () => {
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
         suunto: { username: 'username', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
-        polar: { id: 1, token: 'token' },
+        polar: { id: 1n, token: 'token' },
       });
 
       const service = new UserService();
@@ -908,7 +908,7 @@ describe('User service', () => {
 
       const service = new UserService();
       const auth: PolarAuth = {
-        x_user_id: 1,
+        x_user_id: 1n,
         access_token: 'access_token',
         token_type: 'bearer',
       };
@@ -920,7 +920,7 @@ describe('User service', () => {
       expect(userRepository.insert).toBeCalledWith({
         c2cId: 1,
         polar: {
-          id: 1,
+          id: 1n,
           token: 'access_token',
         },
       });
@@ -934,7 +934,7 @@ describe('User service', () => {
 
       const service = new UserService();
       const auth: PolarAuth = {
-        x_user_id: 1,
+        x_user_id: 1n,
         access_token: 'access_token',
         token_type: 'bearer',
       };
@@ -946,7 +946,7 @@ describe('User service', () => {
       expect(userRepository.update).toBeCalledWith({
         c2cId: 1,
         polar: {
-          id: 1,
+          id: 1n,
           token: 'access_token',
         },
         garmin: {

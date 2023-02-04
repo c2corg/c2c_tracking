@@ -11,7 +11,7 @@ import { isISO8601Duration } from '../../helpers/utils';
 const PolarAuth = z.object({
   access_token: z.string().min(10).max(100),
   token_type: z.literal('bearer'),
-  x_user_id: z.number().int().positive(),
+  x_user_id: z.coerce.bigint(),
 });
 export type PolarAuth = z.infer<typeof PolarAuth>;
 
@@ -279,7 +279,7 @@ export class PolarApi {
     }
   }
 
-  public async registerUser(token: string, userId: number): Promise<void> {
+  public async registerUser(token: string, userId: bigint): Promise<void> {
     try {
       await axios.post(
         `${this.baseUrl}users`,
@@ -296,7 +296,7 @@ export class PolarApi {
     }
   }
 
-  public async deleteUser(token: string, userId: number): Promise<void> {
+  public async deleteUser(token: string, userId: bigint): Promise<void> {
     try {
       await axios.delete(`${this.baseUrl}users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
     } catch (error: unknown) {

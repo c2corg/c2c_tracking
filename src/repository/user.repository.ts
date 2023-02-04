@@ -7,7 +7,7 @@ import { decrypt, encrypt } from '../helpers/utils';
 
 import type { User } from './user';
 
-type UserRow = {
+type AbstractUserRow = {
   c2c_id: number;
   strava_id: number | undefined | null;
   strava_access_token: string | undefined | null;
@@ -24,9 +24,12 @@ type UserRow = {
   decathlon_expires_at: Date | undefined | null;
   decathlon_refresh_token: string | undefined | null;
   decathlon_webhook_id: string | undefined | null;
-  polar_id: number | undefined | null;
   polar_token: string | undefined | null;
 };
+
+type UserQueryRow = AbstractUserRow & { polar_id: string | undefined | null };
+
+type UserInputRow = AbstractUserRow & { polar_id: bigint | undefined | null };
 
 export class UserRepository {
   readonly #TABLE = config.get('db.schema') + '.users';
@@ -143,11 +146,11 @@ export class UserRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn(this.#TABLE).where({ c2c_id: user.c2cId }).update<UserRow>(this.userToRecord(user));
+    await conn(this.#TABLE).where({ c2c_id: user.c2cId }).update<UserInputRow>(this.userToRecord(user));
     return user;
   }
 
-  private rowToUser(row: UserRow): User {
+  private rowToUser(row: UserQueryRow): User {
     return {
       c2cId: row.c2c_id,
       ...(row.strava_id &&
@@ -195,16 +198,16 @@ export class UserRepository {
       ...(row.polar_id &&
         row.polar_token && {
           polar: {
-            id: row.polar_id,
+            id: BigInt(row.polar_id),
             token: decrypt(row.polar_token),
           },
         }),
     };
   }
 
-  private userToRecord(user: User): UserRow {
+  private userToRecord(user: User): UserInputRow {
     const strava:
-      | Pick<UserRow, 'strava_access_token' | 'strava_expires_at' | 'strava_id' | 'strava_refresh_token'>
+      | Pick<UserInputRow, 'strava_access_token' | 'strava_expires_at' | 'strava_id' | 'strava_refresh_token'>
       | undefined = user.strava
       ? {
           strava_id: user.strava.id,
@@ -219,7 +222,7 @@ export class UserRepository {
           strava_refresh_token: null,
         };
     const suunto:
-      | Pick<UserRow, 'suunto_access_token' | 'suunto_expires_at' | 'suunto_refresh_token' | 'suunto_username'>
+      | Pick<UserInputRow, 'suunto_access_token' | 'suunto_expires_at' | 'suunto_refresh_token' | 'suunto_username'>
       | undefined = user.suunto
       ? {
           suunto_username: user.suunto.username,
@@ -233,7 +236,7 @@ export class UserRepository {
           suunto_expires_at: null,
           suunto_refresh_token: null,
         };
-    const garmin: Pick<UserRow, 'garmin_token' | 'garmin_token_secret'> | undefined = user.garmin
+    const garmin: Pick<UserInputRow, 'garmin_token' | 'garmin_token_secret'> | undefined = user.garmin
       ? {
           garmin_token: user.garmin.token,
           garmin_token_secret: encrypt(user.garmin.tokenSecret),
@@ -244,7 +247,7 @@ export class UserRepository {
         };
     const decathlon:
       | Pick<
-          UserRow,
+          UserInputRow,
           | 'decathlon_id'
           | 'decathlon_access_token'
           | 'decathlon_expires_at'
@@ -266,7 +269,7 @@ export class UserRepository {
           decathlon_refresh_token: null,
           decathlon_webhook_id: null,
         };
-    const polar: Pick<UserRow, 'polar_id' | 'polar_token'> | undefined = user.polar
+    const polar: Pick<UserInputRow, 'polar_id' | 'polar_token'> | undefined = user.polar
       ? {
           polar_id: user.polar.id,
           polar_token: user.polar.token ? encrypt(user.polar.token) : null,

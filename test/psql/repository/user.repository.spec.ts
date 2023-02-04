@@ -33,6 +33,7 @@ describe('User Repository', () => {
         expiresAt: 1,
         webhookId: 'webhookId',
       },
+      polar: { token: 'polar_token', id: 1n },
     };
     await expect(repository.update(user1)).resolves.toEqual(user1);
 
@@ -44,5 +45,7 @@ describe('User Repository', () => {
     await expect(repository.findByGarminToken('unknown_token')).resolves.toBeUndefined();
     await expect(repository.findByDecathlonId('1')).resolves.toEqual(user1);
     await expect(repository.findByDecathlonId('99')).resolves.toBeUndefined();
+    await expect(repository.findByPolarId(1)).resolves.toEqual(user1);
+    await expect(repository.findByPolarId(99)).resolves.toBeUndefined();
   });
 });
