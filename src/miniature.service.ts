@@ -30,7 +30,7 @@ export class MiniatureService {
   }
 
   private simplifiedCoordinates(geometry: LineString): number[][] {
-    const coordinates: number[][] = JSON.parse(JSON.stringify(geometry.coordinates));
+    const coordinates: number[][] = structuredClone(geometry.coordinates);
     const tolerance = this.estimateTolerance(coordinates);
     return simplify(coordinates, tolerance, false);
   }
