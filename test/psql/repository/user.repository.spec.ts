@@ -45,7 +45,7 @@ describe('User Repository', () => {
     await expect(repository.findByGarminToken('unknown_token')).resolves.toBeUndefined();
     await expect(repository.findByDecathlonId('1')).resolves.toEqual(user1);
     await expect(repository.findByDecathlonId('99')).resolves.toBeUndefined();
-    await expect(repository.findByPolarId(1)).resolves.toEqual(user1);
-    await expect(repository.findByPolarId(99)).resolves.toBeUndefined();
+    await expect(repository.findByPolarId(1n)).resolves.toEqual(user1);
+    await expect(repository.findByPolarId(99n)).resolves.toBeUndefined();
   });
 });

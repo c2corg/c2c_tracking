@@ -11,7 +11,17 @@ import { isISO8601Duration } from '../../helpers/utils';
 const PolarAuth = z.object({
   access_token: z.string().min(10).max(100),
   token_type: z.literal('bearer'),
-  x_user_id: z.coerce.bigint(),
+  // see https://github.com/colinhacks/zod/issues/1896
+  x_user_id: z
+    .any()
+    .transform((value) => {
+      try {
+        return BigInt(value);
+      } catch (error) {
+        return value;
+      }
+    })
+    .pipe(z.bigint()),
 });
 export type PolarAuth = z.infer<typeof PolarAuth>;
 
@@ -54,7 +64,17 @@ const WebhookPingEvent = z.object({
 });
 const WebhookExerciseEvent = z.object({
   event: z.literal('EXERCISE'),
-  user_id: z.number().int().positive(),
+  // see https://github.com/colinhacks/zod/issues/1896
+  user_id: z
+    .any()
+    .transform((value) => {
+      try {
+        return BigInt(value);
+      } catch (error) {
+        return value;
+      }
+    })
+    .pipe(z.bigint()),
   entity_id: z.string().min(1).max(50),
   timestamp: z.string().refine(isISO8601),
   url: z.string().refine(isURL, {

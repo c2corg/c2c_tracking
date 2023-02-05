@@ -116,7 +116,7 @@ export class UserRepository {
     }
   }
 
-  public async findByPolarId(polarId: number): Promise<User | undefined> {
+  public async findByPolarId(polarId: bigint): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {
