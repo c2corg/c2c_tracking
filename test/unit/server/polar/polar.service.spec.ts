@@ -1,3 +1,5 @@
+import JSONBig from 'json-bigint';
+
 import log from '../../../../src/helpers/logger';
 import * as utils from '../../../../src/helpers/utils';
 import { miniatureService } from '../../../../src/miniature.service';
@@ -287,7 +289,7 @@ describe('Polar Service', () => {
   describe('handleWebhookEvent', () => {
     it('does nothing for PING events', async () => {
       const event: WebhookEvent = { event: 'PING', timestamp: '1970-01-01T00:00:01Z' };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
       const service = new PolarService();
@@ -299,10 +301,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
       jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce(undefined);
@@ -321,10 +323,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
       jest
@@ -344,10 +346,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
       jest
@@ -367,10 +369,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://nowhere',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'c811b6bd84e9fb0212d95f3190d539e510ecb7f6a0cef924785fe2d0d6b93fc2';
 
       jest
@@ -392,10 +394,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
       jest
@@ -418,10 +420,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
       jest
@@ -452,10 +454,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
       jest
@@ -487,10 +489,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
       jest
@@ -526,10 +528,10 @@ describe('Polar Service', () => {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
-        user_id: 1,
+        user_id: 1n,
         url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
-      const raw = JSON.stringify(event);
+      const raw = JSONBig.stringify(event);
       const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
 
       jest
