@@ -3,6 +3,7 @@ import './dotenv';
 import type { Server } from 'http';
 
 import { ErrorCallback, retry } from 'async';
+import watch from 'node-watch';
 
 import { app } from './app';
 import config from './config';
@@ -71,6 +72,13 @@ export async function start(): Promise<void> {
 
   process.once('SIGHUP', () => {
     log.info(`Received event: SIGHUP`);
+  });
+
+  watch('./', { filter: /maintenance_mode\.txt$/ }, (eventType) => {
+    if (eventType === 'update') {
+      app.context['shuttingDown'] = true;
+      log.info('Received signal to switch to maintenance mode');
+    }
   });
 
   try {
