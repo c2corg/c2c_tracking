@@ -110,6 +110,7 @@ export class PolarService {
       // nothing to do
       return;
     }
+    log.warn(event);
 
     const user = await userRepository.findByPolarId(event.user_id);
     if (!user) {
