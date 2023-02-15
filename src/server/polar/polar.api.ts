@@ -76,9 +76,8 @@ const WebhookExerciseEvent = z.object({
     })
     .pipe(z.bigint()),
   entity_id: z.string().min(1).max(50),
-  timestamp: z.string().refine(isISO8601),
-  url: z.string().refine(isURL, {
-    message: 'String must be an URL',
+  timestamp: z.string().refine(isISO8601, {
+    message: 'String must be an ISO-8601 date',
   }),
 });
 export const WebhookEvent = WebhookPingEvent.or(WebhookExerciseEvent);

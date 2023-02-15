@@ -302,7 +302,6 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
@@ -324,7 +323,6 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
@@ -347,7 +345,6 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
@@ -364,41 +361,15 @@ describe('Polar Service', () => {
       expect(log.warn).toBeCalledWith(`Invalid Polar webhook event: signature doesn't match`);
     });
 
-    it('logs and returns if matching exercise id cannot be extracted', async () => {
-      const event: WebhookEvent = {
-        event: 'EXERCISE',
-        timestamp: '1970-01-01T00:00:01Z',
-        entity_id: 'entityId',
-        user_id: 1n,
-        url: 'https://nowhere',
-      };
-      const raw = JSONBig.stringify(event);
-      const signature = 'c811b6bd84e9fb0212d95f3190d539e510ecb7f6a0cef924785fe2d0d6b93fc2';
-
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-
-      const service = new PolarService();
-      await service.handleWebhookEvent(event, raw, signature);
-
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
-        `Polar exercise webhook event for user 1 couldn't be processed: unable to retrieve exercise id`,
-      );
-    });
-
     it('logs and returns if exercise info cannot be retrieved', async () => {
       const event: WebhookEvent = {
         event: 'EXERCISE',
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
-      const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
+      const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
       jest
         .spyOn(userRepository, 'findByPolarId')
@@ -421,10 +392,9 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
-      const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
+      const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
       jest
         .spyOn(userRepository, 'findByPolarId')
@@ -455,10 +425,9 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
-      const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
+      const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
       jest
         .spyOn(userRepository, 'findByPolarId')
@@ -490,10 +459,9 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
-      const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
+      const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
       jest
         .spyOn(userRepository, 'findByPolarId')
@@ -529,10 +497,9 @@ describe('Polar Service', () => {
         timestamp: '1970-01-01T00:00:01Z',
         entity_id: 'entityId',
         user_id: 1n,
-        url: 'https://www.polaraccesslink.com/v3/exercises/entityId',
       };
       const raw = JSONBig.stringify(event);
-      const signature = 'bd8f35142b8b5a82f35a5a8056af7e65f1f204ff854dcb2e15ab25c5636a97fd';
+      const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
       jest
         .spyOn(userRepository, 'findByPolarId')
@@ -558,7 +525,7 @@ describe('Polar Service', () => {
 
       expect(userService.addActivities).toBeCalledTimes(1);
       expect(userService.addActivities).toBeCalledWith(1, {
-        date: '1970-01-01T00:00:01Z+02:45',
+        date: '1970-01-01T00:00:01+02:45',
         duration: 1,
         geojson: {
           coordinates: [[0, 0, 220]],
