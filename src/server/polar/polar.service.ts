@@ -127,15 +127,7 @@ export class PolarService {
       return;
     }
 
-    const found = /https:\/\/www.polaraccesslink.com\/v3\/exercises\/(\w+)/.exec(event.url);
-    if (!found || found.length < 2 || !found[1]) {
-      promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
-      log.warn(
-        `Polar exercise webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve exercise id`,
-      );
-      return;
-    }
-    const exerciseId = found[1];
+    const exerciseId = event.entity_id;
     let exercise: Exercise;
     try {
       exercise = await polarApi.getExercise(user.polar.token, exerciseId);
