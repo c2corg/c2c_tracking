@@ -190,7 +190,7 @@ export class PolarService {
         minutes: Math.abs(exercise.start_time_utc_offset) % 60,
       })
       .format('HH:mm');
-    return exercise.start_time + 'Z' + (isNegative ? '-' : '+') + offset;
+    return exercise.start_time + (isNegative ? '-' : '+') + offset;
   }
 
   private duration(duration: string): number {
