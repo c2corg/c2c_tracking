@@ -1,0 +1,16 @@
+name: "Label issues"
+
+on:
+  issues
+
+jobs:
+  main:
+    name: Label issues
+    runs-on: ubuntu-latest
+    steps:
+      # Add label corresponding to conventional commit type
+      - uses: srvaroa/labeler@v1.2
+        with:
+          config_path: .github/semantic-labels.yml
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
