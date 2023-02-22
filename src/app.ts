@@ -15,6 +15,7 @@ import enabledIf from './helpers/enabled-if';
 import log from './helpers/logger';
 import { promResponseTimeSummary } from './metrics/prometheus';
 import activities from './server/activities';
+import coros from './server/coros';
 import decathlon from './server/decathlon';
 import { defaultErrorHandler } from './server/error-handler';
 import garmin from './server/garmin';
@@ -38,6 +39,7 @@ router.use(
   decathlon.allowedMethods(),
 );
 router.use('/polar', enabledIf(config.get('trackers.polar.enabled')), polar.routes(), polar.allowedMethods());
+router.use('/coros', enabledIf(config.get('trackers.coros.enabled')), coros.routes(), coros.allowedMethods());
 router.use(
   '/users/:userId/activities',
   ensureAuthenticated,
@@ -99,7 +101,7 @@ app
       logger: log,
       level: logLevel,
       customLogLevel: (res: ServerResponse, error: Error): LevelWithSilent => {
-        if (!error && res.req?.url === '/health') {
+        if (!error && (res.req?.url === '/health' || res.req?.url?.startsWith('/.well-known/acme-challenge'))) {
           return 'silent';
         }
         return 'info';

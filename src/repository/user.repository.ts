@@ -25,11 +25,14 @@ type AbstractUserRow = {
   decathlon_refresh_token: string | undefined | null;
   decathlon_webhook_id: string | undefined | null;
   polar_token: string | undefined | null;
+  coros_access_token: string | undefined | null;
+  coros_expires_at: Date | undefined | null;
+  coros_refresh_token: string | undefined | null;
 };
 
-type UserQueryRow = AbstractUserRow & { polar_id: string | undefined | null };
+type UserQueryRow = AbstractUserRow & { polar_id: string | undefined | null; coros_id: string | undefined | null };
 
-type UserInputRow = AbstractUserRow & { polar_id: bigint | undefined | null };
+type UserInputRow = AbstractUserRow & { polar_id: bigint | undefined | null; coros_id: string | undefined | null };
 
 export class UserRepository {
   readonly #TABLE = config.get('db.schema') + '.users';
@@ -132,6 +135,22 @@ export class UserRepository {
     }
   }
 
+  public async findByCorosId(corosId: string): Promise<User | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      const row = await conn(this.#TABLE).where({ coros_id: corosId }).first();
+      if (!row) {
+        return undefined;
+      }
+      return this.rowToUser(row);
+    } catch (err) {
+      return undefined;
+    }
+  }
+
   public async insert(user: User): Promise<User> {
     const conn = await db.getConnection();
     if (!conn) {
@@ -200,6 +219,16 @@ export class UserRepository {
           polar: {
             id: BigInt(row.polar_id),
             token: decrypt(row.polar_token),
+          },
+        }),
+      ...(row.coros_id &&
+        row.coros_access_token &&
+        row.coros_refresh_token && {
+          coros: {
+            id: row.coros_id,
+            accessToken: decrypt(row.coros_access_token),
+            expiresAt: dayjs(row.coros_expires_at).unix(),
+            refreshToken: decrypt(row.coros_refresh_token),
           },
         }),
     };
@@ -278,6 +307,21 @@ export class UserRepository {
           polar_id: null,
           polar_token: null,
         };
+    const coros:
+      | Pick<UserInputRow, 'coros_id' | 'coros_access_token' | 'coros_expires_at' | 'coros_refresh_token'>
+      | undefined = user.coros
+      ? {
+          coros_id: user.coros.id,
+          coros_access_token: user.coros.accessToken ? encrypt(user.coros.accessToken) : null,
+          coros_expires_at: user.coros.expiresAt ? dayjs.unix(user.coros.expiresAt).toDate() : null,
+          coros_refresh_token: user.coros.refreshToken ? encrypt(user.coros.refreshToken) : null,
+        }
+      : {
+          coros_id: null,
+          coros_access_token: null,
+          coros_expires_at: null,
+          coros_refresh_token: null,
+        };
     return {
       c2c_id: user.c2cId,
       ...(strava && { ...strava }),
@@ -285,6 +329,7 @@ export class UserRepository {
       ...(garmin && { ...garmin }),
       ...(decathlon && { ...decathlon }),
       ...(polar && { ...polar }),
+      ...(coros && { ...coros }),
     };
   }
 }

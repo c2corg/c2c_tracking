@@ -37,6 +37,15 @@ export const PolarInfo = z.object({
 });
 export type PolarInfo = z.infer<typeof PolarInfo>;
 
+export const CorosInfo = z.object({
+  id: z.string(),
+  accessToken: z.string().min(10).max(5000).optional(),
+  expiresAt: z.number().int().positive().optional(),
+  refreshToken: z.string().min(10).max(5000).optional(),
+});
+
+export type CorosInfo = z.infer<typeof CorosInfo>;
+
 export const User = z.object({
   c2cId: z.number().int().positive(),
   strava: StravaInfo.optional(),
@@ -44,5 +53,6 @@ export const User = z.object({
   garmin: GarminInfo.optional(),
   decathlon: DecathlonInfo.optional(),
   polar: PolarInfo.optional(),
+  coros: CorosInfo.optional(),
 });
 export type User = z.infer<typeof User>;

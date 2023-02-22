@@ -545,6 +545,9 @@
   "fives": {
     "string": "Puszta kézzel "
   },
+  "flatwater": {
+    "string": "Flatwater"
+  },
   "floorball": {
     "string": "Floorball"
   },
@@ -638,6 +641,9 @@
   "golf": {
     "string": "Golf"
   },
+  "gpscardio": {
+    "string": "GPS Cardio"
+  },
   "grandchistera": {
     "string": "Nagy chistera"
   },
@@ -655,6 +661,9 @@
   },
   "gym": {
     "string": "Gym"
+  },
+  "gymcardio": {
+    "string": "Gym Cardio"
   },
   "gymnastick": {
     "string": "Torna"
@@ -764,6 +773,9 @@
   "indoor": {
     "string": "Indoor"
   },
+  "indoorbike": {
+    "string": "Indoor Bike"
+  },
   "indoorcardio": {
     "string": "Indoor cardio"
   },
@@ -779,8 +791,14 @@
   "indoorfootball": {
     "string": "Teremfutball"
   },
+  "indoorrower": {
+    "string": "Indoor rowing"
+  },
   "indoorrowing": {
     "string": "Indoor Rowing"
+  },
+  "indoorrun": {
+    "string": "Indoor Running"
   },
   "indoorrunning": {
     "string": "Indoor Running"
@@ -829,6 +847,9 @@
   },
   "jumpingrope": {
     "string": "Ugrókötél"
+  },
+  "jumprope": {
+    "string": "Jumping rope"
   },
   "karate": {
     "string": "Karate"
@@ -1043,6 +1064,9 @@
   "mountainboard": {
     "string": "Mountain board"
   },
+  "mountainclimb": {
+    "string": "Alpinizmus"
+  },
   "mountaineering": {
     "string": "Alpinizmus"
   },
@@ -1115,6 +1139,9 @@
   "onshoregrinding": {
     "string": "Onshore Grinding"
   },
+  "openwater": {
+    "string": "Open water Swimming"
+  },
   "openwaterswimming": {
     "string": "Open water Swimming"
   },
@@ -1160,8 +1187,14 @@
   "other6": {
     "string": "Other6"
   },
+  "outdoorbike": {
+    "string": "Outdoor Bike"
+  },
   "outdoorgym": {
     "string": "Outdoor Gym"
+  },
+  "outdoorrun": {
+    "string": "Outdoor Run"
   },
   "paddling": {
     "string": "Paddling"
@@ -1211,6 +1244,9 @@
   "pilates": {
     "string": "Pilates"
   },
+  "pilot": {
+    "string": "Pilot"
+  },
   "pistolshooting": {
     "string": "Pisztolylövészet"
   },
@@ -1231,6 +1267,9 @@
   },
   "pool": {
     "string": "Amerikai billiárd"
+  },
+  "poolswim": {
+    "string": "Úszás"
   },
   "poolswimming": {
     "string": "Úszás"
@@ -1421,6 +1460,9 @@
   "singlegasdive": {
     "string": "Single-gas Dive"
   },
+  "singlepitch": {
+    "string": "Single-Pitch"
+  },
   "skateboard": {
     "string": "Skateboard"
   },
@@ -1436,8 +1478,14 @@
   "skateskiingws": {
     "string": "Skating"
   },
+  "ski": {
+    "string": "Sí"
+  },
   "skiing": {
     "string": "Sí"
+  },
+  "skitouring": {
+    "string": "Ski Touring"
   },
   "skimboard": {
     "string": "Skimboard"
@@ -1517,6 +1565,9 @@
   "speedskating": {
     "string": "Gyorskorcsolya"
   },
+  "speedsurfing": {
+    "string": "Speedsurfing"
+  },
   "speedwalking": {
     "string": "Speed Walking"
   },
@@ -1576,6 +1627,9 @@
   },
   "streetskateboarding": {
     "string": "Utcai gördeszka "
+  },
+  "strength": {
+    "string": "Strength"
   },
   "strengthtraining": {
     "string": "Strength Training"
@@ -1643,8 +1697,11 @@
   "trackcycling": {
     "string": "Versenykerékpár"
   },
+  "trackrun": {
+    "string": "Futás"
+  },
   "trackrunning": {
-    "string": "Futás "
+    "string": "Futás"
   },
   "trackandfieldrunning": {
     "string": "Track & field running"
@@ -1859,6 +1916,9 @@
   "wheelchairracing": {
     "string": "Kerekesszékes futás"
   },
+  "whitewater": {
+    "string": "Whitewater"
+  },
   "whitewaterkayaking": {
     "string": "Kajak természetes vizek "
   },
@@ -1888,6 +1948,9 @@
   },
   "xare": {
     "string": "A xare "
+  },
+  "xcski": {
+    "string": "XC skiing"
   },
   "xcskiingclassic": {
     "string": "Classic XC skiing"

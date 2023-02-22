@@ -9,6 +9,7 @@ import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from '
 import { activityRepository } from './repository/activity.repository';
 import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
 import { userRepository } from './repository/user.repository';
+import type { CorosAuth } from './server/coros/coros.api';
 import type { DecathlonAuth } from './server/decathlon/decathlon.api';
 import type { GarminAuth } from './server/garmin/garmin.api';
 import type { PolarAuth } from './server/polar/polar.api';
@@ -40,10 +41,11 @@ const suuntoEnabled = config.get('trackers.suunto.enabled');
 const garminEnabled = config.get('trackers.garmin.enabled');
 const decathlonEnabled = config.get('trackers.decathlon.enabled');
 const polarEnabled = config.get('trackers.polar.enabled');
+const corosEnabled = config.get('trackers.coros.enabled');
 
 export class UserService {
   public async getUserInfo(c2cId: number): Promise<{ [key in Vendor]?: Status }> {
-    const { strava, suunto, garmin, decathlon, polar } = (await userRepository.findById(c2cId)) || {};
+    const { strava, suunto, garmin, decathlon, polar, coros } = (await userRepository.findById(c2cId)) || {};
     return {
       ...(stravaEnabled && {
         strava: !!strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
@@ -56,6 +58,7 @@ export class UserService {
         decathlon: !!decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
       }),
       ...(polarEnabled && { polar: !!polar ? 'configured' : 'not-configured' }),
+      ...(corosEnabled && { coros: !!coros ? 'configured' : 'not-configured' }),
     };
   }
 
@@ -312,6 +315,63 @@ export class UserService {
       await userRepository.insert(user);
     }
   }
+
+  public async configureCoros(c2cId: number, auth: CorosAuth): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (user) {
+      user = {
+        ...user,
+        coros: {
+          id: auth.openId,
+          accessToken: auth.access_token,
+          expiresAt: dayjs().add(this.corosTokenDurationDays, 'day').unix(),
+          refreshToken: auth.refresh_token,
+        },
+      };
+      await userRepository.update(user);
+    } else {
+      user = {
+        c2cId,
+        coros: {
+          id: auth.openId,
+          accessToken: auth.access_token,
+          expiresAt: dayjs().add(this.corosTokenDurationDays, 'day').unix(),
+          refreshToken: auth.refresh_token,
+        },
+      };
+      await userRepository.insert(user);
+    }
+  }
+
+  public async resetCorosAuthExpiration(c2cId: number): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.coros || !user.coros.id) {
+      throw new NotFoundError(`User ${c2cId} not configured for Coros`);
+    }
+    user = {
+      ...user,
+      coros: { ...user.coros, expiresAt: dayjs().add(this.corosTokenDurationDays, 'day').unix() },
+    };
+    await userRepository.update(user);
+  }
+
+  public async clearCorosTokens(c2cId: number): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.coros) {
+      return;
+    }
+    const { accessToken, refreshToken, expiresAt, ...coros } = user.coros;
+    user = { ...user, coros };
+    await userRepository.update(user);
+  }
+
+  private corosTokenDurationDays = 29; // 30, but let's have a lower limit because we aren't sur of the exact time
 
   public async addActivities(c2cId: number, ...newActivities: NewActivityWithGeometry[]): Promise<void> {
     if (!newActivities.length) {

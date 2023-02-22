@@ -26,11 +26,15 @@ export const isISO8601Duration = (duration: string | undefined): boolean => {
 };
 
 export const fitToGeoJSON = (fit: ArrayBuffer): LineString | undefined => {
-  const coordinates = extractGeometry(new Uint8Array(fit));
-  if (!coordinates.length) {
+  try {
+    const coordinates = extractGeometry(new Uint8Array(fit));
+    if (!coordinates.length) {
+      return undefined;
+    }
+    return { coordinates, type: 'LineString' };
+  } catch {
     return undefined;
   }
-  return { coordinates, type: 'LineString' };
 };
 
 export const encrypt = (token: string): string => aes.encrypt(token, config.get('db.crypto')).toString();

@@ -327,10 +327,36 @@ const config = convict({
         sensitive: true,
       },
     },
+    coros: {
+      enabled: {
+        doc: 'Boolean to specify whether to enable connection with Coros',
+        default: true,
+        env: 'COROS_ENABLED',
+      },
+      baseUrl: {
+        doc: 'Specify base URL for Coros API',
+        format: 'baseUrl',
+        default: 'https://open.coros.com/',
+        env: 'COROS_SERVER',
+      },
+      clientId: {
+        doc: 'Coros client ID',
+        format: 'notEmptyString',
+        default: 'f263ed9257c74e808befaf548a27852c',
+        env: 'COROS_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'Coros client secret',
+        format: 'notEmptyString',
+        default: '',
+        env: 'COROS_CLIENT_SECRET',
+        sensitive: true,
+      },
+    },
   },
   miniatures: {
     size: {
-      doc: 'Miniatures size in pixels',
+      doc: 'Miniature size in pixels',
       format: 'nat',
       default: 300,
       env: 'MINIATURES_SIZE',
