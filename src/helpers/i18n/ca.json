@@ -545,9 +545,6 @@
   "fives": {
     "string": "Fives"
   },
-  "flatwater": {
-    "string": "Flatwater"
-  },
   "floorball": {
     "string": "Floorball"
   },
@@ -641,9 +638,6 @@
   "golf": {
     "string": "Golf"
   },
-  "gpscardio": {
-    "string": "GPS Cardio"
-  },
   "grandchistera": {
     "string": "Grand chistera"
   },
@@ -661,9 +655,6 @@
   },
   "gym": {
     "string": "Gym"
-  },
-  "gymcardio": {
-    "string": "Gym Cardio"
   },
   "gymnastick": {
     "string": "Gymnastics"
@@ -773,9 +764,6 @@
   "indoor": {
     "string": "Indoor"
   },
-  "indoorbike": {
-    "string": "Indoor Bike"
-  },
   "indoorcardio": {
     "string": "Indoor cardio"
   },
@@ -791,14 +779,8 @@
   "indoorfootball": {
     "string": "Indoor football"
   },
-  "indoorrower": {
-    "string": "Indoor rowing"
-  },
   "indoorrowing": {
     "string": "Indoor Rowing"
-  },
-  "indoorrun": {
-    "string": "Indoor Running"
   },
   "indoorrunning": {
     "string": "Indoor Running"
@@ -846,9 +828,6 @@
     "string": "Judo"
   },
   "jumpingrope": {
-    "string": "Jumping rope"
-  },
-  "jumprope": {
     "string": "Jumping rope"
   },
   "karate": {
@@ -1064,9 +1043,6 @@
   "mountainboard": {
     "string": "Mountain board"
   },
-  "mountainclimb": {
-    "string": "Mountaineering"
-  },
   "mountaineering": {
     "string": "Mountaineering"
   },
@@ -1139,9 +1115,6 @@
   "onshoregrinding": {
     "string": "Onshore Grinding"
   },
-  "openwater": {
-    "string": "Open water Swimming"
-  },
   "openwaterswimming": {
     "string": "Open water Swimming"
   },
@@ -1187,14 +1160,8 @@
   "other6": {
     "string": "Other6"
   },
-  "outdoorbike": {
-    "string": "Outdoor Bike"
-  },
   "outdoorgym": {
     "string": "Outdoor Gym"
-  },
-  "outdoorrun": {
-    "string": "Outdoor Run"
   },
   "paddling": {
     "string": "Paddling"
@@ -1244,9 +1211,6 @@
   "pilates": {
     "string": "Pilates"
   },
-  "pilot": {
-    "string": "Pilot"
-  },
   "pistolshooting": {
     "string": "Pistol shooting"
   },
@@ -1267,9 +1231,6 @@
   },
   "pool": {
     "string": "Pool"
-  },
-  "poolswim": {
-    "string": "Swimming"
   },
   "poolswimming": {
     "string": "Swimming"
@@ -1460,9 +1421,6 @@
   "singlegasdive": {
     "string": "Single-gas Dive"
   },
-  "singlepitch": {
-    "string": "Single-Pitch"
-  },
   "skateboard": {
     "string": "Skateboard"
   },
@@ -1478,14 +1436,8 @@
   "skateskiingws": {
     "string": "Skating"
   },
-  "ski": {
-    "string": "Skiing"
-  },
   "skiing": {
     "string": "Skiing"
-  },
-  "skitouring": {
-    "string": "Ski Touring"
   },
   "skimboard": {
     "string": "Skim board"
@@ -1565,9 +1517,6 @@
   "speedskating": {
     "string": "Speedskating"
   },
-  "speedsurfing": {
-    "string": "Speedsurfing"
-  },
   "speedwalking": {
     "string": "Speed Walking"
   },
@@ -1627,9 +1576,6 @@
   },
   "streetskateboarding": {
     "string": "Street skateboarding"
-  },
-  "strength": {
-    "string": "Strength"
   },
   "strengthtraining": {
     "string": "Strength Training"
@@ -1696,9 +1642,6 @@
   },
   "trackcycling": {
     "string": "Track cycling"
-  },
-  "trackrun": {
-    "string": "Track running"
   },
   "trackrunning": {
     "string": "Track running"
@@ -1916,9 +1859,6 @@
   "wheelchairracing": {
     "string": "Wheelchair racing"
   },
-  "whitewater": {
-    "string": "Whitewater"
-  },
   "whitewaterkayaking": {
     "string": "Whitewater kayaking"
   },
@@ -1948,9 +1888,6 @@
   },
   "xare": {
     "string": "Xare"
-  },
-  "xcski": {
-    "string": "XC skiing"
   },
   "xcskiingclassic": {
     "string": "Classic XC skiing"

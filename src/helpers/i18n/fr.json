@@ -545,9 +545,6 @@
   "fives": {
     "string": "La main nue"
   },
-  "flatwater": {
-    "string": "Plan d'eau"
-  },
   "floorball": {
     "string": "Floorball"
   },
@@ -641,9 +638,6 @@
   "golf": {
     "string": "Golf"
   },
-  "gpscardio": {
-    "string": "Aérobie"
-  },
   "grandchistera": {
     "string": "Le grand chistera"
   },
@@ -661,9 +655,6 @@
   },
   "gym": {
     "string": "Gym"
-  },
-  "gymcardio": {
-    "string": "Aérobie"
   },
   "gymnastick": {
     "string": "Gymnastique"
@@ -773,9 +764,6 @@
   "indoor": {
     "string": "Indoor"
   },
-  "indoorbike": {
-    "string": "Home trainer"
-  },
   "indoorcardio": {
     "string": "Cardio en salle"
   },
@@ -783,25 +771,19 @@
     "string": "Escalade en salle"
   },
   "indoorcycling": {
-    "string": "Home trainer"
+    "string": "Vélo en salle"
   },
   "indoorfitnessbike": {
-    "string": "Home trainer"
+    "string": "Vélo en salle"
   },
   "indoorfootball": {
     "string": "Football en salle"
   },
-  "indoorrower": {
-    "string": "Rameur d'intérieur"
-  },
   "indoorrowing": {
     "string": "Rameur d'intérieur"
   },
-  "indoorrun": {
-    "string": "Tapis de course"
-  },
   "indoorrunning": {
-    "string": "Tapis de course"
+    "string": "Course en salle"
   },
   "indoorweighttraining": {
     "string": "Musculation"
@@ -846,9 +828,6 @@
     "string": "Judo"
   },
   "jumpingrope": {
-    "string": "Corde à sauter"
-  },
-  "jumprope": {
     "string": "Corde à sauter"
   },
   "karate": {
@@ -1064,9 +1043,6 @@
   "mountainboard": {
     "string": "Mountain board"
   },
-  "mountainclimb": {
-    "string": "Alpinisme"
-  },
   "mountaineering": {
     "string": "Alpinisme"
   },
@@ -1139,9 +1115,6 @@
   "onshoregrinding": {
     "string": "Entrainement au Grinding"
   },
-  "openwater": {
-    "string": "Nage en eaux libres"
-  },
   "openwaterswimming": {
     "string": "Nage en eaux libres"
   },
@@ -1187,14 +1160,8 @@
   "other6": {
     "string": "Autre"
   },
-  "outdoorbike": {
-    "string": "Vélo"
-  },
   "outdoorgym": {
     "string": "Outdoor Gym"
-  },
-  "outdoorrun": {
-    "string": "Course à pied"
   },
   "paddling": {
     "string": "Canoë Kayak"
@@ -1244,9 +1211,6 @@
   "pilates": {
     "string": "Pilates"
   },
-  "pilot": {
-    "string": "Pilot"
-  },
   "pistolshooting": {
     "string": "Tir au pistolet"
   },
@@ -1267,9 +1231,6 @@
   },
   "pool": {
     "string": "Billard américain"
-  },
-  "poolswim": {
-    "string": "Natation"
   },
   "poolswimming": {
     "string": "Natation"
@@ -1460,9 +1421,6 @@
   "singlegasdive": {
     "string": "Plongée monogaz"
   },
-  "singlepitch": {
-    "string": "Escalade"
-  },
   "skateboard": {
     "string": "Skateboard"
   },
@@ -1478,17 +1436,11 @@
   "skateskiingws": {
     "string": "Skating"
   },
-  "ski": {
-    "string": "Ski"
-  },
   "skiing": {
     "string": "Ski"
   },
   "skimboard": {
     "string": "Skim board"
-  },
-  "skitouring": {
-    "string": "Ski de randonnée"
   },
   "skittouring": {
     "string": "Ski de randonnée"
@@ -1565,9 +1517,6 @@
   "speedskating": {
     "string": "Patinage de vitesse"
   },
-  "speedsurfing": {
-    "string": "Speedsurfing"
-  },
   "speedwalking": {
     "string": "Marche rapide"
   },
@@ -1623,16 +1572,13 @@
     "string": "Street dance"
   },
   "streetrunning": {
-    "string": "Course à pied"
+    "string": "Street Running"
   },
   "streetskateboarding": {
     "string": "Skate board street"
   },
-  "strength": {
-    "string": "Musculation"
-  },
   "strengthtraining": {
-    "string": "Musculation"
+    "string": "Strength Training"
   },
   "stretching": {
     "string": "Stretching"
@@ -1696,9 +1642,6 @@
   },
   "trackcycling": {
     "string": "Cyclisme sur piste"
-  },
-  "trackrun": {
-    "string": "Course sur piste"
   },
   "trackrunning": {
     "string": "Course sur piste"
@@ -1916,9 +1859,6 @@
   "wheelchairracing": {
     "string": "Course en fauteuil"
   },
-  "whitewater": {
-    "string": "Eaux vives"
-  },
   "whitewaterkayaking": {
     "string": "Kayak en eaux vives"
   },
@@ -1929,10 +1869,10 @@
     "string": "Planche à voile"
   },
   "windsurf": {
-    "string": "Planche à voile"
+    "string": "Windsurf"
   },
   "windsurfing": {
-    "string": "Plache à voile"
+    "string": "Windsurf"
   },
   "wingsuitflying": {
     "string": "Wingsuit"
@@ -1948,9 +1888,6 @@
   },
   "xare": {
     "string": "Le xare"
-  },
-  "xcski": {
-    "string": "Ski de fond"
   },
   "xcskiingclassic": {
     "string": "Ski de fond"

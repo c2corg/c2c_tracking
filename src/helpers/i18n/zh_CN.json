@@ -545,9 +545,6 @@
   "fives": {
     "string": "空手回力球"
   },
-  "flatwater": {
-    "string": "Flatwater"
-  },
   "floorball": {
     "string": "Floorball"
   },
@@ -641,9 +638,6 @@
   "golf": {
     "string": "高尔夫球"
   },
-  "gpscardio": {
-    "string": "GPS Cardio"
-  },
   "grandchistera": {
     "string": "grand chistera柳条大捧兜回力球"
   },
@@ -661,9 +655,6 @@
   },
   "gym": {
     "string": "Gym"
-  },
-  "gymcardio": {
-    "string": "Gym Cardio"
   },
   "gymnastick": {
     "string": "体操"
@@ -773,9 +764,6 @@
   "indoor": {
     "string": "Indoor"
   },
-  "indoorbike": {
-    "string": "Indoor Bike"
-  },
   "indoorcardio": {
     "string": "Indoor cardio"
   },
@@ -791,14 +779,8 @@
   "indoorfootball": {
     "string": "室内足球"
   },
-  "indoorrower": {
-    "string": "Indoor rowing"
-  },
   "indoorrowing": {
     "string": "Indoor Rowing"
-  },
-  "indoorrun": {
-    "string": "Indoor Running"
   },
   "indoorrunning": {
     "string": "Indoor Running"
@@ -847,9 +829,6 @@
   },
   "jumpingrope": {
     "string": "跳绳"
-  },
-  "jumprope": {
-    "string": "Jumping rope"
   },
   "karate": {
     "string": "空手道"
@@ -1064,9 +1043,6 @@
   "mountainboard": {
     "string": "山地板"
   },
-  "mountainclimb": {
-    "string": "登山"
-  },
   "mountaineering": {
     "string": "登山"
   },
@@ -1139,9 +1115,6 @@
   "onshoregrinding": {
     "string": "Onshore Grinding"
   },
-  "openwater": {
-    "string": "Open water Swimming"
-  },
   "openwaterswimming": {
     "string": "Open water Swimming"
   },
@@ -1187,14 +1160,8 @@
   "other6": {
     "string": "Other6"
   },
-  "outdoorbike": {
-    "string": "Outdoor Bike"
-  },
   "outdoorgym": {
     "string": "Outdoor Gym"
-  },
-  "outdoorrun": {
-    "string": "Outdoor Run"
   },
   "paddling": {
     "string": "Paddling"
@@ -1244,9 +1211,6 @@
   "pilates": {
     "string": "普拉特健身操"
   },
-  "pilot": {
-    "string": "Pilot"
-  },
   "pistolshooting": {
     "string": "手枪射击"
   },
@@ -1267,9 +1231,6 @@
   },
   "pool": {
     "string": "美式桌球"
-  },
-  "poolswim": {
-    "string": "游泳"
   },
   "poolswimming": {
     "string": "游泳"
@@ -1460,9 +1421,6 @@
   "singlegasdive": {
     "string": "Single-gas Dive"
   },
-  "singlepitch": {
-    "string": "Single-Pitch"
-  },
   "skateboard": {
     "string": "Skateboard"
   },
@@ -1478,14 +1436,8 @@
   "skateskiingws": {
     "string": "Skating"
   },
-  "ski": {
-    "string": "滑雪"
-  },
   "skiing": {
     "string": "滑雪"
-  },
-  "skitouring": {
-    "string": "Ski Touring"
   },
   "skimboard": {
     "string": "浅水冲浪"
@@ -1565,9 +1517,6 @@
   "speedskating": {
     "string": "速度滑冰"
   },
-  "speedsurfing": {
-    "string": "Speedsurfing"
-  },
   "speedwalking": {
     "string": "Speed Walking"
   },
@@ -1627,9 +1576,6 @@
   },
   "streetskateboarding": {
     "string": "街头滑板"
-  },
-  "strength": {
-    "string": "Strength"
   },
   "strengthtraining": {
     "string": "Strength Training"
@@ -1696,9 +1642,6 @@
   },
   "trackcycling": {
     "string": "场地自行车赛"
-  },
-  "trackrun": {
-    "string": "赛道跑"
   },
   "trackrunning": {
     "string": "赛道跑"
@@ -1916,9 +1859,6 @@
   "wheelchairracing": {
     "string": "轮椅赛跑"
   },
-  "whitewater": {
-    "string": "Whitewater"
-  },
   "whitewaterkayaking": {
     "string": "皮划艇漂流"
   },
@@ -1948,9 +1888,6 @@
   },
   "xare": {
     "string": "Xare回力球"
-  },
-  "xcski": {
-    "string": "XC skiing"
   },
   "xcskiingclassic": {
     "string": "Classic XC skiing"
