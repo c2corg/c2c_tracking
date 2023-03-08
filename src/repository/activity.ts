@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { LineString } from './geojson';
 
-export const Vendor = z.enum(['strava', 'suunto', 'garmin', 'decathlon', 'polar']);
+export const Vendor = z.enum(['strava', 'suunto', 'garmin', 'decathlon', 'polar', 'coros']);
 export type Vendor = z.infer<typeof Vendor>;
 
 export const Activity = z.object({

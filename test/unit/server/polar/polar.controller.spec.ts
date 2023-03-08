@@ -52,9 +52,7 @@ describe('Polar Controller', () => {
       jest.spyOn(polarService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
-        request(app.callback())
-          .get('/polar/exchange-token/1')
-          .query({ code: 'longenoughcode', scope: 'activity:read' }),
+        request(app.callback()).get('/polar/exchange-token/1').query({ code: 'longenoughcode' }),
         1,
       );
 

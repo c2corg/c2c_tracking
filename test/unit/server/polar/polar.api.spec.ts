@@ -165,17 +165,6 @@ describe('Polar API', () => {
       expect(axios.get).toBeCalledTimes(1);
     });
 
-    it('throws if request failed', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
-
-      const api = new PolarApi();
-
-      await expect(api.getExerciseFit('token', 'exerciseId')).rejects.toMatchInlineSnapshot(
-        `[Error: Error on Polar getExrciseFIT request]`,
-      );
-      expect(axios.get).toBeCalledTimes(1);
-    });
-
     it('returns FIT', async () => {
       jest.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 

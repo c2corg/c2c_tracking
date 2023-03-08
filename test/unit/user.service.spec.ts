@@ -4,6 +4,7 @@ import { miniatureService } from '../../src/miniature.service';
 import type { Activity } from '../../src/repository/activity';
 import { activityRepository } from '../../src/repository/activity.repository';
 import { userRepository } from '../../src/repository/user.repository';
+import type { CorosAuth } from '../../src/server/coros/coros.api';
 import type { DecathlonAuth } from '../../src/server/decathlon/decathlon.api';
 import type { GarminAuth } from '../../src/server/garmin/garmin.api';
 import type { PolarAuth } from '../../src/server/polar/polar.api';
@@ -15,10 +16,13 @@ describe('User service', () => {
   beforeEach(() => {
     jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
     jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    const timers = jest.useFakeTimers();
+    timers.setSystemTime(new Date('1970-01-01'));
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    jest.useRealTimers();
   });
 
   describe('getUserInfo', () => {
@@ -34,6 +38,7 @@ describe('User service', () => {
 
       expect(info).toMatchInlineSnapshot(`
         {
+          "coros": "not-configured",
           "decathlon": "not-configured",
           "garmin": "not-configured",
           "polar": "not-configured",
@@ -53,6 +58,7 @@ describe('User service', () => {
 
       expect(info).toMatchInlineSnapshot(`
         {
+          "coros": "not-configured",
           "decathlon": "not-configured",
           "garmin": "not-configured",
           "polar": "not-configured",
@@ -79,6 +85,7 @@ describe('User service', () => {
 
       expect(info).toMatchInlineSnapshot(`
         {
+          "coros": "not-configured",
           "decathlon": "token-lost",
           "garmin": "configured",
           "polar": "configured",
@@ -93,6 +100,12 @@ describe('User service', () => {
     it('should return configured state', async () => {
       jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
+        coros: {
+          id: 'id',
+          accessToken: 'access_token',
+          expiresAt: 1,
+          refreshToken: 'refrsh_token',
+        },
         decathlon: {
           id: '1',
           webhookId: 'webhokid',
@@ -111,6 +124,7 @@ describe('User service', () => {
 
       expect(info).toMatchInlineSnapshot(`
         {
+          "coros": "configured",
           "decathlon": "configured",
           "garmin": "configured",
           "polar": "configured",
@@ -953,6 +967,173 @@ describe('User service', () => {
           token: 'token',
           tokenSecret: 'tokenSecret',
         },
+      });
+    });
+  });
+
+  describe('configureCoros', () => {
+    beforeEach(() => {
+      const timers = jest.useFakeTimers();
+      timers.setSystemTime(new Date('1970-01-01'));
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('creates user info', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      const auth: CorosAuth = {
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      };
+      await service.configureCoros(1, auth);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.insert).toBeCalledTimes(1);
+      expect(userRepository.insert).toBeCalledWith({
+        c2cId: 1,
+        coros: {
+          id: '1',
+          accessToken: 'access_token',
+          expiresAt: 2505600,
+          refreshToken: 'refresh_token',
+        },
+      });
+    });
+
+    it('updates user info', async () => {
+      jest
+        .spyOn(userRepository, 'findById')
+        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
+      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      const auth: CorosAuth = {
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      };
+      await service.configureCoros(1, auth);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        coros: {
+          id: '1',
+          accessToken: 'access_token',
+          expiresAt: 2505600,
+          refreshToken: 'refresh_token',
+        },
+        garmin: {
+          token: 'token',
+          tokenSecret: 'tokenSecret',
+        },
+      });
+    });
+  });
+
+  describe('resetCorosAuthExpiration', () => {
+    it('throws if user is not found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await expect(service.resetCorosAuthExpiration(1)).rejects.toMatchInlineSnapshot('[Error: User 1 not found]');
+
+      expect(userRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('throws if user is not yet configured for suunto', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await expect(service.resetCorosAuthExpiration(1)).rejects.toMatchInlineSnapshot(
+        '[Error: User 1 not configured for Coros]',
+      );
+
+      expect(userRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('updates coros info', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: {
+          id: '1',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 1,
+        },
+      });
+      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      await service.resetCorosAuthExpiration(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        coros: {
+          id: '1',
+          accessToken: 'access_token',
+          refreshToken: 'refresh_token',
+          expiresAt: 2505600,
+        },
+      });
+    });
+  });
+
+  describe('clearCorosTokens', () => {
+    it('throws if user is not found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await expect(service.clearCorosTokens(1)).rejects.toBeInstanceOf(NotFoundError);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('does nothing if no auth info is found', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      jest.spyOn(userRepository, 'update');
+
+      const service = new UserService();
+      await service.clearCorosTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).not.toBeCalled();
+    });
+
+    it('clears tokens', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
+      });
+      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1' },
+      });
+
+      const service = new UserService();
+      await service.clearCorosTokens(1);
+
+      expect(userRepository.findById).toBeCalledTimes(1);
+      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.update).toBeCalledTimes(1);
+      expect(userRepository.update).toBeCalledWith({
+        c2cId: 1,
+        coros: { id: '1' },
       });
     });
   });

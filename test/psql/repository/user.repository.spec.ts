@@ -34,6 +34,7 @@ describe('User Repository', () => {
         webhookId: 'webhookId',
       },
       polar: { token: 'polar_token', id: 1n },
+      coros: { id: '1', accessToken: 'coros_access_token', refreshToken: 'coros_refresh_token', expiresAt: 1 },
     };
     await expect(repository.update(user1)).resolves.toEqual(user1);
 
@@ -47,5 +48,7 @@ describe('User Repository', () => {
     await expect(repository.findByDecathlonId('99')).resolves.toBeUndefined();
     await expect(repository.findByPolarId(1n)).resolves.toEqual(user1);
     await expect(repository.findByPolarId(99n)).resolves.toBeUndefined();
+    await expect(repository.findByCorosId('1')).resolves.toEqual(user1);
+    await expect(repository.findByCorosId('2')).resolves.toBeUndefined();
   });
 });
