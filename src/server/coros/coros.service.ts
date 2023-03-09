@@ -223,7 +223,7 @@ export class CorosService {
       type: corosApi.getSport(workout.mode, workout.subMode),
       duration: workout.duration,
       geojson,
-      ...(workout.distance && { length: workout.distance }), // float in Strava API, integer in DB
+      ...(workout.distance && { length: Math.round(workout.distance) }), // float in Coros API, integer in DB
     };
   }
 
