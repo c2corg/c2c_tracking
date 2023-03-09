@@ -1484,11 +1484,11 @@
   "skiing": {
     "string": "Ski"
   },
-  "skimboard": {
-    "string": "Skim board"
-  },
   "skitouring": {
     "string": "Ski de randonnée"
+  },
+  "skimboard": {
+    "string": "Skim board"
   },
   "skittouring": {
     "string": "Ski de randonnée"
