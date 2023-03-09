@@ -247,4 +247,13 @@ describe('Coros API', () => {
       expect(axios.get).toBeCalledTimes(1);
     });
   });
+
+  describe('getSport', () => {
+    it('computes sport based on mode and submode', () => {
+      const api = new CorosApi();
+      expect(api.getSport(8, 1)).toEqual('Outdoor Run');
+      expect(api.getSport(8, 3)).toEqual('Unknown');
+      expect(api.getSport(29, 1)).toEqual('Ski Touring');
+    });
+  });
 });

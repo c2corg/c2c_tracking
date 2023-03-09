@@ -65,10 +65,10 @@ export const WebhookEvent = z.object({
 export type WebhookEvent = z.infer<typeof WebhookEvent>;
 
 const sportType = new Map<number, string>();
-sportType.set(801, 'Outdoor Run');
-sportType.set(802, 'Indoor Run');
-sportType.set(901, 'Outdoor Bike');
-sportType.set(902, 'Indoor Bike');
+sportType.set(81, 'Outdoor Run');
+sportType.set(82, 'Indoor Run');
+sportType.set(91, 'Outdoor Bike');
+sportType.set(92, 'Indoor Bike');
 sportType.set(101, 'Open Water');
 sportType.set(102, 'Pool Swim');
 sportType.set(131, 'Triathlon');
@@ -213,7 +213,7 @@ export class CorosApi {
   }
 
   public getSport(mode: number, subMode: number): string {
-    return sportType.get(mode * 100 + subMode) ?? 'Unknown';
+    return sportType.get(mode * 10 + subMode) ?? 'Unknown';
   }
 }
 
