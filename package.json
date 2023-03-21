@@ -103,7 +103,7 @@
     "node-mocks-http": "1.12.2",
     "passport-custom": "1.1.1",
     "pino-pretty": "10.0.0",
-    "prettier": "2.8.5",
+    "prettier": "2.8.6",
     "supertest": "6.3.3",
     "ts-jest": "29.0.5",
     "ts-node": "10.9.1",
