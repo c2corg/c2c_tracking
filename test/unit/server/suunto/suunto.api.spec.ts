@@ -7,8 +7,12 @@ jest.mock('axios');
 
 describe('Suunto API', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
     jest.clearAllMocks();
   });
 
@@ -21,7 +25,7 @@ describe('Suunto API', () => {
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto token exchange request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
@@ -32,7 +36,7 @@ describe('Suunto API', () => {
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto token exchange request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('returns auth', async () => {
@@ -58,7 +62,7 @@ describe('Suunto API', () => {
           "user": "user",
         }
       `);
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -71,7 +75,7 @@ describe('Suunto API', () => {
       await expect(api.refreshAuth('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto refresh token request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
@@ -82,7 +86,7 @@ describe('Suunto API', () => {
       await expect(api.refreshAuth('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto refresh token request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('returns refresh auth', async () => {
@@ -107,7 +111,7 @@ describe('Suunto API', () => {
             "token_type": "bearer",
           }
         `);
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -120,7 +124,7 @@ describe('Suunto API', () => {
       await expect(api.getWorkouts('token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkouts request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
@@ -131,7 +135,7 @@ describe('Suunto API', () => {
       await expect(api.getWorkouts('token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkouts request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns workouts', async () => {
@@ -175,7 +179,7 @@ describe('Suunto API', () => {
           ],
         }
       `);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -188,7 +192,7 @@ describe('Suunto API', () => {
       await expect(api.getWorkoutDetails('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkoutDetails request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
@@ -199,7 +203,7 @@ describe('Suunto API', () => {
       await expect(api.getWorkoutDetails('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkoutDetails request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns workout details', async () => {
@@ -239,7 +243,7 @@ describe('Suunto API', () => {
           },
         }
       `);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -252,7 +256,7 @@ describe('Suunto API', () => {
       await expect(api.getFIT('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getFIT request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns FIT', async () => {
@@ -262,7 +266,7 @@ describe('Suunto API', () => {
       const result = await api.getFIT('1', 'token', 'subscription');
 
       expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -275,7 +279,7 @@ describe('Suunto API', () => {
       await expect(api.deauthorize('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto deauthorize request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls API', async () => {
@@ -284,7 +288,7 @@ describe('Suunto API', () => {
       const api = new SuuntoApi();
       await api.deauthorize('token');
 
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 });

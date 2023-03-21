@@ -61,7 +61,7 @@ export class PolarService {
   }
 
   public async setupWebhook(): Promise<void> {
-    (await this.checkWebhookSubscription()) || this.requestWebhookSubscription();
+    (await this.checkWebhookSubscription()) || void this.requestWebhookSubscription();
   }
 
   private async checkWebhookSubscription(): Promise<boolean> {

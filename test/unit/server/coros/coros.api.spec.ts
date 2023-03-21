@@ -8,8 +8,12 @@ jest.mock('axios');
 describe('Coros API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('exchangeToken', () => {
@@ -21,7 +25,7 @@ describe('Coros API', () => {
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros token exchange request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -35,8 +39,8 @@ describe('Coros API', () => {
       const api = new CorosApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://open.coros.com/oauth2/accesstoken',
         {
           code: 'code',
@@ -66,7 +70,7 @@ describe('Coros API', () => {
       await expect(api.deauthorize('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros deauthorize request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -75,8 +79,8 @@ describe('Coros API', () => {
       const api = new CorosApi();
       await api.deauthorize('token');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://open.coros.com/oauth2/deauthorize',
         { token: 'token' },
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
@@ -93,7 +97,7 @@ describe('Coros API', () => {
       await expect(api.refreshAuth('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros refresh token request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -102,8 +106,8 @@ describe('Coros API', () => {
       const api = new CorosApi();
       await api.refreshAuth('token');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://open.coros.com/oauth2/refresh-token',
         {
           grant_type: 'refresh_token',
@@ -125,7 +129,7 @@ describe('Coros API', () => {
       await expect(api.getWorkouts('token', '1', 20230201, 20230228)).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros getWorkouts request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -150,8 +154,8 @@ describe('Coros API', () => {
       const api = new CorosApi();
       const result = await api.getWorkouts('token', '1', 20230201, 20230228);
 
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://open.coros.com/v2/coros/sport/list', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://open.coros.com/v2/coros/sport/list', {
         params: { token: 'token', openId: '1', startDate: 20230201, endDate: 20230228 },
       });
       expect(result).toMatchInlineSnapshot(`
@@ -184,7 +188,7 @@ describe('Coros API', () => {
       await expect(api.getWorkoutDetails('token', 'workoutId', 8, 1, 'openId')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros getWorkoutDetails request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -223,7 +227,7 @@ describe('Coros API', () => {
           "result": "0000",
         }
       `);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -234,7 +238,7 @@ describe('Coros API', () => {
       const api = new CorosApi();
 
       await expect(api.getFIT('url')).rejects.toMatchInlineSnapshot(`[Error: Error on Coros getFIT request]`);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns FIT', async () => {
@@ -244,7 +248,7 @@ describe('Coros API', () => {
       const result = await api.getFIT('url');
 
       expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 

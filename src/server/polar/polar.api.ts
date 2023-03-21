@@ -14,10 +14,13 @@ const PolarAuth = z.object({
   // see https://github.com/colinhacks/zod/issues/1896
   x_user_id: z
     .any()
-    .transform((value) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .transform((value: any) => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         return BigInt(value);
       } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value;
       }
     })
@@ -67,10 +70,13 @@ const WebhookExerciseEvent = z.object({
   // see https://github.com/colinhacks/zod/issues/1896
   user_id: z
     .any()
-    .transform((value) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .transform((value: any) => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         return BigInt(value);
       } catch (error) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value;
       }
     })

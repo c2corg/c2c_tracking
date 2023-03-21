@@ -7,8 +7,12 @@ jest.mock('axios');
 
 describe('Garmin API', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('requestUnauthorizedRequestToken', () => {
@@ -68,8 +72,8 @@ describe('Garmin API', () => {
       const api = new GarminApi();
       await api.backfillActivities(30, 'token', 'tokenSecret');
 
-      expect(jest.mocked(axios).get).toBeCalledTimes(1);
-      expect(jest.mocked(axios).get).toBeCalledWith(
+      expect(jest.mocked(axios).get).toHaveBeenCalledTimes(1);
+      expect(jest.mocked(axios).get).toHaveBeenCalledWith(
         `https://apis.garmin.com/wellness-api/rest/backfill/activityDetails?summaryStartTimeInSeconds=1583020800&summaryEndTimeInSeconds=1585699199`,
         expect.anything(),
       );
@@ -83,8 +87,8 @@ describe('Garmin API', () => {
       const api = new GarminApi();
       await api.deauthorize('tokn', 'toknSecret');
 
-      expect(jest.mocked(axios).delete).toBeCalledTimes(1);
-      expect(jest.mocked(axios).delete).toBeCalledWith(
+      expect(jest.mocked(axios).delete).toHaveBeenCalledTimes(1);
+      expect(jest.mocked(axios).delete).toHaveBeenCalledWith(
         `https://apis.garmin.com/wellness-api/rest/user/registration`,
         expect.anything(),
       );

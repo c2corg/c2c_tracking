@@ -30,8 +30,9 @@ describe('Strava API', () => {
       const api = new StravaApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ code: 'code' }),
       });
       expect(result).toMatchInlineSnapshot(`
@@ -55,8 +56,8 @@ describe('Strava API', () => {
       const api = new StravaApi();
       await api.deauthorize('token');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith('https://www.strava.com/api/v3/oauth/deauthorize?access_token=token');
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/deauthorize?access_token=token');
     });
   });
 
@@ -81,8 +82,9 @@ describe('Strava API', () => {
           "refresh_token": "refresh_token",
         }
       `);
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ refresh_token: 'refresh_token' }),
       });
     });
@@ -121,8 +123,8 @@ describe('Strava API', () => {
           },
         ]
       `);
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://www.strava.com/api/v3/athlete/activities', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/athlete/activities', {
         headers: { Authorization: 'Bearer access_token' },
       });
     });
@@ -157,8 +159,8 @@ describe('Strava API', () => {
           "total_elevation_gain": 1.2,
         }
       `);
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://www.strava.com/api/v3/activities/123', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/123', {
         headers: { Authorization: 'Bearer access_token' },
       });
     });
@@ -203,8 +205,8 @@ describe('Strava API', () => {
           },
         ]
       `);
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith(
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith(
         'https://www.strava.com/api/v3/activities/1/streams?keys=time,latlng,altitude&key_by_type=',
         {
           headers: { Authorization: 'Bearer access_token' },
@@ -221,8 +223,8 @@ describe('Strava API', () => {
       const result = await api.requestSubscriptionCreation('http://redirect.to', 'verify_token');
 
       expect(result).toEqual(123);
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://www.strava.com/api/v3/push_subscriptions',
         {
           client_id: '63968',
@@ -262,8 +264,8 @@ describe('Strava API', () => {
           },
         ]
       `);
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://www.strava.com/api/v3/push_subscriptions', expect.anything());
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/push_subscriptions', expect.anything());
     });
   });
 
@@ -274,8 +276,11 @@ describe('Strava API', () => {
       const api = new StravaApi();
       await api.deleteSubscription('123');
 
-      expect(axios.delete).toBeCalledTimes(1);
-      expect(axios.delete).toBeCalledWith('https://www.strava.com/api/v3/push_subscriptions/123', expect.anything());
+      expect(axios.delete).toHaveBeenCalledTimes(1);
+      expect(axios.delete).toHaveBeenCalledWith(
+        'https://www.strava.com/api/v3/push_subscriptions/123',
+        expect.anything(),
+      );
     });
   });
 });

@@ -14,8 +14,12 @@ import { UserService } from '../../src/user.service';
 
 describe('User service', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
     const timers = jest.useFakeTimers();
     timers.setSystemTime(new Date('1970-01-01'));
   });
@@ -46,8 +50,8 @@ describe('User service', () => {
           "suunto": "token-lost",
         }
       `);
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
     });
 
     it('returns not configured state', async () => {
@@ -66,8 +70,8 @@ describe('User service', () => {
           "suunto": "not-configured",
         }
       `);
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
     });
 
     it('should return token lost state', async () => {
@@ -93,8 +97,8 @@ describe('User service', () => {
           "suunto": "token-lost",
         }
       `);
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
     });
 
     it('should return configured state', async () => {
@@ -132,8 +136,8 @@ describe('User service', () => {
           "suunto": "configured",
         }
       `);
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
     });
   });
 
@@ -152,10 +156,10 @@ describe('User service', () => {
       };
       await service.configureStrava(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.insert).toBeCalledTimes(1);
-      expect(userRepository.insert).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.insert).toHaveBeenCalledTimes(1);
+      expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -182,10 +186,10 @@ describe('User service', () => {
       };
       await service.configureStrava(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -254,8 +258,8 @@ describe('User service', () => {
         expires_at: 10,
         expires_in: 30,
       });
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -275,9 +279,9 @@ describe('User service', () => {
       const service = new UserService();
       await expect(service.clearStravaTokens(1)).rejects.toBeInstanceOf(NotFoundError);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('does nothing if no auth info is found', async () => {
@@ -287,9 +291,9 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearStravaTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('clears tokens', async () => {
@@ -305,10 +309,10 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearStravaTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: { id: 1 },
       });
@@ -372,10 +376,10 @@ describe('User service', () => {
       };
       await service.configureSuunto(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.insert).toBeCalledTimes(1);
-      expect(userRepository.insert).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.insert).toHaveBeenCalledTimes(1);
+      expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         suunto: {
           username: 'user1',
@@ -402,10 +406,10 @@ describe('User service', () => {
       };
       await service.configureSuunto(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         suunto: {
           username: 'user1',
@@ -484,8 +488,8 @@ describe('User service', () => {
         refresh_token: 'new_refresh_token',
         expires_in: 30,
       });
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         suunto: {
           username: 'user1',
@@ -505,9 +509,9 @@ describe('User service', () => {
       const service = new UserService();
       await expect(service.clearSuuntoTokens(1)).rejects.toBeInstanceOf(NotFoundError);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('does nothing if no auth info is found', async () => {
@@ -517,9 +521,9 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearSuuntoTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('clears tokens', async () => {
@@ -535,10 +539,10 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearSuuntoTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         suunto: { username: '1' },
       });
@@ -590,10 +594,10 @@ describe('User service', () => {
       };
       await service.configureGarmin(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.insert).toBeCalledTimes(1);
-      expect(userRepository.insert).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.insert).toHaveBeenCalledTimes(1);
+      expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         garmin: {
           token: 'token',
@@ -621,10 +625,10 @@ describe('User service', () => {
       };
       await service.configureGarmin(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         suunto: {
           accessToken: 'access_token',
@@ -693,10 +697,10 @@ describe('User service', () => {
       };
       await service.configureDecathlon(1, auth, '1', 'webhookId');
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.insert).toBeCalledTimes(1);
-      expect(userRepository.insert).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.insert).toHaveBeenCalledTimes(1);
+      expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         decathlon: {
           id: '1',
@@ -723,10 +727,10 @@ describe('User service', () => {
       };
       await service.configureDecathlon(1, auth, '1', 'webhookId');
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         decathlon: {
           id: '1',
@@ -807,8 +811,8 @@ describe('User service', () => {
         token_type: 'bearer',
         expires_in: 30,
       });
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         decathlon: {
           id: '1',
@@ -829,9 +833,9 @@ describe('User service', () => {
       const service = new UserService();
       await expect(service.clearDecathlonTokens(1)).rejects.toBeInstanceOf(NotFoundError);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('does nothing if no auth info is found', async () => {
@@ -841,9 +845,9 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearDecathlonTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('clears tokens', async () => {
@@ -865,10 +869,10 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearDecathlonTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         decathlon: { id: '1', webhookId: 'webhookId' },
       });
@@ -928,10 +932,10 @@ describe('User service', () => {
       };
       await service.configurePolar(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.insert).toBeCalledTimes(1);
-      expect(userRepository.insert).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.insert).toHaveBeenCalledTimes(1);
+      expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         polar: {
           id: 1n,
@@ -954,10 +958,10 @@ describe('User service', () => {
       };
       await service.configurePolar(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         polar: {
           id: 1n,
@@ -993,10 +997,10 @@ describe('User service', () => {
       };
       await service.configureCoros(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.insert).toBeCalledTimes(1);
-      expect(userRepository.insert).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.insert).toHaveBeenCalledTimes(1);
+      expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         coros: {
           id: '1',
@@ -1021,10 +1025,10 @@ describe('User service', () => {
       };
       await service.configureCoros(1, auth);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         coros: {
           id: '1',
@@ -1077,8 +1081,8 @@ describe('User service', () => {
 
       const service = new UserService();
       await service.resetCorosAuthExpiration(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         coros: {
           id: '1',
@@ -1098,9 +1102,9 @@ describe('User service', () => {
       const service = new UserService();
       await expect(service.clearCorosTokens(1)).rejects.toBeInstanceOf(NotFoundError);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('does nothing if no auth info is found', async () => {
@@ -1110,9 +1114,9 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearCorosTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
 
     it('clears tokens', async () => {
@@ -1128,10 +1132,10 @@ describe('User service', () => {
       const service = new UserService();
       await service.clearCorosTokens(1);
 
-      expect(userRepository.findById).toBeCalledTimes(1);
-      expect(userRepository.findById).toBeCalledWith(1);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(userRepository.findById).toHaveBeenCalledTimes(1);
+      expect(userRepository.findById).toHaveBeenCalledWith(1);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         coros: { id: '1' },
       });
@@ -1176,8 +1180,8 @@ describe('User service', () => {
         },
       });
 
-      expect(activityRepository.upsert).toBeCalledTimes(1);
-      expect(activityRepository.upsert).toBeCalledWith(
+      expect(activityRepository.upsert).toHaveBeenCalledTimes(1);
+      expect(activityRepository.upsert).toHaveBeenCalledWith(
         [],
         expect.arrayContaining([expect.objectContaining({ vendorId: '1000' })]),
         expect.arrayContaining([expect.objectContaining({ vendorId: '1' })]),
@@ -1223,18 +1227,18 @@ describe('User service', () => {
         },
       });
 
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('1.png');
-      expect(miniatureService.generateMiniature).toBeCalledTimes(1);
-      expect(miniatureService.generateMiniature).toBeCalledWith({
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('1.png');
+      expect(miniatureService.generateMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.generateMiniature).toHaveBeenCalledWith({
         type: 'LineString',
         coordinates: [
           [1.0, 1.0],
           [2.0, 2.0],
         ],
       });
-      expect(activityRepository.upsert).toBeCalledTimes(1);
-      expect(activityRepository.upsert).toBeCalledWith(
+      expect(activityRepository.upsert).toHaveBeenCalledTimes(1);
+      expect(activityRepository.upsert).toHaveBeenCalledWith(
         [],
         expect.arrayContaining([expect.objectContaining({ vendorId: '1000' })]),
         expect.arrayContaining([expect.objectContaining({ vendorId: '1' })]),
@@ -1270,8 +1274,8 @@ describe('User service', () => {
         },
       });
 
-      expect(activityRepository.upsert).toBeCalledTimes(1);
-      expect(activityRepository.upsert).toBeCalledWith(
+      expect(activityRepository.upsert).toHaveBeenCalledTimes(1);
+      expect(activityRepository.upsert).toHaveBeenCalledWith(
         [
           {
             id: 1,
@@ -1320,8 +1324,8 @@ describe('User service', () => {
         type: 'FLY',
       });
 
-      expect(activityRepository.update).toBeCalledTimes(1);
-      expect(activityRepository.update).toBeCalledWith({
+      expect(activityRepository.update).toHaveBeenCalledTimes(1);
+      expect(activityRepository.update).toHaveBeenCalledWith({
         id: 1,
         userId: 1,
         vendor: 'strava',
@@ -1368,11 +1372,11 @@ describe('User service', () => {
       const service = new UserService();
       await service.deleteActivity('strava', '1');
 
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledWith('strava', '1');
-      expect(activityRepository.deleteByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.deleteByVendorId).toBeCalledWith('strava', '1');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
     });
 
     it('logs if miniature info cannot be retrieved', async () => {
@@ -1383,13 +1387,13 @@ describe('User service', () => {
       const service = new UserService();
       await service.deleteActivity('strava', '1');
 
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledWith('strava', '1');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniature info for 1`);
-      expect(activityRepository.deleteByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.deleteByVendorId).toBeCalledWith('strava', '1');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniature info for 1`);
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
     });
 
     it('logs if miniature cannot be deleted', async () => {
@@ -1400,14 +1404,14 @@ describe('User service', () => {
       const service = new UserService();
       await service.deleteActivity('strava', '1');
 
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledWith('strava', '1');
-      expect(activityRepository.deleteByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.deleteByVendorId).toBeCalledWith('strava', '1');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
     });
 
     it('deletes miniature', async () => {
@@ -1418,13 +1422,13 @@ describe('User service', () => {
       const service = new UserService();
       await service.deleteActivity('strava', '1');
 
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.getMiniatureByVendorId).toBeCalledWith('strava', '1');
-      expect(activityRepository.deleteByVendorId).toBeCalledTimes(1);
-      expect(activityRepository.deleteByVendorId).toBeCalledWith('strava', '1');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).not.toBeCalled();
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniatureByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByVendorId).toHaveBeenCalledWith('strava', '1');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).not.toHaveBeenCalled();
     });
   });
 
@@ -1446,8 +1450,8 @@ describe('User service', () => {
       const result = await service.getActivities(1);
 
       expect(result).toEqual(activities);
-      expect(activityRepository.findByUser).toBeCalledTimes(1);
-      expect(activityRepository.findByUser).toBeCalledWith(1);
+      expect(activityRepository.findByUser).toHaveBeenCalledTimes(1);
+      expect(activityRepository.findByUser).toHaveBeenCalledWith(1);
     });
   });
 
@@ -1467,8 +1471,8 @@ describe('User service', () => {
       const result = await service.getActivity(1, 2);
 
       expect(result).toEqual(activity);
-      expect(activityRepository.findByUserAndId).toBeCalledTimes(1);
-      expect(activityRepository.findByUserAndId).toBeCalledWith(1, 2);
+      expect(activityRepository.findByUserAndId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.findByUserAndId).toHaveBeenCalledWith(1, 2);
     });
 
     it('returns undefined if activity was not found', async () => {
@@ -1478,8 +1482,8 @@ describe('User service', () => {
       const result = await service.getActivity(1, 2);
 
       expect(result).toBeUndefined();
-      expect(activityRepository.findByUserAndId).toBeCalledTimes(1);
-      expect(activityRepository.findByUserAndId).toBeCalledWith(1, 2);
+      expect(activityRepository.findByUserAndId).toHaveBeenCalledTimes(1);
+      expect(activityRepository.findByUserAndId).toHaveBeenCalledWith(1, 2);
     });
   });
 });

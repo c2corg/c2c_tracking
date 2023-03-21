@@ -8,8 +8,12 @@ import { authenticated } from '../../../utils';
 describe('Activities Controller', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /users/:userId/activities', () => {
@@ -31,7 +35,7 @@ describe('Activities Controller', () => {
       const response = await authenticated(request(app.callback()).get('/users/1/activities?lang=1'), 1);
 
       expect(response.status).toBe(400);
-      expect(activityService.getActivities).not.toBeCalled();
+      expect(activityService.getActivities).not.toHaveBeenCalled();
     });
 
     it('responds with user activities summaries', async () => {
@@ -66,8 +70,8 @@ describe('Activities Controller', () => {
           },
         ]
       `);
-      expect(activityService.getActivities).toBeCalledTimes(1);
-      expect(activityService.getActivities).toBeCalledWith(1, undefined);
+      expect(activityService.getActivities).toHaveBeenCalledTimes(1);
+      expect(activityService.getActivities).toHaveBeenCalledWith(1, undefined);
     });
 
     it('responds with user activities summaries with specific lang', async () => {
@@ -101,8 +105,8 @@ describe('Activities Controller', () => {
           },
         ]
       `);
-      expect(activityService.getActivities).toBeCalledTimes(1);
-      expect(activityService.getActivities).toBeCalledWith(1, 'en');
+      expect(activityService.getActivities).toHaveBeenCalledTimes(1);
+      expect(activityService.getActivities).toHaveBeenCalledWith(1, 'en');
     });
   });
 

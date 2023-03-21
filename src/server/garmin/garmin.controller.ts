@@ -19,7 +19,7 @@ class GarminController {
   }
 
   public async requestUnauthorizedRequestToken(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
     const { token, tokenSecret } = await service.requestUnauthorizedRequestToken();
     await this.keyv.set(c2cId.toString(), tokenSecret, 1000 * 60 * 60); // 1 hour TTL
     ctx.body = { token };
@@ -27,7 +27,7 @@ class GarminController {
   }
 
   public async exchangeToken(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
 
     const token = ctx.query['oauth_token'] as string;
     const verifier = ctx.query['oauth_verifier'] as string;
@@ -53,22 +53,22 @@ class GarminController {
   }
 
   public async deauthorize(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
     await service.deauthorize(c2cId);
     ctx.status = 204;
   }
 
-  public async activityWebhook(ctx: Context): Promise<void> {
+  public activityWebhook(ctx: Context): void {
     const body = ctx.request.body as {
       activityDetails: (GarminActivity & { userId: string; userAccessToken: string })[];
     };
-    service.handleActivityWebhook(body.activityDetails); // async
+    void service.handleActivityWebhook(body.activityDetails); // async
     ctx.status = 200;
   }
 
-  public async deauthorizeWebhook(ctx: Context): Promise<void> {
+  public deauthorizeWebhook(ctx: Context): void {
     const body = ctx.request.body as { deregistrations: { userId: string; userAccessToken: string }[] };
-    service.handleDeauthorizeWebhook(body.deregistrations); // async
+    void service.handleDeauthorizeWebhook(body.deregistrations); // async
     ctx.status = 200;
   }
 }

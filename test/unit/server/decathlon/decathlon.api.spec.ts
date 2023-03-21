@@ -27,8 +27,9 @@ describe('Decathlon API', () => {
       const api = new DecathlonApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith('https://api-global.decathlon.net/connect/oauth/token', null, {
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith('https://api-global.decathlon.net/connect/oauth/token', null, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ code: 'code' }),
       });
       expect(result).toMatchInlineSnapshot(`
@@ -63,8 +64,8 @@ describe('Decathlon API', () => {
           "token_type": "bearer",
         }
       `);
-      expect(axios.postForm).toBeCalledTimes(1);
-      expect(axios.postForm).toBeCalledWith(
+      expect(axios.postForm).toHaveBeenCalledTimes(1);
+      expect(axios.postForm).toHaveBeenCalledWith(
         'https://api-global.decathlon.net/connect/oauth/token',
         { grant_type: 'refresh_token', refresh_token: 'refresh_token' },
         {
@@ -83,8 +84,9 @@ describe('Decathlon API', () => {
       const result = await api.getUserId('access_token');
 
       expect(result).toEqual('userId');
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/me', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/me', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
     });
@@ -117,8 +119,9 @@ describe('Decathlon API', () => {
           },
         ]
       `);
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/activities', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/activities', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
     });
@@ -157,10 +160,14 @@ describe('Decathlon API', () => {
           "startdate": "2022-01-01T00:00:01Z",
         }
       `);
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/activities/12345', {
-        headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
-      });
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith(
+        'https://api-global.decathlon.net/sportstrackingdata/v2/activities/12345',
+        {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
+        },
+      );
     });
   });
 
@@ -186,8 +193,9 @@ describe('Decathlon API', () => {
       const result = await api.getExistingWebhookSubscription('access_token');
 
       expect(result).toEqual('goodsubscription');
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
     });
@@ -207,8 +215,9 @@ describe('Decathlon API', () => {
       const result = await api.getExistingWebhookSubscription('access_token');
 
       expect(result).toBeUndefined();
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
     });
@@ -228,11 +237,12 @@ describe('Decathlon API', () => {
       const result = await api.createWebhookSubscription('1', 'access_token');
 
       expect(result).toMatchInlineSnapshot(`"12345"`);
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks',
         expect.objectContaining({ user: `/v2/users/1` }),
         {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
         },
       );
@@ -247,10 +257,14 @@ describe('Decathlon API', () => {
       const result = await api.deleteWebhookSubscription('1', 'access_token');
 
       expect(result).toMatchInlineSnapshot(`undefined`);
-      expect(axios.delete).toBeCalledTimes(1);
-      expect(axios.delete).toBeCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks/1', {
-        headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
-      });
+      expect(axios.delete).toHaveBeenCalledTimes(1);
+      expect(axios.delete).toHaveBeenCalledWith(
+        'https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks/1',
+        {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
+        },
+      );
     });
   });
 });

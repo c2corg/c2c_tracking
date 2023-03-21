@@ -2,8 +2,8 @@ import { database as db } from '../../../src/db';
 import { ActivityRepository } from '../../../src/repository/activity.repository';
 
 describe('Activity Repository', () => {
-  afterEach(() => {
-    db.closeDatabase();
+  afterEach(async () => {
+    await db.closeDatabase();
   });
 
   it('executes requests', async () => {
@@ -21,6 +21,7 @@ describe('Activity Repository', () => {
     });
 
     expect(activity1).toEqual({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       id: expect.any(Number),
       vendor: 'strava',
       vendorId: 'strava1',
@@ -47,6 +48,7 @@ describe('Activity Repository', () => {
     });
 
     expect(activity2).toEqual({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       id: expect.any(Number),
       vendor: 'suunto',
       vendorId: 'suunto1',
@@ -71,6 +73,7 @@ describe('Activity Repository', () => {
     });
 
     expect(activity3).toEqual({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       id: expect.any(Number),
       vendor: 'suunto',
       vendorId: 'suunto2',

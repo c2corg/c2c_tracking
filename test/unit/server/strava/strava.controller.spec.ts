@@ -7,10 +7,14 @@ import { stravaService } from '../../../../src/server/strava/strava.service';
 import { authenticated } from '../../../utils';
 
 describe('Strava Controller', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /strava/exchange-token/:userId', () => {
@@ -87,8 +91,8 @@ describe('Strava Controller', () => {
       );
 
       expect(response.status).toBe(204);
-      expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toBeCalledTimes(1);
-      expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
+      expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
+      expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
     });
   });
 
@@ -111,7 +115,7 @@ describe('Strava Controller', () => {
       const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
-      expect(stravaService.deauthorize).toBeCalledTimes(1);
+      expect(stravaService.deauthorize).toHaveBeenCalledTimes(1);
     });
 
     it('deauthorizes user', async () => {
@@ -120,8 +124,8 @@ describe('Strava Controller', () => {
       const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
-      expect(stravaService.deauthorize).toBeCalledTimes(1);
-      expect(stravaService.deauthorize).toBeCalledWith(1);
+      expect(stravaService.deauthorize).toHaveBeenCalledTimes(1);
+      expect(stravaService.deauthorize).toHaveBeenCalledWith(1);
     });
   });
 
@@ -172,8 +176,8 @@ describe('Strava Controller', () => {
       const response = await request(app.callback()).post('/strava/webhook').send(event);
 
       expect(response.status).toBe(200);
-      expect(stravaService.handleWebhookEvent).toBeCalledTimes(1);
-      expect(stravaService.handleWebhookEvent).toBeCalledWith(event);
+      expect(stravaService.handleWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith(event);
     });
   });
 });

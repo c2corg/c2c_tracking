@@ -14,8 +14,12 @@ const FAR_FUTURE = 10000000000;
 describe('Coros Service', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
     const timers = jest.useFakeTimers();
     timers.setSystemTime(new Date('1983-08-25'));
   });
@@ -55,20 +59,22 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(corosApi.exchangeToken).toBeCalledWith('code');
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledWith(1, {
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(corosApi.exchangeToken).toHaveBeenCalledWith('code');
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         openId: '1',
       });
-      expect(corosApi.getWorkouts).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).toBeCalledWith('access_token', '1', 19830726, 19830825);
-      expect(corosApi.getFIT).toBeCalledTimes(1);
-      expect(corosApi.getFIT).toBeCalledWith('https://oss.coros.com/fit/407419767966679040/418173292602490880.fit');
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(corosApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).toHaveBeenCalledWith('access_token', '1', 19830726, 19830825);
+      expect(corosApi.getFIT).toHaveBeenCalledTimes(1);
+      expect(corosApi.getFIT).toHaveBeenCalledWith(
+        'https://oss.coros.com/fit/407419767966679040/418173292602490880.fit',
+      );
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'coros',
         vendorId: '1234',
         type: 'Outdoor Run',
@@ -124,13 +130,13 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).toBeCalledTimes(1);
-      expect(corosApi.getWorkoutDetails).toBeCalledTimes(1);
-      expect(corosApi.getFIT).not.toBeCalled();
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkoutDetails).toHaveBeenCalledTimes(1);
+      expect(corosApi.getFIT).not.toHaveBeenCalled();
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
     });
 
     it('throws if auth cannot be configured', async () => {
@@ -146,10 +152,10 @@ describe('Coros Service', () => {
         `"test"`,
       );
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).not.toBeCalled();
-      expect(userService.addActivities).not.toBeCalled();
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).not.toHaveBeenCalled();
+      expect(userService.addActivities).not.toHaveBeenCalled();
     });
 
     it('logs if activity retrieval fails', async () => {
@@ -163,10 +169,10 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).toBeCalledTimes(1);
-      expect(userService.addActivities).not.toBeCalled();
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).not.toHaveBeenCalled();
       expect(log.info).toHaveBeenCalledTimes(1);
       expect(log.info).toHaveBeenCalledWith(`Unable to retrieve Coros workouts for user 1`);
     });
@@ -198,11 +204,11 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
       expect(log.info).toHaveBeenCalledTimes(1);
       expect(log.info).toHaveBeenCalledWith(
         `Unable to retrieve Coros geometry for 1234 (https://coros.com/fit)`,
@@ -248,12 +254,12 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).toBeCalledTimes(1);
-      expect(corosApi.getWorkoutDetails).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkoutDetails).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
       expect(log.info).toHaveBeenCalledTimes(1);
       expect(log.info).toHaveBeenCalledWith(
         `Coros workout FIT URL couldn't be extracted from workout details for 1234`,
@@ -289,14 +295,16 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(corosApi.getWorkouts).toBeCalledTimes(1);
-      expect(corosApi.getFIT).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith(`Unable to convert Coros FIT file to geometry for 1234 (https://coros.com/fit)`);
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(corosApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(corosApi.getFIT).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith(
+        `Unable to convert Coros FIT file to geometry for 1234 (https://coros.com/fit)`,
+      );
     });
 
     it('logs if activities cannot be saved in DB', async () => {
@@ -329,10 +337,10 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(corosApi.exchangeToken).toBeCalledTimes(1);
-      expect(userService.configureCoros).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(userService.configureCoros).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'coros',
         vendorId: '1234',
         type: 'Outdoor Run',
@@ -347,8 +355,8 @@ describe('Coros Service', () => {
           type: 'LineString',
         },
       });
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith(`Unable to retrieve Coros workouts for user 1`);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith(`Unable to retrieve Coros workouts for user 1`);
     });
   });
 
@@ -381,15 +389,16 @@ describe('Coros Service', () => {
 
       const service = new CorosService();
       await service.deauthorize(1);
-      expect(corosApi.deauthorize).toBeCalledTimes(1);
-      expect(corosApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
+      expect(corosApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(corosApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
     });
 
     it('warns if no miniature info could be retrieved', async () => {
@@ -404,17 +413,18 @@ describe('Coros Service', () => {
 
       const service = new CorosService();
       await service.deauthorize(1);
-      expect(corosApi.deauthorize).toBeCalledTimes(1);
-      expect(corosApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor coros`);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
+      expect(corosApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(corosApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniatures info for user 1 and vendor coros`);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
     });
 
     it('warns if miniature could not be deleted', async () => {
@@ -429,18 +439,19 @@ describe('Coros Service', () => {
 
       const service = new CorosService();
       await service.deauthorize(1);
-      expect(corosApi.deauthorize).toBeCalledTimes(1);
-      expect(corosApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
+      expect(corosApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(corosApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
     });
 
     it('deletes miniatures', async () => {
@@ -455,15 +466,16 @@ describe('Coros Service', () => {
 
       const service = new CorosService();
       await service.deauthorize(1);
-      expect(corosApi.deauthorize).toBeCalledTimes(1);
-      expect(corosApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'coros');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
+      expect(corosApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(corosApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'coros');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ coros: expect.anything() }));
     });
   });
 
@@ -499,10 +511,10 @@ describe('Coros Service', () => {
       });
 
       expect(result).toBe('access_token');
-      expect(corosApi.refreshAuth).toBeCalledTimes(1);
-      expect(corosApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.resetCorosAuthExpiration).toBeCalledTimes(1);
-      expect(userService.resetCorosAuthExpiration).toBeCalledWith(1);
+      expect(corosApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(corosApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.resetCorosAuthExpiration).toHaveBeenCalledTimes(1);
+      expect(userService.resetCorosAuthExpiration).toHaveBeenCalledWith(1);
     });
 
     it('returns undefined if refresh fails', async () => {
@@ -516,9 +528,9 @@ describe('Coros Service', () => {
       });
 
       expect(result).toBeUndefined();
-      expect(corosApi.refreshAuth).toBeCalledTimes(1);
-      expect(corosApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.clearCorosTokens).toBeCalledTimes(1);
+      expect(corosApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(corosApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.clearCorosTokens).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -544,8 +556,8 @@ describe('Coros Service', () => {
       const service = new CorosService();
       await service.handleWebhookEvent(event, 'bad_client', 'secret');
 
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith(`Invalid credentials for Coros wbehook event: received bad_client:secret`);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith(`Invalid credentials for Coros wbehook event: received bad_client:secret`);
     });
 
     it('logs if no matching user is found', async () => {
@@ -573,8 +585,8 @@ describe('Coros Service', () => {
         '902d20cc-c2a8-4536-89a9-41e0f7626977',
       );
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Coros webhook event for openId 1 couldn't be processed: unable to find matching user in DB`,
       );
     });
@@ -607,8 +619,11 @@ describe('Coros Service', () => {
         '902d20cc-c2a8-4536-89a9-41e0f7626977',
       );
 
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith(`Unable to retrieve Coros geometry for 1234 (https://coros.com/fit)`, undefined);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith(
+        `Unable to retrieve Coros geometry for 1234 (https://coros.com/fit)`,
+        undefined,
+      );
     });
 
     it('logs and returns if activity cannot be saved in DB', async () => {
@@ -641,8 +656,8 @@ describe('Coros Service', () => {
         '902d20cc-c2a8-4536-89a9-41e0f7626977',
       );
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Coros webhook event for user 1 couldn't be processed: unable to insert activity data`,
       );
     });
@@ -679,8 +694,8 @@ describe('Coros Service', () => {
         '902d20cc-c2a8-4536-89a9-41e0f7626977',
       );
 
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         date: '2018-01-16T18:01:09+08:00',
         duration: 1,
         geojson: {

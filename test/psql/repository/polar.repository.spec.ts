@@ -2,8 +2,8 @@ import { database as db } from '../../../src/db';
 import { PolarRepository } from '../../../src/repository/polar.repository';
 
 describe('Polar Repository', () => {
-  afterEach(() => {
-    db.closeDatabase();
+  afterEach(async () => {
+    await db.closeDatabase();
   });
 
   it('executes requests', async () => {

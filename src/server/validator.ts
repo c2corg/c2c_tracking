@@ -18,7 +18,7 @@ function validateObject(object: unknown = {}, label: string, schema: Schema | un
       // Throw error with custom message if validation failed
       log.info(
         `Validation failed, invalid ${label}: ${result.error.issues
-          .map((issue) => `[message: ${issue.message}, path: ${issue.path}, type: ${issue.code}]`)
+          .map((issue) => `[message: ${issue.message}, path: ${issue.path.join('.')}, type: ${issue.code}]`)
           .join(' - ')}`,
       );
       throw new FieldValidationError(`Invalid ${label}`, result.error.format());

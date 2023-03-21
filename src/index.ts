@@ -9,7 +9,7 @@ import { app } from './app';
 import config from './config';
 import { database as db } from './db';
 import log from './helpers/logger';
-import { metricsServer } from './metrics';
+import { metricsKoa } from './metrics';
 import { polarService } from './server/polar/polar.service';
 import { stravaService } from './server/strava/strava.service';
 
@@ -37,12 +37,12 @@ async function closeServer(server: Server): Promise<void> {
   });
 }
 
-async function closeGracefully(signal: string, server: Server): Promise<void> {
+async function closeGracefully(signal: string, servers: Server[]): Promise<void> {
   log.info(`Received signal to terminate: ${signal}`);
 
   app.context['shuttingDown'] = true;
 
-  const shutdown = [closeServer(server), db.closeDatabase(), metricsServer.close()];
+  const shutdown = [...servers.map((server) => closeServer(server)), db.closeDatabase()];
 
   for (const s of shutdown) {
     try {
@@ -85,21 +85,27 @@ export async function start(): Promise<void> {
     log.info('Apply database migration');
     await db.schemaMigration();
 
+    const servers: Server[] = [];
+
     const port = config.get('server.port');
-    const server = app.listen(port, () => {
-      log.info(`Server is running on port ${port}`);
-      stravaService.setupWebhook();
-      polarService.setupWebhook();
+    servers.push(
+      app.listen(port, () => {
+        log.info(`Server is running on port ${port}`);
+        void stravaService.setupWebhook();
+        void polarService.setupWebhook();
+      }),
+    );
+    servers.push(metricsKoa.listen(config.get('metrics.port')));
+
+    process.once('SIGINT', (signal: string): void => {
+      void closeGracefully(signal, servers);
     });
-
-    // Export metrics for prometheus
-    metricsServer.listen(config.get('metrics.port'));
-
-    process.once('SIGINT', async (signal: string) => closeGracefully(signal, server));
-    process.once('SIGTERM', async (signal: string) => closeGracefully(signal, server));
+    process.once('SIGTERM', (signal: string): void => {
+      void closeGracefully(signal, servers);
+    });
   } catch (err) {
     log.error(err, 'An error occurred while initializing application.');
   }
 }
 
-start();
+void start();

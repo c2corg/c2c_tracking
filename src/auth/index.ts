@@ -7,15 +7,15 @@ import config from '../config';
 import c2cJwtExtractor from './c2c-jwt-extractor';
 import verify from './c2c-jwt-verify';
 
-const ensureAuthenticated: Middleware = async (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
+const ensureAuthenticated: Middleware = (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
   passport.authenticate('jwt', { session: false })(ctx, next);
 
 const ensureUserFromParamsMatchesAuthUser: Middleware = async (
   ctx: Context,
   next: () => Promise<unknown>,
 ): Promise<unknown> => {
-  const authenticatedUser: { id: number } | undefined = ctx.state['user'];
-  const requiredUser = Number.parseInt(ctx['params'].userId, 10);
+  const authenticatedUser: { id: number } | undefined = ctx.state['user'] as { id: number } | undefined;
+  const requiredUser = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
   if (authenticatedUser?.id === requiredUser) {
     await next();
     return;

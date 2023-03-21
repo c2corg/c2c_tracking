@@ -34,7 +34,7 @@ export class GarminService {
   private async setupUser(c2cId: number, auth: GarminAuth): Promise<void> {
     await userService.configureGarmin(c2cId, auth);
     // request backfill for activities from last 30 days (async)
-    garminApi.backfillActivities(30, auth.token, auth.tokenSecret);
+    void garminApi.backfillActivities(30, auth.token, auth.tokenSecret);
   }
 
   private toGeoJSON(samples?: GarminSample[]): LineString | undefined {

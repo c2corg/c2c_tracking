@@ -3,8 +3,8 @@ import type { User } from '../../../src/repository/user';
 import { UserRepository } from '../../../src/repository/user.repository';
 
 describe('User Repository', () => {
-  afterEach(() => {
-    db.closeDatabase();
+  afterEach(async () => {
+    await db.closeDatabase();
   });
 
   it('executes requests', async () => {
