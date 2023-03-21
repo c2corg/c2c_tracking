@@ -54,8 +54,8 @@ describe('Activity Service', () => {
           },
         ]
       `);
-      expect(userService.getActivities).toBeCalledTimes(1);
-      expect(userService.getActivities).toBeCalledWith(1);
+      expect(userService.getActivities).toHaveBeenCalledTimes(1);
+      expect(userService.getActivities).toHaveBeenCalledWith(1);
     });
 
     it('returns only specific lang if specified', async () => {
@@ -89,8 +89,8 @@ describe('Activity Service', () => {
           },
         ]
       `);
-      expect(userService.getActivities).toBeCalledTimes(1);
-      expect(userService.getActivities).toBeCalledWith(1);
+      expect(userService.getActivities).toHaveBeenCalledTimes(1);
+      expect(userService.getActivities).toHaveBeenCalledWith(1);
     });
 
     it('defaults to unknown if i18n key is not found', async () => {
@@ -124,16 +124,20 @@ describe('Activity Service', () => {
           },
         ]
       `);
-      expect(userService.getActivities).toBeCalledTimes(1);
-      expect(userService.getActivities).toBeCalledWith(1);
+      expect(userService.getActivities).toHaveBeenCalledTimes(1);
+      expect(userService.getActivities).toHaveBeenCalledWith(1);
     });
   });
 
   describe('getActivityGeometry', () => {
     beforeEach(() => {
       jest.clearAllMocks();
-      jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-      jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+      jest.spyOn(log, 'info').mockImplementation(() => {
+        /* do nothing */
+      });
+      jest.spyOn(log, 'warn').mockImplementation(() => {
+        /* do nothing */
+      });
     });
 
     it('throws if activity does not exist', async () => {

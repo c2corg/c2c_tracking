@@ -10,8 +10,12 @@ import { userService } from '../../../../src/user.service';
 describe('Strava Service', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('containsRequiredScopes', () => {
@@ -66,20 +70,20 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(stravaApi.exchangeToken).toBeCalledTimes(1);
-      expect(stravaApi.exchangeToken).toBeCalledWith('code');
-      expect(userService.configureStrava).toBeCalledTimes(1);
-      expect(userService.configureStrava).toBeCalledWith(1, {
+      expect(stravaApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(stravaApi.exchangeToken).toHaveBeenCalledWith('code');
+      expect(userService.configureStrava).toHaveBeenCalledTimes(1);
+      expect(userService.configureStrava).toHaveBeenCalledWith(1, {
         athlete: { id: 1 },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
         expires_in: 1,
       });
-      expect(stravaApi.getAthleteActivities).toBeCalledTimes(1);
-      expect(stravaApi.getAthleteActivities).toBeCalledWith('access_token');
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledWith('access_token');
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'strava',
         vendorId: '1',
         name: 'Morning run',
@@ -125,20 +129,20 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(stravaApi.exchangeToken).toBeCalledTimes(1);
-      expect(stravaApi.exchangeToken).toBeCalledWith('code');
-      expect(userService.configureStrava).toBeCalledTimes(1);
-      expect(userService.configureStrava).toBeCalledWith(1, {
+      expect(stravaApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(stravaApi.exchangeToken).toHaveBeenCalledWith('code');
+      expect(userService.configureStrava).toHaveBeenCalledTimes(1);
+      expect(userService.configureStrava).toHaveBeenCalledWith(1, {
         athlete: { id: 1 },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
         expires_in: 1,
       });
-      expect(stravaApi.getAthleteActivities).toBeCalledTimes(1);
-      expect(stravaApi.getAthleteActivities).toBeCalledWith('access_token');
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledWith('access_token');
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
     });
 
     it('throws if auth cannot be configured', async () => {
@@ -157,8 +161,8 @@ describe('Strava Service', () => {
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
       ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
 
-      expect(userService.configureStrava).toBeCalledTimes(1);
-      expect(stravaApi.getAthleteActivities).not.toBeCalled();
+      expect(userService.configureStrava).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getAthleteActivities).not.toHaveBeenCalled();
     });
 
     it('logs if activity retrieval fails', async () => {
@@ -176,8 +180,8 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(stravaApi.getAthleteActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).not.toBeCalled();
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).not.toHaveBeenCalled();
     });
   });
 
@@ -189,7 +193,7 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
 
-      expect(userService.getStravaInfo).not.toBeCalled();
+      expect(userService.getStravaInfo).not.toHaveBeenCalled();
     });
 
     it('throws if no matching auth exists for user', async () => {
@@ -202,9 +206,9 @@ describe('Strava Service', () => {
         `"Unable to retrieve token for user 1"`,
       );
 
-      expect(userService.getStravaInfo).toBeCalledTimes(1);
-      expect(userService.getStravaInfo).toBeCalledWith(1);
-      expect(userService.clearStravaTokens).toBeCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledWith(1);
+      expect(userService.clearStravaTokens).toHaveBeenCalledTimes(1);
     });
 
     it('calls strava API then updates DB', async () => {
@@ -224,17 +228,18 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.deauthorize(1);
 
-      expect(userService.getStravaInfo).toBeCalledTimes(1);
-      expect(userService.getStravaInfo).toBeCalledWith(1);
-      expect(stravaApi.deauthorize).toBeCalledTimes(1);
-      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+      expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledWith(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
     });
 
     it('warns if no miniature info could be retrieved', async () => {
@@ -254,19 +259,20 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.deauthorize(1);
 
-      expect(userService.getStravaInfo).toBeCalledTimes(1);
-      expect(userService.getStravaInfo).toBeCalledWith(1);
-      expect(stravaApi.deauthorize).toBeCalledTimes(1);
-      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor strava`);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+      expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledWith(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniatures info for user 1 and vendor strava`);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
     });
 
     it('warns if miniature could not be deleted', async () => {
@@ -286,20 +292,21 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.deauthorize(1);
 
-      expect(userService.getStravaInfo).toBeCalledTimes(1);
-      expect(userService.getStravaInfo).toBeCalledWith(1);
-      expect(stravaApi.deauthorize).toBeCalledTimes(1);
-      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+      expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledWith(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
     });
 
     it('deletes miniatures', async () => {
@@ -319,19 +326,20 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.deauthorize(1);
 
-      expect(userService.getStravaInfo).toBeCalledTimes(1);
-      expect(userService.getStravaInfo).toBeCalledWith(1);
-      expect(stravaApi.deauthorize).toBeCalledTimes(1);
-      expect(stravaApi.deauthorize).toBeCalledWith('access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
-      expect(log.warn).not.toBeCalled();
+      expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledWith(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(stravaApi.deauthorize).toHaveBeenCalledWith('access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ strava: expect.anything() }));
+      expect(log.warn).not.toHaveBeenCalled();
     });
   });
 
@@ -357,8 +365,8 @@ describe('Strava Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBe('access_token');
-      expect(userService.getStravaInfo).toBeCalledTimes(1);
-      expect(userService.getStravaInfo).toBeCalledWith(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getStravaInfo).toHaveBeenCalledWith(1);
     });
 
     it('retrieves a new access token if current one is expired', async () => {
@@ -380,10 +388,10 @@ describe('Strava Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBe('new_access_token');
-      expect(stravaApi.refreshAuth).toBeCalledTimes(1);
-      expect(stravaApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.updateStravaAuth).toBeCalledTimes(1);
-      expect(userService.updateStravaAuth).toBeCalledWith(1, {
+      expect(stravaApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(stravaApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.updateStravaAuth).toHaveBeenCalledTimes(1);
+      expect(userService.updateStravaAuth).toHaveBeenCalledWith(1, {
         access_token: 'new_access_token',
         refresh_token: 'new_refresh_token',
         expires_at: 3600,
@@ -405,9 +413,9 @@ describe('Strava Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBeUndefined();
-      expect(stravaApi.refreshAuth).toBeCalledTimes(1);
-      expect(stravaApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.clearStravaTokens).toBeCalledTimes(1);
+      expect(stravaApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(stravaApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.clearStravaTokens).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -428,11 +436,11 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.setupWebhook();
 
-      expect(stravaRepository.findSubscription).toBeCalledTimes(1);
-      expect(stravaApi.getSubscriptions).toBeCalledTimes(1);
-      expect(stravaApi.requestSubscriptionCreation).not.toBeCalled();
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith('Found matching Strava webhook subscription');
+      expect(stravaRepository.findSubscription).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getSubscriptions).toHaveBeenCalledTimes(1);
+      expect(stravaApi.requestSubscriptionCreation).not.toHaveBeenCalled();
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('Found matching Strava webhook subscription');
     });
 
     it('handles no subscription', async () => {
@@ -446,11 +454,11 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.setupWebhook();
 
-      expect(stravaRepository.findSubscription).toBeCalledTimes(1);
-      expect(stravaApi.getSubscriptions).not.toBeCalled();
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith('No Strava webhook subscription found in DB');
-      expect(requestWebhookSpy).toBeCalledTimes(1);
+      expect(stravaRepository.findSubscription).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getSubscriptions).not.toHaveBeenCalled();
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('No Strava webhook subscription found in DB');
+      expect(requestWebhookSpy).toHaveBeenCalledTimes(1);
 
       requestWebhookSpy.mockRestore();
     });
@@ -466,13 +474,13 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.setupWebhook();
 
-      expect(stravaRepository.findSubscription).toBeCalledTimes(1);
-      expect(stravaApi.getSubscriptions).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(stravaRepository.findSubscription).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getSubscriptions).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Strava webhook subscription status couldn't be checked: unable to retrieve current subscription. Assuming not set`,
       );
-      expect(requestWebhookSpy).toBeCalledTimes(1);
+      expect(requestWebhookSpy).toHaveBeenCalledTimes(1);
 
       requestWebhookSpy.mockRestore();
     });
@@ -496,11 +504,11 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service.setupWebhook();
 
-      expect(stravaRepository.findSubscription).toBeCalledTimes(1);
-      expect(stravaApi.getSubscriptions).toBeCalledTimes(1);
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith('No matching Strava webhook subscription found');
-      expect(requestWebhookSpy).toBeCalledTimes(1);
+      expect(stravaRepository.findSubscription).toHaveBeenCalledTimes(1);
+      expect(stravaApi.getSubscriptions).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('No matching Strava webhook subscription found');
+      expect(requestWebhookSpy).toHaveBeenCalledTimes(1);
 
       requestWebhookSpy.mockRestore();
     });
@@ -512,12 +520,12 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service['requestWebhookSubscription']();
 
-      expect(stravaApi.requestSubscriptionCreation).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(stravaApi.requestSubscriptionCreation).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Strava subscription couldn't be requested, maybe another webhook is already registered`,
       );
-      expect(stravaRepository.setSubscription).not.toBeCalled();
+      expect(stravaRepository.setSubscription).not.toHaveBeenCalled();
     });
 
     it('logs if subscription cannot be stored in DB', async () => {
@@ -527,11 +535,11 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service['requestWebhookSubscription']();
 
-      expect(stravaApi.requestSubscriptionCreation).toBeCalledTimes(1);
-      expect(stravaRepository.setSubscription).toBeCalledTimes(1);
-      expect(stravaRepository.setSubscription).toBeCalledWith(1);
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Strava subscription couldn't be stored in DB`);
+      expect(stravaApi.requestSubscriptionCreation).toHaveBeenCalledTimes(1);
+      expect(stravaRepository.setSubscription).toHaveBeenCalledTimes(1);
+      expect(stravaRepository.setSubscription).toHaveBeenCalledWith(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Strava subscription couldn't be stored in DB`);
     });
 
     it('creates new subscription', async () => {
@@ -541,9 +549,9 @@ describe('Strava Service', () => {
       const service = new StravaService();
       await service['requestWebhookSubscription']();
 
-      expect(stravaApi.requestSubscriptionCreation).toBeCalledTimes(1);
-      expect(stravaRepository.setSubscription).toBeCalledTimes(1);
-      expect(stravaRepository.setSubscription).toBeCalledWith(1);
+      expect(stravaApi.requestSubscriptionCreation).toHaveBeenCalledTimes(1);
+      expect(stravaRepository.setSubscription).toHaveBeenCalledTimes(1);
+      expect(stravaRepository.setSubscription).toHaveBeenCalledWith(1);
     });
   });
 
@@ -562,8 +570,8 @@ describe('Strava Service', () => {
         updates: {},
       });
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Invalid webhook event: subscription id 1 doesn't match`);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Invalid webhook event: subscription id 1 doesn't match`);
     });
 
     it('ignores undesired events', async () => {
@@ -580,8 +588,8 @@ describe('Strava Service', () => {
         updates: {},
       });
 
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith(`Not handling event athlete/update`);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith(`Not handling event athlete/update`);
     });
 
     describe('athlete delete event', () => {
@@ -600,8 +608,8 @@ describe('Strava Service', () => {
           updates: { authorized: 'false' },
         });
 
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava athlete deletion webhook event for Strava user 1 couldn't be processed: unable to find matching user in DB`,
         );
       });
@@ -631,10 +639,10 @@ describe('Strava Service', () => {
           updates: { authorized: 'false' },
         });
 
-        expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-        expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'strava');
-        expect(userRepository.update).toBeCalledTimes(1);
-        expect(userRepository.update).toBeCalledWith({ c2cId: 1 });
+        expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+        expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+        expect(userRepository.update).toHaveBeenCalledTimes(1);
+        expect(userRepository.update).toHaveBeenCalledWith({ c2cId: 1 });
       });
     });
 
@@ -654,8 +662,8 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity creation webhook event for Strava user 1 couldn't be processed: unable to find matching user in DB`,
         );
       });
@@ -679,9 +687,9 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity creation webhook event for user 1 couldn't be processed: unable to acquire valid token`,
         );
 
@@ -709,14 +717,14 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledWith('access_token', 1);
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity creation webhook event for user 1 couldn't be processed: unable to retrieve activity data`,
         );
-        expect(userService.addActivities).not.toBeCalled();
+        expect(userService.addActivities).not.toHaveBeenCalled();
 
         getTokenSpy.mockRestore();
       });
@@ -764,11 +772,11 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledWith('access_token', 1);
-        expect(userService.addActivities).toBeCalledTimes(1);
-        expect(userService.addActivities).toBeCalledWith(1, {
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(userService.addActivities).toHaveBeenCalledTimes(1);
+        expect(userService.addActivities).toHaveBeenCalledWith(1, {
           vendor: 'strava',
           vendorId: '1',
           date: '1970-01-01T02:00:01+02:00',
@@ -785,8 +793,8 @@ describe('Strava Service', () => {
           },
           heightDiffUp: 1,
         });
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity creation webhook event for user 1 couldn't be processed: unable to insert activity data`,
         );
 
@@ -836,11 +844,11 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledWith('access_token', 1);
-        expect(userService.addActivities).toBeCalledTimes(1);
-        expect(userService.addActivities).toBeCalledWith(1, {
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(userService.addActivities).toHaveBeenCalledTimes(1);
+        expect(userService.addActivities).toHaveBeenCalledWith(1, {
           vendor: 'strava',
           vendorId: '1',
           date: '1970-01-01T00:00:01Z',
@@ -857,7 +865,7 @@ describe('Strava Service', () => {
           },
           heightDiffUp: 1,
         });
-        expect(log.warn).not.toBeCalled();
+        expect(log.warn).not.toHaveBeenCalled();
 
         getTokenSpy.mockRestore();
       });
@@ -879,8 +887,8 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity update webhook event for Strava user 1 couldn't be processed: unable to find matching user in DB`,
         );
       });
@@ -904,9 +912,9 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity update webhook event for user 1 couldn't be processed: unable to acquire valid token`,
         );
 
@@ -934,14 +942,14 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledWith('access_token', 1);
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity update webhook event for user 1 couldn't be processed: unable to retrieve activity data`,
         );
-        expect(userService.updateActivity).not.toBeCalled();
+        expect(userService.updateActivity).not.toHaveBeenCalled();
 
         getTokenSpy.mockRestore();
       });
@@ -976,19 +984,19 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledWith('access_token', 1);
-        expect(userService.updateActivity).toBeCalledTimes(1);
-        expect(userService.updateActivity).toBeCalledWith(1, {
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(userService.updateActivity).toHaveBeenCalledTimes(1);
+        expect(userService.updateActivity).toHaveBeenCalledWith(1, {
           vendor: 'strava',
           vendorId: '1',
           date: '1970-01-01T00:00:01Z',
           name: 'Morning Run',
           type: 'Run',
         });
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity update webhook event for user 1 couldn't be processed: unable to update activity data in DB`,
         );
 
@@ -1025,18 +1033,18 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(service.getToken).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledTimes(1);
-        expect(stravaApi.getActivity).toBeCalledWith('access_token', 1);
-        expect(userService.updateActivity).toBeCalledTimes(1);
-        expect(userService.updateActivity).toBeCalledWith(1, {
+        expect(service.getToken).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(userService.updateActivity).toHaveBeenCalledTimes(1);
+        expect(userService.updateActivity).toHaveBeenCalledWith(1, {
           vendor: 'strava',
           vendorId: '1',
           date: '1970-01-01T00:00:01Z',
           name: 'Morning Run',
           type: 'Run',
         });
-        expect(log.warn).not.toBeCalled();
+        expect(log.warn).not.toHaveBeenCalled();
 
         getTokenSpy.mockRestore();
       });
@@ -1058,10 +1066,10 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(userService.deleteActivity).toBeCalledTimes(1);
-        expect(userService.deleteActivity).toBeCalledWith('strava', '1');
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(userService.deleteActivity).toHaveBeenCalledTimes(1);
+        expect(userService.deleteActivity).toHaveBeenCalledWith('strava', '1');
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Strava activity delete webhook event for activity 1 couldn't be processed: unable to delete activity data in DB`,
         );
       });
@@ -1081,9 +1089,9 @@ describe('Strava Service', () => {
           updates: {},
         });
 
-        expect(userService.deleteActivity).toBeCalledTimes(1);
-        expect(userService.deleteActivity).toBeCalledWith('strava', '1');
-        expect(log.warn).not.toBeCalled();
+        expect(userService.deleteActivity).toHaveBeenCalledTimes(1);
+        expect(userService.deleteActivity).toHaveBeenCalledWith('strava', '1');
+        expect(log.warn).not.toHaveBeenCalled();
       });
     });
   });
@@ -1092,7 +1100,7 @@ describe('Strava Service', () => {
     it('throws if streamset has no distance stream', () => {
       const service = new StravaService();
       expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1122,7 +1130,7 @@ describe('Strava Service', () => {
     it('throws if streamset has no latlng stream', () => {
       const service = new StravaService();
       expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1149,7 +1157,7 @@ describe('Strava Service', () => {
     it('throws if streams are not all synchronized with distance stream', () => {
       const service = new StravaService();
       expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1187,7 +1195,7 @@ describe('Strava Service', () => {
     it('throws if streams are not all of same size', () => {
       const service = new StravaService();
       expect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1222,7 +1230,7 @@ describe('Strava Service', () => {
     it('converts streamset to geojson', () => {
       const service = new StravaService();
       expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1286,7 +1294,7 @@ describe('Strava Service', () => {
     it('converts streamset to geojson without altitude', () => {
       const service = new StravaService();
       expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1340,7 +1348,7 @@ describe('Strava Service', () => {
     it('converts streamset to geojson without timestamp', () => {
       const service = new StravaService();
       expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {
@@ -1394,7 +1402,7 @@ describe('Strava Service', () => {
     it('converts streamset to geojson without timestamp and altitude', () => {
       const service = new StravaService();
       expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
           [
             {

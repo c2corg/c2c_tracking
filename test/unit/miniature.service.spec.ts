@@ -21,8 +21,8 @@ describe('Miniature service', () => {
         ],
       });
 
-      expect(axios.get).toBeCalledTimes(1);
-      expect(storage.put).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(storage.put).toHaveBeenCalledTimes(1);
       expect(id).toMatch(/^.*\.png$/);
     });
   });
@@ -34,8 +34,8 @@ describe('Miniature service', () => {
       const service = new MiniatureService();
       await service.deleteMiniature('id.png');
 
-      expect(storage.delete).toBeCalledTimes(1);
-      expect(storage.delete).toBeCalledWith('id.png');
+      expect(storage.delete).toHaveBeenCalledTimes(1);
+      expect(storage.delete).toHaveBeenCalledWith('id.png');
     });
   });
 });

@@ -7,10 +7,14 @@ import { corosService } from '../../../../src/server/coros/coros.service';
 import { authenticated } from '../../../utils';
 
 describe('Coros Controller', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /coros/exchange-token/:userId', () => {
@@ -66,8 +70,8 @@ describe('Coros Controller', () => {
       );
 
       expect(response.status).toBe(204);
-      expect(corosService.requestAccessTokenAndSetupUser).toBeCalledTimes(1);
-      expect(corosService.requestAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
+      expect(corosService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
+      expect(corosService.requestAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
     });
   });
 
@@ -90,7 +94,7 @@ describe('Coros Controller', () => {
       const response = await authenticated(request(app.callback()).post('/coros/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
-      expect(corosService.deauthorize).toBeCalledTimes(1);
+      expect(corosService.deauthorize).toHaveBeenCalledTimes(1);
     });
 
     it('deauthorizes user', async () => {
@@ -99,8 +103,8 @@ describe('Coros Controller', () => {
       const response = await authenticated(request(app.callback()).post('/coros/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
-      expect(corosService.deauthorize).toBeCalledTimes(1);
-      expect(corosService.deauthorize).toBeCalledWith(1);
+      expect(corosService.deauthorize).toHaveBeenCalledTimes(1);
+      expect(corosService.deauthorize).toHaveBeenCalledWith(1);
     });
   });
 
@@ -137,8 +141,8 @@ describe('Coros Controller', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ message: 'ok', result: '0000' });
-      expect(corosService.handleWebhookEvent).toBeCalledTimes(1);
-      expect(corosService.handleWebhookEvent).toBeCalledWith(event, 'client', 'secret');
+      expect(corosService.handleWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(corosService.handleWebhookEvent).toHaveBeenCalledWith(event, 'client', 'secret');
     });
   });
 });

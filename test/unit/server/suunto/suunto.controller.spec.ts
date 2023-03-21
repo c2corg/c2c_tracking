@@ -6,10 +6,14 @@ import { suuntoService } from '../../../../src/server/suunto/suunto.service';
 import { authenticated } from '../../../utils';
 
 describe('Suunto Controller', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /suunto/exchange-token/:userId', () => {
@@ -70,8 +74,8 @@ describe('Suunto Controller', () => {
       );
 
       expect(response.status).toBe(204);
-      expect(suuntoService.requestShortLivedAccessTokenAndSetupUser).toBeCalledTimes(1);
-      expect(suuntoService.requestShortLivedAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
+      expect(suuntoService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
+      expect(suuntoService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
     });
   });
 
@@ -82,7 +86,7 @@ describe('Suunto Controller', () => {
       const response = await request(app.callback()).post('/suunto/webhook').send({});
 
       expect(response.status).toBe(400);
-      expect(suuntoService.handleWebhookEvent).not.toBeCalled();
+      expect(suuntoService.handleWebhookEvent).not.toHaveBeenCalled();
     });
 
     it('handle event', async () => {
@@ -93,8 +97,8 @@ describe('Suunto Controller', () => {
         .send({ username: 'user', workoutid: 'id' })
         .set({ authorization: 'auth' });
 
-      expect(suuntoService.handleWebhookEvent).toBeCalledTimes(1);
-      expect(suuntoService.handleWebhookEvent).toBeCalledWith({ username: 'user', workoutid: 'id' }, 'auth');
+      expect(suuntoService.handleWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(suuntoService.handleWebhookEvent).toHaveBeenCalledWith({ username: 'user', workoutid: 'id' }, 'auth');
     });
   });
 

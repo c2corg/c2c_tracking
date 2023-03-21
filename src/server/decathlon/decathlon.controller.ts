@@ -5,7 +5,7 @@ import { decathlonService as service } from './decathlon.service';
 
 class DecathlonController {
   public async exchangeToken(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
     if (ctx.query['error']) {
       ctx.log.info(`User ${c2cId} denied Decathlon authorization`);
       ctx.throw(403, 'auth-denied');
@@ -21,14 +21,14 @@ class DecathlonController {
   }
 
   public async deauthorize(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt(ctx['params'].userId, 10);
+    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
     await service.deauthorize(c2cId);
     ctx.status = 204;
   }
 
-  public async webhook(ctx: Context): Promise<void> {
+  public webhook(ctx: Context): void {
     const event = <WebhookEvent>ctx.request.body;
-    service.handleWebhookEvent(event); // async handling
+    void service.handleWebhookEvent(event); // async handling
     ctx.status = 200; // acknowledge event
   }
 }

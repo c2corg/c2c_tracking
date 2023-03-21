@@ -208,7 +208,7 @@ export class StravaService {
   ): stream is AltitudeStream => stream.type === 'altitude';
 
   public async setupWebhook(): Promise<void> {
-    (await this.checkWebhookSubscription()) || this.requestWebhookSubscription();
+    (await this.checkWebhookSubscription()) || void this.requestWebhookSubscription();
   }
 
   private async checkWebhookSubscription(): Promise<boolean> {

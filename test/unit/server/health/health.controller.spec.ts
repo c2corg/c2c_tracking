@@ -9,8 +9,9 @@ describe('GET /health', () => {
     const response = await request(app.callback()).get('/health');
     expect(response.body as Status).toMatchInlineSnapshot(
       {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         startTime: expect.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/),
-        // eslint-disable-next-line security/detect-non-literal-regexp
+        // eslint-disable-next-line security/detect-non-literal-regexp, @typescript-eslint/no-unsafe-assignment
         version: expect.stringMatching(new RegExp(semverRegex.source + '|dev')),
       },
       `

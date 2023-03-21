@@ -6,6 +6,7 @@ module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   extends: [
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
     'plugin:node/recommended',
     'plugin:import/recommended',
@@ -15,6 +16,7 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 'latest',
+    project: './tsconfig.eslint.json',
     sourceType: 'module', // Allows for the use of imports,
   },
   rules: {
@@ -44,15 +46,16 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-throw-literal': 'error',
       },
-      parserOptions: {
-        project: ['./tsconfig.eslint.json'],
-      },
     },
     {
       files: ['test/**/*.ts'],
+      plugins: ['jest'],
+      extends: ['plugin:jest/recommended'],
       rules: {
         'node/no-unpublished-import': 'off',
         'node/no-extraneous-import': 'off',
+        '@typescript-eslint/unbound-method': 'off',
+        'jest/unbound-method': 'error',
       },
     },
   ],

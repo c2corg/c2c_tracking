@@ -2,8 +2,8 @@ import { database as db } from '../../../src/db';
 import { StravaRepository } from '../../../src/repository/strava.repository';
 
 describe('Strava Repository', () => {
-  afterEach(() => {
-    db.closeDatabase();
+  afterEach(async () => {
+    await db.closeDatabase();
   });
 
   it('executes requests', async () => {

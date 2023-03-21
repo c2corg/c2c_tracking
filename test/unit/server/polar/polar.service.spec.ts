@@ -15,8 +15,12 @@ jest.mock('../../../../src/helpers/utils');
 describe('Polar Service', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('requestAccessTokenAndSetupUser', () => {
@@ -30,12 +34,12 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
 
-      expect(polarApi.exchangeToken).toBeCalledTimes(1);
-      expect(polarApi.exchangeToken).toBeCalledWith('code');
-      expect(polarApi.registerUser).toBeCalledTimes(1);
-      expect(polarApi.registerUser).toBeCalledWith('access_token', 1n);
-      expect(userService.configurePolar).toBeCalledTimes(1);
-      expect(userService.configurePolar).toBeCalledWith(1, {
+      expect(polarApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(polarApi.exchangeToken).toHaveBeenCalledWith('code');
+      expect(polarApi.registerUser).toHaveBeenCalledTimes(1);
+      expect(polarApi.registerUser).toHaveBeenCalledWith('access_token', 1n);
+      expect(userService.configurePolar).toHaveBeenCalledTimes(1);
+      expect(userService.configurePolar).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         x_user_id: 1n,
         token_type: 'bearer',
@@ -70,15 +74,16 @@ describe('Polar Service', () => {
 
       const service = new PolarService();
       await service.deauthorize(1);
-      expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+      expect(polarApi.deleteUser).toHaveBeenCalledTimes(1);
+      expect(polarApi.deleteUser).toHaveBeenCalledWith('token', 1n);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
     });
 
     it('warns if no miniature info could be retrieved', async () => {
@@ -91,17 +96,18 @@ describe('Polar Service', () => {
 
       const service = new PolarService();
       await service.deauthorize(1);
-      expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor polar`);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+      expect(polarApi.deleteUser).toHaveBeenCalledTimes(1);
+      expect(polarApi.deleteUser).toHaveBeenCalledWith('token', 1n);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniatures info for user 1 and vendor polar`);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
     });
 
     it('warns if miniature could not be deleted', async () => {
@@ -114,18 +120,19 @@ describe('Polar Service', () => {
 
       const service = new PolarService();
       await service.deauthorize(1);
-      expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+      expect(polarApi.deleteUser).toHaveBeenCalledTimes(1);
+      expect(polarApi.deleteUser).toHaveBeenCalledWith('token', 1n);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
     });
 
     it('deletes miniatures', async () => {
@@ -138,15 +145,16 @@ describe('Polar Service', () => {
 
       const service = new PolarService();
       await service.deauthorize(1);
-      expect(polarApi.deleteUser).toBeCalledTimes(1);
-      expect(polarApi.deleteUser).toBeCalledWith('token', 1n);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'polar');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
+      expect(polarApi.deleteUser).toHaveBeenCalledTimes(1);
+      expect(polarApi.deleteUser).toHaveBeenCalledWith('token', 1n);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'polar');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ polar: expect.anything() }));
     });
   });
 
@@ -167,11 +175,11 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.setupWebhook();
 
-      expect(polarRepository.findWebhookSecret).toBeCalledTimes(1);
-      expect(polarApi.getWebhook).toBeCalledTimes(1);
-      expect(polarApi.createWebhook).not.toBeCalled();
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith('Found matching Polar webhook subscription');
+      expect(polarRepository.findWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(polarApi.getWebhook).toHaveBeenCalledTimes(1);
+      expect(polarApi.createWebhook).not.toHaveBeenCalled();
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('Found matching Polar webhook subscription');
     });
 
     it('handles no subscription', async () => {
@@ -185,11 +193,11 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.setupWebhook();
 
-      expect(polarRepository.findWebhookSecret).toBeCalledTimes(1);
-      expect(polarApi.getWebhook).not.toBeCalled();
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith('No Polar webhook subscription found in DB');
-      expect(requestWebhookSpy).toBeCalledTimes(1);
+      expect(polarRepository.findWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(polarApi.getWebhook).not.toHaveBeenCalled();
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('No Polar webhook subscription found in DB');
+      expect(requestWebhookSpy).toHaveBeenCalledTimes(1);
 
       requestWebhookSpy.mockRestore();
     });
@@ -205,13 +213,13 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.setupWebhook();
 
-      expect(polarRepository.findWebhookSecret).toBeCalledTimes(1);
-      expect(polarApi.getWebhook).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(polarRepository.findWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(polarApi.getWebhook).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar webhook subscription status couldn't be checked: unable to retrieve current subscription. Assuming not set`,
       );
-      expect(requestWebhookSpy).toBeCalledTimes(1);
+      expect(requestWebhookSpy).toHaveBeenCalledTimes(1);
 
       requestWebhookSpy.mockRestore();
     });
@@ -235,11 +243,11 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.setupWebhook();
 
-      expect(polarRepository.findWebhookSecret).toBeCalledTimes(1);
-      expect(polarApi.getWebhook).toBeCalledTimes(1);
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith('No matching Polar webhook subscription found');
-      expect(requestWebhookSpy).toBeCalledTimes(1);
+      expect(polarRepository.findWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(polarApi.getWebhook).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('No matching Polar webhook subscription found');
+      expect(requestWebhookSpy).toHaveBeenCalledTimes(1);
 
       requestWebhookSpy.mockRestore();
     });
@@ -251,12 +259,12 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service['requestWebhookSubscription']();
 
-      expect(polarApi.createWebhook).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(polarApi.createWebhook).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar subscription couldn't be requested, maybe another webhook is already registered`,
       );
-      expect(polarRepository.setWebhookSecret).not.toBeCalled();
+      expect(polarRepository.setWebhookSecret).not.toHaveBeenCalled();
     });
 
     it('logs if subscription cannot be stored in DB', async () => {
@@ -266,11 +274,11 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service['requestWebhookSubscription']();
 
-      expect(polarApi.createWebhook).toBeCalledTimes(1);
-      expect(polarRepository.setWebhookSecret).toBeCalledTimes(1);
-      expect(polarRepository.setWebhookSecret).toBeCalledWith('secret');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Polar webhook secret couldn't be stored in DB`);
+      expect(polarApi.createWebhook).toHaveBeenCalledTimes(1);
+      expect(polarRepository.setWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(polarRepository.setWebhookSecret).toHaveBeenCalledWith('secret');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Polar webhook secret couldn't be stored in DB`);
     });
 
     it('creates new subscription', async () => {
@@ -280,20 +288,24 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service['requestWebhookSubscription']();
 
-      expect(polarApi.createWebhook).toBeCalledTimes(1);
-      expect(polarRepository.setWebhookSecret).toBeCalledTimes(1);
-      expect(polarRepository.setWebhookSecret).toBeCalledWith('secret');
+      expect(polarApi.createWebhook).toHaveBeenCalledTimes(1);
+      expect(polarRepository.setWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(polarRepository.setWebhookSecret).toHaveBeenCalledWith('secret');
     });
   });
 
   describe('handleWebhookEvent', () => {
     it('does nothing for PING events', async () => {
+      jest.spyOn(userRepository, 'findByPolarId');
+
       const event: WebhookEvent = { event: 'PING', timestamp: '1970-01-01T00:00:01Z' };
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
+
+      expect(userRepository.findByPolarId).not.toHaveBeenCalled();
     });
 
     it('logs if no matching user is found', async () => {
@@ -311,8 +323,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar activity creation webhook event for Polar user 1 couldn't be processed: unable to find matching user in DB`,
       );
     });
@@ -335,8 +347,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Invalid Polar webhook event: signature doesn't match`);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Invalid Polar webhook event: signature doesn't match`);
     });
 
     it('logs and returns if signature is invalid', async () => {
@@ -357,8 +369,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Invalid Polar webhook event: signature doesn't match`);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Invalid Polar webhook event: signature doesn't match`);
     });
 
     it('logs and returns if exercise info cannot be retrieved', async () => {
@@ -380,8 +392,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar exercise webhook event for user 1 couldn't be processed: unable to retrieve exercise data`,
       );
     });
@@ -413,8 +425,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar exercise webhook event for user 1 couldn't be processed: unable to retrieve exercise FIT data`,
       );
     });
@@ -447,8 +459,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar exercise webhook event for user 1 couldn't be processed: unable to convert exercise FIT data to geometry`,
       );
     });
@@ -485,8 +497,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Polar activity creation webhook event for user 1 couldn't be processed: unable to insert activity data`,
       );
     });
@@ -523,8 +535,8 @@ describe('Polar Service', () => {
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
 
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         date: '1970-01-01T00:00:01+02:45',
         duration: 1,
         geojson: {

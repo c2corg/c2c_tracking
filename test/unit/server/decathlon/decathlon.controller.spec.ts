@@ -7,10 +7,14 @@ import { decathlonService } from '../../../../src/server/decathlon/decathlon.ser
 import { authenticated } from '../../../utils';
 
 describe('Decathlon Controller', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /decathlon/exchange-token/:userId', () => {
@@ -75,8 +79,8 @@ describe('Decathlon Controller', () => {
       );
 
       expect(response.status).toBe(204);
-      expect(decathlonService.requestShortLivedAccessTokenAndSetupUser).toBeCalledTimes(1);
-      expect(decathlonService.requestShortLivedAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
+      expect(decathlonService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
+      expect(decathlonService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
     });
   });
 
@@ -99,7 +103,7 @@ describe('Decathlon Controller', () => {
       const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
-      expect(decathlonService.deauthorize).toBeCalledTimes(1);
+      expect(decathlonService.deauthorize).toHaveBeenCalledTimes(1);
     });
 
     it('deauthorizes user', async () => {
@@ -108,8 +112,8 @@ describe('Decathlon Controller', () => {
       const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
-      expect(decathlonService.deauthorize).toBeCalledTimes(1);
-      expect(decathlonService.deauthorize).toBeCalledWith(1);
+      expect(decathlonService.deauthorize).toHaveBeenCalledTimes(1);
+      expect(decathlonService.deauthorize).toHaveBeenCalledWith(1);
     });
   });
 
@@ -134,8 +138,8 @@ describe('Decathlon Controller', () => {
       const response = await request(app.callback()).post('/decathlon/webhook').send(event);
 
       expect(response.status).toBe(200);
-      expect(decathlonService.handleWebhookEvent).toBeCalledTimes(1);
-      expect(decathlonService.handleWebhookEvent).toBeCalledWith(event);
+      expect(decathlonService.handleWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(decathlonService.handleWebhookEvent).toHaveBeenCalledWith(event);
     });
   });
 });

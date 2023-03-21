@@ -8,8 +8,12 @@ import { userService } from '../../../../src/user.service';
 
 describe('Garmin service', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   afterEach(() => {
@@ -39,11 +43,11 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier');
 
-      expect(garminApi.exchangeToken).toBeCalledTimes(1);
-      expect(garminApi.exchangeToken).toBeCalledWith('requestToken', 'requestTokenSecret', 'verifier');
-      expect(userService.configureGarmin).toBeCalledTimes(1);
-      expect(userService.configureGarmin).toBeCalledWith(1, { token: 'token', tokenSecret: 'tokenSecret' });
-      expect(garminApi.backfillActivities).toBeCalledTimes(1);
+      expect(garminApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(garminApi.exchangeToken).toHaveBeenCalledWith('requestToken', 'requestTokenSecret', 'verifier');
+      expect(userService.configureGarmin).toHaveBeenCalledTimes(1);
+      expect(userService.configureGarmin).toHaveBeenCalledWith(1, { token: 'token', tokenSecret: 'tokenSecret' });
+      expect(garminApi.backfillActivities).toHaveBeenCalledTimes(1);
     });
 
     it('throws if auth cannot be configured', async () => {
@@ -70,8 +74,8 @@ describe('Garmin service', () => {
           "tokenSecret": "tokenSecret",
         }
       `);
-      expect(userService.getGarminInfo).toBeCalledTimes(1);
-      expect(userService.getGarminInfo).toBeCalledWith(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
     });
   });
 
@@ -83,7 +87,7 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
 
-      expect(userService.getGarminInfo).not.toBeCalled();
+      expect(userService.getGarminInfo).not.toHaveBeenCalled();
     });
 
     it('throws if no matching auth exists for user', async () => {
@@ -93,8 +97,8 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
 
-      expect(userService.getGarminInfo).toBeCalledTimes(1);
-      expect(userService.getGarminInfo).toBeCalledWith(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
     });
 
     it('calls garmin API then updates DB', async () => {
@@ -109,17 +113,18 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.deauthorize(1);
 
-      expect(userService.getGarminInfo).toBeCalledTimes(1);
-      expect(userService.getGarminInfo).toBeCalledWith(1);
-      expect(garminApi.deauthorize).toBeCalledTimes(1);
-      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
     });
 
     it('warns if no miniature info could be retrieved', async () => {
@@ -134,19 +139,20 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.deauthorize(1);
 
-      expect(userService.getGarminInfo).toBeCalledTimes(1);
-      expect(userService.getGarminInfo).toBeCalledWith(1);
-      expect(garminApi.deauthorize).toBeCalledTimes(1);
-      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor garmin`);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniatures info for user 1 and vendor garmin`);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
     });
 
     it('warns if miniature could not be deleted', async () => {
@@ -161,20 +167,21 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.deauthorize(1);
 
-      expect(userService.getGarminInfo).toBeCalledTimes(1);
-      expect(userService.getGarminInfo).toBeCalledWith(1);
-      expect(garminApi.deauthorize).toBeCalledTimes(1);
-      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
     });
 
     it('deletes miniatures', async () => {
@@ -189,19 +196,20 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.deauthorize(1);
 
-      expect(userService.getGarminInfo).toBeCalledTimes(1);
-      expect(userService.getGarminInfo).toBeCalledWith(1);
-      expect(garminApi.deauthorize).toBeCalledTimes(1);
-      expect(garminApi.deauthorize).toBeCalledWith('token', 'tokenSecret');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'garmin');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
+      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ garmin: expect.anything() }));
     });
   });
 
@@ -241,11 +249,11 @@ describe('Garmin service', () => {
         },
       ]);
 
-      expect(userRepository.findByGarminToken).toBeCalledTimes(2);
-      expect(userRepository.findByGarminToken).nthCalledWith(1, 'user1Token');
-      expect(userRepository.findByGarminToken).nthCalledWith(2, 'user2Token');
-      expect(userService.addActivities).toBeCalledTimes(2);
-      expect(userService.addActivities).nthCalledWith(1, 1, {
+      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(2);
+      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(1, 'user1Token');
+      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(2, 'user2Token');
+      expect(userService.addActivities).toHaveBeenCalledTimes(2);
+      expect(userService.addActivities).toHaveBeenNthCalledWith(1, 1, {
         date: '1970-01-01T00:00:01Z',
         geojson: {
           coordinates: [
@@ -258,7 +266,7 @@ describe('Garmin service', () => {
         vendor: 'garmin',
         vendorId: '1',
       });
-      expect(userService.addActivities).nthCalledWith(2, 2, {
+      expect(userService.addActivities).toHaveBeenNthCalledWith(2, 2, {
         date: '1970-01-01T00:00:01Z',
         geojson: {
           coordinates: [
@@ -287,9 +295,9 @@ describe('Garmin service', () => {
         },
       ]);
 
-      expect(userRepository.findByGarminToken).toBeCalledTimes(1);
-      expect(userRepository.findByGarminToken).toBeCalledWith('user1Token');
-      expect(userService.addActivities).not.toBeCalled();
+      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(1);
+      expect(userRepository.findByGarminToken).toHaveBeenCalledWith('user1Token');
+      expect(userService.addActivities).not.toHaveBeenCalled();
     });
 
     it('logs and returns if user for activity cannot be found', async () => {
@@ -306,9 +314,9 @@ describe('Garmin service', () => {
         },
       ]);
 
-      expect(userService.addActivities).not.toBeCalled();
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(userService.addActivities).not.toHaveBeenCalled();
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Garmin activity webhook event for Garmin token user1TokenNotMatchingInDb couldn't be processed: unable to find matching user in DB`,
       );
     });
@@ -331,9 +339,9 @@ describe('Garmin service', () => {
         },
       ]);
 
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Garmin activity creation webhook event for user 1 couldn't be processed: unable to insert activity data`,
       );
     });
@@ -354,15 +362,15 @@ describe('Garmin service', () => {
         { userId: 'user2', userAccessToken: 'user2AccessToken' },
       ]);
 
-      expect(userRepository.findByGarminToken).toBeCalledTimes(2);
-      expect(userRepository.findByGarminToken).nthCalledWith(1, 'user1AccessToken');
-      expect(userRepository.findByGarminToken).nthCalledWith(2, 'user2AccessToken');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(2);
-      expect(activityRepository.deleteByUserAndVendor).nthCalledWith(1, 1, 'garmin');
-      expect(activityRepository.deleteByUserAndVendor).nthCalledWith(2, 2, 'garmin');
-      expect(userRepository.update).toBeCalledTimes(2);
-      expect(userRepository.update).nthCalledWith(1, { c2cId: 1 });
-      expect(userRepository.update).nthCalledWith(2, { c2cId: 2 });
+      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(2);
+      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(1, 'user1AccessToken');
+      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(2, 'user2AccessToken');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(2);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenNthCalledWith(1, 1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenNthCalledWith(2, 2, 'garmin');
+      expect(userRepository.update).toHaveBeenCalledTimes(2);
+      expect(userRepository.update).toHaveBeenNthCalledWith(1, { c2cId: 1 });
+      expect(userRepository.update).toHaveBeenNthCalledWith(2, { c2cId: 2 });
     });
 
     it('logs if matching user is not found', async () => {
@@ -373,10 +381,10 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.handleDeauthorizeWebhook([{ userId: 'user1', userAccessToken: 'user1AccessToken' }]);
 
-      expect(userRepository.findByGarminToken).toBeCalledTimes(1);
-      expect(userRepository.findByGarminToken).toBeCalledWith('user1AccessToken');
-      expect(activityRepository.deleteByUserAndVendor).not.toBeCalled();
-      expect(userRepository.update).not.toBeCalled();
+      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(1);
+      expect(userRepository.findByGarminToken).toHaveBeenCalledWith('user1AccessToken');
+      expect(activityRepository.deleteByUserAndVendor).not.toHaveBeenCalled();
+      expect(userRepository.update).not.toHaveBeenCalled();
     });
   });
 });

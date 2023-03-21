@@ -43,7 +43,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ c2c_id: c2cId }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ c2c_id: c2cId }).first();
 
       if (!row) {
         return undefined;
@@ -61,7 +62,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ strava_id: stravaId }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ strava_id: stravaId }).first();
       if (!row) {
         return undefined;
       }
@@ -77,7 +79,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ suunto_username: username }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ suunto_username: username }).first();
       if (!row) {
         return undefined;
       }
@@ -93,7 +96,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ garmin_token: token }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ garmin_token: token }).first();
       if (!row) {
         return undefined;
       }
@@ -109,7 +113,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ decathlon_id: decathlonId }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ decathlon_id: decathlonId }).first();
       if (!row) {
         return undefined;
       }
@@ -125,7 +130,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ polar_id: polarId }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ polar_id: polarId }).first();
       if (!row) {
         return undefined;
       }
@@ -141,7 +147,8 @@ export class UserRepository {
       if (!conn) {
         throw new IOError('No connection to database');
       }
-      const row = await conn(this.#TABLE).where({ coros_id: corosId }).first();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ coros_id: corosId }).first();
       if (!row) {
         return undefined;
       }
@@ -156,6 +163,7 @@ export class UserRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
+
     await conn(this.#TABLE).insert(this.userToRecord(user));
     return user;
   }

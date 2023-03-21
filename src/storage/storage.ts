@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs, { constants, promises as fsPromises } from 'fs';
 import path from 'path';
 import type { Readable } from 'stream';
 
@@ -39,24 +39,25 @@ export class LocalStorage implements Storage {
     return path.resolve(this.#baseDirectory, sanitize(key));
   }
 
-  public async exists(key: string): Promise<boolean> {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return fs.existsSync(this.path(key));
+  public exists(key: string): Promise<boolean> {
+    return new Promise<boolean>((resolve) => {
+      fs.access(this.path(key), constants.F_OK, (err) => resolve(!err));
+    });
   }
 
-  public async get(key: string): Promise<Buffer> {
+  public get(key: string): Promise<Buffer> {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return fs.readFileSync(this.path(key));
+    return fsPromises.readFile(this.path(key));
   }
 
-  public async put(key: string, data: Buffer): Promise<void> {
+  public put(key: string, data: Buffer): Promise<void> {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return fs.writeFileSync(this.path(key), data);
+    return fsPromises.writeFile(this.path(key), data);
   }
 
-  public async delete(key: string): Promise<void> {
+  public delete(key: string): Promise<void> {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
-    return fs.unlinkSync(this.path(key));
+    return fsPromises.unlink(this.path(key));
   }
 }
 
@@ -91,7 +92,7 @@ export class S3Storage implements Storage {
     const stream = Body as Readable;
     return new Promise<Buffer>((resolve, reject) => {
       const chunks: Buffer[] = [];
-      stream.on('data', (chunk) => chunks.push(chunk));
+      stream.on('data', (chunk) => chunks.push(chunk as Buffer));
       stream.once('end', () => resolve(Buffer.concat(chunks)));
       stream.once('error', reject);
     });

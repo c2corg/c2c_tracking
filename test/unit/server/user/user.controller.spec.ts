@@ -7,8 +7,12 @@ import { authenticated } from '../../../utils';
 
 describe('User Controller', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /users/:userId/status', () => {
@@ -45,8 +49,8 @@ describe('User Controller', () => {
           "suunto": "configured",
         }
       `);
-      expect(userService.getUserInfo).toBeCalledTimes(1);
-      expect(userService.getUserInfo).toBeCalledWith('1');
+      expect(userService.getUserInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getUserInfo).toHaveBeenCalledWith(1);
     });
   });
 });

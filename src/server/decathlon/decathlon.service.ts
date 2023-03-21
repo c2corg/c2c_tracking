@@ -125,7 +125,7 @@ export class DecathlonService {
     return undefined;
   }
 
-  private async retrieveActivityGeometry(activity: Activity): Promise<LineString | undefined> {
+  private retrieveActivityGeometry(activity: Activity): LineString | undefined {
     try {
       const coordinates = this.locationsToGeoJson(activity);
       return coordinates.length ? { type: 'LineString', coordinates } : undefined;
@@ -176,7 +176,7 @@ export class DecathlonService {
     let geojson: LineString | undefined = undefined;
     try {
       activity = await decathlonApi.getActivity(token, activityId);
-      geojson = await this.retrieveActivityGeometry(activity);
+      geojson = this.retrieveActivityGeometry(activity);
       if (!geojson) {
         return;
       }

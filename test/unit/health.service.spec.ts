@@ -22,7 +22,7 @@ describe('Health service', () => {
 
     expect(service.getStatus()).toMatchInlineSnapshot(
       {
-        // eslint-disable-next-line security/detect-non-literal-regexp
+        // eslint-disable-next-line security/detect-non-literal-regexp, @typescript-eslint/no-unsafe-assignment
         version: expect.stringMatching(new RegExp(semverRegex.source + '|dev')),
       },
       `

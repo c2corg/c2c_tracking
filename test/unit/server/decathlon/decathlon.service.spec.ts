@@ -9,8 +9,12 @@ import { userService } from '../../../../src/user.service';
 describe('Decathlon Service', () => {
   beforeEach(() => {
     jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   afterEach(() => {
@@ -54,16 +58,16 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(decathlonApi.exchangeToken).toBeCalledTimes(1);
-      expect(decathlonApi.exchangeToken).toBeCalledWith('code');
-      expect(decathlonApi.getUserId).toBeCalledTimes(1);
-      expect(decathlonApi.getUserId).toBeCalledWith('access_token');
-      expect(decathlonApi.getExistingWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.getExistingWebhookSubscription).toBeCalledWith('access_token');
-      expect(decathlonApi.createWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.createWebhookSubscription).toBeCalledWith('userId', 'access_token');
-      expect(userService.configureDecathlon).toBeCalledTimes(1);
-      expect(userService.configureDecathlon).toBeCalledWith(
+      expect(decathlonApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.exchangeToken).toHaveBeenCalledWith('code');
+      expect(decathlonApi.getUserId).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getUserId).toHaveBeenCalledWith('access_token');
+      expect(decathlonApi.getExistingWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getExistingWebhookSubscription).toHaveBeenCalledWith('access_token');
+      expect(decathlonApi.createWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.createWebhookSubscription).toHaveBeenCalledWith('userId', 'access_token');
+      expect(userService.configureDecathlon).toHaveBeenCalledTimes(1);
+      expect(userService.configureDecathlon).toHaveBeenCalledWith(
         1,
         {
           access_token: 'access_token',
@@ -74,12 +78,12 @@ describe('Decathlon Service', () => {
         'userId',
         'webhookId',
       );
-      expect(decathlonApi.getActivities).toBeCalledTimes(1);
-      expect(decathlonApi.getActivities).toBeCalledWith('access_token');
-      expect(decathlonApi.getActivity).toBeCalledTimes(1);
-      expect(decathlonApi.getActivity).toBeCalledWith('access_token', '1');
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(decathlonApi.getActivities).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getActivities).toHaveBeenCalledWith('access_token');
+      expect(decathlonApi.getActivity).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getActivity).toHaveBeenCalledWith('access_token', '1');
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'decathlon',
         vendorId: '1',
         name: 'Morning run',
@@ -123,15 +127,15 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(decathlonApi.exchangeToken).toBeCalledTimes(1);
-      expect(decathlonApi.exchangeToken).toBeCalledWith('code');
-      expect(decathlonApi.getUserId).toBeCalledTimes(1);
-      expect(decathlonApi.getUserId).toBeCalledWith('access_token');
-      expect(decathlonApi.getExistingWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.getExistingWebhookSubscription).toBeCalledWith('access_token');
-      expect(decathlonApi.createWebhookSubscription).not.toBeCalled();
-      expect(userService.configureDecathlon).toBeCalledTimes(1);
-      expect(userService.configureDecathlon).toBeCalledWith(
+      expect(decathlonApi.exchangeToken).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.exchangeToken).toHaveBeenCalledWith('code');
+      expect(decathlonApi.getUserId).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getUserId).toHaveBeenCalledWith('access_token');
+      expect(decathlonApi.getExistingWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getExistingWebhookSubscription).toHaveBeenCalledWith('access_token');
+      expect(decathlonApi.createWebhookSubscription).not.toHaveBeenCalled();
+      expect(userService.configureDecathlon).toHaveBeenCalledTimes(1);
+      expect(userService.configureDecathlon).toHaveBeenCalledWith(
         1,
         {
           access_token: 'access_token',
@@ -161,10 +165,10 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(userService.configureDecathlon).toBeCalledTimes(1);
-      expect(decathlonApi.getActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(userService.configureDecathlon).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
     });
 
     it('throws if user id cannot be retrieved', async () => {
@@ -184,9 +188,9 @@ describe('Decathlon Service', () => {
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
       ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
 
-      expect(decathlonApi.getUserId).toBeCalledTimes(1);
-      expect(decathlonApi.getExistingWebhookSubscription).not.toBeCalled();
-      expect(decathlonApi.getActivities).not.toBeCalled();
+      expect(decathlonApi.getUserId).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getExistingWebhookSubscription).not.toHaveBeenCalled();
+      expect(decathlonApi.getActivities).not.toHaveBeenCalled();
     });
 
     it('throws if exising webhooks cannot be retrieved', async () => {
@@ -205,8 +209,8 @@ describe('Decathlon Service', () => {
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
       ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
 
-      expect(decathlonApi.getExistingWebhookSubscription).toBeCalledTimes(1);
-      expect(userService.configureDecathlon).not.toBeCalled();
+      expect(decathlonApi.getExistingWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(userService.configureDecathlon).not.toHaveBeenCalled();
     });
 
     it('throws if webhook cannot be setup', async () => {
@@ -226,8 +230,8 @@ describe('Decathlon Service', () => {
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
       ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
 
-      expect(decathlonApi.createWebhookSubscription).toBeCalledTimes(1);
-      expect(userService.configureDecathlon).not.toBeCalled();
+      expect(decathlonApi.createWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(userService.configureDecathlon).not.toHaveBeenCalled();
     });
 
     it('throws if auth cannot be configured', async () => {
@@ -248,8 +252,8 @@ describe('Decathlon Service', () => {
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
       ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
 
-      expect(userService.configureDecathlon).toBeCalledTimes(1);
-      expect(decathlonApi.getActivities).not.toBeCalled();
+      expect(userService.configureDecathlon).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.getActivities).not.toHaveBeenCalled();
     });
 
     it('logs if activity retrieval fails', async () => {
@@ -269,10 +273,10 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(decathlonApi.getActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).not.toBeCalled();
-      expect(log.info).toBeCalledTimes(1);
-      expect(log.info).toBeCalledWith(`Unable to retrieve Decathlon activities for user 1`);
+      expect(decathlonApi.getActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).not.toHaveBeenCalled();
+      expect(log.info).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith(`Unable to retrieve Decathlon activities for user 1`);
     });
   });
 
@@ -284,7 +288,7 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
 
-      expect(userService.getDecathlonInfo).not.toBeCalled();
+      expect(userService.getDecathlonInfo).not.toHaveBeenCalled();
     });
 
     it('throws if no matching auth exists for user', async () => {
@@ -336,15 +340,16 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.deauthorize(1);
 
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
     });
 
     it('warns if no miniature info could be retrieved', async () => {
@@ -367,17 +372,18 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.deauthorize(1);
 
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor decathlon`);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniatures info for user 1 and vendor decathlon`);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
     });
 
     it('warns if miniature could not be deleted', async () => {
@@ -400,18 +406,19 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.deauthorize(1);
 
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
     });
 
     it('deletes miniatures', async () => {
@@ -434,17 +441,18 @@ describe('Decathlon Service', () => {
       const service = new DecathlonService();
       await service.deauthorize(1);
 
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledTimes(1);
-      expect(decathlonApi.deleteWebhookSubscription).toBeCalledWith('webhookId', 'access_token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'decathlon');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.deleteWebhookSubscription).toHaveBeenCalledWith('webhookId', 'access_token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'decathlon');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      expect(userRepository.update).toHaveBeenCalledWith(expect.not.objectContaining({ decathlon: expect.anything() }));
     });
   });
 
@@ -471,8 +479,8 @@ describe('Decathlon Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBe('access_token');
-      expect(userService.getDecathlonInfo).toBeCalledTimes(1);
-      expect(userService.getDecathlonInfo).toBeCalledWith(1);
+      expect(userService.getDecathlonInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getDecathlonInfo).toHaveBeenCalledWith(1);
     });
 
     it('retrieves a new access token if current one is expired', async () => {
@@ -495,10 +503,10 @@ describe('Decathlon Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBe('new_access_token');
-      expect(decathlonApi.refreshAuth).toBeCalledTimes(1);
-      expect(decathlonApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.updateDecathlonAuth).toBeCalledTimes(1);
-      expect(userService.updateDecathlonAuth).toBeCalledWith(1, {
+      expect(decathlonApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.updateDecathlonAuth).toHaveBeenCalledTimes(1);
+      expect(userService.updateDecathlonAuth).toHaveBeenCalledWith(1, {
         access_token: 'new_access_token',
         token_type: 'bearer',
         refresh_token: 'new_refresh_token',
@@ -521,9 +529,9 @@ describe('Decathlon Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBeUndefined();
-      expect(decathlonApi.refreshAuth).toBeCalledTimes(1);
-      expect(decathlonApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.clearDecathlonTokens).toBeCalledTimes(1);
+      expect(decathlonApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(decathlonApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.clearDecathlonTokens).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -538,10 +546,10 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
-        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledWith('userId');
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Decathlon activity creation webhook event for Decathlon user userId couldn't be processed: unable to find matching user in DB`,
         );
       });
@@ -555,10 +563,10 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
-        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledWith('userId');
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Decathlon activity creation webhook event for user 1 couldn't be processed: unable to acquire valid token`,
         );
       });
@@ -582,12 +590,12 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
-        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
-        expect(decathlonApi.getActivity).toBeCalledTimes(1);
-        expect(decathlonApi.getActivity).toBeCalledWith('access_token', 'activityId');
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledWith('userId');
+        expect(decathlonApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(decathlonApi.getActivity).toHaveBeenCalledWith('access_token', 'activityId');
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Decathlon activity creation webhook event for user 1 couldn't be processed: unable to retrieve activity data`,
         );
       });
@@ -619,12 +627,12 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
-        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
-        expect(decathlonApi.getActivity).toBeCalledTimes(1);
-        expect(decathlonApi.getActivity).toBeCalledWith('access_token', 'activityId');
-        expect(userService.addActivities).toBeCalledTimes(1);
-        expect(userService.addActivities).toBeCalledWith(1, {
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledWith('userId');
+        expect(decathlonApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(decathlonApi.getActivity).toHaveBeenCalledWith('access_token', 'activityId');
+        expect(userService.addActivities).toHaveBeenCalledTimes(1);
+        expect(userService.addActivities).toHaveBeenCalledWith(1, {
           vendor: 'decathlon',
           vendorId: 'activityId',
           date: '1970-01-01T00:00:01Z',
@@ -632,8 +640,8 @@ describe('Decathlon Service', () => {
           type: 'Bicycle',
           geojson: { type: 'LineString', coordinates: [[1, 1, 1, 1]] },
         });
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Decathlon activity creation webhook event for user 1 couldn't be processed: unable to insert activity data`,
         );
       });
@@ -665,11 +673,11 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
-        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
-        expect(decathlonApi.getActivity).toBeCalledTimes(1);
-        expect(decathlonApi.getActivity).toBeCalledWith('access_token', 'activityId');
-        expect(userService.addActivities).not.toBeCalled();
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledWith('userId');
+        expect(decathlonApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(decathlonApi.getActivity).toHaveBeenCalledWith('access_token', 'activityId');
+        expect(userService.addActivities).not.toHaveBeenCalled();
       });
 
       it('saves event activity', async () => {
@@ -699,12 +707,12 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(userRepository.findByDecathlonId).toBeCalledTimes(1);
-        expect(userRepository.findByDecathlonId).toBeCalledWith('userId');
-        expect(decathlonApi.getActivity).toBeCalledTimes(1);
-        expect(decathlonApi.getActivity).toBeCalledWith('access_token', 'activityId');
-        expect(userService.addActivities).toBeCalledTimes(1);
-        expect(userService.addActivities).toBeCalledWith(1, {
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledTimes(1);
+        expect(userRepository.findByDecathlonId).toHaveBeenCalledWith('userId');
+        expect(decathlonApi.getActivity).toHaveBeenCalledTimes(1);
+        expect(decathlonApi.getActivity).toHaveBeenCalledWith('access_token', 'activityId');
+        expect(userService.addActivities).toHaveBeenCalledTimes(1);
+        expect(userService.addActivities).toHaveBeenCalledWith(1, {
           vendor: 'decathlon',
           vendorId: 'activityId',
           date: '1970-01-01T00:00:01Z',
@@ -712,7 +720,7 @@ describe('Decathlon Service', () => {
           type: 'Bicycle',
           geojson: { type: 'LineString', coordinates: [[1, 1, 1, 1]] },
         });
-        expect(log.warn).not.toBeCalled();
+        expect(log.warn).not.toHaveBeenCalled();
       });
     });
 
@@ -726,8 +734,8 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_delete', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(log.warn).toBeCalledTimes(1);
-        expect(log.warn).toBeCalledWith(
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(
           `Decathlon activity delete webhook event for activity activityId couldn't be processed: unable to delete activity data in DB`,
         );
       });
@@ -741,7 +749,7 @@ describe('Decathlon Service', () => {
           event: { name: 'activity_delete', ressource_id: 'activityId', event_time: 1 },
         });
 
-        expect(log.warn).not.toBeCalled();
+        expect(log.warn).not.toHaveBeenCalled();
       });
     });
   });

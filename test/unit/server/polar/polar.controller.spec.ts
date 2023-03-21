@@ -7,10 +7,14 @@ import { polarService } from '../../../../src/server/polar/polar.service';
 import { authenticated } from '../../../utils';
 
 describe('Polar Controller', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /polar/exchange-token/:userId', () => {
@@ -69,8 +73,8 @@ describe('Polar Controller', () => {
       );
 
       expect(response.status).toBe(204);
-      expect(polarService.requestAccessTokenAndSetupUser).toBeCalledTimes(1);
-      expect(polarService.requestAccessTokenAndSetupUser).toBeCalledWith(1, 'longenoughcode');
+      expect(polarService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
+      expect(polarService.requestAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
     });
   });
 
@@ -93,7 +97,7 @@ describe('Polar Controller', () => {
       const response = await authenticated(request(app.callback()).post('/polar/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
-      expect(polarService.deauthorize).toBeCalledTimes(1);
+      expect(polarService.deauthorize).toHaveBeenCalledTimes(1);
     });
 
     it('deauthorizes user', async () => {
@@ -102,8 +106,8 @@ describe('Polar Controller', () => {
       const response = await authenticated(request(app.callback()).post('/polar/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
-      expect(polarService.deauthorize).toBeCalledTimes(1);
-      expect(polarService.deauthorize).toBeCalledWith(1);
+      expect(polarService.deauthorize).toHaveBeenCalledTimes(1);
+      expect(polarService.deauthorize).toHaveBeenCalledWith(1);
     });
   });
 
@@ -127,8 +131,8 @@ describe('Polar Controller', () => {
         .send(event);
 
       expect(response.status).toBe(200);
-      expect(polarService.handleWebhookEvent).toBeCalledTimes(1);
-      expect(polarService.handleWebhookEvent).toBeCalledWith(
+      expect(polarService.handleWebhookEvent).toHaveBeenCalledTimes(1);
+      expect(polarService.handleWebhookEvent).toHaveBeenCalledWith(
         event,
         expect.any(String),
         'f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8',

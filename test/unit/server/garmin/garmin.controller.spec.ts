@@ -13,8 +13,12 @@ describe('Garmin Controller', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     await (garminController['keyv'] as Keyv).clear();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('GET /garmin/request-token/:userId', () => {
@@ -92,8 +96,8 @@ describe('Garmin Controller', () => {
         .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
 
       expect(response.status).toBe(204);
-      expect(garminService.requestAccessTokenAndSetupUser).toBeCalledTimes(1);
-      expect(garminService.requestAccessTokenAndSetupUser).toBeCalledWith(
+      expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
+      expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledWith(
         1,
         'oauth_token',
         'tokenSecret',
@@ -140,8 +144,8 @@ describe('Garmin Controller', () => {
       const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
-      expect(garminService.deauthorize).toBeCalledTimes(1);
-      expect(garminService.deauthorize).toBeCalledWith(1);
+      expect(garminService.deauthorize).toHaveBeenCalledTimes(1);
+      expect(garminService.deauthorize).toHaveBeenCalledWith(1);
     });
   });
 
@@ -165,8 +169,8 @@ describe('Garmin Controller', () => {
       const response = await request(app.callback()).post('/garmin/webhook/activities').send(body);
 
       expect(response.status).toBe(200);
-      expect(garminService.handleActivityWebhook).toBeCalledTimes(1);
-      expect(garminService.handleActivityWebhook).toBeCalledWith([]);
+      expect(garminService.handleActivityWebhook).toHaveBeenCalledTimes(1);
+      expect(garminService.handleActivityWebhook).toHaveBeenCalledWith([]);
     });
   });
 
@@ -188,7 +192,7 @@ describe('Garmin Controller', () => {
       const response = await request(app.callback()).post('/garmin/webhook/deauthorize').send(body);
 
       expect(response.status).toBe(200);
-      expect(garminService.handleDeauthorizeWebhook).toBeCalledTimes(1);
+      expect(garminService.handleDeauthorizeWebhook).toHaveBeenCalledTimes(1);
     });
   });
 });

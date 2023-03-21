@@ -2,10 +2,10 @@ import path from 'path';
 
 import knex, { Knex } from 'knex';
 
-(async (): Promise<void> => {
+void (async (): Promise<void> => {
   let connection: Knex | undefined;
   try {
-    connection = await knex({
+    connection = knex({
       client: 'pg',
       connection: {
         host: process.env['DB_HOST'] || 'localhost',
@@ -28,6 +28,6 @@ import knex, { Knex } from 'knex';
   } catch (error: unknown) {
     console.error(error);
   } finally {
-    connection?.destroy();
+    await connection?.destroy();
   }
 })();

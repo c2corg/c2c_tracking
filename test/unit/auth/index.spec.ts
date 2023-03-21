@@ -6,21 +6,25 @@ import { AuthenticatedUserStrategy } from '../../utils';
 
 describe('ensureAuthenticated', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   it('allows authenticated user', async () => {
     passport.use('jwt', AuthenticatedUserStrategy(123));
     const ctx = createMockContext();
-    await ensureAuthenticated(ctx, async () => undefined);
+    await ensureAuthenticated(ctx, () => Promise.resolve(undefined));
     expect(ctx.state).toMatchObject({ user: { id: 123 } });
   });
 
   it('disallows un-authenticated user', async () => {
     passport.use('jwt', AuthenticatedUserStrategy());
     const ctx = createMockContext();
-    await ensureAuthenticated(ctx, async () => undefined);
+    await ensureAuthenticated(ctx, () => Promise.resolve(undefined));
     expect(ctx.state).not.toHaveProperty('user');
   });
 });
@@ -33,7 +37,7 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
         params: { userId: '123' },
       },
     });
-    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
+    await ensureUserFromParamsMatchesAuthUser(ctx, () => Promise.resolve(undefined));
     expect(ctx.status).not.toBe(403);
   });
 
@@ -45,9 +49,9 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
       },
       throw: jest.fn(),
     });
-    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
-    expect(ctx.throw).toBeCalledTimes(1);
-    expect(ctx.throw).toBeCalledWith(403);
+    await ensureUserFromParamsMatchesAuthUser(ctx, () => Promise.resolve(undefined));
+    expect(ctx.throw).toHaveBeenCalledTimes(1);
+    expect(ctx.throw).toHaveBeenCalledWith(403);
   });
 
   it('rejects un-authenticated user', async () => {
@@ -58,8 +62,8 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
       },
       throw: jest.fn(),
     });
-    await ensureUserFromParamsMatchesAuthUser(ctx, async () => undefined);
-    expect(ctx.throw).toBeCalledTimes(1);
-    expect(ctx.throw).toBeCalledWith(403);
+    await ensureUserFromParamsMatchesAuthUser(ctx, () => Promise.resolve(undefined));
+    expect(ctx.throw).toHaveBeenCalledTimes(1);
+    expect(ctx.throw).toHaveBeenCalledWith(403);
   });
 });

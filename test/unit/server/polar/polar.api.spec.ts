@@ -8,8 +8,12 @@ jest.mock('axios');
 describe('Polar API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   describe('exchangeToken', () => {
@@ -21,7 +25,7 @@ describe('Polar API', () => {
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar token exchange request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls polar API', async () => {
@@ -35,8 +39,8 @@ describe('Polar API', () => {
       const api = new PolarApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://polarremote.com/v2/oauth2/token',
         {
           code: 'code',
@@ -67,7 +71,7 @@ describe('Polar API', () => {
       await expect(api.registerUser('token', 1n)).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar register user request]`,
       );
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls polar API', async () => {
@@ -76,8 +80,8 @@ describe('Polar API', () => {
       const api = new PolarApi();
       await api.registerUser('token', 1n);
 
-      expect(axios.post).toBeCalledTimes(1);
-      expect(axios.post).toBeCalledWith(
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
         'https://www.polaraccesslink.com/v3/users',
         { 'member-id': '1' },
         expect.objectContaining({ headers: { Authorization: `Bearer token` } }),
@@ -94,7 +98,7 @@ describe('Polar API', () => {
       await expect(api.deleteUser('token', 1n)).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar delete user request]`,
       );
-      expect(axios.delete).toBeCalledTimes(1);
+      expect(axios.delete).toHaveBeenCalledTimes(1);
     });
 
     it('calls polar API', async () => {
@@ -103,8 +107,8 @@ describe('Polar API', () => {
       const api = new PolarApi();
       await api.deleteUser('token', 1n);
 
-      expect(axios.delete).toBeCalledTimes(1);
-      expect(axios.delete).toBeCalledWith('https://www.polaraccesslink.com/v3/users/1', {
+      expect(axios.delete).toHaveBeenCalledTimes(1);
+      expect(axios.delete).toHaveBeenCalledWith('https://www.polaraccesslink.com/v3/users/1', {
         headers: { Authorization: `Bearer token` },
       });
     });
@@ -119,7 +123,7 @@ describe('Polar API', () => {
       await expect(api.getExercise('token', 'exerciseId')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar delete user request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls polar API', async () => {
@@ -136,8 +140,8 @@ describe('Polar API', () => {
       const api = new PolarApi();
       const result = await api.getExercise('token', 'exerciseId');
 
-      expect(axios.get).toBeCalledTimes(1);
-      expect(axios.get).toBeCalledWith('https://www.polaraccesslink.com/v3/exercises/exerciseId', {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://www.polaraccesslink.com/v3/exercises/exerciseId', {
         headers: { Authorization: `Bearer token` },
       });
       expect(result).toMatchInlineSnapshot(`
@@ -162,7 +166,7 @@ describe('Polar API', () => {
       await expect(api.getExerciseFit('token', 'exerciseId')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Polar getExrciseFIT request]`,
       );
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns FIT', async () => {
@@ -172,7 +176,7 @@ describe('Polar API', () => {
       const result = await api.getExerciseFit('token', 'exerciseId');
 
       expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -183,7 +187,7 @@ describe('Polar API', () => {
       const api = new PolarApi();
 
       await expect(api.createWebhook()).rejects.toMatchInlineSnapshot(`[Error: Error on Polar create webhook request]`);
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls polar API', async () => {
@@ -201,7 +205,7 @@ describe('Polar API', () => {
       const result = await api.createWebhook();
 
       expect(result).toEqual('6a123180-b5a2-4ffe-aa74-4aa03cc3f712');
-      expect(axios.post).toBeCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -212,7 +216,7 @@ describe('Polar API', () => {
       const api = new PolarApi();
 
       await expect(api.getWebhook()).rejects.toMatchInlineSnapshot(`[Error: Error on Polar get webhook request]`);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls polar API', async () => {
@@ -243,7 +247,7 @@ describe('Polar API', () => {
           ],
         }
       `);
-      expect(axios.get).toBeCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
 });

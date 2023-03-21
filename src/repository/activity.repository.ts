@@ -64,7 +64,7 @@ export class ActivityRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    const result = await conn(this.#TABLE).insert(this.activityToRecord(activity), ['id']);
+    const result: Activity[] = await conn(this.#TABLE).insert(this.activityToRecord(activity), ['id']);
     return { ...activity, ...result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
   }
 
@@ -93,7 +93,7 @@ export class ActivityRepository {
         await trx<ActivityRow>(this.#TABLE).update(this.activityToRecord(activity)).where({ id: activity.id });
       }
       if (activitiesToInsert.length) {
-        await trx(this.#TABLE).insert(activitiesToInsert.map(this.activityToRecord));
+        await trx(this.#TABLE).insert(activitiesToInsert.map((activities) => this.activityToRecord(activities)));
       }
       if (activitiesToDelete.length) {
         await trx<ActivityRow>(this.#TABLE)

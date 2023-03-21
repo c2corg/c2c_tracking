@@ -12,9 +12,15 @@ import { userService } from '../../../../src/user.service';
 describe('Suunto Service', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
-    jest.spyOn(log, 'debug').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'info').mockImplementation(() => Promise.resolve());
-    jest.spyOn(log, 'warn').mockImplementation(() => Promise.resolve());
+    jest.spyOn(log, 'debug').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'info').mockImplementation(() => {
+      /* do nothing */
+    });
+    jest.spyOn(log, 'warn').mockImplementation(() => {
+      /* do nothing */
+    });
   });
 
   afterEach(() => {
@@ -36,16 +42,16 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(userService.configureSuunto).toBeCalledTimes(1);
-      expect(userService.configureSuunto).toBeCalledWith(1, {
+      expect(userService.configureSuunto).toHaveBeenCalledTimes(1);
+      expect(userService.configureSuunto).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      expect(suuntoApi.getWorkouts).not.toBeCalled();
-      expect(log.warn).toBeCalledTimes(1);
+      expect(suuntoApi.getWorkouts).not.toHaveBeenCalled();
+      expect(log.warn).toHaveBeenCalledTimes(1);
     });
 
     it('handles activities retrieval failure', async () => {
@@ -63,18 +69,18 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(userService.configureSuunto).toBeCalledTimes(1);
-      expect(userService.configureSuunto).toBeCalledWith(1, {
+      expect(userService.configureSuunto).toHaveBeenCalledTimes(1);
+      expect(userService.configureSuunto).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      expect(suuntoApi.getWorkouts).toBeCalledTimes(1);
-      expect(suuntoApi.getWorkouts).toBeCalledWith('access_token', expect.any(String));
-      expect(userService.addActivities).not.toBeCalled();
-      expect(log.warn).toBeCalledTimes(1);
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledWith('access_token', expect.any(String));
+      expect(userService.addActivities).not.toHaveBeenCalled();
+      expect(log.warn).toHaveBeenCalledTimes(1);
     });
 
     it('handles activities retrieval failure (2)', async () => {
@@ -109,18 +115,18 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(userService.configureSuunto).toBeCalledTimes(1);
-      expect(userService.configureSuunto).toBeCalledWith(1, {
+      expect(userService.configureSuunto).toHaveBeenCalledTimes(1);
+      expect(userService.configureSuunto).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      expect(suuntoApi.getWorkouts).toBeCalledTimes(1);
-      expect(suuntoApi.getWorkouts).toBeCalledWith('access_token', expect.any(String));
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledWith('access_token', expect.any(String));
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'suunto',
         vendorId: '1',
         date: '1970-01-01T01:00:00+01:00',
@@ -137,7 +143,7 @@ describe('Suunto Service', () => {
         heightDiffUp: 1,
         length: 1,
       });
-      expect(log.warn).toBeCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledTimes(1);
     });
 
     it('filters out activities without geometry', async () => {
@@ -172,17 +178,17 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(userService.configureSuunto).toBeCalledTimes(1);
-      expect(userService.configureSuunto).toBeCalledWith(1, {
+      expect(userService.configureSuunto).toHaveBeenCalledTimes(1);
+      expect(userService.configureSuunto).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      expect(suuntoApi.getWorkouts).toBeCalledTimes(1);
-      expect(suuntoApi.getWorkouts).toBeCalledWith('access_token', expect.any(String));
-      expect(userService.addActivities).toBeCalledWith(1);
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledWith('access_token', expect.any(String));
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
     });
 
     it('calls API then setups user', async () => {
@@ -217,18 +223,18 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
 
-      expect(userService.configureSuunto).toBeCalledTimes(1);
-      expect(userService.configureSuunto).toBeCalledWith(1, {
+      expect(userService.configureSuunto).toHaveBeenCalledTimes(1);
+      expect(userService.configureSuunto).toHaveBeenCalledWith(1, {
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      expect(suuntoApi.getWorkouts).toBeCalledTimes(1);
-      expect(suuntoApi.getWorkouts).toBeCalledWith('access_token', expect.any(String));
-      expect(userService.addActivities).toBeCalledTimes(1);
-      expect(userService.addActivities).toBeCalledWith(1, {
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledWith('access_token', expect.any(String));
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+      expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'suunto',
         vendorId: '1',
         date: '1970-01-01T00:00:00Z',
@@ -245,7 +251,7 @@ describe('Suunto Service', () => {
         heightDiffUp: 1,
         length: 1,
       });
-      expect(log.warn).not.toBeCalled();
+      expect(log.warn).not.toHaveBeenCalled();
     });
   });
 
@@ -271,8 +277,8 @@ describe('Suunto Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBe('access_token');
-      expect(userService.getSuuntoInfo).toBeCalledTimes(1);
-      expect(userService.getSuuntoInfo).toBeCalledWith(1);
+      expect(userService.getSuuntoInfo).toHaveBeenCalledTimes(1);
+      expect(userService.getSuuntoInfo).toHaveBeenCalledWith(1);
     });
 
     it('retrieves a new access token if current one is expired', async () => {
@@ -294,10 +300,10 @@ describe('Suunto Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBe('new_access_token');
-      expect(suuntoApi.refreshAuth).toBeCalledTimes(1);
-      expect(suuntoApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.updateSuuntoAuth).toBeCalledTimes(1);
-      expect(userService.updateSuuntoAuth).toBeCalledWith(1, {
+      expect(suuntoApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.updateSuuntoAuth).toHaveBeenCalledTimes(1);
+      expect(userService.updateSuuntoAuth).toHaveBeenCalledWith(1, {
         access_token: 'new_access_token',
         refresh_token: 'new_refresh_token',
         expires_in: 3540,
@@ -319,9 +325,9 @@ describe('Suunto Service', () => {
       const result = await service.getToken(1);
 
       expect(result).toBeUndefined();
-      expect(suuntoApi.refreshAuth).toBeCalledTimes(1);
-      expect(suuntoApi.refreshAuth).toBeCalledWith('refresh_token');
-      expect(userService.clearSuuntoTokens).toBeCalledTimes(1);
+      expect(suuntoApi.refreshAuth).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.refreshAuth).toHaveBeenCalledWith('refresh_token');
+      expect(userService.clearSuuntoTokens).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -330,8 +336,8 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await service.handleWebhookEvent({ username: 'user', workoutid: '1' }, undefined);
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Suunto workout webhook event for Suunto user user couldn't be processed: bad auth`,
       );
     });
@@ -344,8 +350,8 @@ describe('Suunto Service', () => {
         `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Suunto workout webhook event for Suunto user user couldn't be processed: unable to find matching user in DB`,
       );
     });
@@ -363,8 +369,8 @@ describe('Suunto Service', () => {
         `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Suunto workout webhook event for user 1 couldn't be processed: unable to acquire valid token`,
       );
 
@@ -385,8 +391,8 @@ describe('Suunto Service', () => {
         `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Suunto workout webhook event for user 1 couldn't be processed: unable to retrieve activity data`,
       );
 
@@ -423,8 +429,8 @@ describe('Suunto Service', () => {
         `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(
         `Suunto activity update/creation webhook event for user 1 couldn't be processed: unable to upsert activity data`,
       );
 
@@ -460,7 +466,7 @@ describe('Suunto Service', () => {
         `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
-      expect(log.warn).not.toBeCalled();
+      expect(log.warn).not.toHaveBeenCalled();
       expect(userService.addActivities).not.toHaveBeenCalled();
 
       getTokenSpy.mockRestore();
@@ -496,7 +502,7 @@ describe('Suunto Service', () => {
         `Bearer 2fbbd34d-4dc3-44fc-8a47-9ba1bc037d2c`,
       );
 
-      expect(log.warn).not.toBeCalled();
+      expect(log.warn).not.toHaveBeenCalled();
 
       getTokenSpy.mockRestore();
     });
@@ -552,15 +558,15 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
 
-      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
-      expect(suuntoApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(suuntoApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -602,17 +608,17 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
 
-      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
-      expect(suuntoApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed retrieving miniatures info for user 1 and vendor suunto`);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(miniatureService.deleteMiniature).not.toBeCalled();
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(suuntoApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed retrieving miniatures info for user 1 and vendor suunto`);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -654,18 +660,18 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
 
-      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
-      expect(suuntoApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(log.warn).toBeCalledTimes(1);
-      expect(log.warn).toBeCalledWith(`Failed deleting miniature miniature.png`);
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(suuntoApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.warn).toHaveBeenCalledWith(`Failed deleting miniature miniature.png`);
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -707,16 +713,16 @@ describe('Suunto Service', () => {
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
 
-      expect(suuntoApi.deauthorize).toBeCalledTimes(1);
-      expect(suuntoApi.deauthorize).toBeCalledWith('token');
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.getMiniaturesByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledTimes(1);
-      expect(activityRepository.deleteByUserAndVendor).toBeCalledWith(1, 'suunto');
-      expect(miniatureService.deleteMiniature).toBeCalledTimes(1);
-      expect(miniatureService.deleteMiniature).toBeCalledWith('miniature.png');
-      expect(userRepository.update).toBeCalledTimes(1);
-      expect(userRepository.update).toBeCalledWith({
+      expect(suuntoApi.deauthorize).toHaveBeenCalledTimes(1);
+      expect(suuntoApi.deauthorize).toHaveBeenCalledWith('token');
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'suunto');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
+      expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
           id: 1,
@@ -725,7 +731,7 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
       });
-      expect(log.warn).not.toBeCalled();
+      expect(log.warn).not.toHaveBeenCalled();
 
       getTokenSpy.mockRestore();
     });

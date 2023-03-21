@@ -6,7 +6,8 @@ import isUUID from 'validator/lib/isUUID';
 
 convict.addFormats({
   baseUrl: {
-    coerce: (v) => v.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    coerce: (v: any) => v.toString(),
     validate: (value: string) => {
       if (!isUrl(value, { require_tld: false, require_protocol: false })) {
         throw new Error('must be a URL');
@@ -17,7 +18,8 @@ convict.addFormats({
     },
   },
   uuid4: {
-    coerce: (v) => v.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    coerce: (v: any) => v.toString(),
     validate: (value: string) => {
       if (!isUUID(value, 4)) {
         throw new Error('must be a UUID version 4');
@@ -25,7 +27,8 @@ convict.addFormats({
     },
   },
   base64: {
-    coerce: (v) => v.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    coerce: (v: any) => v.toString(),
     validate: (value: string) => {
       if (!value.trim().length || !isBase64(value)) {
         throw new Error('must be a non-empty base64 string');
@@ -33,7 +36,8 @@ convict.addFormats({
     },
   },
   strongPassword: {
-    coerce: (v) => v.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    coerce: (v: any) => v.toString(),
     validate: (value: string) => {
       if (!isStrongPassword(value)) {
         throw new Error('must be a strong password');
@@ -41,7 +45,8 @@ convict.addFormats({
     },
   },
   notEmptyString: {
-    coerce: (v) => v.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    coerce: (v: any) => v.toString(),
     validate: (value: string) => {
       if (!value.trim().length) {
         throw new Error('must be a non-empty string');
@@ -49,7 +54,8 @@ convict.addFormats({
     },
   },
   storageBackend: {
-    coerce: (v) => v.toString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
+    coerce: (v: any) => v.toString(),
     validate: (value: string) => {
       if (!['s3', 'local'].includes(value.trim().toLocaleLowerCase())) {
         throw new Error('must be one of local and s3');
