@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/c2corg/c2c_tracking#readme",
   "dependencies": {
-    "@aws-sdk/client-s3": "3.301.0",
+    "@aws-sdk/client-s3": "3.303.0",
     "@c2corg/fit-parser-extract-geometry": "1.0.0",
     "@keyv/redis": "2.5.6",
     "@koa/cors": "4.0.0",
