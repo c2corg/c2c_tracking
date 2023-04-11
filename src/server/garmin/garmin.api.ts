@@ -2,7 +2,7 @@ import { createHmac, randomBytes } from 'crypto';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 import { z } from 'zod';
 
 import config from '../../config.js';
@@ -143,8 +143,6 @@ export const GarminActivity = z.object({
   samples: z.array(GarminSample).optional(),
 });
 export type GarminActivity = z.infer<typeof GarminActivity>;
-
-dayjs.extend(dayjsPluginUTC);
 
 export class GarminApi {
   private readonly oauthUrl = 'https://connectapi.garmin.com/oauth-service/';

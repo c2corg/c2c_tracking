@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 
 import { NotFoundError } from '../../errors.js';
 import log from '../../helpers/logger.js';

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import dayjsPluginTimezone from 'dayjs/plugin/timezone';
+import dayjsPluginTimezone from 'dayjs/plugin/timezone.js';
 import dayjsPluginUtc from 'dayjs/plugin/utc';
 import type { SetNonNullable, SetRequired } from 'type-fest';
 

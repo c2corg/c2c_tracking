@@ -1,7 +1,7 @@
 import { createHmac } from 'crypto';
 
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+import duration from 'dayjs/plugin/duration.js';
 import { parse } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
 
