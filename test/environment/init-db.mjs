@@ -1,6 +1,9 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import knex from 'knex';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 void (async () => {
   let connection;

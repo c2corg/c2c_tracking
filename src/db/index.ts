@@ -1,9 +1,12 @@
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import { type AsyncResultCallback, retry } from 'async';
+import { retry, type AsyncResultCallback } from 'async';
 import knex, { Knex } from 'knex';
 
 import config from '../config.js';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 export type Configuration = {
   host: string;
