@@ -19,14 +19,14 @@ import { userService } from '../../user.service';
 
 import {
   Activity,
-  StravaAuth,
-  stravaApi,
-  WebhookEvent,
   AltitudeStream,
   DistanceStream,
   LatLngStream,
+  StravaAuth,
   StreamSet,
   TimeStream,
+  WebhookEvent,
+  stravaApi,
 } from './strava.api';
 
 dayjs.extend(dayjsPluginUTC);
@@ -171,7 +171,7 @@ export class StravaService {
       throw new NotFoundError('Available data cannot be converted to a valid geometry');
     }
 
-    const layout = !!altStream ? (!!timeStream ? 'XYZM' : 'XYZ') : !!timeStream ? 'XYM' : 'XY';
+    const layout = altStream ? (timeStream ? 'XYZM' : 'XYZ') : timeStream ? 'XYM' : 'XY';
     const coordinates: number[][] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
       // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion

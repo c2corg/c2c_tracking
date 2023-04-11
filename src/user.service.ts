@@ -48,17 +48,17 @@ export class UserService {
     const { strava, suunto, garmin, decathlon, polar, coros } = (await userRepository.findById(c2cId)) || {};
     return {
       ...(stravaEnabled && {
-        strava: !!strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+        strava: strava ? (strava.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
       }),
       ...(suuntoEnabled && {
-        suunto: !!suunto ? (suunto.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+        suunto: suunto ? (suunto.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
       }),
-      ...(garminEnabled && { garmin: !!garmin ? 'configured' : 'not-configured' }),
+      ...(garminEnabled && { garmin: garmin ? 'configured' : 'not-configured' }),
       ...(decathlonEnabled && {
-        decathlon: !!decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
+        decathlon: decathlon ? (decathlon.refreshToken ? 'configured' : 'token-lost') : 'not-configured',
       }),
-      ...(polarEnabled && { polar: !!polar ? 'configured' : 'not-configured' }),
-      ...(corosEnabled && { coros: !!coros ? 'configured' : 'not-configured' }),
+      ...(polarEnabled && { polar: polar ? 'configured' : 'not-configured' }),
+      ...(corosEnabled && { coros: coros ? 'configured' : 'not-configured' }),
     };
   }
 
