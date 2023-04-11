@@ -1,6 +1,6 @@
 import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
-import aes from 'crypto-js/aes';
-import encUtf8 from 'crypto-js/enc-utf8';
+import aes from 'crypto-js/aes.js';
+import encUtf8 from 'crypto-js/enc-utf8.js';
 import { parse } from 'iso8601-duration';
 import type { Except } from 'type-fest';
 
