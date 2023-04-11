@@ -1,11 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { LocalStorage } from '../../../src/storage/storage.js';
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';
 // eslint-disable-next-line security/detect-non-literal-fs-filename

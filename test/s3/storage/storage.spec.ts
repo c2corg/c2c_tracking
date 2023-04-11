@@ -1,14 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { ObjectCannedACL } from '@aws-sdk/client-s3';
 import request from 'supertest';
 
 import config from '../../../src/config';
 import { S3Storage } from '../../../src/storage/storage';
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';
 // eslint-disable-next-line security/detect-non-literal-fs-filename

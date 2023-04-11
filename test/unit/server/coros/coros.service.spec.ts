@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import log from '../../../../src/helpers/logger.js';
 import { miniatureService } from '../../../../src/miniature.service';
@@ -9,8 +8,6 @@ import { userRepository } from '../../../../src/repository/user.repository';
 import { corosApi, WebhookEvent } from '../../../../src/server/coros/coros.api';
 import { CorosService } from '../../../../src/server/coros/coros.service';
 import { userService } from '../../../../src/user.service';
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const FAR_FUTURE = 10000000000;
 
