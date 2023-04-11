@@ -1,4 +1,4 @@
-import { database as db } from '../../../src/db';
+import { database as db } from '../../../src/db/index.js';
 import { StravaRepository } from '../../../src/repository/strava.repository.js';
 
 describe('Strava Repository', () => {

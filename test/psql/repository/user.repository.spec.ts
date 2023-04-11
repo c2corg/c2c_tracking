@@ -1,4 +1,4 @@
-import { database as db } from '../../../src/db';
+import { database as db } from '../../../src/db/index.js';
 import type { User } from '../../../src/repository/user.js';
 import { UserRepository } from '../../../src/repository/user.repository.js';
 

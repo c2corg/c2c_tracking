@@ -1,7 +1,7 @@
 import type { Except } from 'type-fest';
 
 import config from '../config.js';
-import { database as db } from '../db';
+import { database as db } from '../db/index.js';
 import { IOError, NotFoundError } from '../errors.js';
 
 import type { Activity, Vendor } from './activity.js';

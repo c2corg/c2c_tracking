@@ -7,9 +7,9 @@ import watch from 'node-watch';
 
 import { app } from './app.js';
 import config from './config.js';
-import { database as db } from './db';
+import { database as db } from './db/index.js';
 import log from './helpers/logger.js';
-import { metricsKoa } from './metrics';
+import { metricsKoa } from './metrics/index.js';
 import { polarService } from './server/polar/polar.service.js';
 import { stravaService } from './server/strava/strava.service.js';
 

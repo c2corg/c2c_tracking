@@ -1,4 +1,4 @@
-import { database as db } from '../../../src/db';
+import { database as db } from '../../../src/db/index.js';
 import { PolarRepository } from '../../../src/repository/polar.repository.js';
 
 describe('Polar Repository', () => {

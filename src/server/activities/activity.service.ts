@@ -1,7 +1,7 @@
 import type { Except } from 'type-fest';
 
 import { NotFoundError } from '../../errors.js';
-import { Lang, translations } from '../../helpers/i18n';
+import { Lang, translations } from '../../helpers/i18n/index.js';
 import type { Activity } from '../../repository/activity.js';
 import type { LineString } from '../../repository/geojson.js';
 import { userService } from '../../user.service.js';
