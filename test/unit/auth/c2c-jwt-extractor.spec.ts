@@ -1,6 +1,6 @@
 import { createRequest } from 'node-mocks-http';
 
-import c2cJwtExtractor from '../../../src/auth/c2c-jwt-extractor';
+import c2cJwtExtractor from '../../../src/auth/c2c-jwt-extractor.js';
 
 describe('c2cJwtExtractor', () => {
   it('retrieves token from header (v6_api way)', () => {

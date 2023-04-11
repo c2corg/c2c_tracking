@@ -1,6 +1,6 @@
-import config from '../config';
+import config from '../config.js';
 import { database as db } from '../db';
-import { IOError } from '../errors';
+import { IOError } from '../errors.js';
 
 type StravaRow = {
   id: number;

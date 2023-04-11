@@ -1,18 +1,22 @@
 import dayjs from 'dayjs';
 
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { NotFoundError } from '../../errors.js';
+import log from '../../helpers/logger.js';
+import {
+  promTokenRenewalErrorsCounter,
+  promWebhookCounter,
+  promWebhookErrorsCounter,
+} from '../../metrics/prometheus.js';
 import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry, Vendor } from '../../repository/activity.js';
 import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import type { DecathlonInfo } from '../../repository/user';
+import type { LineString } from '../../repository/geojson.js';
+import type { DecathlonInfo } from '../../repository/user.js';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
 import { Activity, decathlonApi, DecathlonAuth, WebhookEvent } from './decathlon.api';
-import { sports } from './sports';
+import { sports } from './sports.js';
 
 export class DecathlonService {
   public async requestShortLivedAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {

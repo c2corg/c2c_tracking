@@ -2,10 +2,10 @@ import { encode } from '@mapbox/polyline';
 import { createId } from '@paralleldrive/cuid2';
 import axios from 'axios';
 
-import config from './config';
-import { simplify } from './helpers/simplify';
-import type { LineString } from './repository/geojson';
-import { storage } from './storage/storage';
+import config from './config.js';
+import { simplify } from './helpers/simplify.js';
+import type { LineString } from './repository/geojson.js';
+import { storage } from './storage/storage.js';
 
 const miniatureSize = config.get('miniatures.size');
 const mapboxToken = config.get('miniatures.mapbox.token');

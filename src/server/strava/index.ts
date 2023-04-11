@@ -1,7 +1,7 @@
 import Router from '@koa/router';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { validate } from '../validator.js';
 
 import { controller } from './strava.controller';
 import { exchangeToken, webhook, webhookSubscription } from './strava.validators';

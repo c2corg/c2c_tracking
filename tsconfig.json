@@ -1,11 +1,12 @@
 {
-  "extends": "@tsconfig/node18-strictest/tsconfig.json",
+  "extends": ["@tsconfig/strictest/tsconfig.json", "@tsconfig/node18/tsconfig.json", "@tsconfig/esm/tsconfig.json"],
   "compilerOptions": {
     "baseUrl": "./",
     "rootDir": "./src",
     "outDir": "./dist",
     "resolveJsonModule": true,
-    "useUnknownInCatchVariables": true
+    "useUnknownInCatchVariables": true,
+    "sourceMap": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,10 +1,10 @@
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
+import { app } from '../../../../src/app.js';
+import log from '../../../../src/helpers/logger.js';
 import type { WebhookEvent } from '../../../../src/server/coros/coros.api';
 import { corosService } from '../../../../src/server/coros/coros.service';
-import { authenticated } from '../../../utils';
+import { authenticated } from '../../../utils.js';
 
 describe('Coros Controller', () => {
   beforeEach(() => {

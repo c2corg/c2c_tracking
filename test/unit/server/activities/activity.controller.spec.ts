@@ -1,9 +1,9 @@
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
+import { app } from '../../../../src/app.js';
+import log from '../../../../src/helpers/logger.js';
 import { activityService } from '../../../../src/server/activities/activity.service';
-import { authenticated } from '../../../utils';
+import { authenticated } from '../../../utils.js';
 
 describe('Activities Controller', () => {
   beforeEach(() => {

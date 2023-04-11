@@ -2,8 +2,8 @@ import axios from 'axios';
 import isISO8601 from 'validator/lib/isISO8601';
 import { z } from 'zod';
 
-import config from '../../config';
-import { handleExternalApiError } from '../../helpers/error';
+import config from '../../config.js';
+import { handleExternalApiError } from '../../helpers/error.js';
 
 export const Athlete = z.object({
   id: z.number().int().positive(),

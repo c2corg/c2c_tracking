@@ -1,8 +1,8 @@
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
+import { app } from '../../../../src/app.js';
 import type { Status } from '../../../../src/health.service';
-import { semverRegex } from '../../../../src/helpers/utils';
+import { semverRegex } from '../../../../src/helpers/utils.js';
 
 describe('GET /health', () => {
   it('responds without authentication', async () => {

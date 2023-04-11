@@ -1,4 +1,4 @@
-import log from '../../../../src/helpers/logger';
+import log from '../../../../src/helpers/logger.js';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { userRepository } from '../../../../src/repository/user.repository';

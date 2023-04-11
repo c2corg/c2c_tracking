@@ -1,6 +1,6 @@
 import type { Context } from 'koa';
 
-import { NotFoundError } from '../../errors';
+import { NotFoundError } from '../../errors.js';
 import type { Lang } from '../../helpers/i18n';
 
 import { activityService as service } from './activity.service';

@@ -1,5 +1,5 @@
-import { NotFoundError } from '../../../../src/errors';
-import log from '../../../../src/helpers/logger';
+import { NotFoundError } from '../../../../src/errors.js';
+import log from '../../../../src/helpers/logger.js';
 import { ActivityService } from '../../../../src/server/activities/activity.service';
 import { stravaService } from '../../../../src/server/strava/strava.service';
 import { suuntoService } from '../../../../src/server/suunto/suunto.service';

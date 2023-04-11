@@ -1,4 +1,4 @@
-import log from './helpers/logger';
+import log from './helpers/logger.js';
 
 export class AppError extends Error {
   constructor(public readonly code: number, message?: string, cause?: Error, public readonly body?: string) {

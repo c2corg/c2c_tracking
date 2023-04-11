@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ValidationSchema } from '../validator';
+import type { ValidationSchema } from '../validator.js';
 
 import { GarminActivity } from './garmin.api';
 

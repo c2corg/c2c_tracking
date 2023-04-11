@@ -1,6 +1,6 @@
 import Router from '@koa/router';
 
-import { validate } from '../validator';
+import { validate } from '../validator.js';
 
 import { controller } from './activity.controller';
 import { activities } from './activity.validators';

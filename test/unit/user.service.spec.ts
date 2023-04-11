@@ -1,7 +1,7 @@
-import { NotFoundError } from '../../src/errors';
-import log from '../../src/helpers/logger';
+import { NotFoundError } from '../../src/errors.js';
+import log from '../../src/helpers/logger.js';
 import { miniatureService } from '../../src/miniature.service';
-import type { Activity } from '../../src/repository/activity';
+import type { Activity } from '../../src/repository/activity.js';
 import { activityRepository } from '../../src/repository/activity.repository';
 import { userRepository } from '../../src/repository/user.repository';
 import type { CorosAuth } from '../../src/server/coros/coros.api';

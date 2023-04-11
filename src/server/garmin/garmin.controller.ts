@@ -2,7 +2,7 @@ import KeyvRedis from '@keyv/redis';
 import Keyv from 'keyv';
 import type { Context } from 'koa';
 
-import config from '../../config';
+import config from '../../config.js';
 
 import type { GarminActivity } from './garmin.api';
 import { garminService as service } from './garmin.service';

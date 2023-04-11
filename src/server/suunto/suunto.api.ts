@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { z } from 'zod';
 
-import config from '../../config';
-import { handleExternalApiError } from '../../helpers/error';
-import log from '../../helpers/logger';
+import config from '../../config.js';
+import { handleExternalApiError } from '../../helpers/error.js';
+import log from '../../helpers/logger.js';
 
 export const SuuntoAuth = z.object({
   access_token: z.string().min(10).max(5000),

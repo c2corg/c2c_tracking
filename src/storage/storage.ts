@@ -1,6 +1,6 @@
-import fs, { constants, promises as fsPromises } from 'fs';
-import path from 'path';
-import type { Readable } from 'stream';
+import fs, { constants, promises as fsPromises } from 'node:fs';
+import path from 'node:path';
+import type { Readable } from 'node:stream';
 
 import {
   DeleteObjectCommand,
@@ -9,7 +9,7 @@ import {
   ObjectCannedACL,
   PutObjectCommand,
   S3Client,
-  S3ClientConfig,
+  type S3ClientConfig,
 } from '@aws-sdk/client-s3';
 import sanitize from 'sanitize-filename';
 import type { SetRequired } from 'type-fest';

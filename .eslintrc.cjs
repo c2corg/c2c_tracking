@@ -9,8 +9,6 @@ module.exports = {
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
     'plugin:node/recommended',
-    'plugin:import/recommended',
-    'plugin:import/typescript',
     'plugin:security/recommended',
     'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
@@ -24,17 +22,6 @@ module.exports = {
     'node/no-missing-import': 'off',
     'node/no-unpublished-import': ['error', { allowModules: ['type-fest'] }],
     'node/no-unsupported-features/es-syntax': 'off',
-    'import/no-named-as-default-member': 'off',
-    'import/order': [
-      'error',
-      {
-        'newlines-between': 'always',
-        alphabetize: {
-          order: 'asc',
-          caseInsensitive: false,
-        },
-      },
-    ],
     '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'error',

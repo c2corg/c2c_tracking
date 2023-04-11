@@ -4,9 +4,9 @@ import isURL from 'validator/lib/isURL';
 import isUUID from 'validator/lib/isUUID';
 import { z } from 'zod';
 
-import config from '../../config';
-import { handleExternalApiError } from '../../helpers/error';
-import { isISO8601Duration } from '../../helpers/utils';
+import config from '../../config.js';
+import { handleExternalApiError } from '../../helpers/error.js';
+import { isISO8601Duration } from '../../helpers/utils.js';
 
 const PolarAuth = z.object({
   access_token: z.string().min(10).max(100),

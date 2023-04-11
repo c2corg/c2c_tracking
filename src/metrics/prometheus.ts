@@ -1,6 +1,6 @@
 import { collectDefaultMetrics, Counter, Gauge, register, Summary } from 'prom-client';
 
-import config from '../config';
+import config from '../config.js';
 
 register.setDefaultLabels({ service: 'c2c_tracking' });
 

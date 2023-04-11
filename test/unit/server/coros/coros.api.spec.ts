@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import log from '../../../../src/helpers/logger';
+import log from '../../../../src/helpers/logger.js';
 import { CorosApi, CorosAuth, WorkoutRecord, WorkoutRecords } from '../../../../src/server/coros/coros.api';
 
 jest.mock('axios');

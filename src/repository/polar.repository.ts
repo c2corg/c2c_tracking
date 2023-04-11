@@ -1,7 +1,7 @@
-import config from '../config';
+import config from '../config.js';
 import { database as db } from '../db';
-import { IOError } from '../errors';
-import { encrypt, decrypt } from '../helpers/utils';
+import { IOError } from '../errors.js';
+import { encrypt, decrypt } from '../helpers/utils.js';
 
 type PolarRow = {
   id: number;

@@ -1,7 +1,7 @@
 import JSONBig from 'json-bigint';
 
-import log from '../../../../src/helpers/logger';
-import * as utils from '../../../../src/helpers/utils';
+import log from '../../../../src/helpers/logger.js';
+import * as utils from '../../../../src/helpers/utils.js';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { polarRepository } from '../../../../src/repository/polar.repository';

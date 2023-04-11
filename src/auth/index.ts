@@ -2,10 +2,10 @@ import type { Context, Middleware } from 'koa';
 import passport from 'koa-passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 
-import config from '../config';
+import config from '../config.js';
 
-import c2cJwtExtractor from './c2c-jwt-extractor';
-import verify from './c2c-jwt-verify';
+import c2cJwtExtractor from './c2c-jwt-extractor.js';
+import verify from './c2c-jwt-verify.js';
 
 const ensureAuthenticated: Middleware = (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
   passport.authenticate('jwt', { session: false })(ctx, next);

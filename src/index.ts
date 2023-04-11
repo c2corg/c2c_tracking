@@ -1,14 +1,14 @@
 import './dotenv';
 
-import type { Server } from 'http';
+import type { Server } from 'node:http';
 
-import { ErrorCallback, retry } from 'async';
+import { type ErrorCallback, retry } from 'async';
 import watch from 'node-watch';
 
-import { app } from './app';
-import config from './config';
+import { app } from './app.js';
+import config from './config.js';
 import { database as db } from './db';
-import log from './helpers/logger';
+import log from './helpers/logger.js';
 import { metricsKoa } from './metrics';
 import { polarService } from './server/polar/polar.service';
 import { stravaService } from './server/strava/strava.service';

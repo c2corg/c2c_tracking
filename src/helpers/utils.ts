@@ -4,8 +4,8 @@ import encUtf8 from 'crypto-js/enc-utf8';
 import { parse } from 'iso8601-duration';
 import type { Except } from 'type-fest';
 
-import config from '../config';
-import type { LineString } from '../repository/geojson';
+import config from '../config.js';
+import type { LineString } from '../repository/geojson.js';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Except<T, K>;
 

@@ -1,7 +1,7 @@
 import Router from '@koa/router';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { validate } from '../validator.js';
 
 import { controller } from './garmin.controller';
 import { activityWebhook, deauthorizeWebhook, exchangeToken } from './garmin.validators';

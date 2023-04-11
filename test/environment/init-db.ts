@@ -1,6 +1,6 @@
-import path from 'path';
+import path from 'node:path';
 
-import knex, { Knex } from 'knex';
+import knex, { type Knex } from 'knex';
 
 void (async (): Promise<void> => {
   let connection: Knex | undefined;

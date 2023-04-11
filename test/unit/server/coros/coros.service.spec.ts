@@ -1,7 +1,7 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-import log from '../../../../src/helpers/logger';
+import log from '../../../../src/helpers/logger.js';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
 import { userRepository } from '../../../../src/repository/user.repository';
@@ -52,6 +52,7 @@ describe('Coros Service', () => {
           },
         ],
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
@@ -330,6 +331,7 @@ describe('Coros Service', () => {
           },
         ],
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
@@ -645,6 +647,7 @@ describe('Coros Service', () => {
       jest
         .spyOn(userRepository, 'findByCorosId')
         .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockRejectedValueOnce('error');
@@ -683,6 +686,7 @@ describe('Coros Service', () => {
       jest
         .spyOn(userRepository, 'findByCorosId')
         .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());

@@ -1,10 +1,11 @@
-import { readFileSync } from 'fs';
-import { tmpdir } from 'os';
-import { resolve } from 'path';
+import { readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
 
-import { LocalStorage } from '../../../src/storage/storage';
+import { LocalStorage } from '../../../src/storage/storage.js';
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';
+// eslint-disable-next-line security/detect-non-literal-fs-filename
 const buffer = readFileSync(resolve(__dirname, '../../resources/piano.png'));
 
 describe('Local storage', () => {

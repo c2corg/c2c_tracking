@@ -1,9 +1,9 @@
 import type { Except } from 'type-fest';
 
-import { NotFoundError } from '../../errors';
+import { NotFoundError } from '../../errors.js';
 import { Lang, translations } from '../../helpers/i18n';
-import type { Activity } from '../../repository/activity';
-import type { LineString } from '../../repository/geojson';
+import type { Activity } from '../../repository/activity.js';
+import type { LineString } from '../../repository/geojson.js';
 import { userService } from '../../user.service';
 
 export class ActivityService {

@@ -1,5 +1,5 @@
 import { database as db } from '../../../src/db';
-import type { User } from '../../../src/repository/user';
+import type { User } from '../../../src/repository/user.js';
 import { UserRepository } from '../../../src/repository/user.repository';
 
 describe('User Repository', () => {

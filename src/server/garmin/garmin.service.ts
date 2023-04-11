@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
 import dayjsPluginUTC from 'dayjs/plugin/utc';
 
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
+import { NotFoundError } from '../../errors.js';
+import log from '../../helpers/logger.js';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.js';
 import { miniatureService } from '../../miniature.service';
-import { hasGeometry, NewActivity, NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import { hasGeometry, type NewActivity, type NewActivityWithGeometry, Vendor } from '../../repository/activity.js';
 import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import type { GarminInfo } from '../../repository/user';
+import type { LineString } from '../../repository/geojson.js';
+import type { GarminInfo } from '../../repository/user.js';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 

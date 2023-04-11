@@ -1,10 +1,10 @@
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
+import { app } from '../../../../src/app.js';
+import log from '../../../../src/helpers/logger.js';
 import type { WebhookEvent } from '../../../../src/server/decathlon/decathlon.api';
 import { decathlonService } from '../../../../src/server/decathlon/decathlon.service';
-import { authenticated } from '../../../utils';
+import { authenticated } from '../../../utils.js';
 
 describe('Decathlon Controller', () => {
   beforeEach(() => {

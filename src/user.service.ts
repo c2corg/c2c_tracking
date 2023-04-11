@@ -1,13 +1,13 @@
 import dayjs from 'dayjs';
 
-import config from './config';
-import { NotFoundError } from './errors';
-import log from './helpers/logger';
-import type { Optional } from './helpers/utils';
+import config from './config.js';
+import { NotFoundError } from './errors.js';
+import log from './helpers/logger.js';
+import type { Optional } from './helpers/utils.js';
 import { miniatureService } from './miniature.service';
-import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity';
+import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity.js';
 import { activityRepository } from './repository/activity.repository';
-import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
+import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user.js';
 import { userRepository } from './repository/user.repository';
 import type { CorosAuth } from './server/coros/coros.api';
 import type { DecathlonAuth } from './server/decathlon/decathlon.api';
