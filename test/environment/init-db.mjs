@@ -23,7 +23,10 @@ void (async () => {
     await connection.schema.dropSchemaIfExists('public', true);
     await connection.schema.createSchema('public');
 
-    await connection.migrate.latest({ directory: path.resolve(__dirname, '../../src/db/migrations') });
+    await connection.migrate.latest({
+      directory: path.resolve(__dirname, '../../src/db/migrations'),
+      loadExtensions: ['.mjs'],
+    });
 
     await connection('users').insert({ c2c_id: 1 });
     await connection('users').insert({ c2c_id: 2 });
