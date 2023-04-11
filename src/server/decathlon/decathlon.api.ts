@@ -1,5 +1,5 @@
 import axios from 'axios';
-import isISO8601 from 'validator/lib/isISO8601';
+import validator from 'validator';
 import { z } from 'zod';
 
 import config from '../../config.js';
@@ -20,7 +20,7 @@ export const Activity = z.object({
   id: z.string().min(5).max(100),
   name: z.string().max(100).optional(),
   sport: z.string().regex(/^\/v2\/sports\/\d+$/),
-  startdate: z.string().refine(isISO8601, {
+  startdate: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
   duration: z.number().nonnegative().optional(),

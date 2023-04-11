@@ -1,8 +1,7 @@
 import { createHmac } from 'crypto';
 
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration.js';
-import { parse } from 'iso8601-duration';
+import { parse, toSeconds } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
 
 import { NotFoundError } from '../../errors.js';
@@ -18,8 +17,6 @@ import { userRepository } from '../../repository/user.repository.js';
 import { userService } from '../../user.service.js';
 
 import { WebhookEvent, isWebhookPingEvent, polarApi, type Exercise } from './polar.api.js';
-
-dayjs.extend(duration);
 
 export class PolarService {
   public async requestAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
@@ -171,30 +168,33 @@ export class PolarService {
   }
 
   private asRepositoryActivity(exercise: Exercise, geojson: LineString): NewActivityWithGeometry {
+    const startDate = this.localDate(exercise);
     return {
       vendor: 'polar' as Vendor,
       vendorId: exercise.id,
-      date: this.localDate(exercise),
+      date: startDate,
       type: exercise.sport,
       geojson,
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
-      ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API
+      ...(exercise.duration && { duration: this.duration(exercise.duration, dayjs(startDate).toDate()) }), // ISO8601 duration in Polar API
     };
   }
 
   private localDate(exercise: Exercise): string {
     const isNegative = exercise.start_time_utc_offset < 0;
-    const offset = dayjs
-      .duration({
-        hours: Math.floor(Math.abs(exercise.start_time_utc_offset) / 60),
-        minutes: Math.abs(exercise.start_time_utc_offset) % 60,
-      })
-      .format('HH:mm');
-    return exercise.start_time + (isNegative ? '-' : '+') + offset;
+    const hours = Math.floor(Math.abs(exercise.start_time_utc_offset) / 60);
+    const minutes = Math.abs(exercise.start_time_utc_offset) % 60;
+    return (
+      exercise.start_time +
+      (isNegative ? '-' : '+') +
+      hours.toString().padStart(2, '0') +
+      ':' +
+      minutes.toString().padStart(2, '0')
+    );
   }
 
-  private duration(duration: string): number {
-    return Math.round(dayjs.duration(parse(duration)).asSeconds());
+  private duration(duration: string, startDate: Date): number {
+    return Math.round(toSeconds(parse(duration), startDate));
   }
 }
 

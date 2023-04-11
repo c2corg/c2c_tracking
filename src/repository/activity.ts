@@ -1,5 +1,5 @@
 import type { Except, SetOptional, SetRequired } from 'type-fest';
-import isISO8601 from 'validator/lib/isISO8601';
+import validator from 'validator';
 import { z } from 'zod';
 
 import { LineString } from './geojson.js';
@@ -12,7 +12,7 @@ export const Activity = z.object({
   userId: z.number().int().positive(),
   vendor: Vendor,
   vendorId: z.string().min(1),
-  date: z.string().refine(isISO8601, {
+  date: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
   name: z.string().min(1).optional(),
