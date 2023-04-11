@@ -1,15 +1,12 @@
 import convict from 'convict';
-import isBase64 from 'validator/es/lib/isBase64';
-import isStrongPassword from 'validator/es/lib/isStrongPassword';
-import isUrl from 'validator/es/lib/isURL';
-import isUUID from 'validator/es/lib/isUUID';
+import validator from 'validator';
 
 convict.addFormats({
   baseUrl: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     coerce: (v: any) => v.toString(),
     validate: (value: string) => {
-      if (!isUrl(value, { require_tld: false, require_protocol: false })) {
+      if (!validator.isURL(value, { require_tld: false, require_protocol: false })) {
         throw new Error('must be a URL');
       }
       if (!value.endsWith('/')) {
@@ -21,7 +18,7 @@ convict.addFormats({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     coerce: (v: any) => v.toString(),
     validate: (value: string) => {
-      if (!isUUID(value, 4)) {
+      if (!validator.isUUID(value, 4)) {
         throw new Error('must be a UUID version 4');
       }
     },
@@ -30,7 +27,7 @@ convict.addFormats({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     coerce: (v: any) => v.toString(),
     validate: (value: string) => {
-      if (!value.trim().length || !isBase64(value)) {
+      if (!value.trim().length || !validator.isBase64(value)) {
         throw new Error('must be a non-empty base64 string');
       }
     },
@@ -39,7 +36,7 @@ convict.addFormats({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call
     coerce: (v: any) => v.toString(),
     validate: (value: string) => {
-      if (!isStrongPassword(value)) {
+      if (!validator.isStrongPassword(value)) {
         throw new Error('must be a strong password');
       }
     },
