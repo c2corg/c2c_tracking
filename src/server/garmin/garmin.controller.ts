@@ -4,8 +4,8 @@ import type { Context } from 'koa';
 
 import config from '../../config.js';
 
-import type { GarminActivity } from './garmin.api';
-import { garminService as service } from './garmin.service';
+import type { GarminActivity } from './garmin.api.js';
+import { garminService as service } from './garmin.service.js';
 
 class GarminController {
   private readonly keyv;

@@ -2,8 +2,8 @@ import request from 'supertest';
 
 import { app } from '../../../../src/app.js';
 import log from '../../../../src/helpers/logger.js';
-import type { WebhookEvent } from '../../../../src/server/polar/polar.api';
-import { polarService } from '../../../../src/server/polar/polar.service';
+import type { WebhookEvent } from '../../../../src/server/polar/polar.api.js';
+import { polarService } from '../../../../src/server/polar/polar.service.js';
 import { authenticated } from '../../../utils.js';
 
 describe('Polar Controller', () => {

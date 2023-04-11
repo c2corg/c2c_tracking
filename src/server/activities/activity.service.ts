@@ -4,7 +4,7 @@ import { NotFoundError } from '../../errors.js';
 import { Lang, translations } from '../../helpers/i18n';
 import type { Activity } from '../../repository/activity.js';
 import type { LineString } from '../../repository/geojson.js';
-import { userService } from '../../user.service';
+import { userService } from '../../user.service.js';
 
 export class ActivityService {
   public async getActivities(

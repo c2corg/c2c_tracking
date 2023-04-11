@@ -9,13 +9,13 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.js';
-import { miniatureService } from '../../miniature.service';
+import { miniatureService } from '../../miniature.service.js';
 import type { NewActivityWithGeometry, UpdateActivity, Vendor } from '../../repository/activity.js';
-import { activityRepository } from '../../repository/activity.repository';
+import { activityRepository } from '../../repository/activity.repository.js';
 import type { LineString } from '../../repository/geojson.js';
-import { stravaRepository } from '../../repository/strava.repository';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import { stravaRepository } from '../../repository/strava.repository.js';
+import { userRepository } from '../../repository/user.repository.js';
+import { userService } from '../../user.service.js';
 
 import {
   Activity,
@@ -27,7 +27,7 @@ import {
   TimeStream,
   WebhookEvent,
   stravaApi,
-} from './strava.api';
+} from './strava.api.js';
 
 dayjs.extend(dayjsPluginUTC);
 

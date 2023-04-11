@@ -1,10 +1,10 @@
 import log from '../../../../src/helpers/logger.js';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { garminApi, type GarminAuth } from '../../../../src/server/garmin/garmin.api';
-import { GarminService } from '../../../../src/server/garmin/garmin.service';
-import { userService } from '../../../../src/user.service';
+import { miniatureService } from '../../../../src/miniature.service.js';
+import { activityRepository } from '../../../../src/repository/activity.repository.js';
+import { userRepository } from '../../../../src/repository/user.repository.js';
+import { garminApi, type GarminAuth } from '../../../../src/server/garmin/garmin.api.js';
+import { GarminService } from '../../../../src/server/garmin/garmin.service.js';
+import { userService } from '../../../../src/user.service.js';
 
 describe('Garmin service', () => {
   beforeEach(() => {

@@ -1,10 +1,10 @@
 import log from '../../../../src/helpers/logger.js';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { decathlonApi } from '../../../../src/server/decathlon/decathlon.api';
-import { DecathlonService } from '../../../../src/server/decathlon/decathlon.service';
-import { userService } from '../../../../src/user.service';
+import { miniatureService } from '../../../../src/miniature.service.js';
+import { activityRepository } from '../../../../src/repository/activity.repository.js';
+import { userRepository } from '../../../../src/repository/user.repository.js';
+import { decathlonApi } from '../../../../src/server/decathlon/decathlon.api.js';
+import { DecathlonService } from '../../../../src/server/decathlon/decathlon.service.js';
+import { userService } from '../../../../src/user.service.js';
 
 describe('Decathlon Service', () => {
   beforeEach(() => {

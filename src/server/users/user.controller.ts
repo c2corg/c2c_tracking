@@ -1,6 +1,6 @@
 import type { Context } from 'koa';
 
-import { userService } from '../../user.service';
+import { userService } from '../../user.service.js';
 
 class UserController {
   public async getStatus(ctx: Context): Promise<void> {

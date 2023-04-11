@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { ValidationSchema } from '../validator.js';
 
-import { WebhookEvent } from './polar.api';
+import { WebhookEvent } from './polar.api.js';
 
 export const exchangeToken: ValidationSchema = {
   query: z

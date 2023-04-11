@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { MiniatureService } from '../../src/miniature.service';
+import { MiniatureService } from '../../src/miniature.service.js';
 import { storage } from '../../src/storage/storage.js';
 
 jest.mock('axios');

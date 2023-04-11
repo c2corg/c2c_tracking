@@ -1,16 +1,16 @@
 import { NotFoundError } from '../../src/errors.js';
 import log from '../../src/helpers/logger.js';
-import { miniatureService } from '../../src/miniature.service';
+import { miniatureService } from '../../src/miniature.service.js';
 import type { Activity } from '../../src/repository/activity.js';
-import { activityRepository } from '../../src/repository/activity.repository';
-import { userRepository } from '../../src/repository/user.repository';
-import type { CorosAuth } from '../../src/server/coros/coros.api';
-import type { DecathlonAuth } from '../../src/server/decathlon/decathlon.api';
-import type { GarminAuth } from '../../src/server/garmin/garmin.api';
-import type { PolarAuth } from '../../src/server/polar/polar.api';
-import type { StravaAuth } from '../../src/server/strava/strava.api';
-import type { SuuntoAuth } from '../../src/server/suunto/suunto.api';
-import { UserService } from '../../src/user.service';
+import { activityRepository } from '../../src/repository/activity.repository.js';
+import { userRepository } from '../../src/repository/user.repository.js';
+import type { CorosAuth } from '../../src/server/coros/coros.api.js';
+import type { DecathlonAuth } from '../../src/server/decathlon/decathlon.api.js';
+import type { GarminAuth } from '../../src/server/garmin/garmin.api.js';
+import type { PolarAuth } from '../../src/server/polar/polar.api.js';
+import type { StravaAuth } from '../../src/server/strava/strava.api.js';
+import type { SuuntoAuth } from '../../src/server/suunto/suunto.api.js';
+import { UserService } from '../../src/user.service.js';
 
 describe('User service', () => {
   beforeEach(() => {

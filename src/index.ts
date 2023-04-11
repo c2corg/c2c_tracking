@@ -1,8 +1,8 @@
-import './dotenv';
+import './dotenv.js';
 
 import type { Server } from 'node:http';
 
-import { type ErrorCallback, retry } from 'async';
+import { retry, type ErrorCallback } from 'async';
 import watch from 'node-watch';
 
 import { app } from './app.js';
@@ -10,8 +10,8 @@ import config from './config.js';
 import { database as db } from './db';
 import log from './helpers/logger.js';
 import { metricsKoa } from './metrics';
-import { polarService } from './server/polar/polar.service';
-import { stravaService } from './server/strava/strava.service';
+import { polarService } from './server/polar/polar.service.js';
+import { stravaService } from './server/strava/strava.service.js';
 
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {

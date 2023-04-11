@@ -1,7 +1,13 @@
 import axios from 'axios';
 
 import log from '../../../../src/helpers/logger.js';
-import { CreatedWebhookInfo, Exercise, PolarApi, PolarAuth, WebhookInfo } from '../../../../src/server/polar/polar.api';
+import {
+  CreatedWebhookInfo,
+  Exercise,
+  PolarApi,
+  PolarAuth,
+  WebhookInfo,
+} from '../../../../src/server/polar/polar.api.js';
 
 jest.mock('axios');
 

@@ -2,13 +2,13 @@ import JSONBig from 'json-bigint';
 
 import log from '../../../../src/helpers/logger.js';
 import * as utils from '../../../../src/helpers/utils.js';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { polarRepository } from '../../../../src/repository/polar.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { polarApi, WebhookEvent } from '../../../../src/server/polar/polar.api';
-import { PolarService } from '../../../../src/server/polar/polar.service';
-import { userService } from '../../../../src/user.service';
+import { miniatureService } from '../../../../src/miniature.service.js';
+import { activityRepository } from '../../../../src/repository/activity.repository.js';
+import { polarRepository } from '../../../../src/repository/polar.repository.js';
+import { userRepository } from '../../../../src/repository/user.repository.js';
+import { polarApi, WebhookEvent } from '../../../../src/server/polar/polar.api.js';
+import { PolarService } from '../../../../src/server/polar/polar.service.js';
+import { userService } from '../../../../src/user.service.js';
 
 jest.mock('../../../../src/helpers/utils');
 

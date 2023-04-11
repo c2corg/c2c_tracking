@@ -1,5 +1,5 @@
 import { database as db } from '../../../src/db';
-import { ActivityRepository } from '../../../src/repository/activity.repository';
+import { ActivityRepository } from '../../../src/repository/activity.repository.js';
 
 describe('Activity Repository', () => {
   afterEach(async () => {

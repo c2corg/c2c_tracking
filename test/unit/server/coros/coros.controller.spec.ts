@@ -2,8 +2,8 @@ import request from 'supertest';
 
 import { app } from '../../../../src/app.js';
 import log from '../../../../src/helpers/logger.js';
-import type { WebhookEvent } from '../../../../src/server/coros/coros.api';
-import { corosService } from '../../../../src/server/coros/coros.service';
+import type { WebhookEvent } from '../../../../src/server/coros/coros.api.js';
+import { corosService } from '../../../../src/server/coros/coros.service.js';
 import { authenticated } from '../../../utils.js';
 
 describe('Coros Controller', () => {

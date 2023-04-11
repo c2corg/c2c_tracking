@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './suunto.api';
-import { suuntoService as service } from './suunto.service';
+import type { WebhookEvent } from './suunto.api.js';
+import { suuntoService as service } from './suunto.service.js';
 
 class SuuntoController {
   public async exchangeToken(ctx: Context): Promise<void> {

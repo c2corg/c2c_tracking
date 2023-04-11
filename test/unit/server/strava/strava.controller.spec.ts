@@ -2,8 +2,8 @@ import request from 'supertest';
 
 import { app } from '../../../../src/app.js';
 import log from '../../../../src/helpers/logger.js';
-import type { WebhookEvent } from '../../../../src/server/strava/strava.api';
-import { stravaService } from '../../../../src/server/strava/strava.service';
+import type { WebhookEvent } from '../../../../src/server/strava/strava.api.js';
+import { stravaService } from '../../../../src/server/strava/strava.service.js';
 import { authenticated } from '../../../utils.js';
 
 describe('Strava Controller', () => {

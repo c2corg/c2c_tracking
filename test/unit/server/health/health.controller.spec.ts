@@ -1,7 +1,7 @@
 import request from 'supertest';
 
 import { app } from '../../../../src/app.js';
-import type { Status } from '../../../../src/health.service';
+import type { Status } from '../../../../src/health.service.js';
 import { semverRegex } from '../../../../src/helpers/utils.js';
 
 describe('GET /health', () => {

@@ -3,8 +3,8 @@ import Router from '@koa/router';
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
 import { validate } from '../validator.js';
 
-import { controller } from './coros.controller';
-import { exchangeToken, webhook } from './coros.validators';
+import { controller } from './coros.controller.js';
+import { exchangeToken, webhook } from './coros.validators.js';
 
 const router = new Router();
 

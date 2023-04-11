@@ -2,7 +2,7 @@ import request from 'supertest';
 
 import { app } from '../../../../src/app.js';
 import log from '../../../../src/helpers/logger.js';
-import { activityService } from '../../../../src/server/activities/activity.service';
+import { activityService } from '../../../../src/server/activities/activity.service.js';
 import { authenticated } from '../../../utils.js';
 
 describe('Activities Controller', () => {

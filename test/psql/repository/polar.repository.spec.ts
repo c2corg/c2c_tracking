@@ -1,5 +1,5 @@
 import { database as db } from '../../../src/db';
-import { PolarRepository } from '../../../src/repository/polar.repository';
+import { PolarRepository } from '../../../src/repository/polar.repository.js';
 
 describe('Polar Repository', () => {
   afterEach(async () => {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import log from '../../../../src/helpers/logger.js';
-import { SuuntoApi } from '../../../../src/server/suunto/suunto.api';
+import { SuuntoApi } from '../../../../src/server/suunto/suunto.api.js';
 
 jest.mock('axios');
 

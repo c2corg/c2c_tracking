@@ -1,6 +1,6 @@
 import { database as db } from '../../../src/db';
 import type { User } from '../../../src/repository/user.js';
-import { UserRepository } from '../../../src/repository/user.repository';
+import { UserRepository } from '../../../src/repository/user.repository.js';
 
 describe('User Repository', () => {
   afterEach(async () => {

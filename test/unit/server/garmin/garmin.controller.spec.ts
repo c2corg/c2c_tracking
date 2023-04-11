@@ -5,8 +5,8 @@ import request from 'supertest';
 import { app } from '../../../../src/app.js';
 import log from '../../../../src/helpers/logger.js';
 import type { GarminActivity } from '../../../../src/server/garmin/garmin.api';
-import { controller as garminController } from '../../../../src/server/garmin/garmin.controller';
-import { garminService } from '../../../../src/server/garmin/garmin.service';
+import { controller as garminController } from '../../../../src/server/garmin/garmin.controller.js';
+import { garminService } from '../../../../src/server/garmin/garmin.service.js';
 import { authenticated } from '../../../utils.js';
 
 describe('Garmin Controller', () => {

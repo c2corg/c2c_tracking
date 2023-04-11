@@ -14,7 +14,7 @@ import {
 import sanitize from 'sanitize-filename';
 import type { SetRequired } from 'type-fest';
 
-import config from '../config';
+import config from '../config.js';
 
 export abstract class Storage {
   public abstract exists(key: string): Promise<boolean>;

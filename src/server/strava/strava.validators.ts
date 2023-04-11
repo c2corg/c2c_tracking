@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import type { ValidationSchema } from '../validator.js';
 
-import { WebhookEvent } from './strava.api';
+import { WebhookEvent } from './strava.api.js';
 
 export const exchangeToken: ValidationSchema = {
   query: z

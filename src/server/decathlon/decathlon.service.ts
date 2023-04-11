@@ -7,15 +7,15 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.js';
-import { miniatureService } from '../../miniature.service';
+import { miniatureService } from '../../miniature.service.js';
 import type { NewActivityWithGeometry, Vendor } from '../../repository/activity.js';
-import { activityRepository } from '../../repository/activity.repository';
+import { activityRepository } from '../../repository/activity.repository.js';
 import type { LineString } from '../../repository/geojson.js';
 import type { DecathlonInfo } from '../../repository/user.js';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import { userRepository } from '../../repository/user.repository.js';
+import { userService } from '../../user.service.js';
 
-import { Activity, decathlonApi, DecathlonAuth, WebhookEvent } from './decathlon.api';
+import { Activity, decathlonApi, DecathlonAuth, WebhookEvent } from './decathlon.api.js';
 import { sports } from './sports.js';
 
 export class DecathlonService {

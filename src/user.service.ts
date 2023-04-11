@@ -4,17 +4,17 @@ import config from './config.js';
 import { NotFoundError } from './errors.js';
 import log from './helpers/logger.js';
 import type { Optional } from './helpers/utils.js';
-import { miniatureService } from './miniature.service';
+import { miniatureService } from './miniature.service.js';
 import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity.js';
-import { activityRepository } from './repository/activity.repository';
+import { activityRepository } from './repository/activity.repository.js';
 import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user.js';
-import { userRepository } from './repository/user.repository';
-import type { CorosAuth } from './server/coros/coros.api';
-import type { DecathlonAuth } from './server/decathlon/decathlon.api';
-import type { GarminAuth } from './server/garmin/garmin.api';
-import type { PolarAuth } from './server/polar/polar.api';
-import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api';
-import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api';
+import { userRepository } from './repository/user.repository.js';
+import type { CorosAuth } from './server/coros/coros.api.js';
+import type { DecathlonAuth } from './server/decathlon/decathlon.api.js';
+import type { GarminAuth } from './server/garmin/garmin.api.js';
+import type { PolarAuth } from './server/polar/polar.api.js';
+import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api.js';
+import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api.js';
 
 type Status = 'not-configured' | 'configured' | 'token-lost';
 

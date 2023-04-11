@@ -2,8 +2,8 @@ import request from 'supertest';
 
 import { app } from '../../../../src/app.js';
 import log from '../../../../src/helpers/logger.js';
-import type { WebhookEvent } from '../../../../src/server/decathlon/decathlon.api';
-import { decathlonService } from '../../../../src/server/decathlon/decathlon.service';
+import type { WebhookEvent } from '../../../../src/server/decathlon/decathlon.api.js';
+import { decathlonService } from '../../../../src/server/decathlon/decathlon.service.js';
 import { authenticated } from '../../../utils.js';
 
 describe('Decathlon Controller', () => {
