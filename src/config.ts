@@ -1,8 +1,8 @@
 import convict from 'convict';
-import isBase64 from 'validator/lib/isBase64';
-import isStrongPassword from 'validator/lib/isStrongPassword';
-import isUrl from 'validator/lib/isURL';
-import isUUID from 'validator/lib/isUUID';
+import isBase64 from 'validator/es/lib/isBase64';
+import isStrongPassword from 'validator/es/lib/isStrongPassword';
+import isUrl from 'validator/es/lib/isURL';
+import isUUID from 'validator/es/lib/isUUID';
 
 convict.addFormats({
   baseUrl: {
