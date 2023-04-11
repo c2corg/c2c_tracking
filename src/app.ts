@@ -9,7 +9,7 @@ import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
 import type { LevelWithSilent } from 'pino';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth/index.js';
 import config from './config.js';
 import enabledIf from './helpers/enabled-if.js';
 import log from './helpers/logger.js';

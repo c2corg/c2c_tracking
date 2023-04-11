@@ -1,6 +1,6 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.js';
 import { validate } from '../validator.js';
 
 import { controller } from './coros.controller.js';
