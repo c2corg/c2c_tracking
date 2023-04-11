@@ -1,9 +1,9 @@
 import path from 'node:path';
 
-import knex, { type Knex } from 'knex';
+import knex from 'knex';
 
-void (async (): Promise<void> => {
-  let connection: Knex | undefined;
+void (async () => {
+  let connection;
   try {
     connection = knex({
       client: 'pg',
@@ -25,7 +25,7 @@ void (async (): Promise<void> => {
     await connection('users').insert({ c2c_id: 1 });
     await connection('users').insert({ c2c_id: 2 });
     console.log('DB initialized 🚀');
-  } catch (error: unknown) {
+  } catch (error) {
     console.error(error);
   } finally {
     await connection?.destroy();
