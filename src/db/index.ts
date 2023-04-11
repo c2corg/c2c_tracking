@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { retry, type AsyncResultCallback } from 'async';
-import knex, { Knex } from 'knex';
+import { Knex, default as knex } from 'knex';
 
 import config from '../config.js';
 
