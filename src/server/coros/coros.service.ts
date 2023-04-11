@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import dayjsPluginTimezone from 'dayjs/plugin/timezone.js';
-import dayjsPluginUtc from 'dayjs/plugin/utc';
+import dayjsPluginUtc from 'dayjs/plugin/utc.js';
 import type { SetNonNullable, SetRequired } from 'type-fest';
 
 import config from '../../config.js';
