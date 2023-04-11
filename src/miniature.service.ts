@@ -1,4 +1,4 @@
-import { encode } from '@mapbox/polyline';
+import polyline from '@mapbox/polyline';
 import { createId } from '@paralleldrive/cuid2';
 import axios from 'axios';
 
@@ -24,8 +24,8 @@ export class MiniatureService {
 
   private mapboxUrl(geometry: LineString): string {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const polyline = encode(this.simplifiedCoordinates(geometry).map(([lng, lat]) => [lat!, lng!]));
-    const uriEncodedPolyline = encodeURIComponent(polyline);
+    const poly = polyline.encode(this.simplifiedCoordinates(geometry).map(([lng, lat]) => [lat!, lng!]));
+    const uriEncodedPolyline = encodeURIComponent(poly);
     return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-2+f00(${uriEncodedPolyline})/auto/${miniatureSize}x${miniatureSize}?access_token=${mapboxToken}&attribution=false&logo=false&padding=20`;
   }
 
