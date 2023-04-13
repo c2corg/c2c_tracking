@@ -1,9 +1,8 @@
+import baseConfig from './jest.config.common.mjs';
+
 export default {
+  ...baseConfig,
+  displayName: 'PSQL',
   roots: ['<rootDir>/test/psql'],
-  testEnvironment: 'node',
-  testMatch: ['**/*.spec.ts'],
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest'],
-  },
   setupFiles: ['<rootDir>/test/environment/env-vars.mjs'],
 };

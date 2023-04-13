@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import type { ValidationSchema } from '../validator';
+import type { ValidationSchema } from '../validator.js';
 
-import { WebhookEvent } from './decathlon.api';
+import { WebhookEvent } from './decathlon.api.js';
 
 export const exchangeToken: ValidationSchema = {
   query: z

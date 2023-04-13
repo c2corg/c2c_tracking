@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { AppError, ExternalApiError } from '../errors';
-import { promApiErrorsCounter } from '../metrics/prometheus';
-import type { Vendor } from '../repository/activity';
+import { AppError, ExternalApiError } from '../errors.js';
+import { promApiErrorsCounter } from '../metrics/prometheus.js';
+import type { Vendor } from '../repository/activity.js';
 
-import log from './logger';
+import log from './logger.js';
 
 export function handleExternalApiError(vendor: Vendor, message: string, error: unknown): AppError {
   if (error instanceof AppError) {

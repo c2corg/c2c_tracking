@@ -5,7 +5,7 @@ import {
   DecathlonApi,
   DecathlonAuth,
   WebhookSubscription,
-} from '../../../../src/server/decathlon/decathlon.api';
+} from '../../../../src/server/decathlon/decathlon.api.js';
 
 jest.mock('axios');
 

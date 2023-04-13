@@ -1,9 +1,9 @@
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import { suuntoService } from '../../../../src/server/suunto/suunto.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.js';
+import log from '../../../../src/helpers/logger.js';
+import { suuntoService } from '../../../../src/server/suunto/suunto.service.js';
+import { authenticated } from '../../../utils.js';
 
 describe('Suunto Controller', () => {
   beforeEach(() => {

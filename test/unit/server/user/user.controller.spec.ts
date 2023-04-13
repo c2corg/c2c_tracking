@@ -1,9 +1,9 @@
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import { userService } from '../../../../src/user.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.js';
+import log from '../../../../src/helpers/logger.js';
+import { userService } from '../../../../src/user.service.js';
+import { authenticated } from '../../../utils.js';
 
 describe('User Controller', () => {
   beforeEach(() => {

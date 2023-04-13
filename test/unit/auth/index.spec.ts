@@ -1,8 +1,8 @@
 import { createMockContext } from '@shopify/jest-koa-mocks';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth';
-import log from '../../../src/helpers/logger';
-import { AuthenticatedUserStrategy } from '../../utils';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth/index.js';
+import log from '../../../src/helpers/logger.js';
+import { AuthenticatedUserStrategy } from '../../utils.js';
 
 describe('ensureAuthenticated', () => {
   beforeEach(() => {

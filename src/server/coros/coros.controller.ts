@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './coros.api';
-import { corosService as service } from './coros.service';
+import type { WebhookEvent } from './coros.api.js';
+import { corosService as service } from './coros.service.js';
 
 class CorosController {
   public async exchangeToken(ctx: Context): Promise<void> {

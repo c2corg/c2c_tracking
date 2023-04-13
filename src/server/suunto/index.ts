@@ -1,10 +1,10 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.js';
+import { validate } from '../validator.js';
 
-import { controller } from './suunto.controller';
-import { exchangeToken, webhook } from './suunto.validators';
+import { controller } from './suunto.controller.js';
+import { exchangeToken, webhook } from './suunto.validators.js';
 
 const router = new Router();
 

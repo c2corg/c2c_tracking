@@ -1,6 +1,6 @@
-import config from '../../src/config';
-import { HealthService } from '../../src/health.service';
-import { semverRegex } from '../../src/helpers/utils';
+import config from '../../src/config.js';
+import { HealthService } from '../../src/health.service.js';
+import { semverRegex } from '../../src/helpers/utils.js';
 
 jest.mock('../../src/config');
 

@@ -1,8 +1,10 @@
-import type { Knex } from 'knex';
-
 const schema = process.env['DB_SCHEMA'] || 'public';
 
-export function up(db: Knex): Knex.SchemaBuilder {
+/**
+ * @param {import('knex').Knex} db
+ * @returns {import('knex').Knex.SchemaBuilder}
+ */
+export function up(db) {
   return db.schema.withSchema(schema).alterTable('users', (table) => {
     table.string('decathlon_id');
     table.string('decathlon_access_token', 4096);
@@ -12,7 +14,11 @@ export function up(db: Knex): Knex.SchemaBuilder {
   });
 }
 
-export function down(db: Knex): Knex.SchemaBuilder {
+/**
+ * @param {import('knex').Knex} db
+ * @returns {import('knex').Knex.SchemaBuilder}
+ */
+export function down(db) {
   return db.schema.withSchema(schema).alterTable('users', (table) => {
     table.dropColumns(
       'decathlon_id',

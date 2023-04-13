@@ -1,13 +1,13 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { suuntoApi } from '../../../../src/server/suunto/suunto.api';
-import { SuuntoService } from '../../../../src/server/suunto/suunto.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.js';
+import { miniatureService } from '../../../../src/miniature.service.js';
+import { activityRepository } from '../../../../src/repository/activity.repository.js';
+import { userRepository } from '../../../../src/repository/user.repository.js';
+import { suuntoApi } from '../../../../src/server/suunto/suunto.api.js';
+import { SuuntoService } from '../../../../src/server/suunto/suunto.service.js';
+import { userService } from '../../../../src/user.service.js';
 
 describe('Suunto Service', () => {
   beforeEach(() => {
@@ -108,6 +108,7 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
@@ -216,6 +217,7 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
@@ -419,6 +421,7 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
@@ -492,6 +495,7 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
       jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);

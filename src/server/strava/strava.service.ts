@@ -1,29 +1,33 @@
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 
-import config from '../../config';
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, UpdateActivity, Vendor } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import { stravaRepository } from '../../repository/strava.repository';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import config from '../../config.js';
+import { NotFoundError } from '../../errors.js';
+import log from '../../helpers/logger.js';
+import {
+  promTokenRenewalErrorsCounter,
+  promWebhookCounter,
+  promWebhookErrorsCounter,
+} from '../../metrics/prometheus.js';
+import { miniatureService } from '../../miniature.service.js';
+import type { NewActivityWithGeometry, UpdateActivity, Vendor } from '../../repository/activity.js';
+import { activityRepository } from '../../repository/activity.repository.js';
+import type { LineString } from '../../repository/geojson.js';
+import { stravaRepository } from '../../repository/strava.repository.js';
+import { userRepository } from '../../repository/user.repository.js';
+import { userService } from '../../user.service.js';
 
 import {
   Activity,
-  StravaAuth,
-  stravaApi,
-  WebhookEvent,
   AltitudeStream,
   DistanceStream,
   LatLngStream,
+  StravaAuth,
   StreamSet,
   TimeStream,
-} from './strava.api';
+  WebhookEvent,
+  stravaApi,
+} from './strava.api.js';
 
 dayjs.extend(dayjsPluginUTC);
 
@@ -167,7 +171,7 @@ export class StravaService {
       throw new NotFoundError('Available data cannot be converted to a valid geometry');
     }
 
-    const layout = !!altStream ? (!!timeStream ? 'XYZM' : 'XYZ') : !!timeStream ? 'XYM' : 'XY';
+    const layout = altStream ? (timeStream ? 'XYZM' : 'XYZ') : timeStream ? 'XYM' : 'XY';
     const coordinates: number[][] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
       // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion

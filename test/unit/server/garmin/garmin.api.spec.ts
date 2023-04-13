@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-import log from '../../../../src/helpers/logger';
-import { GarminApi } from '../../../../src/server/garmin/garmin.api';
+import log from '../../../../src/helpers/logger.js';
+import { GarminApi } from '../../../../src/server/garmin/garmin.api.js';
 
 jest.mock('axios');
 

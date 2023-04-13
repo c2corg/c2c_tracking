@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { z } from 'zod';
 
-import config from '../../config';
-import { handleExternalApiError } from '../../helpers/error';
+import config from '../../config.js';
+import { handleExternalApiError } from '../../helpers/error.js';
 
 export const CorosAuth = z.object({
   access_token: z.string().min(5).max(50),

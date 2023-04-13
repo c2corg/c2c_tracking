@@ -1,9 +1,12 @@
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-import knex, { Knex } from 'knex';
+import knex from 'knex';
 
-void (async (): Promise<void> => {
-  let connection: Knex | undefined;
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+void (async () => {
+  let connection;
   try {
     connection = knex({
       client: 'pg',
@@ -20,12 +23,15 @@ void (async (): Promise<void> => {
     await connection.schema.dropSchemaIfExists('public', true);
     await connection.schema.createSchema('public');
 
-    await connection.migrate.latest({ directory: path.resolve(__dirname, '../../src/db/migrations') });
+    await connection.migrate.latest({
+      directory: path.resolve(__dirname, '../../src/db/migrations'),
+      loadExtensions: ['.mjs'],
+    });
 
     await connection('users').insert({ c2c_id: 1 });
     await connection('users').insert({ c2c_id: 2 });
     console.log('DB initialized 🚀');
-  } catch (error: unknown) {
+  } catch (error) {
     console.error(error);
   } finally {
     await connection?.destroy();

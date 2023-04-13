@@ -7,7 +7,7 @@ import {
   StravaRefreshAuth,
   StreamSet,
   Subscription,
-} from '../../../../src/server/strava/strava.api';
+} from '../../../../src/server/strava/strava.api.js';
 
 jest.mock('axios');
 

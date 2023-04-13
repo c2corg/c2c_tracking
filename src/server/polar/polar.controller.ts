@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './polar.api';
-import { polarService as service } from './polar.service';
+import type { WebhookEvent } from './polar.api.js';
+import { polarService as service } from './polar.service.js';
 
 class PolarController {
   public async exchangeToken(ctx: Context): Promise<void> {

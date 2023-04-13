@@ -1,25 +1,22 @@
 import { createHmac } from 'crypto';
 
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import { parse } from 'iso8601-duration';
+import { parse, toSeconds } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
 
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { fitToGeoJSON } from '../../helpers/utils';
-import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import { polarRepository } from '../../repository/polar.repository';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import { NotFoundError } from '../../errors.js';
+import log from '../../helpers/logger.js';
+import { fitToGeoJSON } from '../../helpers/utils.js';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.js';
+import { miniatureService } from '../../miniature.service.js';
+import type { NewActivityWithGeometry, Vendor } from '../../repository/activity.js';
+import { activityRepository } from '../../repository/activity.repository.js';
+import type { LineString } from '../../repository/geojson.js';
+import { polarRepository } from '../../repository/polar.repository.js';
+import { userRepository } from '../../repository/user.repository.js';
+import { userService } from '../../user.service.js';
 
-import { Exercise, polarApi, WebhookEvent, isWebhookPingEvent } from './polar.api';
-
-dayjs.extend(duration);
+import { WebhookEvent, isWebhookPingEvent, polarApi, type Exercise } from './polar.api.js';
 
 export class PolarService {
   public async requestAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
@@ -171,30 +168,33 @@ export class PolarService {
   }
 
   private asRepositoryActivity(exercise: Exercise, geojson: LineString): NewActivityWithGeometry {
+    const startDate = this.localDate(exercise);
     return {
       vendor: 'polar' as Vendor,
       vendorId: exercise.id,
-      date: this.localDate(exercise),
+      date: startDate,
       type: exercise.sport,
       geojson,
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
-      ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API
+      ...(exercise.duration && { duration: this.duration(exercise.duration, dayjs(startDate).toDate()) }), // ISO8601 duration in Polar API
     };
   }
 
   private localDate(exercise: Exercise): string {
     const isNegative = exercise.start_time_utc_offset < 0;
-    const offset = dayjs
-      .duration({
-        hours: Math.floor(Math.abs(exercise.start_time_utc_offset) / 60),
-        minutes: Math.abs(exercise.start_time_utc_offset) % 60,
-      })
-      .format('HH:mm');
-    return exercise.start_time + (isNegative ? '-' : '+') + offset;
+    const hours = Math.floor(Math.abs(exercise.start_time_utc_offset) / 60);
+    const minutes = Math.abs(exercise.start_time_utc_offset) % 60;
+    return (
+      exercise.start_time +
+      (isNegative ? '-' : '+') +
+      hours.toString().padStart(2, '0') +
+      ':' +
+      minutes.toString().padStart(2, '0')
+    );
   }
 
-  private duration(duration: string): number {
-    return Math.round(dayjs.duration(parse(duration)).asSeconds());
+  private duration(duration: string, startDate: Date): number {
+    return Math.round(toSeconds(parse(duration), startDate));
   }
 }
 
