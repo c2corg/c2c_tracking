@@ -1,7 +1,7 @@
 import path from 'node:path';
 
 import { retry, type AsyncResultCallback } from 'async';
-import * as knex from 'knex';
+import { Knex, knex } from 'knex';
 
 import config from '../config.js';
 
@@ -17,14 +17,14 @@ export type Configuration = {
 
 export class Database {
   private config: Configuration;
-  private connection: knex.Knex | undefined;
-  private retryDbConnectionPromise: Promise<knex.Knex | undefined> | undefined;
+  private connection: Knex | undefined;
+  private retryDbConnectionPromise: Promise<Knex | undefined> | undefined;
 
   constructor(config: Configuration) {
     this.config = config;
   }
 
-  public async getConnection(): Promise<knex.Knex | undefined> {
+  public async getConnection(): Promise<Knex | undefined> {
     if (!this.connection) {
       this.connection = await this.retryDbConnection();
     }
@@ -50,8 +50,8 @@ export class Database {
     });
   }
 
-  private async createConnection(): Promise<knex.Knex> {
-    const dbConfig: knex.Knex.Config = {
+  private async createConnection(): Promise<Knex> {
+    const dbConfig: Knex.Config = {
       client: 'pg',
       connection: {
         host: this.config.host,
@@ -68,7 +68,7 @@ export class Database {
       },
     };
 
-    const db = knex.knex(dbConfig);
+    const db = knex(dbConfig);
 
     // Test database connectivity
     await db.raw('select 1');
@@ -76,14 +76,14 @@ export class Database {
     return db;
   }
 
-  private retryDbConnection(): Promise<knex.Knex | undefined> {
+  private retryDbConnection(): Promise<Knex | undefined> {
     if (this.retryDbConnectionPromise instanceof Promise) {
       return this.retryDbConnectionPromise;
     }
 
-    const methodToRetry = (cb: AsyncResultCallback<knex.Knex, Error>): void => {
+    const methodToRetry = (cb: AsyncResultCallback<Knex, Error>): void => {
       this.createConnection()
-        .then((db: knex.Knex) => {
+        .then((db: Knex) => {
           cb(undefined, db);
         })
         .catch((err: Error) => {
@@ -91,8 +91,8 @@ export class Database {
         });
     };
 
-    this.retryDbConnectionPromise = new Promise<knex.Knex | undefined>((resolve, reject) => {
-      retry({ times: 3, interval: 1000 }, methodToRetry, (err: Error | null | undefined, db: knex.Knex | undefined) => {
+    this.retryDbConnectionPromise = new Promise<Knex | undefined>((resolve, reject) => {
+      retry({ times: 3, interval: 1000 }, methodToRetry, (err: Error | null | undefined, db: Knex | undefined) => {
         if (err) {
           reject(err);
         } else {
