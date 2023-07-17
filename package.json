@@ -51,7 +51,7 @@
     "dotenv-expand": "10.0.0",
     "iso8601-duration": "2.1.1",
     "json-bigint": "1.0.0",
-    "keyv": "4.5.2",
+    "keyv": "4.5.3",
     "knex": "2.5.1",
     "koa": "2.14.2",
     "koa-bodyparser": "4.4.1",
