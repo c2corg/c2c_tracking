@@ -103,7 +103,7 @@
     "lint-staged": "13.2.3",
     "node-mocks-http": "1.12.2",
     "passport-custom": "1.1.1",
-    "pino-pretty": "10.1.0",
+    "pino-pretty": "10.2.0",
     "prettier": "3.0.0",
     "supertest": "6.3.3",
     "ts-jest": "29.1.1",
