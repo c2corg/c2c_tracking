@@ -82,7 +82,7 @@
     "@types/koa-passport": "6.0.0",
     "@types/koa-pino-logger": "3.0.1",
     "@types/mapbox__polyline": "1.0.2",
-    "@types/node": "18.16.3",
+    "@types/node": "20.7.0",
     "@types/passport-jwt": "3.0.9",
     "@types/pg": "8.10.2",
     "@types/supertest": "2.0.12",
