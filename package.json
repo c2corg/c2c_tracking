@@ -79,7 +79,7 @@
     "@types/koa__cors": "4.0.0",
     "@types/koa__router": "12.0.2",
     "@types/koa-bodyparser": "4.3.10",
-    "@types/koa-passport": "6.0.0",
+    "@types/koa-passport": "6.0.2",
     "@types/koa-pino-logger": "3.0.3",
     "@types/mapbox__polyline": "1.0.2",
     "@types/node": "18.16.3",
