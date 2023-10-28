@@ -65,7 +65,7 @@ export class ActivityRepository {
       throw new IOError('No connection to database');
     }
     const result: Activity[] = await conn(this.#TABLE).insert(this.activityToRecord(activity), ['id']);
-    return { ...activity, ...result[0]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    return { ...activity, ...result[0]! };
   }
 
   public async update(activity: Activity): Promise<Activity> {

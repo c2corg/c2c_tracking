@@ -386,7 +386,6 @@ export class UserService {
         .map((activity) => {
           if (userActivitiesKeys.has(`${activity.vendor}_${activity.vendorId}`)) {
             // replace
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             const userActivity = userActivities.find(
               ({ vendor, vendorId }) => vendor === activity.vendor && vendorId === activity.vendorId,
             )!;

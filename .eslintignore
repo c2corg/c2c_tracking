@@ -1,6 +1,7 @@
 dist/
 lib/
 reports/
+coverage/
 node_modules/
 *.sh
 .eslintrc.cjs

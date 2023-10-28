@@ -173,7 +173,7 @@ export class GarminApi {
       if (!found || found.length < 3) {
         throw new ExternalApiError('Unable to acquire Garmin unauthorized request token');
       }
-      return { token: found[1]!, tokenSecret: found[2]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      return { token: found[1]!, tokenSecret: found[2]! };
     } catch (error: unknown) {
       throw handleExternalApiError('garmin', 'Unable to acquire Garmin unauthorized request token', error);
     }
@@ -207,7 +207,7 @@ export class GarminApi {
       if (!found || found.length < 3) {
         throw new ExternalApiError('Unable to acquire Garmin access request token');
       }
-      return { token: found[1]!, tokenSecret: found[2]! }; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+      return { token: found[1]!, tokenSecret: found[2]! };
     } catch (error: unknown) {
       throw handleExternalApiError('garmin', 'Unable to acquire Garmin access request token', error);
     }

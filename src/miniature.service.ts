@@ -23,7 +23,6 @@ export class MiniatureService {
   }
 
   private mapboxUrl(geometry: LineString): string {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const polyline = encode(this.simplifiedCoordinates(geometry).map(([lng, lat]) => [lat!, lng!]));
     const uriEncodedPolyline = encodeURIComponent(polyline);
     return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-2+f00(${uriEncodedPolyline})/auto/${miniatureSize}x${miniatureSize}?access_token=${mapboxToken}&attribution=false&logo=false&padding=20`;
@@ -35,7 +34,6 @@ export class MiniatureService {
     return simplify(coordinates, tolerance, false);
   }
 
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   private estimateTolerance(coordinates: number[][]): number {
     const [diff1, diff2] = coordinates.reduce(
       (acc, coord) => {
@@ -60,7 +58,6 @@ export class MiniatureService {
     );
     const max = Math.max(diff1[1]! - diff1[0]!, diff2[1]! - diff2[0]!);
     return max / miniatureSize;
-    /* eslint-enable @typescript-eslint/no-non-null-assertion */
   }
 }
 

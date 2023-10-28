@@ -44,14 +44,12 @@ export class GarminService {
     let coordinates = samples
       .filter((sample) => !!sample.latitudeInDegree && !!sample.longitudeInDegree)
       .map((sample) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const coord: number[] = [sample.longitudeInDegree!, sample.latitudeInDegree!, sample.elevationInMeters || 0];
         sample.startTimeInSeconds && coord.push(sample.startTimeInSeconds);
         return coord;
       });
 
     if (coordinates.every(([_lng, _lat, alt]) => !alt)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       coordinates = coordinates.map((coordinate) => [coordinate[0]!, coordinate[1]!, coordinate[2]!]);
     }
 
@@ -119,7 +117,6 @@ export class GarminService {
       if (!activityMap.has(user.c2cId)) {
         activityMap.set(user.c2cId, []);
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       activityMap.get(user.c2cId)!.push(repositoryActivity);
     }
     for (const [c2cId, activities] of activityMap) {

@@ -2,7 +2,7 @@
   "name": "c2c_tracking",
   "version": "2.4.1",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "description": "Tiny server to handle connection with activity trackers such as Strava, Garmin or Suunto",
   "type": "commonjs",
@@ -33,12 +33,12 @@
   },
   "homepage": "https://github.com/c2corg/c2c_tracking#readme",
   "dependencies": {
-    "@aws-sdk/client-s3": "3.437.0",
+    "@aws-sdk/client-s3": "3.438.0",
     "@c2corg/fit-parser-extract-geometry": "1.0.0",
     "@keyv/redis": "2.8.0",
     "@koa/cors": "4.0.0",
     "@koa/router": "12.0.1",
-    "@mapbox/polyline": "1.2.0",
+    "@mapbox/polyline": "1.2.1",
     "@paralleldrive/cuid2": "2.2.2",
     "@types/json-bigint": "1.0.3",
     "async": "3.2.4",
@@ -70,7 +70,8 @@
   },
   "devDependencies": {
     "@shopify/jest-koa-mocks": "5.1.1",
-    "@tsconfig/node18-strictest": "1.0.0",
+    "@tsconfig/node20": "20.1.2",
+    "@tsconfig/strictest": "2.0.2",
     "@types/async": "3.2.22",
     "@types/convict": "6.1.5",
     "@types/crypto-js": "4.1.3",
@@ -81,8 +82,8 @@
     "@types/koa-bodyparser": "4.3.11",
     "@types/koa-passport": "6.0.2",
     "@types/koa-pino-logger": "3.0.3",
-    "@types/mapbox__polyline": "1.0.2",
-    "@types/node": "18.16.3",
+    "@types/mapbox__polyline": "1.0.4",
+    "@types/node": "20.8.9",
     "@types/passport-jwt": "3.0.12",
     "@types/pg": "8.10.7",
     "@types/supertest": "2.0.15",
@@ -109,6 +110,6 @@
     "ts-jest": "29.1.1",
     "ts-node": "10.9.1",
     "type-fest": "4.6.0",
-    "typescript": "4.9.5"
+    "typescript": "5.2.2"
   }
 }

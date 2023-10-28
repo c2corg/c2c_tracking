@@ -13,7 +13,7 @@ import type { LineString } from '../../repository/geojson';
 import { userRepository } from '../../repository/user.repository';
 import { userService } from '../../user.service';
 
-import { SuuntoAuth, Workouts, workoutTypes, WebhookEvent, suuntoApi, WorkoutSummary, Workout } from './suunto.api';
+import { SuuntoAuth, WebhookEvent, Workout, WorkoutSummary, Workouts, suuntoApi, workoutTypes } from './suunto.api';
 
 dayjs.extend(dayjsPluginUTC);
 
@@ -44,7 +44,7 @@ export class SuuntoService {
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         log.info(`Unable to retrieve geometry for Suunto activity ${workouts.payload[i]!.workoutId} for user ${c2cId}`);
         return undefined;
       });
@@ -52,7 +52,7 @@ export class SuuntoService {
       const activities = workouts.payload
         // eslint-disable-next-line security/detect-object-injection
         .filter((_activity, i) => !!geometries?.[i])
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
       await userService.addActivities(c2cId, ...activities);
     } catch (err: unknown) {

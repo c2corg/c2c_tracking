@@ -1,7 +1,12 @@
 import log from './helpers/logger';
 
 export class AppError extends Error {
-  constructor(public readonly code: number, message?: string, cause?: Error, public readonly body?: string) {
+  constructor(
+    public readonly code: number,
+    message?: string,
+    cause?: Error,
+    public readonly body?: string,
+  ) {
     super(message, { ...(cause && { cause }) });
     log.warn(message);
     this.code = code;

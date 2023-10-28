@@ -15,14 +15,14 @@ import { userService } from '../../user.service';
 
 import {
   Activity,
-  StravaAuth,
-  stravaApi,
-  WebhookEvent,
   AltitudeStream,
   DistanceStream,
   LatLngStream,
+  StravaAuth,
   StreamSet,
   TimeStream,
+  WebhookEvent,
+  stravaApi,
 } from './strava.api';
 
 dayjs.extend(dayjsPluginUTC);
@@ -65,7 +65,7 @@ export class StravaService {
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         log.info(`Unable to retrieve geometry for Strava activity ${activities[i]!.id} for user ${c2cId}`);
         return undefined;
       });
@@ -73,7 +73,7 @@ export class StravaService {
       const repositoryActivities = activities
         // eslint-disable-next-line security/detect-object-injection
         .filter((_activity, i) => !!geometries?.[i])
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         .map((activity, i) => this.asNewRepositoryActivity(activity, geometries[i]!));
       await userService.addActivities(c2cId, ...repositoryActivities);
     } catch (error: unknown) {
@@ -170,14 +170,14 @@ export class StravaService {
     const layout = !!altStream ? (!!timeStream ? 'XYZM' : 'XYZ') : !!timeStream ? 'XYM' : 'XY';
     const coordinates: number[][] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
-      // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
+      // eslint-disable-next-line security/detect-object-injection
       const coordinate: number[] = latlngStream.data[i]!.reverse();
       if (layout.includes('Z')) {
-        // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line security/detect-object-injection
         coordinate.push(altStream!.data[i]!);
       }
       if (layout.includes('M')) {
-        // eslint-disable-next-line security/detect-object-injection, @typescript-eslint/no-non-null-assertion
+        // eslint-disable-next-line security/detect-object-injection
         coordinate.push(startDate + timeStream!.data[i]!);
       }
       coordinates.push(coordinate);

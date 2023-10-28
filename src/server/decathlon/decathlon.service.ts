@@ -43,14 +43,14 @@ export class DecathlonService {
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         log.info(`Unable to retrieve geometry for Decathlon activity ${activities[i]!.id} for user ${c2cId}`);
         return undefined;
       });
       const repositoryActivities = activities
         // eslint-disable-next-line security/detect-object-injection
         .filter((_activity, i) => !!geometries?.[i])
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
       await userService.addActivities(c2cId, ...repositoryActivities);
     } catch (error: unknown) {

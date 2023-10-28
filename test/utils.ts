@@ -13,7 +13,6 @@ export const AuthenticatedUserStrategy = (userId?: number): CustomStrategy =>
   });
 
 export const generateC2cValidToken = (id: number): string => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return sign({}, process.env['JWT_SECRET_KEY']!, { expiresIn: '1m', subject: id.toString() });
 };
 

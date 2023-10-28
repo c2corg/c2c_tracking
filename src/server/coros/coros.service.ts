@@ -52,7 +52,7 @@ export class CorosService {
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         log.info(`Unable to retrieve geometry for Coros workout ${workouts.data[i]!.labelId} for user ${c2cId}`);
         return undefined;
       });
@@ -60,7 +60,7 @@ export class CorosService {
       const repositoryActivities = workouts.data
         // eslint-disable-next-line security/detect-object-injection
         .filter((_workout, i) => !!geometries?.[i])
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, security/detect-object-injection
+        // eslint-disable-next-line security/detect-object-injection
         .map((workout, i) => this.asRepositoryActivity(workout, geometries[i]!));
       await userService.addActivities(c2cId, ...repositoryActivities);
     } catch (error: unknown) {
@@ -193,7 +193,6 @@ export class CorosService {
       if (!activityMap.has(user.c2cId)) {
         activityMap.set(user.c2cId, []);
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       activityMap.get(user.c2cId)!.push(this.asRepositoryActivity(workout, geometry));
     }
 
