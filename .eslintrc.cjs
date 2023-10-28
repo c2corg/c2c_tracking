@@ -42,6 +42,7 @@ module.exports = {
         'node/no-unpublished-import': ['error', { allowModules: ['type-fest'] }],
         'node/no-unsupported-features/es-syntax': 'off',
         'import/no-named-as-default-member': 'off',
+        'import/no-unresolved': 'off',
         'import/order': [
           'error',
           {
@@ -59,14 +60,9 @@ module.exports = {
         '@typescript-eslint/camelcase': 'off',
         '@typescript-eslint/explicit-function-return-type': 'error',
         '@typescript-eslint/explicit-member-accessibility': ['error', { overrides: { constructors: 'no-public' } }],
+        '@typescript-eslint/no-throw-literal': 'error',
       },
       overrides: [
-        {
-          files: ['./**/*.ts]'],
-          rules: {
-            '@typescript-eslint/no-throw-literal': 'error',
-          },
-        },
         {
           files: ['test/**/*.ts'],
           plugins: ['jest'],
@@ -76,10 +72,14 @@ module.exports = {
             'node/no-extraneous-import': 'off',
             '@typescript-eslint/unbound-method': 'off',
             'jest/unbound-method': 'error',
+            'security/detect-non-literal-fs-filename': 'off',
           },
         },
       ],
       settings: {
+        'import/parsers': {
+          '@typescript-eslint/parser': ['.ts', '.tsx'],
+        },
         'import/resolvers': {
           typescript: {
             alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`

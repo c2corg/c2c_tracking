@@ -1,12 +1,10 @@
 import axios from 'axios';
-import isISO8601 from 'validator/lib/isISO8601';
-import isURL from 'validator/lib/isURL';
-import isUUID from 'validator/lib/isUUID';
+import validator from 'validator';
 import { z } from 'zod';
 
-import config from '../../config';
-import { handleExternalApiError } from '../../helpers/error';
-import { isISO8601Duration } from '../../helpers/utils';
+import config from '../../config.js';
+import { handleExternalApiError } from '../../helpers/error.js';
+import { isISO8601Duration } from '../../helpers/utils.js';
 
 const PolarAuth = z.object({
   access_token: z.string().min(10).max(100),
@@ -34,10 +32,10 @@ const CreatedWebhookInfo = z.object({
   data: z.object({
     id: z.string().min(1).max(50),
     events: z.array(WebhookType),
-    url: z.string().refine(isURL, {
+    url: z.string().refine(validator.isURL, {
       message: 'String must be an URL',
     }),
-    signature_secret_key: z.string().refine(isUUID, {
+    signature_secret_key: z.string().refine(validator.isUUID, {
       message: 'String must be an UUID',
     }),
   }),
@@ -50,7 +48,7 @@ const WebhookInfo = z.object({
       z.object({
         id: z.string(),
         events: z.array(WebhookType),
-        url: z.string().refine(isURL, {
+        url: z.string().refine(validator.isURL, {
           message: 'String must be an URL',
         }),
       }),
@@ -61,7 +59,7 @@ export type WebhookInfo = z.infer<typeof WebhookInfo>;
 
 const WebhookPingEvent = z.object({
   event: z.literal('PING'),
-  timestamp: z.string().refine(isISO8601, {
+  timestamp: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
 });
@@ -82,7 +80,7 @@ const WebhookExerciseEvent = z.object({
     })
     .pipe(z.bigint()),
   entity_id: z.string().min(1).max(50),
-  timestamp: z.string().refine(isISO8601, {
+  timestamp: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
 });
@@ -257,7 +255,7 @@ export type SportType = z.infer<typeof SportType>;
 
 const Exercise = z.object({
   id: z.string().min(1).max(50),
-  start_time: z.string().refine(isISO8601, {
+  start_time: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
   start_time_utc_offset: z.number().int(),

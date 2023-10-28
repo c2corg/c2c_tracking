@@ -1,5 +1,5 @@
-import { database as db } from '../../../src/db';
-import { StravaRepository } from '../../../src/repository/strava.repository';
+import { database as db } from '../../../src/db/index.js';
+import { StravaRepository } from '../../../src/repository/strava.repository.js';
 
 describe('Strava Repository', () => {
   afterEach(async () => {

@@ -30,7 +30,7 @@
     "forceConsistentCasingInFileNames": true,
     //esm until tsnode supports extends arrays
     "module": "es2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
 
     "verbatimModuleSyntax": true
   },

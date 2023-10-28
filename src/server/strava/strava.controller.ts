@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent, WebhookSubscription } from './strava.api';
-import { stravaService as service } from './strava.service';
+import type { WebhookEvent, WebhookSubscription } from './strava.api.js';
+import { stravaService as service } from './strava.service.js';
 
 class StravaController {
   public async exchangeToken(ctx: Context): Promise<void> {

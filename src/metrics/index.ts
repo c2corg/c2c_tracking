@@ -2,7 +2,7 @@ import Router from '@koa/router';
 import Koa from 'koa';
 import { register } from 'prom-client';
 
-import config from '../config';
+import config from '../config.js';
 
 const koa = new Koa();
 const router = new Router();

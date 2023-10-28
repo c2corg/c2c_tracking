@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import type { ValidationSchema } from '../validator';
+import type { ValidationSchema } from '../validator.js';
 
-import { WebhookEvent } from './coros.api';
+import { WebhookEvent } from './coros.api.js';
 
 export const exchangeToken: ValidationSchema = {
   query: z.object({

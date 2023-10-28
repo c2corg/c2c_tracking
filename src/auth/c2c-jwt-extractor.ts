@@ -6,7 +6,7 @@ const c2cJwtExtractor = (request: Request): string | null => {
     return null;
   }
   return (
-    [/JWT token="([\w-\.]+)"/, /Bearer ([\w-\.]+)/]
+    [/JWT token="([\w-.]+)"/, /Bearer ([\w-.]+)/]
       .map((regex) => regex.exec(authHeader))
       .find((found) => !!found && found.length === 2)?.[1] ?? null
   );

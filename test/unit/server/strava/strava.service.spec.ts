@@ -1,11 +1,11 @@
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { stravaRepository } from '../../../../src/repository/strava.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { stravaApi } from '../../../../src/server/strava/strava.api';
-import { StravaService } from '../../../../src/server/strava/strava.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.js';
+import { miniatureService } from '../../../../src/miniature.service.js';
+import { activityRepository } from '../../../../src/repository/activity.repository.js';
+import { stravaRepository } from '../../../../src/repository/strava.repository.js';
+import { userRepository } from '../../../../src/repository/user.repository.js';
+import { stravaApi } from '../../../../src/server/strava/strava.api.js';
+import { StravaService } from '../../../../src/server/strava/strava.service.js';
+import { userService } from '../../../../src/user.service.js';
 
 describe('Strava Service', () => {
   beforeEach(() => {

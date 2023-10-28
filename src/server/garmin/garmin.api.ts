@@ -2,12 +2,12 @@ import { createHmac, randomBytes } from 'crypto';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 import { z } from 'zod';
 
-import config from '../../config';
-import { ExternalApiError } from '../../errors';
-import { handleExternalApiError } from '../../helpers/error';
+import config from '../../config.js';
+import { ExternalApiError } from '../../errors.js';
+import { handleExternalApiError } from '../../helpers/error.js';
 
 dayjs.extend(dayjsPluginUTC);
 

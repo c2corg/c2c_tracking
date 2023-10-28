@@ -1,16 +1,28 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { z } from 'zod';
 
-import ca from './ca.json';
-import de from './de.json';
-import en from './en.json';
-import es from './es.json';
-import eu from './eu.json';
-import fr from './fr.json';
-import hu from './hu.json';
-import it from './it.json';
-import ru from './ru.json';
-import sl from './sl.json';
-import zh_CN from './zh_CN.json';
+// @ts-ignore
+import ca from './ca.json' assert { type: 'json' };
+// @ts-ignore
+import de from './de.json' assert { type: 'json' };
+// @ts-ignore
+import en from './en.json' assert { type: 'json' };
+// @ts-ignore
+import es from './es.json' assert { type: 'json' };
+// @ts-ignore
+import eu from './eu.json' assert { type: 'json' };
+// @ts-ignore
+import fr from './fr.json' assert { type: 'json' };
+// @ts-ignore
+import hu from './hu.json' assert { type: 'json' };
+// @ts-ignore
+import it from './it.json' assert { type: 'json' };
+// @ts-ignore
+import ru from './ru.json' assert { type: 'json' };
+// @ts-ignore
+import sl from './sl.json' assert { type: 'json' };
+// @ts-ignore
+import zh_CN from './zh_CN.json' assert { type: 'json' };
 
 export const Lang = z.enum(['fr', 'en', 'ca', 'eu', 'it', 'de', 'es', 'hu', 'ru', 'sl', 'zh_CN']);
 export type Lang = z.infer<typeof Lang>;

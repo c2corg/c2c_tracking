@@ -2,12 +2,12 @@ import { AxiosError } from 'axios';
 import type Keyv from 'keyv';
 import request from 'supertest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import type { GarminActivity } from '../../../../src/server/garmin/garmin.api';
-import { controller as garminController } from '../../../../src/server/garmin/garmin.controller';
-import { garminService } from '../../../../src/server/garmin/garmin.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.js';
+import log from '../../../../src/helpers/logger.js';
+import type { GarminActivity } from '../../../../src/server/garmin/garmin.api.js';
+import { controller as garminController } from '../../../../src/server/garmin/garmin.controller.js';
+import { garminService } from '../../../../src/server/garmin/garmin.service.js';
+import { authenticated } from '../../../utils.js';
 
 describe('Garmin Controller', () => {
   beforeEach(async () => {

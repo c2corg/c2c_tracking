@@ -1,9 +1,9 @@
-import path from 'path';
+import path from 'node:path';
 
-import { AsyncResultCallback, retry } from 'async';
+import { retry, type AsyncResultCallback } from 'async';
 import knex, { Knex } from 'knex';
 
-import config from '../config';
+import config from '../config.js';
 
 export type Configuration = {
   host: string;

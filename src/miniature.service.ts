@@ -1,11 +1,11 @@
-import { encode } from '@mapbox/polyline';
+import polyline from '@mapbox/polyline';
 import { createId } from '@paralleldrive/cuid2';
 import axios from 'axios';
 
-import config from './config';
-import { simplify } from './helpers/simplify';
-import type { LineString } from './repository/geojson';
-import { storage } from './storage/storage';
+import config from './config.js';
+import { simplify } from './helpers/simplify.js';
+import type { LineString } from './repository/geojson.js';
+import { storage } from './storage/storage.js';
 
 const miniatureSize = config.get('miniatures.size');
 const mapboxToken = config.get('miniatures.mapbox.token');
@@ -23,8 +23,8 @@ export class MiniatureService {
   }
 
   private mapboxUrl(geometry: LineString): string {
-    const polyline = encode(this.simplifiedCoordinates(geometry).map(([lng, lat]) => [lat!, lng!]));
-    const uriEncodedPolyline = encodeURIComponent(polyline);
+    const poly = polyline.encode(this.simplifiedCoordinates(geometry).map(([lng, lat]) => [lat!, lng!]));
+    const uriEncodedPolyline = encodeURIComponent(poly);
     return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-2+f00(${uriEncodedPolyline})/auto/${miniatureSize}x${miniatureSize}?access_token=${mapboxToken}&attribution=false&logo=false&padding=20`;
   }
 

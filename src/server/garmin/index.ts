@@ -1,10 +1,10 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.js';
+import { validate } from '../validator.js';
 
-import { controller } from './garmin.controller';
-import { activityWebhook, deauthorizeWebhook, exchangeToken } from './garmin.validators';
+import { controller } from './garmin.controller.js';
+import { activityWebhook, deauthorizeWebhook, exchangeToken } from './garmin.validators.js';
 
 const router = new Router();
 

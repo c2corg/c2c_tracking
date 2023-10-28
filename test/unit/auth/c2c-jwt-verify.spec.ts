@@ -1,4 +1,4 @@
-import verify from '../../../src/auth/c2c-jwt-verify';
+import verify from '../../../src/auth/c2c-jwt-verify.js';
 
 describe('verify', () => {
   it('accepts payload with sub', () => {

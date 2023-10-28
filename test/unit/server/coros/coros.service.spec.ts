@@ -1,13 +1,13 @@
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { corosApi, WebhookEvent } from '../../../../src/server/coros/coros.api';
-import { CorosService } from '../../../../src/server/coros/coros.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.js';
+import { miniatureService } from '../../../../src/miniature.service.js';
+import { activityRepository } from '../../../../src/repository/activity.repository.js';
+import { userRepository } from '../../../../src/repository/user.repository.js';
+import { corosApi, WebhookEvent } from '../../../../src/server/coros/coros.api.js';
+import { CorosService } from '../../../../src/server/coros/coros.service.js';
+import { userService } from '../../../../src/user.service.js';
 
 const FAR_FUTURE = 10000000000;
 
