@@ -1,5 +1,5 @@
 # build stage
-FROM node:20-slim as build-stage
+FROM node:lts-slim as build-stage
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /usr
 COPY package*.json ./
@@ -10,7 +10,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # production stage
-FROM node:20-slim
+FROM node:lts-slim
 ARG version
 ENV npm_package_version=${version}
 ENV NODE_ENV production

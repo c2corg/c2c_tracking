@@ -5,7 +5,7 @@
     "node": ">=20.0.0"
   },
   "description": "Tiny server to handle connection with activity trackers such as Strava, Garmin or Suunto",
-  "type": "commonjs",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node src/index.ts | pino-pretty -c -t",
@@ -20,7 +20,7 @@
     "test:psql": "jest --config jest.config.psql.mjs --runInBand",
     "test:ci:s3": "jest --config jest.config.s3.ci.mjs --runInBand",
     "test:ci:psql": "npm run test:ci:psql:init && jest --config jest.config.psql.ci.mjs --runInBand",
-    "test:ci:psql:init": "ts-node test/environment/init-db.ts"
+    "test:ci:psql:init": "node test/environment/init-db.mjs"
   },
   "repository": {
     "type": "git",
@@ -70,6 +70,7 @@
   },
   "devDependencies": {
     "@shopify/jest-koa-mocks": "5.1.1",
+    "@tsconfig/esm": "1.0.5",
     "@tsconfig/node20": "20.1.2",
     "@tsconfig/strictest": "2.0.2",
     "@types/async": "3.2.22",

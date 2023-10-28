@@ -6,6 +6,7 @@
     "outDir": "./dist",
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": true,
+    "sourceMap": true,
 
     // strictest until tsnode support extends arrays
     "strict": true,
@@ -26,7 +27,12 @@
 
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    //esm until tsnode supports extends arrays
+    "module": "es2022",
+    "moduleResolution": "bundler",
+
+    "verbatimModuleSyntax": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
