@@ -1,4 +1,7 @@
-import request from 'supertest';
+import { Server } from 'http';
+
+import supertest from 'supertest';
+import TestAgent from 'supertest/lib/agent';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -7,6 +10,18 @@ import { decathlonService } from '../../../../src/server/decathlon/decathlon.ser
 import { authenticated } from '../../../utils';
 
 describe('Decathlon Controller', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => {
@@ -19,16 +34,14 @@ describe('Decathlon Controller', () => {
 
   describe('GET /decathlon/exchange-token/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback())
-        .get('/decathlon/exchange-token/1')
-        .query({ code: 'code', scope: '' });
+      const response = await request.get('/decathlon/exchange-token/1').query({ code: 'code', scope: '' });
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
       const response = await authenticated(
-        request(app.callback()).get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', scope: '' }),
+        request.get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', scope: '' }),
         2,
       );
 
@@ -37,7 +50,7 @@ describe('Decathlon Controller', () => {
 
     it('validates input', async () => {
       const response = await authenticated(
-        request(app.callback()).get('/decathlon/exchange-token/1').query({ code: 'tooshort', scope: '' }),
+        request.get('/decathlon/exchange-token/1').query({ code: 'tooshort', scope: '' }),
         1,
       );
 
@@ -46,7 +59,7 @@ describe('Decathlon Controller', () => {
 
     it('acknowledges authorization denial from user', async () => {
       const response = await authenticated(
-        request(app.callback()).get('/decathlon/exchange-token/1').query({ error: 'error', state: '' }),
+        request.get('/decathlon/exchange-token/1').query({ error: 'error', state: '' }),
         1,
       );
 
@@ -58,9 +71,7 @@ describe('Decathlon Controller', () => {
       jest.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
-        request(app.callback())
-          .get('/decathlon/exchange-token/1')
-          .query({ code: 'longenoughcode', state: '', scope: '' }),
+        request.get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', state: '', scope: '' }),
         1,
       );
 
@@ -72,9 +83,7 @@ describe('Decathlon Controller', () => {
       jest.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
-        request(app.callback())
-          .get('/decathlon/exchange-token/1')
-          .query({ code: 'longenoughcode', state: '', scope: '' }),
+        request.get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', state: '', scope: '' }),
         1,
       );
 
@@ -86,13 +95,13 @@ describe('Decathlon Controller', () => {
 
   describe('POST /decathlon/deauthorize/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).post('/decathlon/deauthorize/1');
+      const response = await request.post('/decathlon/deauthorize/1');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 2);
+      const response = await authenticated(request.post('/decathlon/deauthorize/1'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -100,7 +109,7 @@ describe('Decathlon Controller', () => {
     it('retuns 500 if service fails', async () => {
       jest.spyOn(decathlonService, 'deauthorize').mockRejectedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/decathlon/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
       expect(decathlonService.deauthorize).toHaveBeenCalledTimes(1);
@@ -109,7 +118,7 @@ describe('Decathlon Controller', () => {
     it('deauthorizes user', async () => {
       jest.spyOn(decathlonService, 'deauthorize').mockResolvedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/decathlon/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/decathlon/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
       expect(decathlonService.deauthorize).toHaveBeenCalledTimes(1);
@@ -119,7 +128,7 @@ describe('Decathlon Controller', () => {
 
   describe('POST /decathlon/webhook', () => {
     it('validtes input', async () => {
-      const response = await request(app.callback()).post('/decathlon/webhook').query({ what: 'ever' });
+      const response = await request.post('/decathlon/webhook').query({ what: 'ever' });
 
       expect(response.status).toBe(400);
     });
@@ -135,7 +144,7 @@ describe('Decathlon Controller', () => {
           event_time: 1,
         },
       };
-      const response = await request(app.callback()).post('/decathlon/webhook').send(event);
+      const response = await request.post('/decathlon/webhook').send(event);
 
       expect(response.status).toBe(200);
       expect(decathlonService.handleWebhookEvent).toHaveBeenCalledTimes(1);

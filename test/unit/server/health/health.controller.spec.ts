@@ -1,12 +1,27 @@
-import request from 'supertest';
+import { Server } from 'http';
+
+import supertest from 'supertest';
+import TestAgent from 'supertest/lib/agent';
 
 import { app } from '../../../../src/app';
 import type { Status } from '../../../../src/health.service';
 import { semverRegex } from '../../../../src/helpers/utils';
 
 describe('GET /health', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   it('responds without authentication', async () => {
-    const response = await request(app.callback()).get('/health');
+    const response = await request.get('/health');
     expect(response.body as Status).toMatchInlineSnapshot(
       {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

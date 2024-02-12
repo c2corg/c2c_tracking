@@ -1,4 +1,7 @@
-import request from 'supertest';
+import { Server } from 'http';
+
+import supertest from 'supertest';
+import TestAgent from 'supertest/lib/agent';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -7,6 +10,18 @@ import { corosService } from '../../../../src/server/coros/coros.service';
 import { authenticated } from '../../../utils';
 
 describe('Coros Controller', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => {
@@ -19,31 +34,25 @@ describe('Coros Controller', () => {
 
   describe('GET /coros/exchange-token/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).get('/coros/exchange-token/1').query({ code: 'code' });
+      const response = await request.get('/coros/exchange-token/1').query({ code: 'code' });
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(
-        request(app.callback()).get('/coros/exchange-token/1').query({ code: 'longenoughcode' }),
-        2,
-      );
+      const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'longenoughcode' }), 2);
 
       expect(response.status).toBe(403);
     });
 
     it('validates input', async () => {
-      const response = await authenticated(
-        request(app.callback()).get('/coros/exchange-token/1').query({ code: 'tooshort' }),
-        1,
-      );
+      const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'tooshort' }), 1);
 
       expect(response.status).toBe(400);
     });
 
     it('acknowledges authorization denial from user', async () => {
-      const response = await authenticated(request(app.callback()).get('/coros/exchange-token/1'), 1);
+      const response = await authenticated(request.get('/coros/exchange-token/1'), 1);
 
       expect(response.status).toBe(403);
       expect(response.text).toEqual('auth-denied');
@@ -52,10 +61,7 @@ describe('Coros Controller', () => {
     it('throws if user setup fails', async () => {
       jest.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
-      const response = await authenticated(
-        request(app.callback()).get('/coros/exchange-token/1').query({ code: 'longenoughcode' }),
-        1,
-      );
+      const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'longenoughcode' }), 1);
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
@@ -64,10 +70,7 @@ describe('Coros Controller', () => {
     it('setups user', async () => {
       jest.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
-      const response = await authenticated(
-        request(app.callback()).get('/coros/exchange-token/1').query({ code: 'longenoughcode' }),
-        1,
-      );
+      const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'longenoughcode' }), 1);
 
       expect(response.status).toBe(204);
       expect(corosService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
@@ -77,13 +80,13 @@ describe('Coros Controller', () => {
 
   describe('POST /coros/deauthorize/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).post('/coros/deauthorize/1');
+      const response = await request.post('/coros/deauthorize/1');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).post('/coros/deauthorize/1'), 2);
+      const response = await authenticated(request.post('/coros/deauthorize/1'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -91,7 +94,7 @@ describe('Coros Controller', () => {
     it('retuns 500 if service fails', async () => {
       jest.spyOn(corosService, 'deauthorize').mockRejectedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/coros/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/coros/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
       expect(corosService.deauthorize).toHaveBeenCalledTimes(1);
@@ -100,7 +103,7 @@ describe('Coros Controller', () => {
     it('deauthorizes user', async () => {
       jest.spyOn(corosService, 'deauthorize').mockResolvedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/coros/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/coros/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
       expect(corosService.deauthorize).toHaveBeenCalledTimes(1);
@@ -110,7 +113,7 @@ describe('Coros Controller', () => {
 
   describe('POST /coros/webhook', () => {
     it('validates input', async () => {
-      const response = await request(app.callback()).post('/coros/webhook').send({ what: 'ever' });
+      const response = await request.post('/coros/webhook').send({ what: 'ever' });
 
       expect(response.status).toBe(400);
     });
@@ -133,11 +136,7 @@ describe('Coros Controller', () => {
           },
         ],
       };
-      const response = await request(app.callback())
-        .post('/coros/webhook')
-        .set('client', 'client')
-        .set('secret', 'secret')
-        .send(event);
+      const response = await request.post('/coros/webhook').set('client', 'client').set('secret', 'secret').send(event);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ message: 'ok', result: '0000' });

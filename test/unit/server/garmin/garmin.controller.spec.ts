@@ -1,6 +1,9 @@
+import { Server } from 'http';
+
 import { AxiosError } from 'axios';
 import type Keyv from 'keyv';
-import request from 'supertest';
+import supertest from 'supertest';
+import TestAgent from 'supertest/lib/agent';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -10,6 +13,18 @@ import { garminService } from '../../../../src/server/garmin/garmin.service';
 import { authenticated } from '../../../utils';
 
 describe('Garmin Controller', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   beforeEach(async () => {
     jest.clearAllMocks();
     await (garminController['keyv'] as Keyv).clear();
@@ -23,13 +38,13 @@ describe('Garmin Controller', () => {
 
   describe('GET /garmin/request-token/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).get('/garmin/request-token/1');
+      const response = await request.get('/garmin/request-token/1');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).get('/garmin/request-token/1'), 2);
+      const response = await authenticated(request.get('/garmin/request-token/1'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -39,7 +54,7 @@ describe('Garmin Controller', () => {
         .spyOn(garminService, 'requestUnauthorizedRequestToken')
         .mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
 
-      const response = await authenticated(request(app.callback()).get('/garmin/request-token/1'), 1);
+      const response = await authenticated(request.get('/garmin/request-token/1'), 1);
 
       expect(await (garminController['keyv'] as Keyv).get('1')).toBe('tokenSecret');
       expect(response.body).toEqual({ token: 'token' });
@@ -48,14 +63,14 @@ describe('Garmin Controller', () => {
 
   describe('POST /garmin/exchange-token/:userId', () => {
     it('requires valid input', async () => {
-      const response = await request(app.callback())
+      const response = await request
         .get('/garmin/exchange-token/1')
         .query({ oauth_token: 'short', oauth_verifier: 'watever' });
       expect(response.status).toBe(400);
     });
 
     it('acknowledges authorization denial from user', async () => {
-      const response = await request(app.callback())
+      const response = await request
         .get('/garmin/exchange-token/1')
         .query({ oauth_token: 'oauth_token', oauth_verifier: 'NULL' });
 
@@ -64,7 +79,7 @@ describe('Garmin Controller', () => {
     });
 
     it('needs a token secret still stored in keyv', async () => {
-      const response = await request(app.callback())
+      const response = await request
         .get('/garmin/exchange-token/1')
         .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
 
@@ -76,7 +91,7 @@ describe('Garmin Controller', () => {
       await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 100);
       jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
-      const response = await request(app.callback())
+      const response = await request
         .get('/garmin/exchange-token/1')
         .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
 
@@ -91,7 +106,7 @@ describe('Garmin Controller', () => {
       await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 100);
       jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
-      const response = await request(app.callback())
+      const response = await request
         .get('/garmin/exchange-token/1')
         .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
 
@@ -111,13 +126,13 @@ describe('Garmin Controller', () => {
 
   describe('POST /garmin/deauthorize/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).post('/garmin/deauthorize/1');
+      const response = await request.post('/garmin/deauthorize/1');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 2);
+      const response = await authenticated(request.post('/garmin/deauthorize/1'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -125,7 +140,7 @@ describe('Garmin Controller', () => {
     it('throws if garmin API call fails', async () => {
       jest.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(new AxiosError());
 
-      const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
     });
@@ -133,7 +148,7 @@ describe('Garmin Controller', () => {
     it('throws if garmin API call fails (2)', async () => {
       jest.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
     });
@@ -141,7 +156,7 @@ describe('Garmin Controller', () => {
     it('deauthorizes user with garmin API', async () => {
       jest.spyOn(garminService, 'deauthorize').mockResolvedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/garmin/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
       expect(garminService.deauthorize).toHaveBeenCalledTimes(1);
@@ -153,7 +168,7 @@ describe('Garmin Controller', () => {
     it('validates input', async () => {
       jest.spyOn(garminService, 'handleActivityWebhook').mockResolvedValueOnce(undefined);
 
-      const response = await request(app.callback()).post('/garmin/webhook/activities').send({ invalid: 'input' });
+      const response = await request.post('/garmin/webhook/activities').send({ invalid: 'input' });
 
       expect(response.status).toBe(400);
     });
@@ -166,7 +181,7 @@ describe('Garmin Controller', () => {
       } = {
         activityDetails: [],
       };
-      const response = await request(app.callback()).post('/garmin/webhook/activities').send(body);
+      const response = await request.post('/garmin/webhook/activities').send(body);
 
       expect(response.status).toBe(200);
       expect(garminService.handleActivityWebhook).toHaveBeenCalledTimes(1);
@@ -178,7 +193,7 @@ describe('Garmin Controller', () => {
     it('validates input', async () => {
       jest.spyOn(garminService, 'handleDeauthorizeWebhook').mockResolvedValueOnce(undefined);
 
-      const response = await request(app.callback()).post('/garmin/webhook/deauthorize').send({ invalid: 'input' });
+      const response = await request.post('/garmin/webhook/deauthorize').send({ invalid: 'input' });
 
       expect(response.status).toBe(400);
     });
@@ -189,7 +204,7 @@ describe('Garmin Controller', () => {
       const body: { deregistrations: { userId: string; userAccessToken: string }[] } = {
         deregistrations: [],
       };
-      const response = await request(app.callback()).post('/garmin/webhook/deauthorize').send(body);
+      const response = await request.post('/garmin/webhook/deauthorize').send(body);
 
       expect(response.status).toBe(200);
       expect(garminService.handleDeauthorizeWebhook).toHaveBeenCalledTimes(1);

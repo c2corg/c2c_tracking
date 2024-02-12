@@ -1,4 +1,7 @@
-import request from 'supertest';
+import { Server } from 'http';
+
+import supertest from 'supertest';
+import TestAgent from 'supertest/lib/agent';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -6,6 +9,18 @@ import { activityService } from '../../../../src/server/activities/activity.serv
 import { authenticated } from '../../../utils';
 
 describe('Activities Controller', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => {
@@ -18,13 +33,13 @@ describe('Activities Controller', () => {
 
   describe('GET /users/:userId/activities', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).get('/users/1/activities');
+      const response = await request.get('/users/1/activities');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).get('/users/1/activities'), 2);
+      const response = await authenticated(request.get('/users/1/activities'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -32,7 +47,7 @@ describe('Activities Controller', () => {
     it('validates input', async () => {
       jest.spyOn(activityService, 'getActivities');
 
-      const response = await authenticated(request(app.callback()).get('/users/1/activities?lang=1'), 1);
+      const response = await authenticated(request.get('/users/1/activities?lang=1'), 1);
 
       expect(response.status).toBe(400);
       expect(activityService.getActivities).not.toHaveBeenCalled();
@@ -51,7 +66,7 @@ describe('Activities Controller', () => {
         },
       ]);
 
-      const response = await authenticated(request(app.callback()).get('/users/1/activities'), 1);
+      const response = await authenticated(request.get('/users/1/activities'), 1);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchInlineSnapshot(`
@@ -87,7 +102,7 @@ describe('Activities Controller', () => {
         },
       ]);
 
-      const response = await authenticated(request(app.callback()).get('/users/1/activities?lang=en'), 1);
+      const response = await authenticated(request.get('/users/1/activities?lang=en'), 1);
 
       expect(response.status).toBe(200);
       expect(response.body).toMatchInlineSnapshot(`
@@ -112,13 +127,13 @@ describe('Activities Controller', () => {
 
   describe('GET users/:userId/activities/:activityId/geometry', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).get('/users/1/activities/1/geometry');
+      const response = await request.get('/users/1/activities/1/geometry');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).get('/users/1/activities/1/geometry'), 2);
+      const response = await authenticated(request.get('/users/1/activities/1/geometry'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -126,7 +141,7 @@ describe('Activities Controller', () => {
     it('returns  404 if no geometry can be retrieved', async () => {
       jest.spyOn(activityService, 'getActivityGeometry').mockResolvedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).get('/users/1/activities/1/geometry'), 1);
+      const response = await authenticated(request.get('/users/1/activities/1/geometry'), 1);
 
       expect(response.status).toBe(404);
     });
@@ -136,7 +151,7 @@ describe('Activities Controller', () => {
         .spyOn(activityService, 'getActivityGeometry')
         .mockResolvedValueOnce({ type: 'LineString', coordinates: [[1, 1, 1, 1]] });
 
-      const response = await authenticated(request(app.callback()).get('/users/1/activities/1/geometry'), 1);
+      const response = await authenticated(request.get('/users/1/activities/1/geometry'), 1);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({ type: 'LineString', coordinates: [[1, 1, 1, 1]] });

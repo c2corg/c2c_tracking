@@ -1,4 +1,7 @@
-import request from 'supertest';
+import { Server } from 'http';
+
+import supertest from 'supertest';
+import TestAgent from 'supertest/lib/agent';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -7,6 +10,18 @@ import { stravaService } from '../../../../src/server/strava/strava.service';
 import { authenticated } from '../../../utils';
 
 describe('Strava Controller', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => {
@@ -19,18 +34,14 @@ describe('Strava Controller', () => {
 
   describe('GET /strava/exchange-token/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback())
-        .get('/strava/exchange-token/1')
-        .query({ code: 'code', scope: 'activity:read' });
+      const response = await request.get('/strava/exchange-token/1').query({ code: 'code', scope: 'activity:read' });
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
       const response = await authenticated(
-        request(app.callback())
-          .get('/strava/exchange-token/1')
-          .query({ code: 'longenoughcode', scope: 'activity:read' }),
+        request.get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'activity:read' }),
         2,
       );
 
@@ -39,7 +50,7 @@ describe('Strava Controller', () => {
 
     it('validates input', async () => {
       const response = await authenticated(
-        request(app.callback()).get('/strava/exchange-token/1').query({ code: 'tooshort', scope: 'activity:read' }),
+        request.get('/strava/exchange-token/1').query({ code: 'tooshort', scope: 'activity:read' }),
         1,
       );
 
@@ -47,10 +58,7 @@ describe('Strava Controller', () => {
     });
 
     it('acknowledges authorization denial from user', async () => {
-      const response = await authenticated(
-        request(app.callback()).get('/strava/exchange-token/1').query({ error: 'error' }),
-        1,
-      );
+      const response = await authenticated(request.get('/strava/exchange-token/1').query({ error: 'error' }), 1);
 
       expect(response.status).toBe(403);
       expect(response.text).toEqual('auth-denied');
@@ -58,7 +66,7 @@ describe('Strava Controller', () => {
 
     it('throws if unsufficient scopes are accepted', async () => {
       const response = await authenticated(
-        request(app.callback()).get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'toto' }),
+        request.get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'toto' }),
         1,
       );
 
@@ -70,9 +78,7 @@ describe('Strava Controller', () => {
       jest.spyOn(stravaService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
-        request(app.callback())
-          .get('/strava/exchange-token/1')
-          .query({ code: 'longenoughcode', scope: 'activity:read' }),
+        request.get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'activity:read' }),
         1,
       );
 
@@ -84,9 +90,7 @@ describe('Strava Controller', () => {
       jest.spyOn(stravaService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
-        request(app.callback())
-          .get('/strava/exchange-token/1')
-          .query({ code: 'longenoughcode', scope: 'activity:read' }),
+        request.get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'activity:read' }),
         1,
       );
 
@@ -98,13 +102,13 @@ describe('Strava Controller', () => {
 
   describe('POST /strava/deauthorize/:userId', () => {
     it('requires an authenticated user', async () => {
-      const response = await request(app.callback()).post('/strava/deauthorize/1');
+      const response = await request.post('/strava/deauthorize/1');
 
       expect(response.status).toBe(401);
     });
 
     it('requires matching authenticated user', async () => {
-      const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 2);
+      const response = await authenticated(request.post('/strava/deauthorize/1'), 2);
 
       expect(response.status).toBe(403);
     });
@@ -112,7 +116,7 @@ describe('Strava Controller', () => {
     it('retuns 500 if service fails', async () => {
       jest.spyOn(stravaService, 'deauthorize').mockRejectedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/strava/deauthorize/1'), 1);
 
       expect(response.status).toBe(500);
       expect(stravaService.deauthorize).toHaveBeenCalledTimes(1);
@@ -121,7 +125,7 @@ describe('Strava Controller', () => {
     it('deauthorizes user', async () => {
       jest.spyOn(stravaService, 'deauthorize').mockResolvedValueOnce(undefined);
 
-      const response = await authenticated(request(app.callback()).post('/strava/deauthorize/1'), 1);
+      const response = await authenticated(request.post('/strava/deauthorize/1'), 1);
 
       expect(response.status).toBe(204);
       expect(stravaService.deauthorize).toHaveBeenCalledTimes(1);
@@ -131,13 +135,13 @@ describe('Strava Controller', () => {
 
   describe('GET /strava/webhook', () => {
     it('validates input', async () => {
-      const response = await request(app.callback()).get('/strava/webhook').query({ what: 'ever' });
+      const response = await request.get('/strava/webhook').query({ what: 'ever' });
 
       expect(response.status).toBe(400);
     });
 
     it('validates token', async () => {
-      const response = await request(app.callback())
+      const response = await request
         .get('/strava/webhook')
         .query({ 'hub.mode': 'subscribe', 'hub.challenge': 'challenge', 'hub.verify_token': 'invalid_token' });
 
@@ -145,7 +149,7 @@ describe('Strava Controller', () => {
     });
 
     it('replies with challenge', async () => {
-      const response = await request(app.callback())
+      const response = await request
         .get('/strava/webhook')
         .query({ 'hub.mode': 'subscribe', 'hub.challenge': 'challenge', 'hub.verify_token': '%trongpAssM0rd' });
 
@@ -156,7 +160,7 @@ describe('Strava Controller', () => {
 
   describe('POST /strava/webhook', () => {
     it('validates input', async () => {
-      const response = await request(app.callback()).post('/strava/webhook').query({ what: 'ever' });
+      const response = await request.post('/strava/webhook').query({ what: 'ever' });
 
       expect(response.status).toBe(400);
     });
@@ -173,7 +177,7 @@ describe('Strava Controller', () => {
         subscription_id: 1,
         event_time: 1,
       };
-      const response = await request(app.callback()).post('/strava/webhook').send(event);
+      const response = await request.post('/strava/webhook').send(event);
 
       expect(response.status).toBe(200);
       expect(stravaService.handleWebhookEvent).toHaveBeenCalledTimes(1);
