@@ -12,7 +12,7 @@
     "start:dev": "node --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts | pino-pretty -c -t -i req.headers,res.headers\"",
     "build": "tsc",
     "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint --report-unused-disable-directives --ext .ts,.js .",
-    "prepare": "husky install",
+    "prepare": "husky",
     "test": "npm run test:unit && npm run test:psql",
     "test:ci": "npm run test:ci:unit && npm run test:ci:s3 && npm run test:ci:psql",
     "test:unit": "jest --runInBand --detectOpenHandles",
