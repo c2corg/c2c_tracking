@@ -162,9 +162,7 @@ export class GarminApi {
       const timestamp = dayjs().unix();
       const nonce = randomBytes(16).toString('hex');
       const signature = encodeURIComponent(this.generateUnauthorizedRequestTokenSignature(timestamp, nonce));
-      const authorization = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${
-        this.#consumerKey
-      }", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
+      const authorization = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${this.#consumerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
       const response = await axios.post(`${this.oauthUrl}oauth/request_token`, null, {
         headers: { Authorization: authorization },
         responseType: 'text',
@@ -180,9 +178,7 @@ export class GarminApi {
   }
 
   private generateUnauthorizedRequestTokenSignature(timestamp: number, nonce: string): string {
-    const normalizedParameters = `oauth_consumer_key=${
-      this.#consumerKey
-    }&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_version=1.0`;
+    const normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_version=1.0`;
     const signatureBaseString = `POST&${encodeURIComponent(this.oauthUrl + 'oauth/request_token')}&${encodeURIComponent(
       normalizedParameters,
     )}`;
@@ -196,9 +192,7 @@ export class GarminApi {
       const signature = encodeURIComponent(
         this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
       );
-      const authorization = `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${
-        this.#consumerKey
-      }", oauth_token="${requestToken}", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_signature_method="HMAC-SHA1", oauth_signature="${signature}"`;
+      const authorization = `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${this.#consumerKey}", oauth_token="${requestToken}", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_signature_method="HMAC-SHA1", oauth_signature="${signature}"`;
       const response = await axios.post<string>(`${this.oauthUrl}oauth/access_token`, null, {
         headers: { Authorization: authorization },
         responseType: 'text',
@@ -220,9 +214,7 @@ export class GarminApi {
     tokenSecret: string,
     verifier: string,
   ): string {
-    const normalizedParameters = `oauth_consumer_key=${
-      this.#consumerKey
-    }&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_verifier=${verifier}&oauth_version=1.0`;
+    const normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_verifier=${verifier}&oauth_version=1.0`;
     const signatureBaseString = `POST&${encodeURIComponent(this.oauthUrl + 'oauth/access_token')}&${encodeURIComponent(
       normalizedParameters,
     )}`;
@@ -265,9 +257,7 @@ export class GarminApi {
   ): string {
     const timestamp = dayjs().unix();
     const nonce = randomBytes(16).toString('hex');
-    let normalizedParameters = `oauth_consumer_key=${
-      this.#consumerKey
-    }&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
+    let normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
     if (start != undefined && end != undefined) {
       normalizedParameters += `&summaryEndTimeInSeconds=${end}&summaryStartTimeInSeconds=${start}`;
     }
@@ -275,9 +265,7 @@ export class GarminApi {
     const signature = encodeURIComponent(
       createHmac('sha1', `${this.#consumerSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64'),
     );
-    return `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_token="${token}", oauth_consumer_key="${
-      this.#consumerKey
-    }", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
+    return `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_token="${token}", oauth_consumer_key="${this.#consumerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
   }
 }
 
