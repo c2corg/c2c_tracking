@@ -11,7 +11,7 @@ module.exports = {
     'plugin:node/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
-    'plugin:security/recommended',
+    'plugin:security/recommended-legacy',
     'plugin:prettier/recommended', // Enables eslint-plugin-prettier and displays prettier errors as ESLint errors. Make sure this is always the last configuration in the extends array.
   ],
   parserOptions: {
