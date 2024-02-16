@@ -48,7 +48,7 @@
     "crypto-js": "4.2.0",
     "dayjs": "1.11.10",
     "dotenv": "16.4.4",
-    "dotenv-expand": "11.0.3",
+    "dotenv-expand": "11.0.4",
     "iso8601-duration": "2.1.2",
     "json-bigint": "1.0.0",
     "keyv": "4.5.4",
