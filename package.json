@@ -109,7 +109,7 @@
     "supertest": "6.3.4",
     "ts-jest": "29.1.2",
     "ts-node": "10.9.2",
-    "type-fest": "4.14.0",
+    "type-fest": "4.16.0",
     "typescript": "5.4.3"
   }
 }
