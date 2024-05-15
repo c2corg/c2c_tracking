@@ -106,7 +106,7 @@
     "passport-custom": "1.1.1",
     "pino-pretty": "11.0.0",
     "prettier": "3.2.5",
-    "supertest": "6.3.4",
+    "supertest": "7.0.0",
     "ts-jest": "29.1.2",
     "ts-node": "10.9.2",
     "type-fest": "4.14.0",
