@@ -69,7 +69,7 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@shopify/jest-koa-mocks": "5.1.1",
+    "@shopify/jest-koa-mocks": "5.3.0",
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/strictest": "2.0.5",
     "@types/async": "3.2.24",
