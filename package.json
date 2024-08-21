@@ -41,7 +41,7 @@
     "@mapbox/polyline": "1.2.1",
     "@paralleldrive/cuid2": "2.2.2",
     "@types/json-bigint": "1.0.4",
-    "async": "3.2.5",
+    "async": "3.2.6",
     "axios": "1.7.4",
     "cls-rtracer": "2.6.3",
     "convict": "6.2.4",
