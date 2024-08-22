@@ -12,7 +12,9 @@ class GarminController {
 
   constructor() {
     const connectionUri = config.get('keyv.connectionUri');
-    this.keyv = new Keyv(connectionUri ? { store: new KeyvRedis(connectionUri), namespace: 'tracking' } : undefined);
+    this.keyv = new Keyv(
+      connectionUri ? { store: new KeyvRedis({ uri: connectionUri }), namespace: 'tracking' } : undefined,
+    );
     this.keyv.on('error', () => {
       throw new Error('Unable to connect to Redis instance with URI ' + connectionUri);
     });
