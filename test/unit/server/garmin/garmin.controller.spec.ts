@@ -1,7 +1,6 @@
 import { Server } from 'http';
 
 import { AxiosError } from 'axios';
-import type Keyv from 'keyv';
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
 
@@ -27,7 +26,7 @@ describe('Garmin Controller', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    await (garminController['keyv'] as Keyv).clear();
+    await garminController['keyv'].clear();
     jest.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
@@ -56,7 +55,7 @@ describe('Garmin Controller', () => {
 
       const response = await authenticated(request.get('/garmin/request-token/1'), 1);
 
-      expect(await (garminController['keyv'] as Keyv).get('1')).toBe('tokenSecret');
+      expect(await garminController['keyv'].get('1')).toBe('tokenSecret');
       expect(response.body).toEqual({ token: 'token' });
     });
   });
@@ -88,7 +87,7 @@ describe('Garmin Controller', () => {
     });
 
     it('throws if user setup fails', async () => {
-      await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 100);
+      await garminController['keyv'].set('1', 'tokenSecret', 100);
       jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await request
@@ -99,11 +98,11 @@ describe('Garmin Controller', () => {
       expect(response.text).toEqual('setup-failed');
 
       // ensure we clear the entry
-      await (garminController['keyv'] as Keyv).delete('1');
+      await garminController['keyv'].delete('1');
     });
 
     it('setups user', async () => {
-      await (garminController['keyv'] as Keyv).set('1', 'tokenSecret', 100);
+      await garminController['keyv'].set('1', 'tokenSecret', 100);
       jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await request
@@ -120,7 +119,7 @@ describe('Garmin Controller', () => {
       );
 
       // ensure we clear the entry
-      await (garminController['keyv'] as Keyv).delete('1');
+      await garminController['keyv'].delete('1');
     });
   });
 
