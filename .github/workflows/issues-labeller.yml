@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Add label corresponding to conventional commit type
-      - uses: srvaroa/labeler@v1.4
+      - uses: srvaroa/labeler@v1.11
         with:
           config_path: .github/semantic-labels.yml
         env:
