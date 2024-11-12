@@ -55,7 +55,7 @@
     "knex": "3.1.0",
     "koa": "2.15.3",
     "koa-bodyparser": "4.4.1",
-    "koa-helmet": "7.0.2",
+    "koa-helmet": "7.1.0",
     "koa-passport": "6.0.0",
     "koa-pino-logger": "4.0.0",
     "node-watch": "0.7.4",
