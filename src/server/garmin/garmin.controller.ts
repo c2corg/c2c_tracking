@@ -1,6 +1,6 @@
-import KeyvRedis from '@keyv/redis';
+import { createKeyv } from '@keyv/redis';
 // eslint-disable-next-line import/no-named-as-default
-import Keyv, { KeyvStoreAdapter } from 'keyv';
+import Keyv from 'keyv';
 import type { Context } from 'koa';
 
 import config from '../../config';
@@ -14,7 +14,7 @@ class GarminController {
   constructor() {
     const connectionUri = config.get('keyv.connectionUri');
     this.keyv = connectionUri
-      ? new Keyv(new KeyvRedis(connectionUri, { namespace: 'tracking' }) as KeyvStoreAdapter)
+      ? createKeyv(connectionUri, { namespace: 'tracking' })
       : new Keyv({ namespace: 'tracking' });
     this.keyv.on('error', () => {
       throw new Error('Unable to connect to Redis instance with URI ' + connectionUri);
