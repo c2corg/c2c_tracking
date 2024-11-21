@@ -1,4 +1,0 @@
-{
-  "*.ts": ["eslint --fix --report-unused-disable-directives", "prettier --write --ignore-unknown"],
-  "*.{json,md}": ["prettier --write --ignore-unknown"]
-}
