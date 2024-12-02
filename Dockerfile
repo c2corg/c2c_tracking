@@ -1,5 +1,5 @@
 # build stage
-FROM node:22-slim as build-stage
+FROM node:23-slim as build-stage
 RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /usr
 COPY package*.json ./
@@ -10,7 +10,7 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # production stage
-FROM node:22-slim
+FROM node:23-slim
 ARG version
 ENV npm_package_version=${version}
 ENV NODE_ENV production
