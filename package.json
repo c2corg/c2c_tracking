@@ -35,7 +35,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.821.0",
     "@c2corg/fit-parser-extract-geometry": "1.0.3",
-    "@keyv/redis": "4.4.0",
+    "@keyv/redis": "4.4.1",
     "@koa/cors": "5.0.0",
     "@koa/router": "13.1.0",
     "@mapbox/polyline": "1.2.1",
