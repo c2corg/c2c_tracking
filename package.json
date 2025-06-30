@@ -47,7 +47,7 @@
     "convict": "6.2.4",
     "crypto-js": "4.2.0",
     "dayjs": "1.11.13",
-    "dotenv": "16.5.0",
+    "dotenv": "17.0.0",
     "dotenv-expand": "12.0.2",
     "iso8601-duration": "2.1.2",
     "json-bigint": "1.0.0",
