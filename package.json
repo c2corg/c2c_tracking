@@ -37,7 +37,7 @@
     "@c2corg/fit-parser-extract-geometry": "1.0.3",
     "@keyv/redis": "4.4.0",
     "@koa/cors": "5.0.0",
-    "@koa/router": "13.1.0",
+    "@koa/router": "13.1.1",
     "@mapbox/polyline": "1.2.1",
     "@paralleldrive/cuid2": "2.2.2",
     "@types/json-bigint": "1.0.4",
