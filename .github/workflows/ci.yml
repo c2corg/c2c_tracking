@@ -30,7 +30,7 @@ jobs:
         node-version: [lts/*]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Cache node modules
         uses: actions/cache@v4
         env:
@@ -108,7 +108,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Create or update release
