@@ -52,10 +52,9 @@ describe('Strava Service', () => {
           total_elevation_gain: 1.2,
         },
       ]);
-      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce([
-        { type: 'distance', series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
-        {
-          type: 'latlng',
+      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+        distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
+        latlng: {
           series_type: 'distance',
           original_size: 2,
           resolution: 'low',
@@ -64,7 +63,7 @@ describe('Strava Service', () => {
             [2.0, 2.0],
           ],
         },
-      ]);
+      });
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
@@ -123,7 +122,7 @@ describe('Strava Service', () => {
           total_elevation_gain: 1.2,
         },
       ]);
-      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce([]);
+      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({});
       jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
@@ -746,10 +745,9 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce([
-          { type: 'distance', series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
-          {
-            type: 'latlng',
+        jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+          distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
+          latlng: {
             series_type: 'distance',
             original_size: 2,
             resolution: 'low',
@@ -758,7 +756,7 @@ describe('Strava Service', () => {
               [2.0, 2.0],
             ],
           },
-        ]);
+        });
         jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
         const service = new StravaService();
@@ -818,10 +816,9 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce([
-          { type: 'distance', series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
-          {
-            type: 'latlng',
+        jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+          distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
+          latlng: {
             series_type: 'distance',
             original_size: 2,
             resolution: 'low',
@@ -830,7 +827,7 @@ describe('Strava Service', () => {
               [2.0, 2.0],
             ],
           },
-        ]);
+        });
         jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
         const service = new StravaService();
@@ -1132,23 +1129,21 @@ describe('Strava Service', () => {
       expect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'time',
+          {
+            time: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'distance',
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
-          ],
+          },
           1,
         );
       }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
@@ -1159,25 +1154,22 @@ describe('Strava Service', () => {
       expect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'distance',
+          {
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'time',
+            time: {
               series_type: 'time',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'latlng',
+            latlng: {
               series_type: 'time',
               original_size: 2,
               resolution: 'high',
@@ -1186,7 +1178,7 @@ describe('Strava Service', () => {
                 [2.0, 2.0],
               ],
             },
-          ],
+          },
           1,
         );
       }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
@@ -1197,31 +1189,28 @@ describe('Strava Service', () => {
       expect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'distance',
+          {
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'time',
+            time: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'latlng',
+            latlng: {
               series_type: 'distance',
               original_size: 1,
               resolution: 'high',
               data: [[1.0, 1.0]],
             },
-          ],
+          },
           1,
         );
       }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
@@ -1232,25 +1221,22 @@ describe('Strava Service', () => {
       expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'distance',
+          {
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'time',
+            time: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'latlng',
+            latlng: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
@@ -1260,14 +1246,13 @@ describe('Strava Service', () => {
               ],
             },
 
-            {
-              type: 'altitude',
+            altitude: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
-          ],
+          },
           1,
         ),
       ).toMatchInlineSnapshot(`
@@ -1296,25 +1281,22 @@ describe('Strava Service', () => {
       expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'distance',
+          {
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'time',
+            time: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'latlng',
+            latlng: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
@@ -1323,7 +1305,7 @@ describe('Strava Service', () => {
                 [2.0, 2.0],
               ],
             },
-          ],
+          },
           1,
         ),
       ).toMatchInlineSnapshot(`
@@ -1350,17 +1332,15 @@ describe('Strava Service', () => {
       expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'distance',
+          {
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'latlng',
+            latlng: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
@@ -1370,14 +1350,13 @@ describe('Strava Service', () => {
               ],
             },
 
-            {
-              type: 'altitude',
+            altitude: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
-          ],
+          },
           1,
         ),
       ).toMatchInlineSnapshot(`
@@ -1404,17 +1383,15 @@ describe('Strava Service', () => {
       expect(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
         (service as any).streamSetToGeoJSON(
-          [
-            {
-              type: 'distance',
+          {
+            distance: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
               data: [1, 2],
             },
 
-            {
-              type: 'latlng',
+            latlng: {
               series_type: 'distance',
               original_size: 2,
               resolution: 'high',
@@ -1423,7 +1400,7 @@ describe('Strava Service', () => {
                 [2.0, 2.0],
               ],
             },
-          ],
+          },
           1,
         ),
       ).toMatchInlineSnapshot(`
