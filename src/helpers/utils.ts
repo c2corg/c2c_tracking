@@ -9,6 +9,9 @@ import type { LineString } from '../repository/geojson';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Except<T, K>;
 
+// allows typescript to infer non nullable
+export const truthy = <T>(x: T): x is NonNullable<typeof x> => Boolean(x);
+
 export const semverRegex =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
@@ -20,7 +23,7 @@ export const isISO8601Duration = (duration: string | undefined): boolean => {
   try {
     parse(duration);
     return true;
-  } catch (erorr: unknown) {
+  } catch (error: unknown) {
     return false;
   }
 };

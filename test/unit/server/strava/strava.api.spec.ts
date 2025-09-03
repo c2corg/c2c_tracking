@@ -35,17 +35,15 @@ describe('Strava API', () => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ code: 'code' }),
       });
-      expect(result).toMatchInlineSnapshot(`
-        {
-          "access_token": "access_token",
-          "athlete": {
-            "id": 1,
-          },
-          "expires_at": 1,
-          "expires_in": 1,
-          "refresh_token": "refresh_token",
-        }
-      `);
+      expect(result).toMatchObject({
+        access_token: 'access_token',
+        athlete: {
+          id: 1,
+        },
+        expires_at: 1,
+        expires_in: 1,
+        refresh_token: 'refresh_token',
+      });
     });
   });
 
@@ -74,14 +72,12 @@ describe('Strava API', () => {
       const api = new StravaApi();
       const result = await api.refreshAuth('refresh_token');
 
-      expect(result).toMatchInlineSnapshot(`
-        {
-          "access_token": "access_token",
-          "expires_at": 1,
-          "expires_in": 1,
-          "refresh_token": "refresh_token",
-        }
-      `);
+      expect(result).toMatchObject({
+        access_token: 'access_token',
+        expires_at: 1,
+        expires_in: 1,
+        refresh_token: 'refresh_token',
+      });
       expect(axios.post).toHaveBeenCalledTimes(1);
       expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -109,20 +105,18 @@ describe('Strava API', () => {
       const api = new StravaApi();
       const result = await api.getAthleteActivities('access_token');
 
-      expect(result).toMatchInlineSnapshot(`
-        [
-          {
-            "distance": 1.2,
-            "elapsed_time": 1,
-            "id": 123,
-            "name": "Afternoon Run",
-            "sport_type": "Run",
-            "start_date": "2022-01-01T00:00:01Z",
-            "start_date_local": "2022-01-01T01:00:01Z",
-            "total_elevation_gain": 1.2,
-          },
-        ]
-      `);
+      expect(result).toMatchObject([
+        {
+          distance: 1.2,
+          elapsed_time: 1,
+          id: 123,
+          name: 'Afternoon Run',
+          sport_type: 'Run',
+          start_date: '2022-01-01T00:00:01Z',
+          start_date_local: '2022-01-01T01:00:01Z',
+          total_elevation_gain: 1.2,
+        },
+      ]);
       expect(axios.get).toHaveBeenCalledTimes(1);
       expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/athlete/activities', {
         headers: { Authorization: 'Bearer access_token' },
@@ -147,18 +141,16 @@ describe('Strava API', () => {
       const api = new StravaApi();
       const result = await api.getActivity('access_token', 123);
 
-      expect(result).toMatchInlineSnapshot(`
-        {
-          "distance": 1.2,
-          "elapsed_time": 1,
-          "id": 123,
-          "name": "Afternoon Run",
-          "sport_type": "Run",
-          "start_date": "2022-01-01T00:00:01Z",
-          "start_date_local": "2022-01-01T00:00:01Z",
-          "total_elevation_gain": 1.2,
-        }
-      `);
+      expect(result).toMatchObject({
+        distance: 1.2,
+        elapsed_time: 1,
+        id: 123,
+        name: 'Afternoon Run',
+        sport_type: 'Run',
+        start_date: '2022-01-01T00:00:01Z',
+        start_date_local: '2022-01-01T00:00:01Z',
+        total_elevation_gain: 1.2,
+      });
       expect(axios.get).toHaveBeenCalledTimes(1);
       expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/123', {
         headers: { Authorization: 'Bearer access_token' },
@@ -168,9 +160,8 @@ describe('Strava API', () => {
 
   describe('getActivityStream', () => {
     it('calls strava API', async () => {
-      const streamSet: StreamSet = [
-        {
-          type: 'latlng',
+      const streamSet: StreamSet = {
+        latlng: {
           series_type: 'distance',
           original_size: 2,
           resolution: 'low',
@@ -179,39 +170,28 @@ describe('Strava API', () => {
             [2.0, 2.0],
           ],
         },
-      ];
+      };
       jest.mocked(axios).get.mockResolvedValueOnce({ data: streamSet });
 
       const api = new StravaApi();
       const result = await api.getActivityStream('access_token', 1);
 
-      expect(result).toMatchInlineSnapshot(`
-        [
-          {
-            "data": [
-              [
-                1,
-                1,
-              ],
-              [
-                2,
-                2,
-              ],
-            ],
-            "original_size": 2,
-            "resolution": "low",
-            "series_type": "distance",
-            "type": "latlng",
-          },
-        ]
-      `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith(
-        'https://www.strava.com/api/v3/activities/1/streams?keys=time,latlng,altitude&key_by_type=',
-        {
-          headers: { Authorization: 'Bearer access_token' },
+      expect(result).toMatchObject({
+        latlng: {
+          data: [
+            [1, 1],
+            [2, 2],
+          ],
+          original_size: 2,
+          resolution: 'low',
+          series_type: 'distance',
         },
-      );
+      });
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/1/streams', {
+        headers: { Authorization: 'Bearer access_token' },
+        params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
+      });
     });
   });
 
@@ -253,17 +233,15 @@ describe('Strava API', () => {
       const api = new StravaApi();
       const result = await api.getSubscriptions();
 
-      expect(result).toMatchInlineSnapshot(`
-        [
-          {
-            "application_id": 1234,
-            "callback_url": "http://redirect.to",
-            "created_at": "2022-01-01T00:00:01Z",
-            "id": 123,
-            "updated_at": "2022-01-01T00:00:01Z",
-          },
-        ]
-      `);
+      expect(result).toMatchObject([
+        {
+          application_id: 1234,
+          callback_url: 'http://redirect.to',
+          created_at: '2022-01-01T00:00:01Z',
+          id: 123,
+          updated_at: '2022-01-01T00:00:01Z',
+        },
+      ]);
       expect(axios.get).toHaveBeenCalledTimes(1);
       expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/push_subscriptions', expect.anything());
     });
