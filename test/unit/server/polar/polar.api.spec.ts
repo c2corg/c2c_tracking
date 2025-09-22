@@ -29,11 +29,7 @@ describe('Polar API', () => {
     });
 
     it('calls polar API', async () => {
-      const auth: PolarAuth = {
-        access_token: 'access_token',
-        token_type: 'bearer',
-        x_user_id: 1n,
-      };
+      const auth: PolarAuth = { access_token: 'access_token', token_type: 'bearer', x_user_id: 1n };
       jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
       const api = new PolarApi();
@@ -175,7 +171,11 @@ describe('Polar API', () => {
       const api = new PolarApi();
       const result = await api.getExerciseFit('token', 'exerciseId');
 
-      expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
+      expect(result).toMatchInlineSnapshot(`
+        ArrayBuffer [
+          0,
+        ]
+      `);
       expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
@@ -220,15 +220,7 @@ describe('Polar API', () => {
     });
 
     it('calls polar API', async () => {
-      const webhookInfo: WebhookInfo = {
-        data: [
-          {
-            id: '1',
-            events: ['EXERCISE'],
-            url: 'http://perdu.com',
-          },
-        ],
-      };
+      const webhookInfo: WebhookInfo = { data: [{ id: '1', events: ['EXERCISE'], url: 'http://perdu.com' }] };
       jest.mocked(axios).get.mockResolvedValueOnce({ data: webhookInfo });
 
       const api = new PolarApi();

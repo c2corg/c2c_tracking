@@ -29,11 +29,7 @@ describe('Coros API', () => {
     });
 
     it('calls coros API', async () => {
-      const auth: CorosAuth = {
-        access_token: 'access_token',
-        refresh_token: 'refresh_token',
-        openId: '1',
-      };
+      const auth: CorosAuth = { access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' };
       jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
       const api = new CorosApi();
@@ -247,7 +243,11 @@ describe('Coros API', () => {
       const api = new CorosApi();
       const result = await api.getFIT('url');
 
-      expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
+      expect(result).toMatchInlineSnapshot(`
+        ArrayBuffer [
+          0,
+        ]
+      `);
       expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });

@@ -265,7 +265,11 @@ describe('Suunto API', () => {
       const api = new SuuntoApi();
       const result = await api.getFIT('1', 'token', 'subscription');
 
-      expect(result).toMatchInlineSnapshot(`ArrayBuffer []`);
+      expect(result).toMatchInlineSnapshot(`
+        ArrayBuffer [
+          0,
+        ]
+      `);
       expect(axios.get).toHaveBeenCalledTimes(1);
     });
   });
