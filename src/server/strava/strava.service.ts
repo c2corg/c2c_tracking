@@ -4,6 +4,7 @@ import dayjsPluginUTC from 'dayjs/plugin/utc';
 import config from '../../config';
 import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
+import { truthy } from '../../helpers/utils';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
 import type { NewActivityWithGeometry, UpdateActivity, Vendor } from '../../repository/activity';
@@ -151,17 +152,23 @@ export class StravaService {
   }
 
   private streamSetToGeoJSON(stream: StreamSet, startDate: number): LineString | undefined {
-    const distanceStream: DistanceStream | undefined = stream.find(StravaService.isDistanceStream);
-    const timeStream: TimeStream | undefined = stream.find(StravaService.isTimeStream);
-    const latlngStream: LatLngStream | undefined = stream.find(StravaService.isLatLngStream);
-    const altStream: AltitudeStream | undefined = stream.find(StravaService.isAltitudeStream);
+    const distanceStream: DistanceStream | undefined = stream.distance;
+    const timeStream: TimeStream | undefined = stream.time;
+    const latlngStream: LatLngStream | undefined = stream.latlng;
+    const altStream: AltitudeStream | undefined = stream.altitude;
 
     if (!distanceStream || !latlngStream) {
       throw new NotFoundError('Available data cannot be converted to a valid geometry');
     }
     if (
-      stream.some(({ series_type }) => series_type !== 'distance') ||
-      new Set(stream.map(({ original_size }) => original_size)).size > 1
+      Object.values(stream)
+        .filter(truthy)
+        .some((s) => s.series_type !== 'distance') ||
+      new Set(
+        Object.values(stream)
+          .filter(truthy)
+          .map((s) => s.original_size),
+      )?.size > 1
     ) {
       // for now, we cannot handle streams where not everything is synchronized with the distance stream
       throw new NotFoundError('Available data cannot be converted to a valid geometry');
@@ -190,22 +197,6 @@ export class StravaService {
       coordinates,
     };
   }
-
-  private static isDistanceStream = (
-    stream: DistanceStream | TimeStream | LatLngStream | AltitudeStream,
-  ): stream is DistanceStream => stream.type === 'distance';
-
-  private static isTimeStream = (
-    stream: DistanceStream | TimeStream | LatLngStream | AltitudeStream,
-  ): stream is TimeStream => stream.type === 'time';
-
-  private static isLatLngStream = (
-    stream: DistanceStream | TimeStream | LatLngStream | AltitudeStream,
-  ): stream is LatLngStream => stream.type === 'latlng';
-
-  private static isAltitudeStream = (
-    stream: DistanceStream | TimeStream | LatLngStream | AltitudeStream,
-  ): stream is AltitudeStream => stream.type === 'altitude';
 
   public async setupWebhook(): Promise<void> {
     (await this.checkWebhookSubscription()) || this.requestWebhookSubscription();

@@ -100,7 +100,6 @@ export const Activity = z.object({
 export type Activity = z.infer<typeof Activity>;
 
 const ActivityStream = z.object({
-  type: z.string(),
   original_size: z.number().int().positive(),
   series_type: z.enum(['distance', 'time']),
   resolution: z.enum(['low', 'medium', 'high']),
@@ -108,30 +107,32 @@ const ActivityStream = z.object({
 type ActivityStream = z.infer<typeof ActivityStream>;
 
 export const DistanceStream = ActivityStream.extend({
-  type: z.literal('distance'),
   data: z.array(z.number()),
 });
 export type DistanceStream = z.infer<typeof DistanceStream>;
 
 export const TimeStream = ActivityStream.extend({
-  type: z.literal('time'),
   data: z.array(z.number().int()),
 });
 export type TimeStream = z.infer<typeof TimeStream>;
 
 export const LatLngStream = ActivityStream.extend({
-  type: z.literal('latlng'),
-  data: z.array(z.array(z.number())),
+  data: z.array(z.tuple([z.number(), z.number()])),
 });
 export type LatLngStream = z.infer<typeof LatLngStream>;
 
 export const AltitudeStream = ActivityStream.extend({
-  type: z.literal('altitude'),
   data: z.array(z.number()),
 });
 export type AltitudeStream = z.infer<typeof AltitudeStream>;
 
-export const StreamSet = z.array(DistanceStream.or(TimeStream).or(LatLngStream).or(AltitudeStream));
+export const StreamSet = z.object({
+  distance: DistanceStream.optional(),
+  time: TimeStream.optional(),
+  latlng: LatLngStream.optional(),
+  altitude: AltitudeStream.optional(),
+});
+
 export type StreamSet = z.infer<typeof StreamSet>;
 
 export const Subscription = z.object({
@@ -239,12 +240,10 @@ export class StravaApi {
 
   public async getActivityStream(accessToken: string, id: number): Promise<StreamSet> {
     try {
-      const response = await axios.get(
-        `${this.baseUrl}activities/${id}/streams?keys=time,latlng,altitude&key_by_type=`,
-        {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        },
-      );
+      const response = await axios.get(`${this.baseUrl}activities/${id}/streams`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
+      });
       return StreamSet.parse(response.data);
     } catch (error: unknown) {
       throw handleExternalApiError('strava', 'Error on Strava getActivityStream request', error);
