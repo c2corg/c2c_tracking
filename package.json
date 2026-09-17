@@ -118,6 +118,9 @@
     "ts-jest": "29.4.5",
     "type-fest": "5.2.0"
   },
+  "overrides": {
+    "diff": "^4.0.4"
+  },
   "lint-staged": {
     "*.ts": [
       "eslint --fix --report-unused-disable-directives",
