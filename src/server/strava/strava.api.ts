@@ -194,7 +194,10 @@ export class StravaApi {
 
   public async deauthorize(accessToken: string): Promise<void> {
     try {
-      await axios.post<void>(`${this.baseUrl}oauth/deauthorize?access_token=${accessToken}`);
+      await axios.post<void>(`${this.baseUrl}oauth/revoke`, null, {
+        params: { token: accessToken },
+        auth: { username: this.#clientId, password: this.#clientSecret },
+      });
     } catch (error: unknown) {
       throw handleExternalApiError('strava', 'Error on Strava deauthorize request', error);
     }
@@ -252,18 +255,15 @@ export class StravaApi {
 
   public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<number> {
     try {
-      const response = await axios.post(
-        `${this.baseUrl}push_subscriptions`,
-        {
-          client_id: this.#clientId,
-          client_secret: this.#clientSecret,
-          callback_url: callbackUrl,
-          verify_token: verifyToken,
-        },
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        },
-      );
+      // Strava requires these params as HTTP form data (application/x-www-form-urlencoded), not JSON.
+      // A URLSearchParams body makes axios encode and set the content-type accordingly.
+      const params = new URLSearchParams({
+        client_id: this.#clientId,
+        client_secret: this.#clientSecret,
+        callback_url: callbackUrl,
+        verify_token: verifyToken,
+      });
+      const response = await axios.post(`${this.baseUrl}push_subscriptions`, params);
       return z.object({ id: z.number().int().positive() }).parse(response.data).id;
     } catch (error: unknown) {
       throw handleExternalApiError('strava', 'Error on Strava requestSubscriptionCreation request', error);

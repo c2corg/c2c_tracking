@@ -55,7 +55,11 @@ describe('Strava API', () => {
       await api.deauthorize('token');
 
       expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/deauthorize?access_token=token');
+      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/revoke', null, {
+        params: { token: 'token' },
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        auth: expect.objectContaining({ username: expect.any(String), password: expect.any(String) }),
+      });
     });
   });
 
@@ -204,16 +208,15 @@ describe('Strava API', () => {
 
       expect(result).toEqual(123);
       expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(
-        'https://www.strava.com/api/v3/push_subscriptions',
-        {
-          client_id: '63968',
-          client_secret: 'd37d09886c3a92ced03feca580ccecd5630559ec',
-          callback_url: 'http://redirect.to',
-          verify_token: 'verify_token',
-        },
-        expect.anything(),
-      );
+      const [url, body] = jest.mocked(axios).post.mock.calls[0]!;
+      expect(url).toEqual('https://www.strava.com/api/v3/push_subscriptions');
+      expect(body).toBeInstanceOf(URLSearchParams);
+      expect(Object.fromEntries(body as URLSearchParams)).toEqual({
+        client_id: '63968',
+        client_secret: 'd37d09886c3a92ced03feca580ccecd5630559ec',
+        callback_url: 'http://redirect.to',
+        verify_token: 'verify_token',
+      });
     });
   });
 
