@@ -168,6 +168,8 @@ export type WebhookEvent = z.infer<typeof WebhookEvent>;
 
 export class StravaApi {
   private readonly baseUrl = 'https://www.strava.com/api/v3/';
+  // oauth/revoke (unlike oauth/token) is not mirrored under /api/v3/ - it 404s there.
+  private readonly oauthUrl = 'https://www.strava.com/oauth/';
   readonly #clientId: string;
   readonly #clientSecret: string;
 
@@ -194,7 +196,7 @@ export class StravaApi {
 
   public async deauthorize(accessToken: string): Promise<void> {
     try {
-      await axios.post<void>(`${this.baseUrl}oauth/revoke`, null, {
+      await axios.post<void>(`${this.oauthUrl}revoke`, null, {
         params: { token: accessToken },
         auth: { username: this.#clientId, password: this.#clientSecret },
       });
