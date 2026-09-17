@@ -141,6 +141,15 @@ export class UserRepository {
     }
   }
 
+  public async findAllStravaUserIds(): Promise<number[]> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+    const rows: { c2c_id: number }[] = await conn(this.#TABLE).whereNotNull('strava_id').select('c2c_id');
+    return rows.map((row) => row.c2c_id);
+  }
+
   public async findByCorosId(corosId: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();

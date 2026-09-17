@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 import log from '../../../../src/helpers/logger';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
@@ -181,6 +183,73 @@ describe('Strava Service', () => {
 
       expect(stravaApi.getAthleteActivities).toHaveBeenCalledTimes(1);
       expect(userService.addActivities).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('resyncActivities', () => {
+    it('uses the given access token without calling getToken', async () => {
+      jest.spyOn(userService, 'getStravaInfo');
+      jest.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([]);
+      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new StravaService();
+      const result = await service.resyncActivities(1, 'access_token');
+
+      expect(result).toBe(0);
+      expect(userService.getStravaInfo).not.toHaveBeenCalled();
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledWith('access_token');
+    });
+
+    it('falls back to getToken when no access token is given', async () => {
+      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+        id: 1,
+        accessToken: 'stored_access_token',
+        refreshToken: 'refresh_token',
+        expiresAt: dayjs().add(1, 'hour').unix(),
+      });
+      jest.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
+        {
+          id: 1,
+          name: 'Morning run',
+          sport_type: 'Run',
+          start_date: '2022-01-01T00:00:01Z',
+          start_date_local: '2022-01-01T01:00:01Z',
+          distance: 1.2,
+          elapsed_time: 1,
+          total_elevation_gain: 1.2,
+        },
+      ]);
+      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+        distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
+        latlng: {
+          series_type: 'distance',
+          original_size: 2,
+          resolution: 'low',
+          data: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new StravaService();
+      const result = await service.resyncActivities(1);
+
+      expect(result).toBe(1);
+      expect(stravaApi.getAthleteActivities).toHaveBeenCalledWith('stored_access_token');
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+    });
+
+    it('throws if no valid token can be retrieved', async () => {
+      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
+      jest.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
+
+      const service = new StravaService();
+
+      await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Unable to retrieve a valid Strava token for user 1"`,
+      );
     });
   });
 

@@ -40,6 +40,7 @@ describe('User Repository', () => {
 
     await expect(repository.findByStravaId(1)).resolves.toEqual(user1);
     await expect(repository.findByStravaId(99)).resolves.toBeUndefined();
+    await expect(repository.findAllStravaUserIds()).resolves.toEqual([1]);
     await expect(repository.findBySuuntoUsername('2')).resolves.toEqual(user1);
     await expect(repository.findBySuuntoUsername('99')).resolves.toBeUndefined();
     await expect(repository.findByGarminToken('garmin_token')).resolves.toEqual(user1);

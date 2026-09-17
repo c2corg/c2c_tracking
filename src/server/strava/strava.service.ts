@@ -50,37 +50,52 @@ export class StravaService {
     await userService.configureStrava(c2cId, auth);
 
     try {
-      // retrieve last 30 outings
-      const activities: Activity[] = await stravaApi.getAthleteActivities(auth.access_token);
-      const geometries = (
-        await Promise.allSettled(
-          activities.map((activity) =>
-            this.retrieveActivityGeometry(
-              auth.access_token,
-              activity.id,
-              this.localDate(activity.start_date, activity.start_date_local),
-            ),
-          ),
-        )
-      ).map((result, i) => {
-        if (result.status === 'fulfilled') {
-          return result.value;
-        }
-        // eslint-disable-next-line security/detect-object-injection
-        log.info(`Unable to retrieve geometry for Strava activity ${activities[i]!.id} for user ${c2cId}`);
-        return undefined;
-      });
-
-      const repositoryActivities = activities
-        // eslint-disable-next-line security/detect-object-injection
-        .filter((_activity, i) => !!geometries?.[i])
-        // eslint-disable-next-line security/detect-object-injection
-        .map((activity, i) => this.asNewRepositoryActivity(activity, geometries[i]!));
-      await userService.addActivities(c2cId, ...repositoryActivities);
+      await this.resyncActivities(c2cId, auth.access_token);
     } catch (error: unknown) {
       // failing to retrieve activities should not break the registration process
       log.info(`Unable to retrieve Strava activities for user ${c2cId}`);
     }
+  }
+
+  /*
+   * Re-fetches the athlete's most recent activities (and their geometry) from Strava and merges them
+   * into the user's stored activities. Used both right after linking a Strava account, and standalone
+   * to backfill activities that failed to sync in the past (e.g. scripts/backfill-strava-activities.ts).
+   * Returns the number of activities that were successfully retrieved and stored.
+   */
+  public async resyncActivities(c2cId: number, accessToken?: string): Promise<number> {
+    const token = accessToken ?? (await this.getToken(c2cId));
+    if (!token) {
+      throw new NotFoundError(`Unable to retrieve a valid Strava token for user ${c2cId}`);
+    }
+    // retrieve last 30 outings
+    const activities: Activity[] = await stravaApi.getAthleteActivities(token);
+    const geometries = (
+      await Promise.allSettled(
+        activities.map((activity) =>
+          this.retrieveActivityGeometry(
+            token,
+            activity.id,
+            this.localDate(activity.start_date, activity.start_date_local),
+          ),
+        ),
+      )
+    ).map((result, i) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      }
+      // eslint-disable-next-line security/detect-object-injection
+      log.info(`Unable to retrieve geometry for Strava activity ${activities[i]!.id} for user ${c2cId}`);
+      return undefined;
+    });
+
+    const repositoryActivities = activities
+      // eslint-disable-next-line security/detect-object-injection
+      .filter((_activity, i) => !!geometries?.[i])
+      // eslint-disable-next-line security/detect-object-injection
+      .map((activity, i) => this.asNewRepositoryActivity(activity, geometries[i]!));
+    await userService.addActivities(c2cId, ...repositoryActivities);
+    return repositoryActivities.length;
   }
 
   public async deauthorize(c2cId: number): Promise<void> {
