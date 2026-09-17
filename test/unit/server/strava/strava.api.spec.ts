@@ -55,7 +55,7 @@ describe('Strava API', () => {
       await api.deauthorize('token');
 
       expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/revoke', null, {
+      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/oauth/revoke', null, {
         params: { token: 'token' },
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         auth: expect.objectContaining({ username: expect.any(String), password: expect.any(String) }),
