@@ -213,6 +213,33 @@ describe('Garmin service', () => {
     });
   });
 
+  describe('requestBackfill', () => {
+    it('requests a backfill for the given day window', async () => {
+      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      jest.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
+
+      const service = new GarminService();
+      await service.requestBackfill(1, 30);
+
+      expect(garminApi.backfillActivities).toHaveBeenCalledTimes(1);
+      expect(garminApi.backfillActivities).toHaveBeenCalledWith(
+        expect.any(Number),
+        expect.any(Number),
+        'token',
+        'tokenSecret',
+      );
+    });
+
+    it('throws if no matching auth exists for user', async () => {
+      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
+
+      const service = new GarminService();
+      await expect(service.requestBackfill(1, 30)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Unable to retrieve Garmin auth for user 1"`,
+      );
+    });
+  });
+
   describe('handleActivityWebhook', () => {
     it('adds activities for each user', async () => {
       jest

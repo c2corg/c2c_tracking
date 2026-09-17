@@ -34,30 +34,45 @@ export class SuuntoService {
   private async setupUser(c2cId: number, auth: SuuntoAuth): Promise<void> {
     try {
       await userService.configureSuunto(c2cId, auth);
-      // retrieve last 30 outings
-      const workouts: Workouts = await suuntoApi.getWorkouts(auth.access_token, this.#suuntoSubscriptionKey);
-      const geometries = (
-        await Promise.allSettled(
-          workouts.payload.map((workout) => this.retrieveActivityGeometry(auth.access_token, workout.workoutKey)),
-        )
-      ).map((result, i) => {
-        if (result.status === 'fulfilled') {
-          return result.value;
-        }
-        // eslint-disable-next-line security/detect-object-injection
-        log.info(`Unable to retrieve geometry for Suunto activity ${workouts.payload[i]!.workoutId} for user ${c2cId}`);
-        return undefined;
-      });
-
-      const activities = workouts.payload
-        // eslint-disable-next-line security/detect-object-injection
-        .filter((_activity, i) => !!geometries?.[i])
-        // eslint-disable-next-line security/detect-object-injection
-        .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
-      await userService.addActivities(c2cId, ...activities);
+      await this.resyncActivities(c2cId, auth.access_token);
     } catch (err: unknown) {
       log.warn(err);
     }
+  }
+
+  /*
+   * Re-fetches the athlete's most recent workouts (and their geometry) from Suunto and merges them
+   * into the user's stored activities. Used both right after linking a Suunto account, and standalone
+   * to backfill activities that failed to sync in the past (scripts/backfill-suunto-activities.ts).
+   * Returns the number of activities that were successfully retrieved and stored.
+   */
+  public async resyncActivities(c2cId: number, accessToken?: string): Promise<number> {
+    const token = accessToken ?? (await this.getToken(c2cId));
+    if (!token) {
+      throw new NotFoundError(`Unable to retrieve a valid Suunto token for user ${c2cId}`);
+    }
+    // retrieve last 30 outings
+    const workouts: Workouts = await suuntoApi.getWorkouts(token, this.#suuntoSubscriptionKey);
+    const geometries = (
+      await Promise.allSettled(
+        workouts.payload.map((workout) => this.retrieveActivityGeometry(token, workout.workoutKey)),
+      )
+    ).map((result, i) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      }
+      // eslint-disable-next-line security/detect-object-injection
+      log.info(`Unable to retrieve geometry for Suunto activity ${workouts.payload[i]!.workoutId} for user ${c2cId}`);
+      return undefined;
+    });
+
+    const activities = workouts.payload
+      // eslint-disable-next-line security/detect-object-injection
+      .filter((_activity, i) => !!geometries?.[i])
+      // eslint-disable-next-line security/detect-object-injection
+      .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
+    await userService.addActivities(c2cId, ...activities);
+    return activities.length;
   }
 
   public async getToken(c2cId: number): Promise<string | undefined> {

@@ -221,13 +221,18 @@ export class GarminApi {
     return createHmac('sha1', `${this.#consumerSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64');
   }
 
-  public async backfillActivities(days: number, token: string, tokenSecret: string): Promise<void> {
+  public async backfillActivities(
+    startInSeconds: number,
+    endInSeconds: number,
+    token: string,
+    tokenSecret: string,
+  ): Promise<void> {
     try {
       const url = `${this.apiUrl}wellness-api/rest/backfill/activityDetails`;
-      const end = dayjs().utc().endOf('day').unix();
-      const start = dayjs().utc().startOf('day').subtract(days, 'day').unix();
-      await axios.get(`${url}?summaryStartTimeInSeconds=${start}&summaryEndTimeInSeconds=${end}`, {
-        headers: { Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, start, end) },
+      await axios.get(`${url}?summaryStartTimeInSeconds=${startInSeconds}&summaryEndTimeInSeconds=${endInSeconds}`, {
+        headers: {
+          Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, startInSeconds, endInSeconds),
+        },
       });
     } catch (error: unknown) {
       throw handleExternalApiError('garmin', 'Unable to request Garmin summary activity backfill', error);

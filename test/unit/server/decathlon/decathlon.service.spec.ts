@@ -535,6 +535,32 @@ describe('Decathlon Service', () => {
     });
   });
 
+  describe('resyncActivities', () => {
+    it('uses the given access token without calling getToken', async () => {
+      jest.spyOn(userService, 'getDecathlonInfo');
+      jest.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([]);
+      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new DecathlonService();
+      const result = await service.resyncActivities(1, 'access_token');
+
+      expect(result).toBe(0);
+      expect(userService.getDecathlonInfo).not.toHaveBeenCalled();
+      expect(decathlonApi.getActivities).toHaveBeenCalledWith('access_token');
+    });
+
+    it('throws if no valid token can be retrieved', async () => {
+      jest.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce(undefined);
+      jest.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
+
+      const service = new DecathlonService();
+
+      await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Unable to retrieve a valid Decathlon token for user 1"`,
+      );
+    });
+  });
+
   describe('handleWebhookEvent', () => {
     describe('activity create event', () => {
       it('warns if no matching user is found', async () => {

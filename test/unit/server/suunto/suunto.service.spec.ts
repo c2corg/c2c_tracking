@@ -331,6 +331,32 @@ describe('Suunto Service', () => {
     });
   });
 
+  describe('resyncActivities', () => {
+    it('uses the given access token without calling getToken', async () => {
+      jest.spyOn(userService, 'getSuuntoInfo');
+      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({ payload: [], metadata: {} });
+      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new SuuntoService();
+      const result = await service.resyncActivities(1, 'access_token');
+
+      expect(result).toBe(0);
+      expect(userService.getSuuntoInfo).not.toHaveBeenCalled();
+      expect(suuntoApi.getWorkouts).toHaveBeenCalledWith('access_token', expect.any(String));
+    });
+
+    it('throws if no valid token can be retrieved', async () => {
+      jest.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce(undefined);
+      jest.spyOn(userService, 'clearSuuntoTokens').mockResolvedValueOnce(undefined);
+
+      const service = new SuuntoService();
+
+      await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Unable to retrieve a valid Suunto token for user 1"`,
+      );
+    });
+  });
+
   describe('handleWebhookEvent', () => {
     it('filters out event with bad authentication', async () => {
       const service = new SuuntoService();

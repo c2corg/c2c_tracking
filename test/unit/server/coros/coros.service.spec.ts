@@ -534,6 +534,36 @@ describe('Coros Service', () => {
     });
   });
 
+  describe('resyncActivities', () => {
+    it('uses the given access token and openId without looking up the user', async () => {
+      jest.spyOn(userRepository, 'findById');
+      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({ result: '0000', message: 'OK', data: [] });
+      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new CorosService();
+      const result = await service.resyncActivities(1, 'access_token', 'openId');
+
+      expect(result).toBe(0);
+      expect(userRepository.findById).not.toHaveBeenCalled();
+      expect(corosApi.getWorkouts).toHaveBeenCalledWith(
+        'access_token',
+        'openId',
+        expect.any(Number),
+        expect.any(Number),
+      );
+    });
+
+    it('throws if the user has no Coros info', async () => {
+      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+
+      const service = new CorosService();
+
+      await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Unable to retrieve Coros info for user 1"`,
+      );
+    });
+  });
+
   describe('handleWebhookEvent', () => {
     it('validates vent', async () => {
       const event: WebhookEvent = {
