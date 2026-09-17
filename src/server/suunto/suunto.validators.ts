@@ -5,7 +5,7 @@ import type { ValidationSchema } from '../validator';
 export const exchangeToken: ValidationSchema = {
   query: z
     .object({
-      code: z.string().min(5).max(50),
+      code: z.string().min(5).max(255),
     })
     .or(z.object({ error: z.string().min(1).max(50), error_description: z.string().min(1).max(255) })),
 };
