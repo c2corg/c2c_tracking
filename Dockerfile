@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm ci --fund=false
 COPY tsconfig.json ./
 COPY src ./src
+COPY scripts ./scripts
 RUN npm run build
 RUN npm prune --omit=dev
 
@@ -19,8 +20,12 @@ WORKDIR /usr/src/app
 COPY --from=build-stage --chown=node:node /usr/package.json ./
 COPY --from=build-stage --chown=node:node /usr/node_modules ./node_modules
 COPY --from=build-stage --chown=node:node /usr/dist ./
+COPY --from=build-stage --chown=node:node /usr/scripts ./scripts
+COPY --from=build-stage --chown=node:node /usr/tsconfig.json ./tsconfig.json
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENV PORT 8080
 ENV METRICS_PORT 8081
 EXPOSE 8080 8081
-USER node
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD [ "dumb-init", "node", "index.js" ]
