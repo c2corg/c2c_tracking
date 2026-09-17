@@ -58,19 +58,11 @@ describe('Garmin API', () => {
   });
 
   describe('backfillActivities', () => {
-    beforeEach(() => {
-      jest.useFakeTimers({ now: new Date('2020-03-31T21:12:01Z') });
-    });
-
-    afterEach(() => {
-      jest.useRealTimers();
-    });
-
     it('requests activities backfill', async () => {
       jest.mocked(axios).get.mockResolvedValueOnce({ data: [] });
 
       const api = new GarminApi();
-      await api.backfillActivities(30, 'token', 'tokenSecret');
+      await api.backfillActivities(1583020800, 1585699199, 'token', 'tokenSecret');
 
       expect(jest.mocked(axios).get).toHaveBeenCalledTimes(1);
       expect(jest.mocked(axios).get).toHaveBeenCalledWith(

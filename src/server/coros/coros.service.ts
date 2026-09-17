@@ -35,38 +35,60 @@ export class CorosService {
     await userService.configureCoros(c2cId, auth);
 
     try {
-      // retrieve workouts from last 30 days
-      const workouts: WorkoutRecords = await corosApi.getWorkouts(
-        auth.access_token,
-        auth.openId,
-        Number.parseInt(dayjs().subtract(30, 'days').format('YYYYMMDD'), 10),
-        Number.parseInt(dayjs().format('YYYYMMDD'), 10),
-      );
-      const geometries = (
-        await Promise.allSettled(
-          workouts.data.map(
-            async (workout) => await this.retrieveWorkoutGeometry(workout, auth.access_token, auth.openId),
-          ),
-        )
-      ).map((result, i) => {
-        if (result.status === 'fulfilled') {
-          return result.value;
-        }
-        // eslint-disable-next-line security/detect-object-injection
-        log.info(`Unable to retrieve geometry for Coros workout ${workouts.data[i]!.labelId} for user ${c2cId}`);
-        return undefined;
-      });
-
-      const repositoryActivities = workouts.data
-        // eslint-disable-next-line security/detect-object-injection
-        .filter((_workout, i) => !!geometries?.[i])
-        // eslint-disable-next-line security/detect-object-injection
-        .map((workout, i) => this.asRepositoryActivity(workout, geometries[i]!));
-      await userService.addActivities(c2cId, ...repositoryActivities);
+      await this.resyncActivities(c2cId, auth.access_token, auth.openId);
     } catch (error: unknown) {
       // failing to retrieve workouts should not break the registration process
       log.info(`Unable to retrieve Coros workouts for user ${c2cId}`);
     }
+  }
+
+  /*
+   * Re-fetches the athlete's workouts from the last 30 days (and their geometry) from Coros and merges
+   * them into the user's stored activities. Used both right after linking a Coros account, and standalone
+   * to backfill activities that failed to sync in the past (scripts/backfill-coros-activities.ts).
+   * Returns the number of activities that were successfully retrieved and stored.
+   */
+  public async resyncActivities(c2cId: number, accessToken?: string, openId?: string): Promise<number> {
+    let token = accessToken;
+    let id = openId;
+    if (!token || !id) {
+      const user = await userRepository.findById(c2cId);
+      if (!isUserWithCorosInfo(user)) {
+        throw new NotFoundError(`Unable to retrieve Coros info for user ${c2cId}`);
+      }
+      token = await this.getToken(user);
+      id = user.coros.id;
+    }
+    if (!token) {
+      throw new NotFoundError(`Unable to retrieve a valid Coros token for user ${c2cId}`);
+    }
+    // retrieve workouts from last 30 days
+    const workouts: WorkoutRecords = await corosApi.getWorkouts(
+      token,
+      id,
+      Number.parseInt(dayjs().subtract(30, 'days').format('YYYYMMDD'), 10),
+      Number.parseInt(dayjs().format('YYYYMMDD'), 10),
+    );
+    const geometries = (
+      await Promise.allSettled(
+        workouts.data.map(async (workout) => await this.retrieveWorkoutGeometry(workout, token, id)),
+      )
+    ).map((result, i) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      }
+      // eslint-disable-next-line security/detect-object-injection
+      log.info(`Unable to retrieve geometry for Coros workout ${workouts.data[i]!.labelId} for user ${c2cId}`);
+      return undefined;
+    });
+
+    const repositoryActivities = workouts.data
+      // eslint-disable-next-line security/detect-object-injection
+      .filter((_workout, i) => !!geometries?.[i])
+      // eslint-disable-next-line security/detect-object-injection
+      .map((workout, i) => this.asRepositoryActivity(workout, geometries[i]!));
+    await userService.addActivities(c2cId, ...repositoryActivities);
+    return repositoryActivities.length;
   }
 
   private async retrieveWorkoutGeometry(

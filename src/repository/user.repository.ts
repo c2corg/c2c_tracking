@@ -142,11 +142,31 @@ export class UserRepository {
   }
 
   public async findAllStravaUserIds(): Promise<number[]> {
+    return this.findAllUserIdsWithColumn('strava_id');
+  }
+
+  public async findAllSuuntoUserIds(): Promise<number[]> {
+    return this.findAllUserIdsWithColumn('suunto_username');
+  }
+
+  public async findAllDecathlonUserIds(): Promise<number[]> {
+    return this.findAllUserIdsWithColumn('decathlon_id');
+  }
+
+  public async findAllCorosUserIds(): Promise<number[]> {
+    return this.findAllUserIdsWithColumn('coros_id');
+  }
+
+  public async findAllGarminUserIds(): Promise<number[]> {
+    return this.findAllUserIdsWithColumn('garmin_token');
+  }
+
+  private async findAllUserIdsWithColumn(column: keyof UserQueryRow): Promise<number[]> {
     const conn = await db.getConnection();
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    const rows: { c2c_id: number }[] = await conn(this.#TABLE).whereNotNull('strava_id').select('c2c_id');
+    const rows: { c2c_id: number }[] = await conn(this.#TABLE).whereNotNull(column).select('c2c_id');
     return rows.map((row) => row.c2c_id);
   }
 

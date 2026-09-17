@@ -34,7 +34,30 @@ export class GarminService {
   private async setupUser(c2cId: number, auth: GarminAuth): Promise<void> {
     await userService.configureGarmin(c2cId, auth);
     // request backfill for activities from last 30 days (async)
-    void garminApi.backfillActivities(30, auth.token, auth.tokenSecret);
+    const end = dayjs().utc().endOf('day').unix();
+    const start = dayjs().utc().startOf('day').subtract(30, 'day').unix();
+    void garminApi.backfillActivities(start, end, auth.token, auth.tokenSecret);
+  }
+
+  /*
+   * Requests Garmin to replay activity webhook notifications for the `days`-day window ending
+   * `endDaysAgo` days ago (default: today). Garmin delivers the actual activity data asynchronously
+   * via the normal webhook - this only triggers the replay, it does not return activities directly.
+   * Garmin caps each request to roughly a 90-day window; scripts/backfill-garmin-activities.ts chunks
+   * longer ranges into multiple calls.
+   */
+  public async requestBackfill(c2cId: number, days: number, endDaysAgo = 0): Promise<void> {
+    const auth = await this.getAuth(c2cId);
+    if (!auth) {
+      throw new NotFoundError(`Unable to retrieve Garmin auth for user ${c2cId}`);
+    }
+    const end = dayjs().utc().subtract(endDaysAgo, 'day').endOf('day').unix();
+    const start = dayjs()
+      .utc()
+      .subtract(endDaysAgo + days, 'day')
+      .startOf('day')
+      .unix();
+    await garminApi.backfillActivities(start, end, auth.token, auth.tokenSecret);
   }
 
   private toGeoJSON(samples?: GarminSample[]): LineString | undefined {

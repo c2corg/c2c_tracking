@@ -30,33 +30,48 @@ export class DecathlonService {
     await userService.configureDecathlon(c2cId, auth, userId, webhookId);
 
     try {
-      // retrieve last 30 outings
-      const activities = await decathlonApi.getActivities(auth.access_token);
-      const geometries = (
-        await Promise.allSettled(
-          activities.map(async (activity) => {
-            const fullActivity = await decathlonApi.getActivity(auth.access_token, activity.id);
-            return this.retrieveActivityGeometry(fullActivity);
-          }),
-        )
-      ).map((result, i) => {
-        if (result.status === 'fulfilled') {
-          return result.value;
-        }
-        // eslint-disable-next-line security/detect-object-injection
-        log.info(`Unable to retrieve geometry for Decathlon activity ${activities[i]!.id} for user ${c2cId}`);
-        return undefined;
-      });
-      const repositoryActivities = activities
-        // eslint-disable-next-line security/detect-object-injection
-        .filter((_activity, i) => !!geometries?.[i])
-        // eslint-disable-next-line security/detect-object-injection
-        .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
-      await userService.addActivities(c2cId, ...repositoryActivities);
+      await this.resyncActivities(c2cId, auth.access_token);
     } catch (error: unknown) {
       // not retrieving past activities should not block the registration process
       log.info(`Unable to retrieve Decathlon activities for user ${c2cId}`);
     }
+  }
+
+  /*
+   * Re-fetches the athlete's most recent activities (and their geometry) from Decathlon and merges them
+   * into the user's stored activities. Used both right after linking a Decathlon account, and standalone
+   * to backfill activities that failed to sync in the past (scripts/backfill-decathlon-activities.ts).
+   * Returns the number of activities that were successfully retrieved and stored.
+   */
+  public async resyncActivities(c2cId: number, accessToken?: string): Promise<number> {
+    const token = accessToken ?? (await this.getToken(c2cId));
+    if (!token) {
+      throw new NotFoundError(`Unable to retrieve a valid Decathlon token for user ${c2cId}`);
+    }
+    // retrieve last 30 outings
+    const activities = await decathlonApi.getActivities(token);
+    const geometries = (
+      await Promise.allSettled(
+        activities.map(async (activity) => {
+          const fullActivity = await decathlonApi.getActivity(token, activity.id);
+          return this.retrieveActivityGeometry(fullActivity);
+        }),
+      )
+    ).map((result, i) => {
+      if (result.status === 'fulfilled') {
+        return result.value;
+      }
+      // eslint-disable-next-line security/detect-object-injection
+      log.info(`Unable to retrieve geometry for Decathlon activity ${activities[i]!.id} for user ${c2cId}`);
+      return undefined;
+    });
+    const repositoryActivities = activities
+      // eslint-disable-next-line security/detect-object-injection
+      .filter((_activity, i) => !!geometries?.[i])
+      // eslint-disable-next-line security/detect-object-injection
+      .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
+    await userService.addActivities(c2cId, ...repositoryActivities);
+    return repositoryActivities.length;
   }
 
   public async deauthorize(c2cId: number): Promise<void> {
