@@ -35,14 +35,22 @@ describe('S3 storage', () => {
     await expect(storage.exists(key)).resolves.toBe(true);
     await expect(storage.get(key)).resolves.toEqual(buffer);
 
-    // ensure that the file is public
-    await request(storage.baseUrl).get(`/${key}`).expect(200).expect('Content-Type', 'image/png');
-
     // cleaning
     await storage.delete(key);
     await expect(storage.exists(key)).resolves.toBe(false);
 
     // delete a file that does not exist
     await expect(storage.delete('does_not_exist.png')).resolves.toBeUndefined();
+  });
+
+  // needs an S3 server that applies the public-read ACL (not Garage, used in CI)
+  (process.env['S3_SKIP_PUBLIC_CHECK'] === 'true' ? it.skip : it)('serves the files publicly', async () => {
+    await storage.put(key, buffer);
+
+    try {
+      await request(storage.baseUrl).get(`/${key}`).expect(200).expect('Content-Type', 'image/png');
+    } finally {
+      await storage.delete(key);
+    }
   });
 });

@@ -1,0 +1,10 @@
+# S3 server for the tests of the S3 storage (npm run test:ci:s3). Garage: MinIO's
+# community images are no longer published. Initialise it with
+# test/environment/init-s3.sh once started.
+services:
+  garage:
+    image: docker.io/dxflrs/garage:v2.2.0
+    ports:
+      - 9000:3900
+    volumes:
+      - ./test/environment/garage.toml:/etc/garage.toml:ro
