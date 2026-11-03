@@ -48,7 +48,7 @@
     "@types/json-bigint": "1.0.4",
     "async": "3.2.6",
     "axios": "1.21.0",
-    "cls-rtracer": "2.6.3",
+    "cls-rtracer": "2.6.4",
     "convict": "6.2.4",
     "crypto-js": "4.2.0",
     "dayjs": "1.11.19",
