@@ -1,0 +1,15 @@
+# Single node Garage, in memory-ish temporary directories: for the tests only.
+metadata_dir = "/tmp/meta"
+data_dir = "/tmp/data"
+db_engine = "sqlite"
+replication_factor = 1
+rpc_bind_addr = "127.0.0.1:3901"
+rpc_secret = "0000000000000000000000000000000000000000000000000000000000000001"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "0.0.0.0:3900"
+root_domain = ".s3.garage.localhost"
+
+[admin]
+api_bind_addr = "127.0.0.1:3903"
