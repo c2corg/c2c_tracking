@@ -16,6 +16,15 @@ npm install
 - Set required environment variables in `.env` file.
 - Launch the app: `npm run start`
 
+### Database connection
+
+`DB_ENABLE_SSL=true` encrypts the connection to PostgreSQL. By default the server certificate is **not** checked.
+To check it (chain and host name, `DB_HOST` must be a name of the certificate):
+
+- `DB_SSL_REJECT_UNAUTHORIZED=true`;
+- `DB_SSL_CA_FILE=/path/to/ca.crt` when the server certificate comes from a private authority (without it, the system
+  authorities are used).
+
 You can debug server and tests within Visual Studio Code using the predefined configurations in `launch.json`.
 
 ## Release

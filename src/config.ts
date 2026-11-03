@@ -157,6 +157,17 @@ const config = convict({
       default: false,
       env: 'DB_ENABLE_SSL',
     },
+    sslRejectUnauthorized: {
+      doc: 'Boolean to check the certificate of the database server (chain and host name) when SSL is enabled',
+      default: false,
+      env: 'DB_SSL_REJECT_UNAUTHORIZED',
+    },
+    sslCaFile: {
+      doc: 'Path to a PEM file with the certificate authority of the database server, when it is not a public one',
+      format: String,
+      default: '',
+      env: 'DB_SSL_CA_FILE',
+    },
     crypto: {
       doc: 'Secret key for encoding and decoding tokens',
       format: 'notEmptyString',

@@ -1,3 +1,4 @@
+import { readFileSync } from 'fs';
 import path from 'path';
 
 import { AsyncResultCallback, retry } from 'async';
@@ -12,8 +13,29 @@ export type Configuration = {
   password: string;
   database: string;
   ssl: boolean;
+  sslRejectUnauthorized: boolean;
+  sslCaFile: string;
   debug: boolean;
 };
+
+/**
+ * TLS options of the connection: none without SSL. With SSL, the server certificate is only checked (chain and host
+ * name) if asked, against the given authority (a private one) or the system ones.
+ */
+export function sslOptions(
+  dbConfig: Pick<Configuration, 'ssl' | 'sslRejectUnauthorized' | 'sslCaFile'>,
+): { rejectUnauthorized: boolean; ca?: Buffer } | undefined {
+  if (!dbConfig.ssl) {
+    return undefined;
+  }
+
+  return {
+    rejectUnauthorized: dbConfig.sslRejectUnauthorized,
+    // path from the configuration, not from a request
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    ...(dbConfig.sslCaFile && { ca: readFileSync(dbConfig.sslCaFile) }),
+  };
+}
 
 export class Database {
   private config: Configuration;
@@ -59,7 +81,7 @@ export class Database {
         user: this.config.user,
         password: this.config.password,
         database: this.config.database,
-        ...(this.config.ssl && { ssl: { rejectUnauthorized: false } }),
+        ssl: sslOptions(this.config),
       },
       debug: this.config.debug,
       migrations: {
@@ -114,5 +136,7 @@ export const database = new Database({
   user: config.get('db.user'),
   password: config.get('db.password'),
   ssl: config.get('db.ssl'),
+  sslRejectUnauthorized: config.get('db.sslRejectUnauthorized'),
+  sslCaFile: config.get('db.sslCaFile'),
   debug: false, // config.get('env') !== 'production'
 });
