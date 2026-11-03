@@ -116,7 +116,7 @@
     "prettier": "3.6.2",
     "supertest": "7.1.4",
     "ts-jest": "29.4.5",
-    "type-fest": "5.2.0"
+    "type-fest": "5.10.0"
   },
   "overrides": {
     "diff": "^4.0.4"
