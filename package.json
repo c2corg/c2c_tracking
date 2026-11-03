@@ -115,7 +115,7 @@
     "pino-pretty": "13.2.0",
     "prettier": "3.6.2",
     "supertest": "7.3.1",
-    "ts-jest": "29.4.5",
+    "ts-jest": "29.4.15",
     "type-fest": "5.10.0"
   },
   "overrides": {
