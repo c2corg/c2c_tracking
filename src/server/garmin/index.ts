@@ -12,7 +12,7 @@ router.get(
   '/request-token/:userId',
   ensureAuthenticated,
   ensureUserFromParamsMatchesAuthUser,
-  controller.requestUnauthorizedRequestToken.bind(controller),
+  controller.requestAuthorization.bind(controller),
 );
 router.get('/exchange-token/:userId', validate(exchangeToken), controller.exchangeToken.bind(controller));
 router.post(

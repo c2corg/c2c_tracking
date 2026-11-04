@@ -290,11 +290,24 @@ const config = convict({
         env: 'GARMIN_CONSUMER_KEY',
       },
       consumerSecret: {
-        doc: 'Garmin consumer secret',
+        doc: 'Garmin consumer secret (OAuth 1). Only used to migrate the users linked before the switch to OAuth 2',
         format: 'notEmptyString',
         default: '',
         env: 'GARMIN_CONSUMER_SECRET',
         sensitive: true,
+      },
+      clientSecret: {
+        doc: 'Garmin OAuth 2 client secret (the consumer key is the client ID)',
+        format: 'notEmptyString',
+        default: '',
+        env: 'GARMIN_CLIENT_SECRET',
+        sensitive: true,
+      },
+      redirectPath: {
+        doc: 'Path (appended to c2c.frontend.baseUrl) to define URL to redirect to',
+        format: String,
+        default: 'trackers/garmin/exchange-token',
+        env: 'GARMIN_REDIRECT_URI',
       },
     },
     decathlon: {

@@ -14,6 +14,7 @@
     "backfill:decathlon": "ts-node scripts/backfill-decathlon-activities.ts | pino-pretty -c -t",
     "backfill:coros": "ts-node scripts/backfill-coros-activities.ts | pino-pretty -c -t",
     "backfill:garmin": "ts-node scripts/backfill-garmin-activities.ts | pino-pretty -c -t",
+    "migrate:garmin": "ts-node scripts/migrate-garmin-oauth2.ts | pino-pretty -c -t",
     "start:dev": "node --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/index.ts | pino-pretty -c -t -i req.headers,res.headers\"",
     "build": "tsc",
     "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint --report-unused-disable-directives --ext .ts,.js .",
