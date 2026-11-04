@@ -96,7 +96,10 @@ jobs:
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
         uses: docker/build-push-action@v6
         with:
-          push: true
+          # the classic Docker manifest, without attestation: the older Docker Engines of the production hosts cannot
+          # pull an OCI index ("missing signature key"). Tags stay on the `tags` input: `outputs` has no `name`
+          provenance: false
+          outputs: type=image,push=true,oci-mediatypes=false
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: version=${{ fromJSON(steps.docker_meta.outputs.json).labels['org.opencontainers.image.version'] }}
