@@ -11,6 +11,7 @@ import type { LevelWithSilent } from 'pino';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth';
 import config from './config';
+import { corsOrigin } from './helpers/cors-origin';
 import enabledIf from './helpers/enabled-if';
 import log from './helpers/logger';
 import { promResponseTimeSummary } from './metrics/prometheus';
@@ -86,7 +87,7 @@ app
       allowMethods: ['GET', 'POST'],
       allowHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
       maxAge: 1728000,
-      origin: config.get('c2c.frontend.baseUrl').slice(0, -1),
+      origin: corsOrigin(config.get('c2c.frontend.baseUrl'), config.get('c2c.frontend.extraOrigins')),
     }),
   )
   .use(

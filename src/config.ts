@@ -193,6 +193,19 @@ const config = convict({
       env: 'JWT_SECRET_KEY',
       sensitive: true,
     },
+    jwtSecretExtra: {
+      doc: 'Optional second JWT secret, for another deployment of the API (e.g. a pre-production) that uses this tracking. Tokens it signs are accepted, but their user ids are shifted by auth.jwtExtraIdOffset so that they never collide with the users of the main API. Empty to disable',
+      format: String,
+      default: '',
+      env: 'JWT_SECRET_KEY_EXTRA',
+      sensitive: true,
+    },
+    jwtExtraIdOffset: {
+      doc: 'Offset added to the user ids of the tokens signed with the extra secret. The ids of that other API must be lower than this value',
+      format: 'int',
+      default: 1_000_000_000,
+      env: 'JWT_EXTRA_ID_OFFSET',
+    },
   },
   c2c: {
     frontend: {
@@ -201,6 +214,12 @@ const config = convict({
         format: 'baseUrl',
         default: 'http://localhost:8080/',
         env: 'FRONTEND_BASE_URL',
+      },
+      extraOrigins: {
+        doc: 'Comma-separated list of other frontend origins (e.g. https://www.preprod.example.org) allowed by CORS, in addition to the base URL',
+        format: String,
+        default: '',
+        env: 'FRONTEND_EXTRA_ORIGINS',
       },
       subscriptionPath: {
         doc: 'Path (appended to base URL) for subscription URL',

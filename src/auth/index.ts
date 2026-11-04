@@ -5,10 +5,20 @@ import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import config from '../config';
 
 import c2cJwtExtractor from './c2c-jwt-extractor';
-import verify from './c2c-jwt-verify';
+import verify, { verifyWithOffset } from './c2c-jwt-verify';
+
+const jwtSecret = config.get('auth.jwtSecret');
+const jwtSecretExtra = config.get('auth.jwtSecretExtra');
+
+if (jwtSecretExtra && jwtSecretExtra === jwtSecret) {
+  throw new Error('JWT_SECRET_KEY_EXTRA must be different from JWT_SECRET_KEY');
+}
+
+// Passport tries the strategies in order and accepts the first one that validates the token
+const strategies = jwtSecretExtra ? ['jwt', 'jwt-extra'] : ['jwt'];
 
 const ensureAuthenticated: Middleware = (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
-  passport.authenticate('jwt', { session: false })(ctx, next);
+  passport.authenticate(strategies, { session: false })(ctx, next);
 
 const ensureUserFromParamsMatchesAuthUser: Middleware = async (
   ctx: Context,
@@ -26,11 +36,24 @@ const ensureUserFromParamsMatchesAuthUser: Middleware = async (
 passport.use(
   new JwtStrategy(
     {
-      secretOrKey: config.get('auth.jwtSecret'),
+      secretOrKey: jwtSecret,
       jwtFromRequest: ExtractJwt.fromExtractors([c2cJwtExtractor]),
     },
     verify,
   ),
 );
+
+if (jwtSecretExtra) {
+  passport.use(
+    'jwt-extra',
+    new JwtStrategy(
+      {
+        secretOrKey: jwtSecretExtra,
+        jwtFromRequest: ExtractJwt.fromExtractors([c2cJwtExtractor]),
+      },
+      verifyWithOffset(config.get('auth.jwtExtraIdOffset')),
+    ),
+  );
+}
 
 export { passport, ensureAuthenticated, ensureUserFromParamsMatchesAuthUser };
