@@ -1,3 +1,5 @@
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'node:crypto';
+
 import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
 import aes from 'crypto-js/aes.js';
 import encUtf8 from 'crypto-js/enc-utf8.js';
@@ -40,6 +42,42 @@ export const fitToGeoJSON = (fit: ArrayBuffer): LineString | undefined => {
   }
 };
 
-export const encrypt = (token: string): string => aes.encrypt(token, config.get('db.crypto')).toString();
+/*
+ * Tokens are stored encrypted with AES-256-GCM, with a key derived from `db.crypto` through scrypt.
+ * Format: `v1:` + base64(iv (12 bytes) | auth tag (16 bytes) | ciphertext).
+ *
+ * Values written before that (crypto-js passphrase mode, i.e. OpenSSL `Salted__` format with a single MD5 round for
+ * the key derivation) are still readable, and are naturally replaced by the new format when they are next written.
+ */
+const ENCRYPTION_PREFIX = 'v1:';
+const KEY_SALT = 'c2c_tracking.token-encryption.v1';
+const IV_LENGTH = 12;
+const TAG_LENGTH = 16;
 
-export const decrypt = (token: string): string => aes.decrypt(token, config.get('db.crypto')).toString(encUtf8);
+let cachedKey: { passphrase: string; key: Buffer } | undefined;
+
+const encryptionKey = (): Buffer => {
+  const passphrase = config.get('db.crypto');
+  if (cachedKey?.passphrase !== passphrase) {
+    // scrypt is deliberately slow: derive once per passphrase
+    cachedKey = { passphrase, key: scryptSync(passphrase, KEY_SALT, 32) };
+  }
+  return cachedKey.key;
+};
+
+export const encrypt = (token: string): string => {
+  const iv = randomBytes(IV_LENGTH);
+  const cipher = createCipheriv('aes-256-gcm', encryptionKey(), iv);
+  const encrypted = Buffer.concat([cipher.update(token, 'utf8'), cipher.final()]);
+  return ENCRYPTION_PREFIX + Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64');
+};
+
+export const decrypt = (token: string): string => {
+  if (!token.startsWith(ENCRYPTION_PREFIX)) {
+    return aes.decrypt(token, config.get('db.crypto')).toString(encUtf8); // legacy format
+  }
+  const data = Buffer.from(token.slice(ENCRYPTION_PREFIX.length), 'base64');
+  const decipher = createDecipheriv('aes-256-gcm', encryptionKey(), data.subarray(0, IV_LENGTH));
+  decipher.setAuthTag(data.subarray(IV_LENGTH, IV_LENGTH + TAG_LENGTH));
+  return Buffer.concat([decipher.update(data.subarray(IV_LENGTH + TAG_LENGTH)), decipher.final()]).toString('utf8');
+};
