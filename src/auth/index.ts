@@ -3,9 +3,11 @@ import passport from 'koa-passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 
 import config from '../config';
+import log from '../helpers/logger';
 
 import c2cJwtExtractor from './c2c-jwt-extractor';
-import verify, { verifyWithOffset } from './c2c-jwt-verify';
+import { verifyWithOffset } from './c2c-jwt-verify';
+import { TokenChecker } from './c2c-token-check';
 
 const jwtSecret = config.get('auth.jwtSecret');
 const jwtSecretExtra = config.get('auth.jwtSecretExtra');
@@ -13,6 +15,16 @@ const jwtSecretExtra = config.get('auth.jwtSecretExtra');
 if (jwtSecretExtra && jwtSecretExtra === jwtSecret) {
   throw new Error('JWT_SECRET_KEY_EXTRA must be different from JWT_SECRET_KEY');
 }
+
+// The API that issued the tokens of each secret confirms they are still valid: without it, a token logged out,
+// revoked or of a blocked user is accepted until it expires
+const checker = (apiBaseUrl: string, name: string): TokenChecker | undefined => {
+  if (!apiBaseUrl) {
+    log.warn(`No API to check the tokens of ${name}: their signature only is checked`);
+    return undefined;
+  }
+  return new TokenChecker(apiBaseUrl);
+};
 
 // Passport tries the strategies in order and accepts the first one that validates the token
 const strategies = jwtSecretExtra ? ['jwt', 'jwt-extra'] : ['jwt'];
@@ -38,8 +50,9 @@ passport.use(
     {
       secretOrKey: jwtSecret,
       jwtFromRequest: ExtractJwt.fromExtractors([c2cJwtExtractor]),
+      passReqToCallback: true,
     },
-    verify,
+    verifyWithOffset(0, checker(config.get('c2c.api.baseUrl'), 'JWT_SECRET_KEY')),
   ),
 );
 
@@ -50,8 +63,12 @@ if (jwtSecretExtra) {
       {
         secretOrKey: jwtSecretExtra,
         jwtFromRequest: ExtractJwt.fromExtractors([c2cJwtExtractor]),
+        passReqToCallback: true,
       },
-      verifyWithOffset(config.get('auth.jwtExtraIdOffset')),
+      verifyWithOffset(
+        config.get('auth.jwtExtraIdOffset'),
+        checker(config.get('c2c.api.extraBaseUrl'), 'JWT_SECRET_KEY_EXTRA'),
+      ),
     ),
   );
 }

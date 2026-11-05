@@ -208,6 +208,20 @@ const config = convict({
     },
   },
   c2c: {
+    api: {
+      baseUrl: {
+        doc: 'Base URL of the c2c API (e.g. https://api.camptocamp.org/), which confirms that a token signed with JWT_SECRET_KEY is still valid. Empty: the signature only is checked',
+        format: String,
+        default: '',
+        env: 'C2C_API_BASE_URL',
+      },
+      extraBaseUrl: {
+        doc: 'Base URL of the API whose tokens are signed with JWT_SECRET_KEY_EXTRA, which confirms they are still valid. Empty: the signature only is checked',
+        format: String,
+        default: '',
+        env: 'C2C_API_BASE_URL_EXTRA',
+      },
+    },
     frontend: {
       baseUrl: {
         doc: 'Base URL for frontend',
