@@ -5,7 +5,7 @@ import type { Server } from 'http';
 import type { ErrorCallback } from 'async';
 import { retry } from 'async';
 
-import { app } from './app.ts';
+import { app, setShuttingDown } from './app.ts';
 import config from './config.ts';
 import { database as db } from './db/index.ts';
 import log from './helpers/logger.ts';
@@ -41,7 +41,7 @@ async function closeServer(server: Server): Promise<void> {
 async function closeGracefully(signal: string, servers: Server[]): Promise<void> {
   log.info(`Received signal to terminate: ${signal}`);
 
-  app.context['shuttingDown'] = true;
+  setShuttingDown(true);
 
   const shutdown = [...servers.map((server) => closeServer(server)), db.closeDatabase()];
 
@@ -76,7 +76,7 @@ export async function start(): Promise<void> {
   });
 
   watchMaintenanceFile('.', () => {
-    app.context['shuttingDown'] = true;
+    setShuttingDown(true);
     log.info('Received signal to switch to maintenance mode');
   });
 

@@ -3,7 +3,7 @@ import type { Server } from 'node:http';
 import supertest from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { app } from '../../src/app.ts';
+import { app, setShuttingDown } from '../../src/app.ts';
 import { AppError, NotFoundError } from '../../src/errors.ts';
 import { healthService } from '../../src/health.service.ts';
 import log from '../../src/helpers/logger.ts';
@@ -26,7 +26,7 @@ describe('Application', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
-    app.context['shuttingDown'] = false;
+    setShuttingDown(false);
   });
 
   describe('routing', () => {
@@ -52,7 +52,7 @@ describe('Application', () => {
 
   describe('maintenance and shutdown', () => {
     it('answers 503 and closes the connection', async () => {
-      app.context['shuttingDown'] = true;
+      setShuttingDown(true);
 
       const response = await request.get('/health');
 
@@ -136,6 +136,19 @@ describe('Application', () => {
 
       expect(response.status).toBe(404);
       expect(response.text).toBe('details');
+      expect(response.headers['content-type']).toMatch(/^text\/plain/);
+    });
+
+    it('answers application errors without body with the status text', async () => {
+      vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+      vi.spyOn(healthService, 'getStatus').mockImplementation(() => {
+        throw new NotFoundError('not found');
+      });
+
+      const response = await request.get('/health');
+
+      expect(response.status).toBe(404);
+      expect(response.text).toBe('Not Found');
       expect(response.headers['content-type']).toMatch(/^text\/plain/);
     });
 
