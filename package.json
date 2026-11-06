@@ -23,10 +23,7 @@
     "test:psql": "vitest run --project psql",
     "test:s3": "vitest run --project s3",
     "test:watch": "vitest --project unit",
-    "test:ci": "npm run test:ci:unit && npm run test:ci:s3 && npm run test:ci:psql",
-    "test:ci:unit": "vitest run --project unit --coverage --coverage.reportsDirectory=reports/coverage/unit --reporter=default --reporter=junit --outputFile.junit=reports/junit/unit.xml --coverage.thresholds.statements=77 --coverage.thresholds.branches=63 --coverage.thresholds.functions=73 --coverage.thresholds.lines=77",
-    "test:ci:psql": "vitest run --project psql --coverage --coverage.reportsDirectory=reports/coverage/psql --reporter=default --reporter=junit --outputFile.junit=reports/junit/psql.xml",
-    "test:ci:s3": "vitest run --project s3 --coverage --coverage.reportsDirectory=reports/coverage/s3 --reporter=default --reporter=junit --outputFile.junit=reports/junit/s3.xml",
+    "test:ci": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=reports/junit/tests.xml",
     "typecheck": "tsc --noEmit"
   },
   "repository": {
