@@ -1,4 +1,4 @@
-import type { Context } from 'koa';
+import type { Request, Response } from 'express';
 
 import type { HealthService } from '../../health.service.ts';
 
@@ -9,7 +9,7 @@ export default class HealthController {
     this.health = health;
   }
 
-  public getHealth(ctx: Context): void {
-    ctx.body = this.health.getStatus();
+  public getHealth(_req: Request, res: Response): void {
+    res.json(this.health.getStatus());
   }
 }

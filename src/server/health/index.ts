@@ -1,12 +1,13 @@
-import Router from '@koa/router';
+import { Router } from 'express';
 
 import { healthService } from '../../health.service.ts';
+import { methodNotAllowed } from '../method-not-allowed.ts';
 
 import HealthController from './health.controller.ts';
 
 const healthController = new HealthController(healthService);
-const router = new Router();
+const router = Router();
 
-router.get('/', healthController.getHealth.bind(healthController));
+router.route('/').get(healthController.getHealth.bind(healthController)).all(methodNotAllowed);
 
 export default router;

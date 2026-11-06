@@ -1,25 +1,23 @@
-import type { ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
-import cors from '@koa/cors';
-import Router from '@koa/router';
-import rTracer from 'cls-rtracer';
-import type { Context } from 'koa';
-import Koa from 'koa';
-import bodyParser from 'koa-bodyparser';
-import helmet from 'koa-helmet';
-import logger from 'koa-pino-logger';
+import cors from 'cors';
+import express, { type Request, type RequestHandler } from 'express';
+import helmet from 'helmet';
+import createHttpError from 'http-errors';
 import type { LevelWithSilent } from 'pino';
+import { pinoHttp } from 'pino-http';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth/index.ts';
 import config from './config.ts';
 import { corsOrigin } from './helpers/cors-origin.ts';
 import enabledIf from './helpers/enabled-if.ts';
 import log from './helpers/logger.ts';
+import { currentRequestId, requestId } from './helpers/request-id.ts';
 import { promResponseTimeSummary } from './metrics/prometheus.ts';
 import activities from './server/activities/index.ts';
 import coros from './server/coros/index.ts';
 import decathlon from './server/decathlon/index.ts';
-import { defaultErrorHandler } from './server/error-handler.ts';
+import { errorHandler } from './server/error-handler.ts';
 import garmin from './server/garmin/index.ts';
 import health from './server/health/index.ts';
 import polar from './server/polar/index.ts';
@@ -27,98 +25,98 @@ import strava from './server/strava/index.ts';
 import suunto from './server/suunto/index.ts';
 import users from './server/users/index.ts';
 
-const app = new Koa();
-const router = new Router();
-
-router.use('/health', health.routes(), health.allowedMethods());
-router.use('/strava', enabledIf(config.get('trackers.strava.enabled')), strava.routes(), strava.allowedMethods());
-router.use('/suunto', enabledIf(config.get('trackers.suunto.enabled')), suunto.routes(), suunto.allowedMethods());
-router.use('/garmin', enabledIf(config.get('trackers.garmin.enabled')), garmin.routes(), garmin.allowedMethods());
-router.use(
-  '/decathlon',
-  enabledIf(config.get('trackers.decathlon.enabled')),
-  decathlon.routes(),
-  decathlon.allowedMethods(),
-);
-router.use('/polar', enabledIf(config.get('trackers.polar.enabled')), polar.routes(), polar.allowedMethods());
-router.use('/coros', enabledIf(config.get('trackers.coros.enabled')), coros.routes(), coros.allowedMethods());
-router.use(
-  '/users/:userId/activities',
-  ensureAuthenticated,
-  ensureUserFromParamsMatchesAuthUser,
-  activities.routes(),
-  activities.allowedMethods(),
-);
-router.use(
-  '/users/:userId',
-  ensureAuthenticated,
-  ensureUserFromParamsMatchesAuthUser,
-  users.routes(),
-  users.allowedMethods(),
-);
-
-let logLevel: LevelWithSilent;
-switch (config.get('env')) {
-  case 'production':
-    logLevel = 'info';
-    break;
-  case 'test':
-    logLevel = 'silent';
-    break;
-  default:
-    logLevel = 'trace';
-}
-app
-  .use(async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
-    if (ctx['shuttingDown']) {
-      ctx.status = 503;
-      ctx.set('Connection', 'close');
-      ctx.body = 'Server is shutting down';
-    } else {
-      await next();
-    }
-  })
-  .use(async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
-    const end = promResponseTimeSummary.labels({ method: ctx.method, name: ctx.path }).startTimer();
-    await next();
-    end();
-  })
-  .use(
-    cors({
-      allowMethods: ['GET', 'POST'],
-      allowHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
-      maxAge: 1728000,
-      origin: corsOrigin(config.get('c2c.frontend.baseUrl'), config.get('c2c.frontend.extraOrigins')),
-    }),
-  )
-  .use(
-    bodyParser({
-      jsonLimit: config.get('server.payload.limit'),
-    }),
-  )
-  // koa-helmet declares an ES default export, but its CommonJS module.exports is the middleware factory itself
-  .use((helmet as unknown as typeof helmet.default)())
-  .use(rTracer.koaMiddleware())
-  .use(
-    logger({
-      logger: log,
-      level: logLevel,
-      customLogLevel: (res: ServerResponse, error: Error): LevelWithSilent => {
-        if (!error && (res.req?.url === '/health' || res.req?.url?.startsWith('/.well-known/acme-challenge'))) {
-          return 'silent';
-        }
-        return 'info';
-      },
-    }),
-  )
-  .use(passport.initialize())
-  .use(defaultErrorHandler())
-  .use(router.routes())
-  .use(router.allowedMethods());
+let shuttingDown = false;
 
 // Maintenance mode or shutdown: the application then answers 503 to every request
 const setShuttingDown = (value: boolean): void => {
-  app.context['shuttingDown'] = value;
+  shuttingDown = value;
 };
+
+const rejectWhenShuttingDown: RequestHandler = (_req, res, next) => {
+  if (shuttingDown) {
+    res.set('Connection', 'close').type('text/plain').status(503).send('Server is shutting down');
+    return;
+  }
+  next();
+};
+
+// The route pattern of a request, e.g. /users/:userId/activities, 'unmatched' when no route matched
+const routePattern = (req: Request): string => {
+  const route = req.route as { path: string } | undefined;
+  if (!route) {
+    return 'unmatched';
+  }
+  // the base URL of mounted routers has the values of their parameters
+  let base = req.baseUrl;
+  for (const [name, value] of Object.entries(req.params)) {
+    base = base.replace(`/${value}`, `/:${name}`);
+  }
+  return route.path === '/' ? base || '/' : base + route.path;
+};
+
+// Response times by route pattern (not by path, whose ids would make one series per user)
+const measureResponseTime: RequestHandler = (req, res, next) => {
+  const end = promResponseTimeSummary.startTimer();
+  res.on('finish', () => {
+    end({ method: req.method, name: routePattern(req) });
+  });
+  next();
+};
+
+// The level of the log of a request: none in the tests, nor for the health checks and the ACME challenges that
+// succeed (the URL is the original one: routers rewrite req.url)
+const silentRequestLogs = config.get('env') === 'test';
+export const requestLogLevel = (url: string, error: unknown): LevelWithSilent =>
+  silentRequestLogs || (!error && (url === '/health' || url.startsWith('/.well-known/acme-challenge')))
+    ? 'silent'
+    : 'info';
+
+const app = express();
+
+app.use(rejectWhenShuttingDown);
+app.use(measureResponseTime);
+app.use(helmet());
+app.use(
+  cors({
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'],
+    maxAge: 1728000,
+    origin: corsOrigin(config.get('c2c.frontend.baseUrl'), config.get('c2c.frontend.extraOrigins')),
+  }),
+);
+app.use(
+  express.json({
+    limit: config.get('server.payload.limit'),
+    // keep the body as received: the signature of Polar webhooks covers it
+    verify: (req: IncomingMessage & { rawBody?: string }, _res: ServerResponse, buffer: Buffer) => {
+      req.rawBody = buffer.toString('utf8');
+    },
+  }),
+);
+app.use(express.urlencoded({ extended: false }));
+app.use(requestId);
+app.use(
+  pinoHttp({
+    logger: log,
+    genReqId: () => currentRequestId() ?? '',
+    customLogLevel: (req, _res, error) => requestLogLevel((req as Request).originalUrl, error),
+  }),
+);
+app.use(passport.initialize());
+
+app.use('/health', health);
+app.use('/strava', enabledIf(config.get('trackers.strava.enabled')), strava);
+app.use('/suunto', enabledIf(config.get('trackers.suunto.enabled')), suunto);
+app.use('/garmin', enabledIf(config.get('trackers.garmin.enabled')), garmin);
+app.use('/decathlon', enabledIf(config.get('trackers.decathlon.enabled')), decathlon);
+app.use('/polar', enabledIf(config.get('trackers.polar.enabled')), polar);
+app.use('/coros', enabledIf(config.get('trackers.coros.enabled')), coros);
+app.use('/users/:userId/activities', ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, activities);
+app.use('/users/:userId', ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, users);
+
+app.use((_req, _res, next) => {
+  next(createHttpError(404));
+});
+app.use(errorHandler);
 
 export { app, setShuttingDown };

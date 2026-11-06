@@ -107,7 +107,7 @@ export class SuuntoService {
     try {
       fit = await suuntoApi.getFIT(workoutKey.toString(), token, this.#suuntoSubscriptionKey);
     } catch (error: unknown) {
-      log.info(`Unable to retrieve Suunto geometry for ${workoutKey}`, error instanceof Error ? error : undefined);
+      log.info({ err: error }, `Unable to retrieve Suunto geometry for ${workoutKey}`);
       return undefined;
     }
     const geojson: LineString | undefined = fitToGeoJSON(fit);

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import { corsOrigin, parseExtraOrigins } from '../../../src/helpers/cors-origin.ts';
-import { createMockContext } from '../../utils.ts';
 
 describe('parseExtraOrigins', () => {
   it('returns an empty list for an empty string', () => {
@@ -18,26 +17,32 @@ describe('parseExtraOrigins', () => {
 
 describe('corsOrigin', () => {
   const origin = corsOrigin('https://www.example.org/', 'https://www.preprod.example.org/,http://localhost:8080');
-  const ctxWithOrigin = (value?: string): ReturnType<typeof createMockContext> =>
-    createMockContext({ headers: value ? { origin: value } : {} });
+  // the origin the middleware answers to a request from `value`
+  const answer = (check: ReturnType<typeof corsOrigin>, value?: string): string => {
+    let result = '';
+    check(value, (_error, allowed) => {
+      result = allowed;
+    });
+    return result;
+  };
 
   it('allows the main frontend', () => {
-    expect(origin(ctxWithOrigin('https://www.example.org'))).toBe('https://www.example.org');
+    expect(answer(origin, 'https://www.example.org')).toBe('https://www.example.org');
   });
 
   it('allows an extra origin', () => {
-    expect(origin(ctxWithOrigin('https://www.preprod.example.org'))).toBe('https://www.preprod.example.org');
-    expect(origin(ctxWithOrigin('http://localhost:8080'))).toBe('http://localhost:8080');
+    expect(answer(origin, 'https://www.preprod.example.org')).toBe('https://www.preprod.example.org');
+    expect(answer(origin, 'http://localhost:8080')).toBe('http://localhost:8080');
   });
 
   it('answers with the main frontend for any other origin', () => {
-    expect(origin(ctxWithOrigin('https://evil.example.com'))).toBe('https://www.example.org');
-    expect(origin(ctxWithOrigin('https://www.example.org.evil.com'))).toBe('https://www.example.org');
-    expect(origin(ctxWithOrigin())).toBe('https://www.example.org');
+    expect(answer(origin, 'https://evil.example.com')).toBe('https://www.example.org');
+    expect(answer(origin, 'https://www.example.org.evil.com')).toBe('https://www.example.org');
+    expect(answer(origin)).toBe('https://www.example.org');
   });
 
   it('only knows the main frontend without extra origins', () => {
     const only = corsOrigin('https://www.example.org/', '');
-    expect(only(ctxWithOrigin('https://www.preprod.example.org'))).toBe('https://www.example.org');
+    expect(answer(only, 'https://www.preprod.example.org')).toBe('https://www.example.org');
   });
 });

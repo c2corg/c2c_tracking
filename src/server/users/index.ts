@@ -1,9 +1,11 @@
-import Router from '@koa/router';
+import { Router } from 'express';
+
+import { methodNotAllowed } from '../method-not-allowed.ts';
 
 import { controller } from './user.controller.ts';
 
-const router = new Router();
+const router = Router({ mergeParams: true });
 
-router.get('/status', controller.getStatus.bind(controller));
+router.route('/status').get(controller.getStatus.bind(controller)).all(methodNotAllowed);
 
 export default router;

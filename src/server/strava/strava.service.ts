@@ -165,7 +165,7 @@ export class StravaService {
       const stream = await stravaApi.getActivityStream(token, activityId);
       return this.streamSetToGeoJSON(stream, dayjs(startDateLocal).unix());
     } catch (error: unknown) {
-      log.info(`Unable to retrieve Strava geometry for ${activityId}`, error instanceof Error ? error : undefined);
+      log.info({ err: error }, `Unable to retrieve Strava geometry for ${activityId}`);
       return undefined;
     }
   }

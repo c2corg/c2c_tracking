@@ -122,10 +122,7 @@ export class CorosService {
     try {
       fit = await corosApi.getFIT(fitUrl);
     } catch (error: unknown) {
-      log.info(
-        `Unable to retrieve Coros geometry for ${workout.labelId} (${fitUrl})`,
-        error instanceof Error ? error : undefined,
-      );
+      log.info({ err: error }, `Unable to retrieve Coros geometry for ${workout.labelId} (${fitUrl})`);
       return undefined;
     }
     const geojson: LineString | undefined = fitToGeoJSON(fit);

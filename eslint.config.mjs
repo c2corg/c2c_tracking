@@ -29,7 +29,6 @@ export default defineConfig(
       'import-x/resolver-next': [createTypeScriptImportResolver({ alwaysTryTypes: true })],
     },
     rules: {
-      'n/no-extraneous-import': ['error', { allowModules: ['pino'] }],
       // resolution is checked by TypeScript and import-x
       'n/no-missing-import': 'off',
       'n/no-unpublished-import': ['error', { allowModules: ['type-fest'] }],
@@ -46,7 +45,7 @@ export default defineConfig(
       ],
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' },
+        { ignoreRestSiblings: true, argsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' },
       ],
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-member-accessibility': ['error', { overrides: { constructors: 'no-public' } }],
