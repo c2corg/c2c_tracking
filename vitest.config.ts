@@ -6,7 +6,11 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      reporter: ['text-summary', 'lcov'],
+      // lcov for Codacy, json-summary and json for the coverage comment of the pull requests
+      reporter: ['text-summary', 'lcov', 'json-summary', 'json'],
+      reportsDirectory: 'reports/coverage',
+      // a little below the current values (unit tests alone), so that a drop fails the build
+      thresholds: { statements: 77, branches: 63, functions: 73, lines: 77 },
     },
     projects: [
       {
