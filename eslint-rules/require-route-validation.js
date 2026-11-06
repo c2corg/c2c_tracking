@@ -8,7 +8,8 @@ const isRouteChain = (node) =>
   node.callee.type === 'MemberExpression' &&
   node.callee.property.type === 'Identifier' &&
   (node.callee.property.name === 'route' ||
-    ((VERBS.has(node.callee.property.name) || node.callee.property.name === 'all') && isRouteChain(node.callee.object)));
+    ((VERBS.has(node.callee.property.name) || node.callee.property.name === 'all') &&
+      isRouteChain(node.callee.object)));
 
 /** @type {(node: import('estree').Node) => boolean} */
 const isRouter = (node) => node.type === 'Identifier' && node.name === 'router';

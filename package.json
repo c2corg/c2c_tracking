@@ -116,7 +116,7 @@
     "diff": "^4.0.4"
   },
   "lint-staged": {
-    "*.ts": [
+    "*.{ts,js,mjs}": [
       "eslint --fix",
       "prettier --write --ignore-unknown --list-different"
     ],
