@@ -27,7 +27,8 @@
     "test:ci:unit": "vitest run --project unit --coverage --coverage.reportsDirectory=reports/coverage/unit --reporter=default --reporter=junit --outputFile.junit=reports/junit/unit.xml --coverage.thresholds.statements=77 --coverage.thresholds.branches=63 --coverage.thresholds.functions=73 --coverage.thresholds.lines=77",
     "test:ci:psql": "vitest run --project psql --coverage --coverage.reportsDirectory=reports/coverage/psql --reporter=default --reporter=junit --outputFile.junit=reports/junit/psql.xml",
     "test:ci:s3": "vitest run --project s3 --coverage --coverage.reportsDirectory=reports/coverage/s3 --reporter=default --reporter=junit --outputFile.junit=reports/junit/s3.xml",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migrate:garmin": "node --env-file-if-exists=.env scripts/migrate-garmin-oauth2.ts | pino-pretty -c -t"
   },
   "repository": {
     "type": "git",

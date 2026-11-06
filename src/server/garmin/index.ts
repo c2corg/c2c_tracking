@@ -16,7 +16,7 @@ router
     ensureUserFromParamsMatchesAuthUser,
     userRateLimit,
     validate(requestToken),
-    controller.requestUnauthorizedRequestToken.bind(controller),
+    controller.requestAuthorization.bind(controller),
   )
   .all(methodNotAllowed);
 router

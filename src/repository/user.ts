@@ -17,8 +17,15 @@ export const SuuntoInfo = z.object({
 export type SuuntoInfo = z.infer<typeof SuuntoInfo>;
 
 export const GarminInfo = z.object({
-  token: z.string().min(10).max(5000),
-  tokenSecret: z.string().min(10).max(5000),
+  // Garmin API user id, set for OAuth 2 users. Identifies the user in the webhooks.
+  userId: z.string().min(1).optional(),
+  accessToken: z.string().min(10).max(5000).optional(),
+  expiresAt: z.number().int().positive().optional(),
+  refreshToken: z.string().min(10).max(5000).optional(),
+  refreshExpiresAt: z.number().int().positive().optional(),
+  // legacy OAuth 1 credentials, for the users not migrated to OAuth 2 yet
+  token: z.string().min(10).max(5000).optional(),
+  tokenSecret: z.string().min(10).max(5000).optional(),
 });
 export type GarminInfo = z.infer<typeof GarminInfo>;
 
