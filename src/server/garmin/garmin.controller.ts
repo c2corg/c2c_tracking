@@ -4,6 +4,7 @@ import createHttpError from 'http-errors';
 import { Keyv } from 'keyv';
 
 import config from '../../config.ts';
+import log from '../../helpers/logger.ts';
 
 import type { GarminActivity } from './garmin.api.ts';
 import { garminService as service } from './garmin.service.ts';
@@ -16,15 +17,21 @@ class GarminController {
     this.keyv = connectionUri
       ? createKeyv(connectionUri, { namespace: 'tracking' })
       : new Keyv({ namespace: 'tracking' });
-    this.keyv.on('error', () => {
-      throw new Error('Unable to connect to Redis instance with URI ' + connectionUri);
+    // a store error must not crash the service (throwing from this listener did): the calls then return false or
+    // undefined, see below. The URI is not logged, it may hold the Redis password
+    this.keyv.on('error', (error: unknown) => {
+      log.warn({ err: error }, 'Garmin token secret store error');
     });
   }
 
   public async requestUnauthorizedRequestToken(req: Request, res: Response): Promise<void> {
     const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
     const { token, tokenSecret } = await service.requestUnauthorizedRequestToken();
-    await this.keyv.set(c2cId.toString(), tokenSecret, 1000 * 60 * 60); // 1 hour TTL
+    const stored = await this.keyv.set(c2cId.toString(), tokenSecret, 1000 * 60 * 60); // 1 hour TTL
+    if (!stored) {
+      // without the secret, the token exchange would fail when the user comes back from Garmin
+      throw createHttpError(502, 'setup-failed');
+    }
     res.status(200).json({ token });
   }
 
