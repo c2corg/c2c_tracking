@@ -108,6 +108,19 @@ describe('Suunto Controller', () => {
       expect(suuntoService.handleWebhookEvent).toHaveBeenCalledTimes(1);
       expect(suuntoService.handleWebhookEvent).toHaveBeenCalledWith({ username: 'user', workoutid: 'id' }, 'auth');
     });
+
+    it('handles events sent as a form, as Suunto does', async () => {
+      vi.spyOn(suuntoService, 'handleWebhookEvent').mockImplementationOnce(() => Promise.resolve());
+
+      const response = await request
+        .post('/suunto/webhook')
+        .type('form')
+        .send({ username: 'user', workoutid: 'id' })
+        .set({ authorization: 'auth' });
+
+      expect(response.status).toBe(200);
+      expect(suuntoService.handleWebhookEvent).toHaveBeenCalledWith({ username: 'user', workoutid: 'id' }, 'auth');
+    });
   });
 
   describe('POST /suunto/deauthorize/:userId', () => {
