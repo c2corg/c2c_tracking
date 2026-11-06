@@ -26,5 +26,8 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENV PORT=8080
 ENV METRICS_PORT=8081
 EXPOSE 8080 8081
+# no curl in the slim image: Node checks the health endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD ["node", "-e", "fetch('http://localhost:' + process.env.PORT + '/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD [ "dumb-init", "node", "src/index.js" ]

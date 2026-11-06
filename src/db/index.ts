@@ -1,12 +1,11 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 
-import type { AsyncResultCallback } from 'async';
-import { retry } from 'async';
 import type { Knex } from 'knex';
 import knex from 'knex';
 
 import config from '../config.ts';
+import { retry } from '../helpers/retry.ts';
 
 export type Configuration = {
   host: string;
@@ -94,8 +93,13 @@ export class Database {
 
     const db = knex(dbConfig);
 
-    // Test database connectivity
-    await db.raw('select 1');
+    // Test database connectivity, without leaking the pool of a failed attempt
+    try {
+      await db.raw('select 1');
+    } catch (error) {
+      await db.destroy();
+      throw error;
+    }
 
     return db;
   }
@@ -105,26 +109,8 @@ export class Database {
       return this.retryDbConnectionPromise;
     }
 
-    const methodToRetry = (cb: AsyncResultCallback<Knex, Error>): void => {
-      this.createConnection()
-        .then((db: Knex) => {
-          cb(undefined, db);
-        })
-        .catch((err: Error) => {
-          cb(err, undefined);
-        });
-    };
-
-    this.retryDbConnectionPromise = new Promise<Knex | undefined>((resolve, reject) => {
-      retry({ times: 3, interval: 1000 }, methodToRetry, (err: Error | null | undefined, db: Knex | undefined) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(db);
-        }
-
-        this.retryDbConnectionPromise = undefined;
-      });
+    this.retryDbConnectionPromise = retry(() => this.createConnection(), { times: 3, interval: 1000 }).finally(() => {
+      this.retryDbConnectionPromise = undefined;
     });
 
     return this.retryDbConnectionPromise;

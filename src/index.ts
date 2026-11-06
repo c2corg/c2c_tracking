@@ -1,47 +1,20 @@
-import type { Server } from 'http';
-
-import type { ErrorCallback } from 'async';
-import { retry } from 'async';
+import type { Server } from 'node:http';
 
 import { app, setShuttingDown } from './app.ts';
 import config from './config.ts';
 import { database as db } from './db/index.ts';
+import { closeServer } from './helpers/close-server.ts';
 import log from './helpers/logger.ts';
 import { watchMaintenanceFile } from './helpers/maintenance.ts';
 import { metricsApp } from './metrics/index.ts';
-import { polarService } from './server/polar/polar.service.ts';
-import { stravaService } from './server/strava/strava.service.ts';
-
-async function closeServer(server: Server): Promise<void> {
-  const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
-    server.getConnections((err: Error | null, pendingRequests: number) => {
-      if (err) {
-        callback(err);
-      } else if (pendingRequests) {
-        callback(Error(`Number of pending requests: ${pendingRequests}`));
-      } else {
-        callback(undefined);
-      }
-    });
-  };
-
-  return new Promise<void>((resolve, reject) => {
-    retry({ times: 10, interval: 1000 }, checkPendingRequests, (error?: Error | null) => {
-      if (error) {
-        server.close(() => reject(error));
-      } else {
-        server.close(() => resolve());
-      }
-    });
-  });
-}
+import { setupWebhooks } from './webhooks.ts';
 
 async function closeGracefully(signal: string, servers: Server[]): Promise<void> {
   log.info(`Received signal to terminate: ${signal}`);
 
   setShuttingDown(true);
 
-  const shutdown = [...servers.map((server) => closeServer(server)), db.closeDatabase()];
+  const shutdown = [...servers.map((server) => closeServer(server, 10_000)), db.closeDatabase()];
 
   for (const s of shutdown) {
     try {
@@ -88,8 +61,7 @@ export async function start(): Promise<void> {
     servers.push(
       app.listen(port, () => {
         log.info(`Server is running on port ${port}`);
-        void stravaService.setupWebhook();
-        void polarService.setupWebhook();
+        setupWebhooks();
       }),
     );
     servers.push(metricsApp.listen(config.get('metrics.port')));
