@@ -118,5 +118,8 @@
     "*.{json,md}": [
       "prettier --write --ignore-unknown --list-different"
     ]
+  },
+  "allowScripts": {
+    "unrs-resolver": false
   }
 }
