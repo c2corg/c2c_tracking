@@ -1,22 +1,27 @@
 import dayjs from 'dayjs';
-import dayjsPluginTimezone from 'dayjs/plugin/timezone';
-import dayjsPluginUtc from 'dayjs/plugin/utc';
+import dayjsPluginTimezone from 'dayjs/plugin/timezone.js';
+import dayjsPluginUtc from 'dayjs/plugin/utc.js';
 import type { SetNonNullable, SetRequired } from 'type-fest';
 
-import config from '../../config';
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { fitToGeoJSON } from '../../helpers/utils';
-import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import type { User } from '../../repository/user';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import config from '../../config.ts';
+import { NotFoundError } from '../../errors.ts';
+import log from '../../helpers/logger.ts';
+import { fitToGeoJSON } from '../../helpers/utils.ts';
+import {
+  promTokenRenewalErrorsCounter,
+  promWebhookCounter,
+  promWebhookErrorsCounter,
+} from '../../metrics/prometheus.ts';
+import { miniatureService } from '../../miniature.service.ts';
+import { activityRepository } from '../../repository/activity.repository.ts';
+import type { NewActivityWithGeometry } from '../../repository/activity.ts';
+import type { LineString } from '../../repository/geojson.ts';
+import { userRepository } from '../../repository/user.repository.ts';
+import type { User } from '../../repository/user.ts';
+import { userService } from '../../user.service.ts';
 
-import { corosApi, CorosAuth, WebhookEvent, Workout, WorkoutRecords } from './coros.api';
+import type { CorosAuth, WebhookEvent, Workout, WorkoutRecords } from './coros.api.ts';
+import { corosApi } from './coros.api.ts';
 
 dayjs.extend(dayjsPluginUtc);
 dayjs.extend(dayjsPluginTimezone);

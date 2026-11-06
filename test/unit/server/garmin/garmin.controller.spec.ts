@@ -1,16 +1,16 @@
-import { Server } from 'http';
+import type { Server } from 'http';
 
 import { AxiosError } from 'axios';
 import supertest from 'supertest';
-import TestAgent from 'supertest/lib/agent';
+import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import type { GarminActivity } from '../../../../src/server/garmin/garmin.api';
-import { controller as garminController } from '../../../../src/server/garmin/garmin.controller';
-import { garminService } from '../../../../src/server/garmin/garmin.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.ts';
+import log from '../../../../src/helpers/logger.ts';
+import type { GarminActivity } from '../../../../src/server/garmin/garmin.api.ts';
+import { controller as garminController } from '../../../../src/server/garmin/garmin.controller.ts';
+import { garminService } from '../../../../src/server/garmin/garmin.service.ts';
+import { authenticated } from '../../../utils.ts';
 
 describe('Garmin Controller', () => {
   let server: Server;

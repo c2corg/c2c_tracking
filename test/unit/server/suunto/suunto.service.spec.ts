@@ -3,13 +3,13 @@ import { resolve } from 'path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { suuntoApi } from '../../../../src/server/suunto/suunto.api';
-import { SuuntoService } from '../../../../src/server/suunto/suunto.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.ts';
+import { miniatureService } from '../../../../src/miniature.service.ts';
+import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import { userRepository } from '../../../../src/repository/user.repository.ts';
+import { suuntoApi } from '../../../../src/server/suunto/suunto.api.ts';
+import { SuuntoService } from '../../../../src/server/suunto/suunto.service.ts';
+import { userService } from '../../../../src/user.service.ts';
 
 describe('Suunto Service', () => {
   beforeEach(() => {
@@ -110,7 +110,7 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
@@ -218,7 +218,7 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
@@ -447,7 +447,7 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
@@ -520,7 +520,7 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 

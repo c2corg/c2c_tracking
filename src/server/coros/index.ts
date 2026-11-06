@@ -1,10 +1,10 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.ts';
+import { validate } from '../validator.ts';
 
-import { controller } from './coros.controller';
-import { exchangeToken, webhook } from './coros.validators';
+import { controller } from './coros.controller.ts';
+import { exchangeToken, webhook } from './coros.validators.ts';
 
 const router = new Router();
 

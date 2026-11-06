@@ -1,20 +1,24 @@
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 
-import config from '../../config';
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { truthy } from '../../helpers/utils';
-import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, UpdateActivity } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import { stravaRepository } from '../../repository/strava.repository';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
-
+import config from '../../config.ts';
+import { NotFoundError } from '../../errors.ts';
+import log from '../../helpers/logger.ts';
+import { truthy } from '../../helpers/utils.ts';
 import {
+  promTokenRenewalErrorsCounter,
+  promWebhookCounter,
+  promWebhookErrorsCounter,
+} from '../../metrics/prometheus.ts';
+import { miniatureService } from '../../miniature.service.ts';
+import { activityRepository } from '../../repository/activity.repository.ts';
+import type { NewActivityWithGeometry, UpdateActivity } from '../../repository/activity.ts';
+import type { LineString } from '../../repository/geojson.ts';
+import { stravaRepository } from '../../repository/strava.repository.ts';
+import { userRepository } from '../../repository/user.repository.ts';
+import { userService } from '../../user.service.ts';
+
+import type {
   Activity,
   AltitudeStream,
   DistanceStream,
@@ -23,8 +27,8 @@ import {
   StreamSet,
   TimeStream,
   WebhookEvent,
-  stravaApi,
-} from './strava.api';
+} from './strava.api.ts';
+import { stravaApi } from './strava.api.ts';
 
 dayjs.extend(dayjsPluginUTC);
 

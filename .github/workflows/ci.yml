@@ -27,7 +27,7 @@ jobs:
       contents: read
     strategy:
       matrix:
-        node-version: [24] # the version of the Dockerfile and of engines, not the floating LTS
+        node-version: [lts/*]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7

@@ -1,12 +1,8 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  Activity,
-  DecathlonApi,
-  DecathlonAuth,
-  WebhookSubscription,
-} from '../../../../src/server/decathlon/decathlon.api';
+import type { Activity, DecathlonAuth, WebhookSubscription } from '../../../../src/server/decathlon/decathlon.api.ts';
+import { DecathlonApi } from '../../../../src/server/decathlon/decathlon.api.ts';
 
 vi.mock('axios');
 

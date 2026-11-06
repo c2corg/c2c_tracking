@@ -1,23 +1,24 @@
 import { createHmac } from 'crypto';
 
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+import duration from 'dayjs/plugin/duration.js';
 import { parse } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
 
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { fitToGeoJSON } from '../../helpers/utils';
-import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import { polarRepository } from '../../repository/polar.repository';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import { NotFoundError } from '../../errors.ts';
+import log from '../../helpers/logger.ts';
+import { fitToGeoJSON } from '../../helpers/utils.ts';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.ts';
+import { miniatureService } from '../../miniature.service.ts';
+import { activityRepository } from '../../repository/activity.repository.ts';
+import type { NewActivityWithGeometry } from '../../repository/activity.ts';
+import type { LineString } from '../../repository/geojson.ts';
+import { polarRepository } from '../../repository/polar.repository.ts';
+import { userRepository } from '../../repository/user.repository.ts';
+import { userService } from '../../user.service.ts';
 
-import { Exercise, polarApi, WebhookEvent, isWebhookPingEvent } from './polar.api';
+import type { Exercise, WebhookEvent } from './polar.api.ts';
+import { polarApi, isWebhookPingEvent } from './polar.api.ts';
 
 dayjs.extend(duration);
 

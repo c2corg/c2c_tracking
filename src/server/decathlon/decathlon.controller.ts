@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './decathlon.api';
-import { decathlonService as service } from './decathlon.service';
+import type { WebhookEvent } from './decathlon.api.ts';
+import { decathlonService as service } from './decathlon.service.ts';
 
 class DecathlonController {
   public async exchangeToken(ctx: Context): Promise<void> {
@@ -27,7 +27,7 @@ class DecathlonController {
   }
 
   public webhook(ctx: Context): void {
-    const event = <WebhookEvent>ctx.request.body;
+    const event = ctx.request.body as WebhookEvent;
     void service.handleWebhookEvent(event); // async handling
     ctx.status = 200; // acknowledge event
   }

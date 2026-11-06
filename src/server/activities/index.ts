@@ -1,9 +1,9 @@
 import Router from '@koa/router';
 
-import { validate } from '../validator';
+import { validate } from '../validator.ts';
 
-import { controller } from './activity.controller';
-import { activities } from './activity.validators';
+import { controller } from './activity.controller.ts';
+import { activities } from './activity.validators.ts';
 
 const router = new Router();
 

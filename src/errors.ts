@@ -1,15 +1,14 @@
-import log from './helpers/logger';
+import log from './helpers/logger.ts';
 
 export class AppError extends Error {
-  constructor(
-    public readonly code: number,
-    message?: string,
-    cause?: Error,
-    public readonly body?: string,
-  ) {
+  public readonly code: number;
+  public readonly body: string | undefined;
+
+  constructor(code: number, message?: string, cause?: Error, body?: string) {
     super(message, { ...(cause && { cause }) });
     log.warn(message);
     this.code = code;
+    this.body = body;
   }
 }
 

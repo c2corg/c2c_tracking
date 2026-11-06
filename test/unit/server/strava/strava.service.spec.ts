@@ -1,14 +1,14 @@
 import dayjs from 'dayjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { stravaRepository } from '../../../../src/repository/strava.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { stravaApi } from '../../../../src/server/strava/strava.api';
-import { StravaService } from '../../../../src/server/strava/strava.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.ts';
+import { miniatureService } from '../../../../src/miniature.service.ts';
+import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import { stravaRepository } from '../../../../src/repository/strava.repository.ts';
+import { userRepository } from '../../../../src/repository/user.repository.ts';
+import { stravaApi } from '../../../../src/server/strava/strava.api.ts';
+import { StravaService } from '../../../../src/server/strava/strava.service.ts';
+import { userService } from '../../../../src/user.service.ts';
 
 describe('Strava Service', () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { database as db } from '../../../src/db';
-import { PolarRepository } from '../../../src/repository/polar.repository';
+import { database as db } from '../../../src/db/index.ts';
+import { PolarRepository } from '../../../src/repository/polar.repository.ts';
 
 describe('Polar Repository', () => {
   afterEach(async () => {

@@ -3,28 +3,29 @@ import type { ServerResponse } from 'http';
 import cors from '@koa/cors';
 import Router from '@koa/router';
 import rTracer from 'cls-rtracer';
-import Koa, { Context } from 'koa';
+import type { Context } from 'koa';
+import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import helmet from 'koa-helmet';
 import logger from 'koa-pino-logger';
 import type { LevelWithSilent } from 'pino';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth';
-import config from './config';
-import { corsOrigin } from './helpers/cors-origin';
-import enabledIf from './helpers/enabled-if';
-import log from './helpers/logger';
-import { promResponseTimeSummary } from './metrics/prometheus';
-import activities from './server/activities';
-import coros from './server/coros';
-import decathlon from './server/decathlon';
-import { defaultErrorHandler } from './server/error-handler';
-import garmin from './server/garmin';
-import health from './server/health';
-import polar from './server/polar';
-import strava from './server/strava';
-import suunto from './server/suunto';
-import users from './server/users';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth/index.ts';
+import config from './config.ts';
+import { corsOrigin } from './helpers/cors-origin.ts';
+import enabledIf from './helpers/enabled-if.ts';
+import log from './helpers/logger.ts';
+import { promResponseTimeSummary } from './metrics/prometheus.ts';
+import activities from './server/activities/index.ts';
+import coros from './server/coros/index.ts';
+import decathlon from './server/decathlon/index.ts';
+import { defaultErrorHandler } from './server/error-handler.ts';
+import garmin from './server/garmin/index.ts';
+import health from './server/health/index.ts';
+import polar from './server/polar/index.ts';
+import strava from './server/strava/index.ts';
+import suunto from './server/suunto/index.ts';
+import users from './server/users/index.ts';
 
 const app = new Koa();
 const router = new Router();
@@ -95,7 +96,8 @@ app
       jsonLimit: config.get('server.payload.limit'),
     }),
   )
-  .use(helmet())
+  // koa-helmet declares an ES default export, but its CommonJS module.exports is the middleware factory itself
+  .use((helmet as unknown as typeof helmet.default)())
   .use(rTracer.koaMiddleware())
   .use(
     logger({

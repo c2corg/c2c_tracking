@@ -1,10 +1,10 @@
 import type { Except } from 'type-fest';
 
-import { NotFoundError } from '../../errors';
-import { Lang, translations } from '../../helpers/i18n';
-import type { Activity } from '../../repository/activity';
-import type { LineString } from '../../repository/geojson';
-import { userService } from '../../user.service';
+import { NotFoundError } from '../../errors.ts';
+import { Lang, translations } from '../../helpers/i18n/index.ts';
+import type { Activity } from '../../repository/activity.ts';
+import type { LineString } from '../../repository/geojson.ts';
+import { userService } from '../../user.service.ts';
 
 export class ActivityService {
   public async getActivities(

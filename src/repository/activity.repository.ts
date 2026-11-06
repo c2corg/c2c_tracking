@@ -1,11 +1,11 @@
 import type { Except } from 'type-fest';
 
-import config from '../config';
-import { database as db } from '../db';
-import { IOError, NotFoundError } from '../errors';
+import config from '../config.ts';
+import { database as db } from '../db/index.ts';
+import { IOError, NotFoundError } from '../errors.ts';
 
-import type { Activity, Vendor } from './activity';
-import type { LineString } from './geojson';
+import type { Activity, Vendor } from './activity.ts';
+import type { LineString } from './geojson.ts';
 
 type ActivityRow = {
   id: number;

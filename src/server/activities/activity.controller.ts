@@ -1,9 +1,9 @@
 import type { Context } from 'koa';
 
-import { NotFoundError } from '../../errors';
-import type { Lang } from '../../helpers/i18n';
+import { NotFoundError } from '../../errors.ts';
+import type { Lang } from '../../helpers/i18n/index.ts';
 
-import { activityService as service } from './activity.service';
+import { activityService as service } from './activity.service.ts';
 
 class ActivityController {
   public async getUserActivities(ctx: Context): Promise<void> {

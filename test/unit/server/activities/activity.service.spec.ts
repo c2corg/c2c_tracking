@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { NotFoundError } from '../../../../src/errors';
-import log from '../../../../src/helpers/logger';
-import { ActivityService } from '../../../../src/server/activities/activity.service';
-import { stravaService } from '../../../../src/server/strava/strava.service';
-import { suuntoService } from '../../../../src/server/suunto/suunto.service';
-import { userService } from '../../../../src/user.service';
+import { NotFoundError } from '../../../../src/errors.ts';
+import log from '../../../../src/helpers/logger.ts';
+import { ActivityService } from '../../../../src/server/activities/activity.service.ts';
+import { stravaService } from '../../../../src/server/strava/strava.service.ts';
+import { suuntoService } from '../../../../src/server/suunto/suunto.service.ts';
+import { userService } from '../../../../src/user.service.ts';
 
-vi.mock('../../../../src/helpers/utils');
+vi.mock('../../../../src/helpers/utils.ts');
 
 describe('Activity Service', () => {
   beforeEach(() => {

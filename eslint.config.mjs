@@ -44,10 +44,15 @@ export default defineConfig(
           },
         },
       ],
-      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true, destructuredArrayIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-member-accessibility': ['error', { overrides: { constructors: 'no-public' } }],
       '@typescript-eslint/only-throw-error': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      'import-x/extensions': ['error', 'ignorePackages'],
     },
   },
   {
@@ -58,7 +63,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['test/**/*.ts', 'vitest.config.mts', 'eslint.config.mjs'],
+    files: ['test/**/*.ts', 'vitest.config.ts', 'eslint.config.mjs'],
     rules: {
       'n/no-unpublished-import': 'off',
       'n/no-extraneous-import': 'off',
@@ -70,6 +75,8 @@ export default defineConfig(
     rules: {
       '@typescript-eslint/unbound-method': 'off',
       'vitest/unbound-method': 'error',
+      // test fixtures and temporary files
+      'security/detect-non-literal-fs-filename': 'off',
     },
   },
   prettier,

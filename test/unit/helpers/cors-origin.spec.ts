@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { corsOrigin, parseExtraOrigins } from '../../../src/helpers/cors-origin';
-import { createMockContext } from '../../utils';
+import { corsOrigin, parseExtraOrigins } from '../../../src/helpers/cors-origin.ts';
+import { createMockContext } from '../../utils.ts';
 
 describe('parseExtraOrigins', () => {
   it('returns an empty list for an empty string', () => {

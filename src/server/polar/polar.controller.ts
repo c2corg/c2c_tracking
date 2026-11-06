@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './polar.api';
-import { polarService as service } from './polar.service';
+import type { WebhookEvent } from './polar.api.ts';
+import { polarService as service } from './polar.service.ts';
 
 class PolarController {
   public async exchangeToken(ctx: Context): Promise<void> {
@@ -29,7 +29,7 @@ class PolarController {
   }
 
   public webhook(ctx: Context): void {
-    const event = <WebhookEvent>ctx.request.body;
+    const event = ctx.request.body as WebhookEvent;
     void service.handleWebhookEvent(event, ctx.request.rawBody, ctx.request.get('Polar-Webhook-Signature')); // async handling
     ctx.status = 200; // acknowledge event
   }

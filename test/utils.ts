@@ -4,7 +4,8 @@ import type { Request } from 'express';
 import { sign } from 'jsonwebtoken';
 import Koa, { type Context } from 'koa';
 import { createRequest, createResponse } from 'node-mocks-http';
-import { Strategy as CustomStrategy, VerifiedCallback } from 'passport-custom';
+import type { VerifiedCallback } from 'passport-custom';
+import { Strategy as CustomStrategy } from 'passport-custom';
 import type { Test } from 'supertest';
 
 export const AuthenticatedUserStrategy = (userId?: number): CustomStrategy =>

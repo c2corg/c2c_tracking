@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { CorosApi, CorosAuth, WorkoutRecord, WorkoutRecords } from '../../../../src/server/coros/coros.api';
+import log from '../../../../src/helpers/logger.ts';
+import type { CorosAuth, WorkoutRecord, WorkoutRecords } from '../../../../src/server/coros/coros.api.ts';
+import { CorosApi } from '../../../../src/server/coros/coros.api.ts';
 
 vi.mock('axios');
 

@@ -1,10 +1,10 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.ts';
+import { validate } from '../validator.ts';
 
-import { controller } from './strava.controller';
-import { exchangeToken, webhook, webhookSubscription } from './strava.validators';
+import { controller } from './strava.controller.ts';
+import { exchangeToken, webhook, webhookSubscription } from './strava.validators.ts';
 
 const router = new Router();
 

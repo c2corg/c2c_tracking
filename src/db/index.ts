@@ -1,10 +1,12 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 
-import { AsyncResultCallback, retry } from 'async';
-import knex, { Knex } from 'knex';
+import type { AsyncResultCallback } from 'async';
+import { retry } from 'async';
+import type { Knex } from 'knex';
+import knex from 'knex';
 
-import config from '../config';
+import config from '../config.ts';
 
 export type Configuration = {
   host: string;
@@ -68,7 +70,7 @@ export class Database {
     }
 
     await connection.migrate.latest({
-      directory: path.resolve(__dirname, './migrations'),
+      directory: path.resolve(import.meta.dirname, './migrations'),
     });
   }
 

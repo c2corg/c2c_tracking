@@ -1,14 +1,14 @@
-import { Server } from 'http';
+import type { Server } from 'http';
 
 import supertest from 'supertest';
-import TestAgent from 'supertest/lib/agent';
+import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import type { WebhookEvent } from '../../../../src/server/strava/strava.api';
-import { stravaService } from '../../../../src/server/strava/strava.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.ts';
+import log from '../../../../src/helpers/logger.ts';
+import type { WebhookEvent } from '../../../../src/server/strava/strava.api.ts';
+import { stravaService } from '../../../../src/server/strava/strava.service.ts';
+import { authenticated } from '../../../utils.ts';
 
 describe('Strava Controller', () => {
   let server: Server;

@@ -1,18 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { NotFoundError } from '../../src/errors';
-import log from '../../src/helpers/logger';
-import { miniatureService } from '../../src/miniature.service';
-import type { Activity } from '../../src/repository/activity';
-import { activityRepository } from '../../src/repository/activity.repository';
-import { userRepository } from '../../src/repository/user.repository';
-import type { CorosAuth } from '../../src/server/coros/coros.api';
-import type { DecathlonAuth } from '../../src/server/decathlon/decathlon.api';
-import type { GarminAuth } from '../../src/server/garmin/garmin.api';
-import type { PolarAuth } from '../../src/server/polar/polar.api';
-import type { StravaAuth } from '../../src/server/strava/strava.api';
-import type { SuuntoAuth } from '../../src/server/suunto/suunto.api';
-import { UserService } from '../../src/user.service';
+import { NotFoundError } from '../../src/errors.ts';
+import log from '../../src/helpers/logger.ts';
+import { miniatureService } from '../../src/miniature.service.ts';
+import { activityRepository } from '../../src/repository/activity.repository.ts';
+import type { Activity } from '../../src/repository/activity.ts';
+import { userRepository } from '../../src/repository/user.repository.ts';
+import type { CorosAuth } from '../../src/server/coros/coros.api.ts';
+import type { DecathlonAuth } from '../../src/server/decathlon/decathlon.api.ts';
+import type { GarminAuth } from '../../src/server/garmin/garmin.api.ts';
+import type { PolarAuth } from '../../src/server/polar/polar.api.ts';
+import type { StravaAuth } from '../../src/server/strava/strava.api.ts';
+import type { SuuntoAuth } from '../../src/server/suunto/suunto.api.ts';
+import { UserService } from '../../src/user.service.ts';
 
 describe('User service', () => {
   beforeEach(() => {

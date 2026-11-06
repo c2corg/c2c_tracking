@@ -3,8 +3,8 @@
  * account for one vendor, tolerating per-user failures, with a delay between users to stay under the
  * vendor's rate limits (BACKFILL_DELAY_MS env var, default 1000ms).
  */
-import { database } from '../src/db';
-import log from '../src/helpers/logger';
+import { database } from '../src/db/index.ts';
+import log from '../src/helpers/logger.ts';
 
 const DELAY_MS = Number.parseInt(process.env['BACKFILL_DELAY_MS'] ?? '1000', 10);
 

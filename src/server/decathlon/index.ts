@@ -1,10 +1,10 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.ts';
+import { validate } from '../validator.ts';
 
-import { controller } from './decathlon.controller';
-import { exchangeToken, webhook } from './decathlon.validators';
+import { controller } from './decathlon.controller.ts';
+import { exchangeToken, webhook } from './decathlon.validators.ts';
 
 const router = new Router();
 

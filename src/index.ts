@@ -1,17 +1,18 @@
-import './dotenv';
+import './dotenv.ts';
 
 import type { Server } from 'http';
 
-import { ErrorCallback, retry } from 'async';
-import watch from 'node-watch';
+import type { ErrorCallback } from 'async';
+import { retry } from 'async';
 
-import { app } from './app';
-import config from './config';
-import { database as db } from './db';
-import log from './helpers/logger';
-import { metricsKoa } from './metrics';
-import { polarService } from './server/polar/polar.service';
-import { stravaService } from './server/strava/strava.service';
+import { app } from './app.ts';
+import config from './config.ts';
+import { database as db } from './db/index.ts';
+import log from './helpers/logger.ts';
+import { watchMaintenanceFile } from './helpers/maintenance.ts';
+import { metricsKoa } from './metrics/index.ts';
+import { polarService } from './server/polar/polar.service.ts';
+import { stravaService } from './server/strava/strava.service.ts';
 
 async function closeServer(server: Server): Promise<void> {
   const checkPendingRequests = (callback: ErrorCallback<Error | undefined>): void => {
@@ -74,11 +75,9 @@ export async function start(): Promise<void> {
     log.info(`Received event: SIGHUP`);
   });
 
-  watch('./', { filter: /maintenance_mode\.txt$/ }, (eventType) => {
-    if (eventType === 'update') {
-      app.context['shuttingDown'] = true;
-      log.info('Received signal to switch to maintenance mode');
-    }
+  watchMaintenanceFile('.', () => {
+    app.context['shuttingDown'] = true;
+    log.info('Received signal to switch to maintenance mode');
   });
 
   try {

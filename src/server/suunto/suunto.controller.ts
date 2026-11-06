@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './suunto.api';
-import { suuntoService as service } from './suunto.service';
+import type { WebhookEvent } from './suunto.api.ts';
+import { suuntoService as service } from './suunto.service.ts';
 
 class SuuntoController {
   public async exchangeToken(ctx: Context): Promise<void> {
@@ -22,7 +22,7 @@ class SuuntoController {
   }
 
   public webhook(ctx: Context): void {
-    const event = <WebhookEvent>ctx.request.body;
+    const event = ctx.request.body as WebhookEvent;
     const auth = ctx.request.header.authorization;
     void service.handleWebhookEvent(event, auth); // async handling
     ctx.status = 200; // acknowledge event

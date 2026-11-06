@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { SuuntoApi } from '../../../../src/server/suunto/suunto.api';
+import log from '../../../../src/helpers/logger.ts';
+import { SuuntoApi } from '../../../../src/server/suunto/suunto.api.ts';
 
 vi.mock('axios');
 

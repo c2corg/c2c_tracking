@@ -1,9 +1,10 @@
 import type { Middleware } from '@koa/router';
-import { Context, HttpError } from 'koa';
+import type { Context } from 'koa';
+import { HttpError } from 'koa';
 
-import { AppError } from '../errors';
-import log from '../helpers/logger';
-import { promUnhandledErrorsCounter } from '../metrics/prometheus';
+import { AppError } from '../errors.ts';
+import log from '../helpers/logger.ts';
+import { promUnhandledErrorsCounter } from '../metrics/prometheus.ts';
 
 export function defaultErrorHandler(): Middleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {

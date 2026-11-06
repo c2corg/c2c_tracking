@@ -4,7 +4,7 @@ import path from 'path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { sslOptions } from '../../../src/db/index';
+import { sslOptions } from '../../../src/db/index.ts';
 
 describe('database sslOptions', () => {
   let dir: string;
@@ -14,7 +14,7 @@ describe('database sslOptions', () => {
     dir = mkdtempSync(path.join(tmpdir(), 'db-ssl-'));
     caFile = path.join(dir, 'ca.crt');
     // temporary directory created above, not user input
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
+
     writeFileSync(caFile, 'the authority');
   });
 

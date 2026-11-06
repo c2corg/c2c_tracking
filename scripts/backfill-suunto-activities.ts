@@ -3,13 +3,13 @@
  * been confirmed for Suunto (unlike Strava, see backfill-strava-activities.ts) - this is a general
  * recovery tool, not a fix for a known incident. Safe to re-run: addActivities dedupes by vendor+vendorId.
  *
- * Usage: npm run backfill:suunto
+ * Usage: npm run backfill:suunto (in the Docker image: node scripts/backfill-suunto-activities.js)
  * Env: BACKFILL_DELAY_MS (default 1000) - delay between users, to stay under Suunto's rate limits.
  */
-import { userRepository } from '../src/repository/user.repository';
-import { suuntoService } from '../src/server/suunto/suunto.service';
+import { userRepository } from '../src/repository/user.repository.ts';
+import { suuntoService } from '../src/server/suunto/suunto.service.ts';
 
-import { runBackfill } from './backfill-common';
+import { runBackfill } from './backfill-common.ts';
 
 void runBackfill(
   'Suunto',

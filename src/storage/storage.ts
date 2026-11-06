@@ -2,6 +2,7 @@ import fs, { constants, promises as fsPromises } from 'fs';
 import path from 'path';
 import type { Readable } from 'stream';
 
+import type { S3ClientConfig } from '@aws-sdk/client-s3';
 import {
   DeleteObjectCommand,
   GetObjectCommand,
@@ -9,12 +10,11 @@ import {
   ObjectCannedACL,
   PutObjectCommand,
   S3Client,
-  S3ClientConfig,
 } from '@aws-sdk/client-s3';
 import sanitize from 'sanitize-filename';
 import type { SetRequired } from 'type-fest';
 
-import config from '../config';
+import config from '../config.ts';
 
 export abstract class Storage {
   public abstract exists(key: string): Promise<boolean>;
