@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger.ts';
@@ -206,7 +205,7 @@ describe('Strava Service', () => {
         id: 1,
         accessToken: 'stored_access_token',
         refreshToken: 'refresh_token',
-        expiresAt: dayjs().add(1, 'hour').unix(),
+        expiresAt: Math.floor(Date.now() / 1000) + 3600,
       });
       vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {

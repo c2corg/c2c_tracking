@@ -1,12 +1,10 @@
 import { createHmac } from 'crypto';
 
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration.js';
-import { parse } from 'iso8601-duration';
 import invariant from 'tiny-invariant';
 
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
+import { durationSeconds, offsetString } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.ts';
 import { miniatureService } from '../../miniature.service.ts';
@@ -19,8 +17,6 @@ import { userService } from '../../user.service.ts';
 
 import type { Exercise, WebhookEvent } from './polar.api.ts';
 import { polarApi, isWebhookPingEvent } from './polar.api.ts';
-
-dayjs.extend(duration);
 
 export class PolarService {
   public async requestAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
@@ -186,18 +182,11 @@ export class PolarService {
   }
 
   private localDate(exercise: Exercise): string {
-    const isNegative = exercise.start_time_utc_offset < 0;
-    const offset = dayjs
-      .duration({
-        hours: Math.floor(Math.abs(exercise.start_time_utc_offset) / 60),
-        minutes: Math.abs(exercise.start_time_utc_offset) % 60,
-      })
-      .format('HH:mm');
-    return exercise.start_time + (isNegative ? '-' : '+') + offset;
+    return exercise.start_time + offsetString(exercise.start_time_utc_offset);
   }
 
   private duration(duration: string): number {
-    return Math.round(dayjs.duration(parse(duration)).asSeconds());
+    return durationSeconds(duration);
   }
 }
 

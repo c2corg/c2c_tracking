@@ -1,9 +1,5 @@
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime.js';
-
 import config from './config.ts';
-
-dayjs.extend(relativeTime);
+import { humanizeDuration } from './helpers/time.ts';
 
 export type Status = {
   version: string;
@@ -27,7 +23,7 @@ export class HealthService {
     return {
       version: config.get('version'),
       startTime: new Date(this.startTime).toISOString(),
-      upTime: dayjs(this.startTime).fromNow(true),
+      upTime: humanizeDuration(Date.now() - this.startTime),
       strava: config.get('trackers.strava.enabled'),
       suunto: config.get('trackers.suunto.enabled'),
       garmin: config.get('trackers.garmin.enabled'),

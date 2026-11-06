@@ -3,11 +3,12 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypt
 import { extractGeometry } from '@c2corg/fit-parser-extract-geometry';
 import aes from 'crypto-js/aes.js';
 import encUtf8 from 'crypto-js/enc-utf8.js';
-import { parse } from 'iso8601-duration';
 import type { Except } from 'type-fest';
 
 import config from '../config.ts';
 import type { LineString } from '../repository/geojson.ts';
+
+import { isDuration } from './time.ts';
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Except<T, K>;
 
@@ -18,17 +19,7 @@ export const semverRegex =
   // eslint-disable-next-line security/detect-unsafe-regex
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 
-export const isISO8601Duration = (duration: string | undefined): boolean => {
-  if (!duration) {
-    return false;
-  }
-  try {
-    parse(duration);
-    return true;
-  } catch {
-    return false;
-  }
-};
+export const isISO8601Duration = isDuration;
 
 export const fitToGeoJSON = (fit: ArrayBuffer): LineString | undefined => {
   try {
