@@ -1,8 +1,7 @@
-import dayjs from 'dayjs';
-
 import config from './config.ts';
 import { NotFoundError } from './errors.ts';
 import log from './helpers/logger.ts';
+import { epochSeconds, nowSeconds } from './helpers/time.ts';
 import type { Optional } from './helpers/utils.ts';
 import { miniatureService } from './miniature.service.ts';
 import { activityRepository } from './repository/activity.repository.ts';
@@ -21,9 +20,9 @@ type Status = 'not-configured' | 'configured' | 'token-lost';
 const MAX_ACTIVITIES_PER_USER = 30;
 
 const byDate = (a1: Optional<Activity, 'id'>, a2: Optional<Activity, 'id'>): number => {
-  const d1 = dayjs(a1.date);
-  const d2 = dayjs(a2.date);
-  return d1.isSame(d2, 'second') ? 0 : d1.isBefore(d2) ? -1 : 1;
+  const d1 = epochSeconds(a1.date);
+  const d2 = epochSeconds(a2.date);
+  return d1 === d2 ? 0 : d1 < d2 ? -1 : 1;
 };
 
 const isInDb = (activity: Optional<Activity, 'id'>): activity is Activity => !!activity.id;
@@ -324,7 +323,7 @@ export class UserService {
         coros: {
           id: auth.openId,
           accessToken: auth.access_token,
-          expiresAt: dayjs().add(this.corosTokenDurationDays, 'day').unix(),
+          expiresAt: nowSeconds() + this.corosTokenDurationDays * 24 * 60 * 60,
           refreshToken: auth.refresh_token,
         },
       };
@@ -335,7 +334,7 @@ export class UserService {
         coros: {
           id: auth.openId,
           accessToken: auth.access_token,
-          expiresAt: dayjs().add(this.corosTokenDurationDays, 'day').unix(),
+          expiresAt: nowSeconds() + this.corosTokenDurationDays * 24 * 60 * 60,
           refreshToken: auth.refresh_token,
         },
       };
@@ -353,7 +352,7 @@ export class UserService {
     }
     user = {
       ...user,
-      coros: { ...user.coros, expiresAt: dayjs().add(this.corosTokenDurationDays, 'day').unix() },
+      coros: { ...user.coros, expiresAt: nowSeconds() + this.corosTokenDurationDays * 24 * 60 * 60 },
     };
     await userRepository.update(user);
   }

@@ -1,9 +1,7 @@
-import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc.js';
-
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
+import { expiresLater, formatWithOffset } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
 import {
   promTokenRenewalErrorsCounter,
@@ -19,8 +17,6 @@ import { userService } from '../../user.service.ts';
 
 import type { SuuntoAuth, WebhookEvent, Workout, WorkoutSummary, Workouts } from './suunto.api.ts';
 import { suuntoApi, workoutTypes } from './suunto.api.ts';
-
-dayjs.extend(dayjsPluginUTC);
 
 export class SuuntoService {
   readonly #suuntoSubscriptionKey: string;
@@ -83,7 +79,7 @@ export class SuuntoService {
   public async getToken(c2cId: number): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
     const { accessToken, expiresAt, refreshToken } = (await userService.getSuuntoInfo(c2cId)) ?? {};
-    if (accessToken && expiresAt && dayjs.unix(expiresAt).isAfter(dayjs().add(1, 'minute'))) {
+    if (accessToken && expiresAt && expiresLater(expiresAt)) {
       return accessToken;
     }
     if (refreshToken) {
@@ -206,7 +202,7 @@ export class SuuntoService {
     return {
       vendor: 'suunto',
       vendorId: workout.workoutKey,
-      date: dayjs(workout.startTime).utcOffset(workout.timeOffsetInMinutes).format(),
+      date: formatWithOffset(Math.floor(workout.startTime / 1000), workout.timeOffsetInMinutes),
       type: workoutTypes[workout.activityId] || 'Unknown',
       geojson,
       ...(workout.totalDistance && { length: Math.round(workout.totalDistance) }),

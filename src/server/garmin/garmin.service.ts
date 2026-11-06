@@ -1,8 +1,6 @@
-import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc.js';
-
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
+import { formatWithOffset, utcDay } from '../../helpers/time.ts';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.ts';
 import { miniatureService } from '../../miniature.service.ts';
 import { activityRepository } from '../../repository/activity.repository.ts';
@@ -15,8 +13,6 @@ import { userService } from '../../user.service.ts';
 
 import type { GarminActivity, GarminAuth, GarminSample } from './garmin.api.ts';
 import { garminApi } from './garmin.api.ts';
-
-dayjs.extend(dayjsPluginUTC);
 
 export class GarminService {
   public async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
@@ -36,8 +32,8 @@ export class GarminService {
   private async setupUser(c2cId: number, auth: GarminAuth): Promise<void> {
     await userService.configureGarmin(c2cId, auth);
     // request backfill for activities from last 30 days (async)
-    const end = dayjs().utc().endOf('day').unix();
-    const start = dayjs().utc().startOf('day').subtract(30, 'day').unix();
+    const end = utcDay().end;
+    const start = utcDay(30).start;
     void garminApi.backfillActivities(start, end, auth.token, auth.tokenSecret);
   }
 
@@ -53,12 +49,8 @@ export class GarminService {
     if (!auth) {
       throw new NotFoundError(`Unable to retrieve Garmin auth for user ${c2cId}`);
     }
-    const end = dayjs().utc().subtract(endDaysAgo, 'day').endOf('day').unix();
-    const start = dayjs()
-      .utc()
-      .subtract(endDaysAgo + days, 'day')
-      .startOf('day')
-      .unix();
+    const end = utcDay(endDaysAgo).end;
+    const start = utcDay(endDaysAgo + days).start;
     await garminApi.backfillActivities(start, end, auth.token, auth.tokenSecret);
   }
 
@@ -190,10 +182,7 @@ export class GarminService {
     return {
       vendor: 'garmin',
       vendorId: activity.activityId.toString(),
-      date: dayjs
-        .unix(activity.summary.startTimeInSeconds)
-        .utcOffset(activity.summary.startTimeOffsetInSeconds / 60)
-        .format(),
+      date: formatWithOffset(activity.summary.startTimeInSeconds, activity.summary.startTimeOffsetInSeconds / 60),
       type: activity.summary.activityType,
       ...(activity.summary.distanceInMeters && { length: Math.round(activity.summary.distanceInMeters) }),
       ...(activity.summary.durationInSeconds && { duration: activity.summary.durationInSeconds }),

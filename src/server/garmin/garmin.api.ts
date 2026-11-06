@@ -1,15 +1,12 @@
 import { createHmac, randomBytes } from 'crypto';
 
 import axios from 'axios';
-import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { ExternalApiError } from '../../errors.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
-
-dayjs.extend(dayjsPluginUTC);
+import { nowSeconds } from '../../helpers/time.ts';
 
 export const GarminAuth = z.object({
   token: z.string().min(10).max(5000),
@@ -144,8 +141,6 @@ export const GarminActivity = z.object({
 });
 export type GarminActivity = z.infer<typeof GarminActivity>;
 
-dayjs.extend(dayjsPluginUTC);
-
 export class GarminApi {
   private readonly oauthUrl = 'https://connectapi.garmin.com/oauth-service/';
   private readonly apiUrl = 'https://apis.garmin.com/';
@@ -159,7 +154,7 @@ export class GarminApi {
 
   public async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
     try {
-      const timestamp = dayjs().unix();
+      const timestamp = nowSeconds();
       const nonce = randomBytes(16).toString('hex');
       const signature = encodeURIComponent(this.generateUnauthorizedRequestTokenSignature(timestamp, nonce));
       const authorization = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${this.#consumerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
@@ -187,7 +182,7 @@ export class GarminApi {
 
   public async exchangeToken(requestToken: string, requestTokenSecret: string, verifier: string): Promise<GarminAuth> {
     try {
-      const timestamp = dayjs().unix();
+      const timestamp = nowSeconds();
       const nonce = randomBytes(16).toString('hex');
       const signature = encodeURIComponent(
         this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
@@ -260,7 +255,7 @@ export class GarminApi {
     start?: number,
     end?: number,
   ): string {
-    const timestamp = dayjs().unix();
+    const timestamp = nowSeconds();
     const nonce = randomBytes(16).toString('hex');
     let normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
     if (start != undefined && end != undefined) {
