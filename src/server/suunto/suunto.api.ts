@@ -151,14 +151,14 @@ export type Error = z.infer<typeof Error>;
 
 export const Workouts = z.object({
   error: Error.nullish(),
-  metadata: z.record(z.string()),
+  metadata: z.record(z.string(), z.string()),
   payload: z.array(Workout),
 });
 export type Workouts = z.infer<typeof Workouts>;
 
 export const WorkoutSummary = z.object({
   error: Error.nullish(),
-  metadata: z.record(z.string()),
+  metadata: z.record(z.string(), z.string()),
   payload: Workout,
 });
 export type WorkoutSummary = z.infer<typeof WorkoutSummary>;
