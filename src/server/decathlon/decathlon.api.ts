@@ -44,7 +44,7 @@ type ActivitySummary = z.infer<typeof Activity>;
 export const WebhookSubscription = z.object({
   id: z.string(),
   user: z.string(),
-  url: z.string().url(),
+  url: z.url(),
   events: z.array(z.enum(['activity_create', 'activity_delete'])),
 });
 export type WebhookSubscription = z.infer<typeof WebhookSubscription>;
