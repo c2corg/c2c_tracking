@@ -27,6 +27,7 @@ describe('requestLogLevel', () => {
     const requestLogLevel = await loadRequestLogLevel();
 
     expect(requestLogLevel('/health', undefined)).toBe('silent');
+    expect(requestLogLevel('/health/ready', undefined)).toBe('silent');
     expect(requestLogLevel('/.well-known/acme-challenge/token', undefined)).toBe('silent');
     expect(requestLogLevel('/health', new Error('failed'))).toBe('info');
   });

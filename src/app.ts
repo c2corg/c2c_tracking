@@ -63,11 +63,12 @@ const measureResponseTime: RequestHandler = (req, res, next) => {
   next();
 };
 
-// The level of the log of a request: none in the tests, nor for the health checks and the ACME challenges that
+// The level of the log of a request: none in the tests, nor for the health and readiness checks and the ACME challenges that
 // succeed (the URL is the original one: routers rewrite req.url)
 const silentRequestLogs = config.get('env') === 'test';
 export const requestLogLevel = (url: string, error: unknown): LevelWithSilent =>
-  silentRequestLogs || (!error && (url === '/health' || url.startsWith('/.well-known/acme-challenge')))
+  silentRequestLogs ||
+  (!error && (url === '/health' || url === '/health/ready' || url.startsWith('/.well-known/acme-challenge')))
     ? 'silent'
     : 'info';
 

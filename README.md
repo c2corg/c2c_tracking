@@ -29,6 +29,11 @@ To check it (chain and host name, `DB_HOST` must be a name of the certificate):
 
 You can debug server and tests within Visual Studio Code using the predefined configurations in `launch.json`.
 
+### Health
+
+- `GET /health`: liveness, the process answers (version, uptime, enabled trackers). Used by the Docker health check.
+- `GET /health/ready`: readiness, 200 when the database answers within 2 s, 503 otherwise.
+
 ### Routes
 
 Every route validates its input (URL parameters, query, headers, body) with `validate(...)` and zod schemas
