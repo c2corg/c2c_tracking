@@ -5,7 +5,7 @@ import { methodNotAllowed } from '../method-not-allowed.ts';
 import { validate } from '../validator.ts';
 
 import { controller } from './strava.controller.ts';
-import { exchangeToken, webhook, webhookSubscription } from './strava.validators.ts';
+import { deauthorize, exchangeToken, webhook, webhookSubscription } from './strava.validators.ts';
 
 const router = Router();
 
@@ -25,6 +25,7 @@ router
     ensureAuthenticated,
     ensureUserFromParamsMatchesAuthUser,
     userRateLimit,
+    validate(deauthorize),
     controller.deauthorize.bind(controller),
   )
   .all(methodNotAllowed);

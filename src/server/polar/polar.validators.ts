@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
-import type { ValidationSchema } from '../validator.ts';
+import { type ValidationSchema, userIdParams } from '../validator.ts';
 
 import { WebhookEvent } from './polar.api.ts';
 
 export const exchangeToken: ValidationSchema = {
+  params: userIdParams,
   query: z
     .object({
       code: z.string().min(10).max(50),
@@ -31,3 +32,5 @@ export const webhook: ValidationSchema = {
   }),
   body: WebhookEvent,
 };
+
+export const deauthorize: ValidationSchema = { params: userIdParams };
