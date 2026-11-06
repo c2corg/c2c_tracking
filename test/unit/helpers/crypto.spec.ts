@@ -1,7 +1,8 @@
-import aes from 'crypto-js/aes';
+import aes from 'crypto-js/aes.js';
+import { describe, expect, it } from 'vitest';
 
-import config from '../../../src/config';
-import { decrypt, encrypt } from '../../../src/helpers/utils';
+import config from '../../../src/config.ts';
+import { decrypt, encrypt } from '../../../src/helpers/utils.ts';
 
 describe('token encryption', () => {
   it('round-trips values', () => {
