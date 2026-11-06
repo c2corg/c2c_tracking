@@ -1,9 +1,9 @@
-import { Writable } from 'stream';
+import { Writable } from 'node:stream';
 
 import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { describe, expect, it } from 'vitest';
 
-import { createLogger } from '../../../src/helpers/logger';
+import { createLogger } from '../../../src/helpers/logger.ts';
 
 const SECRETS = ['client-secret-value', 'refresh-token-value', 'basic-password', 'bearer-token-value', 'body-secret'];
 
