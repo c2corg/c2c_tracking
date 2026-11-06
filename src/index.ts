@@ -1,5 +1,3 @@
-import './dotenv.ts';
-
 import type { Server } from 'http';
 
 import type { ErrorCallback } from 'async';
