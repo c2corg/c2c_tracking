@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { ExternalApiError } from '../../errors.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { isExternalUrl } from '../../helpers/external-url.ts';
+import { http } from '../../helpers/http.ts';
 
 export const CorosAuth = z.object({
   access_token: z.string().min(5).max(50),
@@ -114,7 +114,7 @@ export class CorosApi {
 
   public async exchangeToken(code: string): Promise<CorosAuth> {
     try {
-      const response = await axios.post(
+      const response = await http.post(
         `${this.#baseUrl}oauth2/accesstoken`,
         {
           client_id: this.#clientId,
@@ -135,7 +135,7 @@ export class CorosApi {
 
   public async deauthorize(accessToken: string): Promise<void> {
     try {
-      await axios.post<void>(
+      await http.post<void>(
         `${this.#baseUrl}oauth2/deauthorize`,
         { token: accessToken },
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
@@ -147,7 +147,7 @@ export class CorosApi {
 
   public async refreshAuth(refreshToken: string): Promise<void> {
     try {
-      await axios.post(
+      await http.post(
         `${this.#baseUrl}oauth2/refresh-token`,
         {
           client_id: this.#clientId,
@@ -169,7 +169,7 @@ export class CorosApi {
     endDate: number,
   ): Promise<WorkoutRecords> {
     try {
-      const response = await axios.get(`${this.#baseUrl}v2/coros/sport/list`, {
+      const response = await http.get(`${this.#baseUrl}v2/coros/sport/list`, {
         params: { token: accessToken, openId, startDate, endDate },
       });
       return WorkoutRecords.parse(response.data);
@@ -186,7 +186,7 @@ export class CorosApi {
     userId: string,
   ): Promise<WorkoutRecord> {
     try {
-      const response = await axios.get<ArrayBuffer>(`${this.#baseUrl}v2/coros/sport/detail/fit`, {
+      const response = await http.get<ArrayBuffer>(`${this.#baseUrl}v2/coros/sport/detail/fit`, {
         responseType: 'arraybuffer',
         params: {
           token: accessToken,
@@ -209,7 +209,7 @@ export class CorosApi {
       throw new ExternalApiError(`Coros FIT URL refused, not an external URL: ${url}`);
     }
     try {
-      const response = await axios.get<ArrayBuffer>(url, {
+      const response = await http.get<ArrayBuffer>(url, {
         responseType: 'arraybuffer',
       });
       return response.data;

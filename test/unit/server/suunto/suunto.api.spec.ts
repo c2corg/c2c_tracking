@@ -1,10 +1,15 @@
-import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { http } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { SuuntoApi } from '../../../../src/server/suunto/suunto.api.ts';
+import { respond } from '../../../utils.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 describe('Suunto API', () => {
   beforeEach(() => {
@@ -19,37 +24,37 @@ describe('Suunto API', () => {
 
   describe('exchangeToken', () => {
     it('throws if request failed', async () => {
-      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(http).post.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto token exchange request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({});
+      vi.mocked(http).post.mockResolvedValueOnce(respond());
 
       const api = new SuuntoApi();
 
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto token exchange request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('returns auth', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({
-        data: {
+      vi.mocked(http).post.mockResolvedValueOnce(
+        respond({
           access_token: 'access_token',
           token_type: 'bearer',
           refresh_token: 'refresh_token',
           expires_in: 1,
           user: 'user',
-        },
-      });
+        }),
+      );
 
       const api = new SuuntoApi();
       const result = await api.exchangeToken('code');
@@ -63,43 +68,43 @@ describe('Suunto API', () => {
           "user": "user",
         }
       `);
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('refreshAuth', () => {
     it('throws if request failed', async () => {
-      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(http).post.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
       await expect(api.refreshAuth('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto refresh token request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({});
+      vi.mocked(http).post.mockResolvedValueOnce(respond());
 
       const api = new SuuntoApi();
 
       await expect(api.refreshAuth('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto refresh token request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('returns refresh auth', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({
-        data: {
+      vi.mocked(http).post.mockResolvedValueOnce(
+        respond({
           access_token: 'access_token',
           token_type: 'bearer',
           refresh_token: 'refresh_token',
           expires_in: 1,
           user: 'user',
-        },
-      });
+        }),
+      );
 
       const api = new SuuntoApi();
       const result = await api.refreshAuth('token');
@@ -112,36 +117,36 @@ describe('Suunto API', () => {
             "token_type": "bearer",
           }
         `);
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('getWorkouts', () => {
     it('throws if request failed', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
       await expect(api.getWorkouts('token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkouts request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({});
+      vi.mocked(http).get.mockResolvedValueOnce(respond());
 
       const api = new SuuntoApi();
 
       await expect(api.getWorkouts('token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkouts request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns workouts', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({
-        data: {
+      vi.mocked(http).get.mockResolvedValueOnce(
+        respond({
           payload: [
             {
               workoutId: 1,
@@ -156,8 +161,8 @@ describe('Suunto API', () => {
             },
           ],
           metadata: {},
-        },
-      });
+        }),
+      );
 
       const api = new SuuntoApi();
       const result = await api.getWorkouts('token', 'subscription');
@@ -180,36 +185,36 @@ describe('Suunto API', () => {
           ],
         }
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('getWorkoutDetails', () => {
     it('throws if request failed', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
       await expect(api.getWorkoutDetails('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkoutDetails request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('throws if request response is invalid', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({});
+      vi.mocked(http).get.mockResolvedValueOnce(respond());
 
       const api = new SuuntoApi();
 
       await expect(api.getWorkoutDetails('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getWorkoutDetails request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns workout details', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({
-        data: {
+      vi.mocked(http).get.mockResolvedValueOnce(
+        respond({
           payload: {
             workoutId: 1,
             workoutKey: '1',
@@ -222,8 +227,8 @@ describe('Suunto API', () => {
             timeOffsetInMinutes: 0,
           },
           metadata: {},
-        },
-      });
+        }),
+      );
 
       const api = new SuuntoApi();
       const result = await api.getWorkoutDetails('1', 'token', 'subscription');
@@ -244,24 +249,24 @@ describe('Suunto API', () => {
           },
         }
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('getFIT', () => {
     it('throws if request failed', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
       await expect(api.getFIT('1', 'token', 'subscription')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto getFIT request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns FIT', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(new ArrayBuffer(1)));
 
       const api = new SuuntoApi();
       const result = await api.getFIT('1', 'token', 'subscription');
@@ -271,29 +276,29 @@ describe('Suunto API', () => {
           0,
         ]
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('deauthorize', () => {
     it('throws if request failed', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
       await expect(api.deauthorize('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Suunto deauthorize request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls API', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce(undefined);
+      vi.mocked(http).get.mockResolvedValueOnce(respond());
 
       const api = new SuuntoApi();
       await api.deauthorize('token');
 
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
   });
 });

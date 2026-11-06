@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
+import { http } from '../../helpers/http.ts';
 import log from '../../helpers/logger.ts';
 
 export const SuuntoAuth = z.object({
@@ -184,7 +184,7 @@ export class SuuntoApi {
 
   public async exchangeToken(code: string): Promise<SuuntoAuth> {
     try {
-      const response = await axios.post(`${this.oauthBaseUrl}oauth/token`, null, {
+      const response = await http.post(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {
           code,
           grant_type: 'authorization_code',
@@ -204,7 +204,7 @@ export class SuuntoApi {
 
   public async refreshAuth(token: string): Promise<SuuntoRefreshAuth> {
     try {
-      const response = await axios.post(`${this.oauthBaseUrl}oauth/token`, null, {
+      const response = await http.post(`${this.oauthBaseUrl}oauth/token`, null, {
         params: {
           refresh_token: token,
           grant_type: 'refresh_token',
@@ -222,7 +222,7 @@ export class SuuntoApi {
 
   public async getWorkouts(token: string, subscriptionKey: string): Promise<Workouts> {
     try {
-      const response = await axios.get(`${this.baseUrl}workouts?limit=30`, {
+      const response = await http.get(`${this.baseUrl}workouts?limit=30`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return Workouts.parse(response.data);
@@ -234,7 +234,7 @@ export class SuuntoApi {
   // id is workout key
   public async getWorkoutDetails(id: string, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
     try {
-      const response = await axios.get(`${this.baseUrl}workouts/${encodeURIComponent(id)}`, {
+      const response = await http.get(`${this.baseUrl}workouts/${encodeURIComponent(id)}`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return WorkoutSummary.parse(response.data);
@@ -246,7 +246,7 @@ export class SuuntoApi {
   // Id is workout id or key
   public async getFIT(id: string, token: string, subscriptionKey: string): Promise<ArrayBuffer> {
     try {
-      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}workout/exportFit/${id}`, {
+      const response = await http.get<ArrayBuffer>(`${this.baseUrl}workout/exportFit/${id}`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
@@ -258,7 +258,7 @@ export class SuuntoApi {
 
   public async deauthorize(token: string): Promise<void> {
     try {
-      await axios.get<void>(`${this.oauthBaseUrl}oauth/deauthorize?client_id=${this.#clientId}`, {
+      await http.get<void>(`${this.oauthBaseUrl}oauth/deauthorize?client_id=${this.#clientId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (error: unknown) {

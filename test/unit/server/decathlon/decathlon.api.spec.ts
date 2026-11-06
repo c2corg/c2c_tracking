@@ -1,10 +1,15 @@
-import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { http } from '../../../../src/helpers/http.ts';
 import type { Activity, DecathlonAuth, WebhookSubscription } from '../../../../src/server/decathlon/decathlon.api.ts';
 import { DecathlonApi } from '../../../../src/server/decathlon/decathlon.api.ts';
+import { respond } from '../../../utils.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 describe('Decathlon API', () => {
   beforeEach(() => {
@@ -19,13 +24,13 @@ describe('Decathlon API', () => {
         refresh_token: 'refresh_token',
         expires_in: 1,
       };
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(auth));
 
       const api = new DecathlonApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith('https://api-global.decathlon.net/connect/oauth/token', null, {
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith('https://api-global.decathlon.net/connect/oauth/token', null, {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ code: 'code' }),
       });
@@ -48,7 +53,7 @@ describe('Decathlon API', () => {
         refresh_token: 'refresh_token',
         expires_in: 1,
       };
-      vi.mocked(axios).postForm.mockResolvedValueOnce({ data: refreshAuth });
+      vi.mocked(http).postForm.mockResolvedValueOnce(respond(refreshAuth));
 
       const api = new DecathlonApi();
       const result = await api.refreshAuth('refresh_token');
@@ -61,8 +66,8 @@ describe('Decathlon API', () => {
           "token_type": "bearer",
         }
       `);
-      expect(axios.postForm).toHaveBeenCalledTimes(1);
-      expect(axios.postForm).toHaveBeenCalledWith(
+      expect(http.postForm).toHaveBeenCalledTimes(1);
+      expect(http.postForm).toHaveBeenCalledWith(
         'https://api-global.decathlon.net/connect/oauth/token',
         { grant_type: 'refresh_token', refresh_token: 'refresh_token' },
         {
@@ -75,14 +80,14 @@ describe('Decathlon API', () => {
 
   describe('getUserId', () => {
     it('calls decathlon API', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: { id: 'userId' } });
+      vi.mocked(http).get.mockResolvedValueOnce(respond({ id: 'userId' }));
 
       const api = new DecathlonApi();
       const result = await api.getUserId('access_token');
 
       expect(result).toEqual('userId');
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/me', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/me', {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
@@ -100,7 +105,7 @@ describe('Decathlon API', () => {
           dataSummaries: {},
         },
       ];
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: activities });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(activities));
 
       const api = new DecathlonApi();
       const result = await api.getActivities('access_token');
@@ -116,8 +121,8 @@ describe('Decathlon API', () => {
           },
         ]
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/activities', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/activities', {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
@@ -136,7 +141,7 @@ describe('Decathlon API', () => {
           '1': { longitude: 1.0, latitude: 1.0, elevation: 1.0 },
         },
       };
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: activity });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(activity));
 
       const api = new DecathlonApi();
       const result = await api.getActivity('access_token', '12345');
@@ -157,14 +162,11 @@ describe('Decathlon API', () => {
           "startdate": "2022-01-01T00:00:01Z",
         }
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith(
-        'https://api-global.decathlon.net/sportstrackingdata/v2/activities/12345',
-        {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
-        },
-      );
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/activities/12345', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
+      });
     });
   });
 
@@ -184,14 +186,14 @@ describe('Decathlon API', () => {
           events: ['activity_create', 'activity_delete'],
         },
       ];
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(subscriptions));
 
       const api = new DecathlonApi();
       const result = await api.getExistingWebhookSubscription('access_token');
 
       expect(result).toEqual('goodsubscription');
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
@@ -206,14 +208,14 @@ describe('Decathlon API', () => {
           events: ['activity_create', 'activity_delete'],
         },
       ];
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(subscriptions));
 
       const api = new DecathlonApi();
       const result = await api.getExistingWebhookSubscription('access_token');
 
       expect(result).toBeUndefined();
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks', {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({ Authorization: 'Bearer access_token' }),
       });
@@ -228,14 +230,14 @@ describe('Decathlon API', () => {
         url: 'http://nowhere.com',
         events: ['activity_create', 'activity_delete'],
       };
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: activity });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(activity));
 
       const api = new DecathlonApi();
       const result = await api.createWebhookSubscription('1', 'access_token');
 
       expect(result).toMatchInlineSnapshot(`"12345"`);
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith(
         'https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks',
         expect.objectContaining({ user: `/v2/users/1` }),
         {
@@ -248,14 +250,14 @@ describe('Decathlon API', () => {
 
   describe('deleteWebhookSubscription', () => {
     it('calls decathlon API', async () => {
-      vi.mocked(axios).delete.mockResolvedValueOnce({ data: undefined });
+      vi.mocked(http).delete.mockResolvedValueOnce(respond(undefined));
 
       const api = new DecathlonApi();
       const result = await api.deleteWebhookSubscription('1', 'access_token');
 
       expect(result).toMatchInlineSnapshot(`undefined`);
-      expect(axios.delete).toHaveBeenCalledTimes(1);
-      expect(axios.delete).toHaveBeenCalledWith(
+      expect(http.delete).toHaveBeenCalledTimes(1);
+      expect(http.delete).toHaveBeenCalledWith(
         'https://api-global.decathlon.net/sportstrackingdata/v2/user_web_hooks/1',
         {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

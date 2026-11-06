@@ -1,9 +1,9 @@
-import axios from 'axios';
 import validator from 'validator';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
+import { http } from '../../helpers/http.ts';
 import { isISO8601Duration } from '../../helpers/utils.ts';
 
 const PolarAuth = z.object({
@@ -284,7 +284,7 @@ export class PolarApi {
 
   public async exchangeToken(code: string): Promise<PolarAuth> {
     try {
-      const response = await axios.post(
+      const response = await http.post(
         'https://polarremote.com/v2/oauth2/token',
         {
           code,
@@ -304,7 +304,7 @@ export class PolarApi {
 
   public async registerUser(token: string, userId: bigint): Promise<void> {
     try {
-      await axios.post(
+      await http.post(
         `${this.baseUrl}users`,
         { 'member-id': userId.toString() },
         {
@@ -321,7 +321,7 @@ export class PolarApi {
 
   public async deleteUser(token: string, userId: bigint): Promise<void> {
     try {
-      await axios.delete(`${this.baseUrl}users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+      await http.delete(`${this.baseUrl}users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
     } catch (error: unknown) {
       throw handleExternalApiError('polar', 'Error on Polar delete user request', error);
     }
@@ -329,7 +329,7 @@ export class PolarApi {
 
   public async getExercise(token: string, exerciseId: string): Promise<Exercise> {
     try {
-      const response = await axios.get(`${this.baseUrl}exercises/${encodeURIComponent(exerciseId)}`, {
+      const response = await http.get(`${this.baseUrl}exercises/${encodeURIComponent(exerciseId)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return Exercise.parse(response.data);
@@ -340,7 +340,7 @@ export class PolarApi {
 
   public async getExerciseFit(token: string, exerciseId: string): Promise<ArrayBuffer> {
     try {
-      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}exercises/${encodeURIComponent(exerciseId)}/fit`, {
+      const response = await http.get<ArrayBuffer>(`${this.baseUrl}exercises/${encodeURIComponent(exerciseId)}/fit`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -352,7 +352,7 @@ export class PolarApi {
 
   public async createWebhook(): Promise<string> {
     try {
-      const response = await axios.post(
+      const response = await http.post(
         `${this.baseUrl}webhooks`,
         {
           events: ['EXERCISE'],
@@ -368,7 +368,7 @@ export class PolarApi {
 
   public async getWebhook(): Promise<WebhookInfo> {
     try {
-      const response = await axios.get(`${this.baseUrl}webhooks`, {
+      const response = await http.get(`${this.baseUrl}webhooks`, {
         auth: { username: this.#clientId, password: this.#clientSecret },
       });
       return WebhookInfo.parse(response.data);

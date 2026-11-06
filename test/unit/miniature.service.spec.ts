@@ -1,16 +1,21 @@
-import axios from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 
+import { http } from '../../src/helpers/http.ts';
 import { MiniatureService } from '../../src/miniature.service.ts';
 import { storage } from '../../src/storage/storage.ts';
+import { respond } from '../utils.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 describe('Miniature service', () => {
   describe('generateMiniature', () => {
     it('simplifies geometry and returns image from API', async () => {
       const data = new ArrayBuffer(1);
-      vi.mocked(axios).get.mockResolvedValueOnce({ data });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(data));
       vi.spyOn(storage, 'put').mockResolvedValueOnce(undefined);
 
       const service = new MiniatureService();
@@ -22,7 +27,7 @@ describe('Miniature service', () => {
         ],
       });
 
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
       expect(storage.put).toHaveBeenCalledTimes(1);
       expect(id).toMatch(/^.*\.png$/);
     });
