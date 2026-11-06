@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import type { ZodType } from 'zod';
+import { z, type ZodType } from 'zod';
 
 import { FieldValidationError } from '../errors.ts';
 import log from '../helpers/logger.ts';
@@ -10,6 +10,13 @@ export type ValidationSchema = {
   body?: ZodType<object> | ZodType<object[]>;
   headers?: ZodType<object>;
 };
+
+// For the routes that read nothing from the request
+export const noInput: ValidationSchema = {};
+
+// A numeric id in the URL path
+export const idParam = z.string().regex(/^\d{1,10}$/);
+export const userIdParams = z.object({ userId: idParam });
 
 function validateObject(object: unknown, label: string, schema: ZodType | undefined): void {
   if (schema) {

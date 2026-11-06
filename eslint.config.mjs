@@ -9,6 +9,8 @@ import security from 'eslint-plugin-security';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+import requireRouteValidation from './eslint-rules/require-route-validation.js';
+
 export default defineConfig(
   globalIgnores(['dist/', 'reports/', 'coverage/']),
   js.configs.recommended,
@@ -55,6 +57,14 @@ export default defineConfig(
     },
   },
   {
+    // every route validates its input (params, query, headers, body) with zod
+    files: ['src/server/**/*.ts'],
+    plugins: { local: { rules: { 'require-route-validation': requireRouteValidation } } },
+    rules: {
+      'local/require-route-validation': 'error',
+    },
+  },
+  {
     files: ['**/*.{js,mjs,cjs}'],
     extends: [tseslint.configs.disableTypeChecked],
     rules: {
@@ -62,7 +72,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['test/**/*.ts', 'vitest.config.ts', 'eslint.config.mjs'],
+    files: ['test/**/*.ts', 'vitest.config.ts', 'eslint.config.mjs', 'eslint-rules/**/*.js'],
     rules: {
       'n/no-unpublished-import': 'off',
       'n/no-extraneous-import': 'off',

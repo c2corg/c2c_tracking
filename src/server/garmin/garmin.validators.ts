@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
-import type { ValidationSchema } from '../validator.ts';
+import { type ValidationSchema, userIdParams } from '../validator.ts';
 
 import { GarminActivity } from './garmin.api.ts';
 
 export const exchangeToken: ValidationSchema = {
+  params: userIdParams,
   query: z
     .object({
       oauth_token: z.string().min(10).max(50),
@@ -38,3 +39,7 @@ export const deauthorizeWebhook: ValidationSchema = {
     })
     .required(),
 };
+
+export const deauthorize: ValidationSchema = { params: userIdParams };
+
+export const requestToken: ValidationSchema = { params: userIdParams };
