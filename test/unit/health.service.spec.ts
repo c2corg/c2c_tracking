@@ -1,12 +1,14 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import config from '../../src/config';
 import { HealthService } from '../../src/health.service';
 import { semverRegex } from '../../src/helpers/utils';
 
-jest.mock('../../src/config');
+vi.mock('../../src/config');
 
 describe('Health service', () => {
   it('computes uptime and apps status', () => {
-    jest.mocked(config).get.mockImplementation((key) => {
+    vi.mocked(config).get.mockImplementation((key) => {
       if (key === 'trackers.strava.enabled') {
         return false;
       }
@@ -15,7 +17,7 @@ describe('Health service', () => {
       }
       return true;
     });
-    const timers = jest.useFakeTimers();
+    const timers = vi.useFakeTimers();
     timers.setSystemTime(new Date('2022-01-01'));
     const service = new HealthService();
     timers.setSystemTime(new Date('2022-01-23'));
@@ -38,6 +40,6 @@ describe('Health service', () => {
       }
     `,
     );
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 });

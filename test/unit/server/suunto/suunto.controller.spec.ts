@@ -2,6 +2,7 @@ import { Server } from 'http';
 
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -22,11 +23,11 @@ describe('Suunto Controller', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -64,7 +65,7 @@ describe('Suunto Controller', () => {
     });
 
     it('throws if user setup fails', async () => {
-      jest.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
+      vi.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
         request.get('/suunto/exchange-token/1').query({ code: 'longenoughcode' }),
@@ -76,7 +77,7 @@ describe('Suunto Controller', () => {
     });
 
     it('setups user', async () => {
-      jest.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
         request.get('/suunto/exchange-token/1').query({ code: 'longenoughcode' }),
@@ -91,7 +92,7 @@ describe('Suunto Controller', () => {
 
   describe('POST /suunto/webhook', () => {
     it('validates input', async () => {
-      jest.spyOn(suuntoService, 'handleWebhookEvent');
+      vi.spyOn(suuntoService, 'handleWebhookEvent');
 
       const response = await request.post('/suunto/webhook').send({});
 
@@ -100,7 +101,7 @@ describe('Suunto Controller', () => {
     });
 
     it('handle event', async () => {
-      jest.spyOn(suuntoService, 'handleWebhookEvent').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(suuntoService, 'handleWebhookEvent').mockImplementationOnce(() => Promise.resolve());
 
       await request.post('/suunto/webhook').send({ username: 'user', workoutid: 'id' }).set({ authorization: 'auth' });
 
@@ -123,7 +124,7 @@ describe('Suunto Controller', () => {
     });
 
     it('throws if service failed', async () => {
-      jest.spyOn(suuntoService, 'deauthorize').mockRejectedValueOnce(undefined);
+      vi.spyOn(suuntoService, 'deauthorize').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request.post('/suunto/deauthorize/1'), 1);
 
@@ -131,7 +132,7 @@ describe('Suunto Controller', () => {
     });
 
     it('call service', async () => {
-      jest.spyOn(suuntoService, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoService, 'deauthorize').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(request.post('/suunto/deauthorize/1'), 1);
 

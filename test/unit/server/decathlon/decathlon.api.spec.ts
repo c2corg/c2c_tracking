@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   Activity,
@@ -7,11 +8,11 @@ import {
   WebhookSubscription,
 } from '../../../../src/server/decathlon/decathlon.api';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Decathlon API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('exchangeToken', () => {
@@ -22,7 +23,7 @@ describe('Decathlon API', () => {
         refresh_token: 'refresh_token',
         expires_in: 1,
       };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
       const api = new DecathlonApi();
       const result = await api.exchangeToken('code');
@@ -51,7 +52,7 @@ describe('Decathlon API', () => {
         refresh_token: 'refresh_token',
         expires_in: 1,
       };
-      jest.mocked(axios).postForm.mockResolvedValueOnce({ data: refreshAuth });
+      vi.mocked(axios).postForm.mockResolvedValueOnce({ data: refreshAuth });
 
       const api = new DecathlonApi();
       const result = await api.refreshAuth('refresh_token');
@@ -78,7 +79,7 @@ describe('Decathlon API', () => {
 
   describe('getUserId', () => {
     it('calls decathlon API', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: { id: 'userId' } });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: { id: 'userId' } });
 
       const api = new DecathlonApi();
       const result = await api.getUserId('access_token');
@@ -103,7 +104,7 @@ describe('Decathlon API', () => {
           dataSummaries: {},
         },
       ];
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: activities });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: activities });
 
       const api = new DecathlonApi();
       const result = await api.getActivities('access_token');
@@ -139,7 +140,7 @@ describe('Decathlon API', () => {
           '1': { longitude: 1.0, latitude: 1.0, elevation: 1.0 },
         },
       };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: activity });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: activity });
 
       const api = new DecathlonApi();
       const result = await api.getActivity('access_token', '12345');
@@ -187,7 +188,7 @@ describe('Decathlon API', () => {
           events: ['activity_create', 'activity_delete'],
         },
       ];
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
 
       const api = new DecathlonApi();
       const result = await api.getExistingWebhookSubscription('access_token');
@@ -209,7 +210,7 @@ describe('Decathlon API', () => {
           events: ['activity_create', 'activity_delete'],
         },
       ];
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
 
       const api = new DecathlonApi();
       const result = await api.getExistingWebhookSubscription('access_token');
@@ -231,7 +232,7 @@ describe('Decathlon API', () => {
         url: 'http://nowhere.com',
         events: ['activity_create', 'activity_delete'],
       };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: activity });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: activity });
 
       const api = new DecathlonApi();
       const result = await api.createWebhookSubscription('1', 'access_token');
@@ -251,7 +252,7 @@ describe('Decathlon API', () => {
 
   describe('deleteWebhookSubscription', () => {
     it('calls decathlon API', async () => {
-      jest.mocked(axios).delete.mockResolvedValueOnce({ data: undefined });
+      vi.mocked(axios).delete.mockResolvedValueOnce({ data: undefined });
 
       const api = new DecathlonApi();
       const result = await api.deleteWebhookSubscription('1', 'access_token');

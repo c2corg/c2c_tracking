@@ -15,22 +15,20 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Jest Unit Tests",
-      "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/node_modules/jest/bin/jest", "--runInBand"],
+      "name": "Debug Unit Tests",
+      "autoAttachChildProcesses": true,
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "--project", "unit", "--no-file-parallelism"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Jest Psql Tests",
-      "runtimeArgs": [
-        "--inspect-brk",
-        "${workspaceRoot}/node_modules/jest/bin/jest",
-        "--config",
-        "${workspaceRoot}/jest.config.psql.mjs",
-        "--runInBand"
-      ],
+      "name": "Debug Psql Tests",
+      "autoAttachChildProcesses": true,
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "--project", "psql"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     }

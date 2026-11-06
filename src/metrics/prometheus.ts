@@ -5,7 +5,7 @@ import config from '../config';
 register.setDefaultLabels({ service: 'c2c_tracking' });
 
 // default metrics
-if (!process.env['JEST_WORKER_ID']) {
+if (config.get('env') !== 'test') {
   collectDefaultMetrics();
 }
 

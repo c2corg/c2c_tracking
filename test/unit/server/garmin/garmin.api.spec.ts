@@ -1,32 +1,33 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger';
 import { GarminApi } from '../../../../src/server/garmin/garmin.api';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Garmin API', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   describe('requestUnauthorizedRequestToken', () => {
     it(`throws if token isn't retrieved`, async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: 'whatever' });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: 'whatever' });
 
       const api = new GarminApi();
       await expect(api.requestUnauthorizedRequestToken()).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to acquire Garmin unauthorized request token"`,
+        `[Error: Unable to acquire Garmin unauthorized request token]`,
       );
     });
 
     it('returns unauthorized request token info', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: 'oauth_token=a-token&oauth_token_secret=tokensecret' });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: 'oauth_token=a-token&oauth_token_secret=tokensecret' });
 
       const api = new GarminApi();
       const { token, tokenSecret } = await api.requestUnauthorizedRequestToken();
@@ -38,16 +39,16 @@ describe('Garmin API', () => {
 
   describe('exchangeToken', () => {
     it(`throws if token isn't retrieved`, async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: 'whatever' });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: 'whatever' });
 
       const api = new GarminApi();
       await expect(api.exchangeToken('token', 'tokenSecret', 'verifier')).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to acquire Garmin access request token"`,
+        `[Error: Unable to acquire Garmin access request token]`,
       );
     });
 
     it('returns unauthorized request token info', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: 'oauth_token=a-token&oauth_token_secret=tokensecret' });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: 'oauth_token=a-token&oauth_token_secret=tokensecret' });
 
       const api = new GarminApi();
       const { token, tokenSecret } = await api.exchangeToken('token', 'tokenSecret', 'verifier');
@@ -59,13 +60,13 @@ describe('Garmin API', () => {
 
   describe('backfillActivities', () => {
     it('requests activities backfill', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: [] });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: [] });
 
       const api = new GarminApi();
       await api.backfillActivities(1583020800, 1585699199, 'token', 'tokenSecret');
 
-      expect(jest.mocked(axios).get).toHaveBeenCalledTimes(1);
-      expect(jest.mocked(axios).get).toHaveBeenCalledWith(
+      expect(vi.mocked(axios).get).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(axios).get).toHaveBeenCalledWith(
         `https://apis.garmin.com/wellness-api/rest/backfill/activityDetails?summaryStartTimeInSeconds=1583020800&summaryEndTimeInSeconds=1585699199`,
         expect.anything(),
       );
@@ -74,13 +75,13 @@ describe('Garmin API', () => {
 
   describe('deauthorize', () => {
     it('deauthorizes user', async () => {
-      jest.mocked(axios).delete.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).delete.mockResolvedValueOnce(undefined);
 
       const api = new GarminApi();
       await api.deauthorize('tokn', 'toknSecret');
 
-      expect(jest.mocked(axios).delete).toHaveBeenCalledTimes(1);
-      expect(jest.mocked(axios).delete).toHaveBeenCalledWith(
+      expect(vi.mocked(axios).delete).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(axios).delete).toHaveBeenCalledWith(
         `https://apis.garmin.com/wellness-api/rest/user/registration`,
         expect.anything(),
       );

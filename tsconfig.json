@@ -1,9 +1,7 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "noEmit": true,
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": true,
 
@@ -28,6 +26,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "test/**/*.mjs", "scripts/**/*.ts", "vitest.config.mts"],
   "exclude": ["node_modules"]
 }

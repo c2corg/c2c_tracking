@@ -1,24 +1,25 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger';
 import { CreatedWebhookInfo, Exercise, PolarApi, PolarAuth, WebhookInfo } from '../../../../src/server/polar/polar.api';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Polar API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   describe('exchangeToken', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -30,7 +31,7 @@ describe('Polar API', () => {
 
     it('calls polar API', async () => {
       const auth: PolarAuth = { access_token: 'access_token', token_type: 'bearer', x_user_id: 1n };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
       const api = new PolarApi();
       const result = await api.exchangeToken('code');
@@ -60,7 +61,7 @@ describe('Polar API', () => {
 
   describe('registerUser', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -71,7 +72,7 @@ describe('Polar API', () => {
     });
 
     it('calls polar API', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
 
       const api = new PolarApi();
       await api.registerUser('token', 1n);
@@ -87,7 +88,7 @@ describe('Polar API', () => {
 
   describe('deleteUser', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).delete.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).delete.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -98,7 +99,7 @@ describe('Polar API', () => {
     });
 
     it('calls polar API', async () => {
-      jest.mocked(axios).delete.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).delete.mockResolvedValueOnce(undefined);
 
       const api = new PolarApi();
       await api.deleteUser('token', 1n);
@@ -112,7 +113,7 @@ describe('Polar API', () => {
 
   describe('getExercise', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -131,7 +132,7 @@ describe('Polar API', () => {
         distance: 1,
         duration: 'PT1S',
       };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: exercise });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: exercise });
 
       const api = new PolarApi();
       const result = await api.getExercise('token', 'exerciseId');
@@ -155,7 +156,7 @@ describe('Polar API', () => {
 
   describe('getExerciseFit', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -166,7 +167,7 @@ describe('Polar API', () => {
     });
 
     it('returns FIT', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 
       const api = new PolarApi();
       const result = await api.getExerciseFit('token', 'exerciseId');
@@ -182,7 +183,7 @@ describe('Polar API', () => {
 
   describe('createWebhook', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -199,7 +200,7 @@ describe('Polar API', () => {
           signature_secret_key: '6a123180-b5a2-4ffe-aa74-4aa03cc3f712',
         },
       };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: webhookInfo });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: webhookInfo });
 
       const api = new PolarApi();
       const result = await api.createWebhook();
@@ -211,7 +212,7 @@ describe('Polar API', () => {
 
   describe('getWebhook', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new PolarApi();
 
@@ -221,7 +222,7 @@ describe('Polar API', () => {
 
     it('calls polar API', async () => {
       const webhookInfo: WebhookInfo = { data: [{ id: '1', events: ['EXERCISE'], url: 'http://perdu.com' }] };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: webhookInfo });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: webhookInfo });
 
       const api = new PolarApi();
       const result = await api.getWebhook();

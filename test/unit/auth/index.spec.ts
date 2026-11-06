@@ -1,15 +1,15 @@
-import { createMockContext } from '@shopify/jest-koa-mocks';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth';
 import log from '../../../src/helpers/logger';
-import { AuthenticatedUserStrategy } from '../../utils';
+import { AuthenticatedUserStrategy, createMockContext } from '../../utils';
 
 describe('ensureAuthenticated', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -47,7 +47,7 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
       customProperties: {
         params: { userId: '123' },
       },
-      throw: jest.fn(),
+      throw: vi.fn(),
     });
     await ensureUserFromParamsMatchesAuthUser(ctx, () => Promise.resolve(undefined));
     expect(ctx.throw).toHaveBeenCalledTimes(1);
@@ -60,7 +60,7 @@ describe('ensureUserFromParamsMatchesAuthUser', () => {
       customProperties: {
         params: { userId: '123' },
       },
-      throw: jest.fn(),
+      throw: vi.fn(),
     });
     await ensureUserFromParamsMatchesAuthUser(ctx, () => Promise.resolve(undefined));
     expect(ctx.throw).toHaveBeenCalledTimes(1);

@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { NotFoundError } from '../../../../src/errors';
 import log from '../../../../src/helpers/logger';
 import { ActivityService } from '../../../../src/server/activities/activity.service';
@@ -5,16 +7,16 @@ import { stravaService } from '../../../../src/server/strava/strava.service';
 import { suuntoService } from '../../../../src/server/suunto/suunto.service';
 import { userService } from '../../../../src/user.service';
 
-jest.mock('../../../../src/helpers/utils');
+vi.mock('../../../../src/helpers/utils');
 
 describe('Activity Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getActivities', () => {
     it('returns all translations if lang is not specified', async () => {
-      jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(userService, 'getActivities').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -59,7 +61,7 @@ describe('Activity Service', () => {
     });
 
     it('returns only specific lang if specified', async () => {
-      jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(userService, 'getActivities').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -94,7 +96,7 @@ describe('Activity Service', () => {
     });
 
     it('defaults to unknown if i18n key is not found', async () => {
-      jest.spyOn(userService, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(userService, 'getActivities').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -131,26 +133,26 @@ describe('Activity Service', () => {
 
   describe('getActivityGeometry', () => {
     beforeEach(() => {
-      jest.clearAllMocks();
-      jest.spyOn(log, 'info').mockImplementation(() => {
+      vi.clearAllMocks();
+      vi.spyOn(log, 'info').mockImplementation(() => {
         /* do nothing */
       });
-      jest.spyOn(log, 'warn').mockImplementation(() => {
+      vi.spyOn(log, 'warn').mockImplementation(() => {
         /* do nothing */
       });
     });
 
     it('throws if activity does not exist', async () => {
-      jest.spyOn(userService, 'getActivity').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getActivity').mockResolvedValueOnce(undefined);
 
       const service = new ActivityService();
       await expect(service.getActivityGeometry(1, 1)).rejects.toBeInstanceOf(NotFoundError);
     });
 
     it('returns geojson from DB if present', async () => {
-      jest.spyOn(stravaService, 'getToken');
-      jest.spyOn(suuntoService, 'getToken');
-      jest.spyOn(userService, 'getActivity').mockResolvedValueOnce({
+      vi.spyOn(stravaService, 'getToken');
+      vi.spyOn(suuntoService, 'getToken');
+      vi.spyOn(userService, 'getActivity').mockResolvedValueOnce({
         id: 1,
         userId: 1,
         vendor: 'garmin',
@@ -175,9 +177,9 @@ describe('Activity Service', () => {
     });
 
     it('returns undefined if geojson is not present for activity', async () => {
-      jest.spyOn(stravaService, 'getToken');
-      jest.spyOn(suuntoService, 'getToken');
-      jest.spyOn(userService, 'getActivity').mockResolvedValueOnce({
+      vi.spyOn(stravaService, 'getToken');
+      vi.spyOn(suuntoService, 'getToken');
+      vi.spyOn(userService, 'getActivity').mockResolvedValueOnce({
         id: 1,
         userId: 1,
         vendor: 'garmin',

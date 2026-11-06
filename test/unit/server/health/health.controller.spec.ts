@@ -2,6 +2,7 @@ import { Server } from 'http';
 
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { app } from '../../../../src/app';
 import type { Status } from '../../../../src/health.service';

@@ -3,6 +3,7 @@ import { resolve } from 'path';
 
 import { ObjectCannedACL } from '@aws-sdk/client-s3';
 import request from 'supertest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import config from '../../../src/config';
 import { S3Storage } from '../../../src/storage/storage';

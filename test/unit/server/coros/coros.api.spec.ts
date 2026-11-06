@@ -1,24 +1,25 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger';
 import { CorosApi, CorosAuth, WorkoutRecord, WorkoutRecords } from '../../../../src/server/coros/coros.api';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Coros API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   describe('exchangeToken', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
@@ -30,7 +31,7 @@ describe('Coros API', () => {
 
     it('calls coros API', async () => {
       const auth: CorosAuth = { access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
       const api = new CorosApi();
       const result = await api.exchangeToken('code');
@@ -59,7 +60,7 @@ describe('Coros API', () => {
 
   describe('deauthorize', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
@@ -70,7 +71,7 @@ describe('Coros API', () => {
     });
 
     it('calls coros API', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
 
       const api = new CorosApi();
       await api.deauthorize('token');
@@ -86,7 +87,7 @@ describe('Coros API', () => {
 
   describe('refreshAuth', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
@@ -97,7 +98,7 @@ describe('Coros API', () => {
     });
 
     it('calls coros API', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
 
       const api = new CorosApi();
       await api.refreshAuth('token');
@@ -118,7 +119,7 @@ describe('Coros API', () => {
 
   describe('getWorkouts', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
@@ -145,7 +146,7 @@ describe('Coros API', () => {
         message: 'OK',
         result: '0000',
       };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: workouts });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: workouts });
 
       const api = new CorosApi();
       const result = await api.getWorkouts('token', '1', 20230201, 20230228);
@@ -177,7 +178,7 @@ describe('Coros API', () => {
 
   describe('getWorkoutDetails', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
@@ -202,7 +203,7 @@ describe('Coros API', () => {
         message: 'OK',
         result: '0000',
       };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: workout });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: workout });
 
       const api = new CorosApi();
       const result = await api.getWorkoutDetails('token', 'workoutId', 8, 1, 'openId');
@@ -229,7 +230,7 @@ describe('Coros API', () => {
 
   describe('getFIT', () => {
     it('throws if request fails', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
@@ -238,7 +239,7 @@ describe('Coros API', () => {
     });
 
     it('returns FIT', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 
       const api = new CorosApi();
       const result = await api.getFIT('url');

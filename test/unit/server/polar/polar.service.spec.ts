@@ -1,4 +1,5 @@
 import JSONBig from 'json-bigint';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger';
 import * as utils from '../../../../src/helpers/utils';
@@ -10,26 +11,28 @@ import { polarApi, WebhookEvent } from '../../../../src/server/polar/polar.api';
 import { PolarService } from '../../../../src/server/polar/polar.service';
 import { userService } from '../../../../src/user.service';
 
-jest.mock('../../../../src/helpers/utils');
+vi.mock('../../../../src/helpers/utils');
 
 describe('Polar Service', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.resetAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   describe('requestAccessTokenAndSetupUser', () => {
     it('calls API and setups user', async () => {
-      jest
-        .spyOn(polarApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', x_user_id: 1n, token_type: 'bearer' });
-      jest.spyOn(polarApi, 'registerUser').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userService, 'configurePolar').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(polarApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        x_user_id: 1n,
+        token_type: 'bearer',
+      });
+      vi.spyOn(polarApi, 'registerUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'configurePolar').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -49,28 +52,28 @@ describe('Polar Service', () => {
 
   describe('deauthorize', () => {
     it('throws if no matching user is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
     });
 
     it('throws if no matching auth exists for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new PolarService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve Polar info for user 1"`,
+        `[Error: Unable to retrieve Polar info for user 1]`,
       );
     });
 
     it('calls polar API then updates DB', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarApi, 'deleteUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new PolarService();
       await service.deauthorize(1);
@@ -87,12 +90,12 @@ describe('Polar Service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarApi, 'deleteUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new PolarService();
       await service.deauthorize(1);
@@ -111,12 +114,12 @@ describe('Polar Service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarApi, 'deleteUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new PolarService();
       await service.deauthorize(1);
@@ -136,12 +139,12 @@ describe('Polar Service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarApi, 'deleteUser').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarApi, 'deleteUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new PolarService();
       await service.deauthorize(1);
@@ -160,8 +163,8 @@ describe('Polar Service', () => {
 
   describe('setupWebhook', () => {
     it('handles existing subscription', async () => {
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getWebhook').mockResolvedValueOnce({
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getWebhook').mockResolvedValueOnce({
         data: [
           {
             id: '1',
@@ -170,7 +173,7 @@ describe('Polar Service', () => {
           },
         ],
       });
-      jest.spyOn(polarApi, 'createWebhook');
+      vi.spyOn(polarApi, 'createWebhook');
 
       const service = new PolarService();
       await service.setupWebhook();
@@ -183,12 +186,12 @@ describe('Polar Service', () => {
     });
 
     it('handles no subscription', async () => {
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce(undefined);
-      jest.spyOn(polarApi, 'getWebhook');
-      const requestWebhookSpy = jest
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce(undefined);
+      vi.spyOn(polarApi, 'getWebhook');
+      const requestWebhookSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(PolarService.prototype as any, 'requestWebhookSubscription')
-        .mockImplementationOnce(() => Promise.resolve());
+        .mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.setupWebhook();
@@ -203,12 +206,12 @@ describe('Polar Service', () => {
     });
 
     it('handles subscription check error', async () => {
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getWebhook').mockRejectedValueOnce(undefined);
-      const requestWebhookSpy = jest
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getWebhook').mockRejectedValueOnce(undefined);
+      const requestWebhookSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(PolarService.prototype as any, 'requestWebhookSubscription')
-        .mockImplementationOnce(() => Promise.resolve());
+        .mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.setupWebhook();
@@ -225,8 +228,8 @@ describe('Polar Service', () => {
     });
 
     it('handles not matching polar subscription', async () => {
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getWebhook').mockResolvedValueOnce({
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getWebhook').mockResolvedValueOnce({
         data: [
           {
             id: '1',
@@ -235,10 +238,10 @@ describe('Polar Service', () => {
           },
         ],
       });
-      const requestWebhookSpy = jest
+      const requestWebhookSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(PolarService.prototype as any, 'requestWebhookSubscription')
-        .mockImplementationOnce(() => Promise.resolve());
+        .mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.setupWebhook();
@@ -253,8 +256,8 @@ describe('Polar Service', () => {
     });
 
     it('logs if subscription cannot be created', async () => {
-      jest.spyOn(polarApi, 'createWebhook').mockRejectedValueOnce(undefined);
-      jest.spyOn(polarRepository, 'setWebhookSecret');
+      vi.spyOn(polarApi, 'createWebhook').mockRejectedValueOnce(undefined);
+      vi.spyOn(polarRepository, 'setWebhookSecret');
 
       const service = new PolarService();
       await service['requestWebhookSubscription']();
@@ -268,8 +271,8 @@ describe('Polar Service', () => {
     });
 
     it('logs if subscription cannot be stored in DB', async () => {
-      jest.spyOn(polarApi, 'createWebhook').mockResolvedValueOnce('secret');
-      jest.spyOn(polarRepository, 'setWebhookSecret').mockRejectedValueOnce(undefined);
+      vi.spyOn(polarApi, 'createWebhook').mockResolvedValueOnce('secret');
+      vi.spyOn(polarRepository, 'setWebhookSecret').mockRejectedValueOnce(undefined);
 
       const service = new PolarService();
       await service['requestWebhookSubscription']();
@@ -282,8 +285,8 @@ describe('Polar Service', () => {
     });
 
     it('creates new subscription', async () => {
-      jest.spyOn(polarApi, 'createWebhook').mockResolvedValueOnce('secret');
-      jest.spyOn(polarRepository, 'setWebhookSecret').mockResolvedValueOnce(undefined);
+      vi.spyOn(polarApi, 'createWebhook').mockResolvedValueOnce('secret');
+      vi.spyOn(polarRepository, 'setWebhookSecret').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service['requestWebhookSubscription']();
@@ -296,7 +299,7 @@ describe('Polar Service', () => {
 
   describe('handleWebhookEvent', () => {
     it('does nothing for PING events', async () => {
-      jest.spyOn(userRepository, 'findByPolarId');
+      vi.spyOn(userRepository, 'findByPolarId');
 
       const event: WebhookEvent = { event: 'PING', timestamp: '1970-01-01T00:00:01Z' };
       const raw = JSONBig.stringify(event);
@@ -318,7 +321,7 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
-      jest.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -339,10 +342,8 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -361,10 +362,8 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'signature';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -383,11 +382,9 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getExercise').mockRejectedValueOnce('error');
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getExercise').mockRejectedValueOnce('error');
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -408,11 +405,9 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
         start_time: '1970-01-01T00:00:01',
         start_time_utc_offset: 180,
@@ -420,7 +415,7 @@ describe('Polar Service', () => {
         distance: 1,
         sport: 'RUNNING',
       });
-      jest.spyOn(polarApi, 'getExerciseFit').mockRejectedValueOnce('error');
+      vi.spyOn(polarApi, 'getExerciseFit').mockRejectedValueOnce('error');
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -441,11 +436,9 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
         start_time: '1970-01-01T00:00:01',
         start_time_utc_offset: 180,
@@ -453,8 +446,8 @@ describe('Polar Service', () => {
         distance: 1,
         sport: 'RUNNING',
       });
-      jest.spyOn(polarApi, 'getExerciseFit').mockResolvedValueOnce(new ArrayBuffer(1));
-      jest.mocked(utils).fitToGeoJSON.mockReturnValueOnce(undefined);
+      vi.spyOn(polarApi, 'getExerciseFit').mockResolvedValueOnce(new ArrayBuffer(1));
+      vi.mocked(utils).fitToGeoJSON.mockReturnValueOnce(undefined);
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -475,11 +468,9 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
         start_time: '1970-01-01T00:00:01',
         start_time_utc_offset: 180,
@@ -487,12 +478,12 @@ describe('Polar Service', () => {
         distance: 1,
         sport: 'RUNNING',
       });
-      jest.spyOn(polarApi, 'getExerciseFit').mockResolvedValueOnce(new ArrayBuffer(1));
-      jest.mocked(utils).fitToGeoJSON.mockReturnValueOnce({
+      vi.spyOn(polarApi, 'getExerciseFit').mockResolvedValueOnce(new ArrayBuffer(1));
+      vi.mocked(utils).fitToGeoJSON.mockReturnValueOnce({
         type: 'LineString',
         coordinates: [[0.0, 0.0, 220]],
       });
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce('error');
+      vi.spyOn(userService, 'addActivities').mockRejectedValueOnce('error');
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
@@ -513,11 +504,9 @@ describe('Polar Service', () => {
       const raw = JSONBig.stringify(event);
       const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
 
-      jest
-        .spyOn(userRepository, 'findByPolarId')
-        .mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
-      jest.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
-      jest.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
         id: 'id',
         start_time: '1970-01-01T00:00:01',
         start_time_utc_offset: 165,
@@ -525,12 +514,12 @@ describe('Polar Service', () => {
         distance: 1,
         sport: 'RUNNING',
       });
-      jest.spyOn(polarApi, 'getExerciseFit').mockResolvedValueOnce(new ArrayBuffer(1));
-      jest.mocked(utils).fitToGeoJSON.mockReturnValueOnce({
+      vi.spyOn(polarApi, 'getExerciseFit').mockResolvedValueOnce(new ArrayBuffer(1));
+      vi.mocked(utils).fitToGeoJSON.mockReturnValueOnce({
         type: 'LineString',
         coordinates: [[0.0, 0.0, 220]],
       });
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new PolarService();
       await service.handleWebhookEvent(event, raw, signature);
