@@ -79,7 +79,7 @@
     "@eslint/js": "10.0.1",
     "@tsconfig/node26": "26.0.1",
     "@tsconfig/strictest": "2.0.8",
-    "@types/async": "3.2.25",
+    "@types/async": "3.2.26",
     "@types/convict": "6.1.6",
     "@types/crypto-js": "4.2.2",
     "@types/koa": "3.0.1",
