@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends dumb-init
 WORKDIR /usr
 COPY package*.json ./
 RUN npm ci --fund=false
-COPY tsconfig.json ./
+COPY tsconfig.json tsconfig.build.json ./
 COPY src ./src
 COPY scripts ./scripts
 RUN npm run build

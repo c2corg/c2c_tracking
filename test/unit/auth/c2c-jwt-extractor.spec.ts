@@ -1,4 +1,5 @@
 import { createRequest } from 'node-mocks-http';
+import { describe, expect, it } from 'vitest';
 
 import c2cJwtExtractor from '../../../src/auth/c2c-jwt-extractor';
 

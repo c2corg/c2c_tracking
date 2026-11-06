@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import log from '../../../../src/helpers/logger';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
@@ -8,16 +10,16 @@ import { userService } from '../../../../src/user.service';
 
 describe('Garmin service', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('requestUnauthorizedRequestToken', () => {
@@ -26,7 +28,7 @@ describe('Garmin service', () => {
         token: 'token',
         tokenSecret: 'tokenSecret',
       };
-      jest.spyOn(garminApi, 'requestUnauthorizedRequestToken').mockResolvedValueOnce(auth);
+      vi.spyOn(garminApi, 'requestUnauthorizedRequestToken').mockResolvedValueOnce(auth);
 
       const service = new GarminService();
       expect(await service.requestUnauthorizedRequestToken()).toEqual(auth);
@@ -35,10 +37,10 @@ describe('Garmin service', () => {
 
   describe('requestAccessTokenAndSetupUser', () => {
     it('calls garmin API and setups user', async () => {
-      jest.spyOn(garminApi, 'exchangeToken').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(userService, 'configureGarmin').mockResolvedValueOnce(undefined);
-      jest.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(garminApi, 'exchangeToken').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userService, 'configureGarmin').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
+      vi.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
       const service = new GarminService();
       await service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier');
@@ -51,19 +53,19 @@ describe('Garmin service', () => {
     });
 
     it('throws if auth cannot be configured', async () => {
-      jest.spyOn(garminApi, 'exchangeToken').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(userService, 'configureGarmin').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(garminApi, 'exchangeToken').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userService, 'configureGarmin').mockRejectedValueOnce(new Error('test'));
 
       const service = new GarminService();
       await expect(
         service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
     });
   });
 
   describe('getAuth', () => {
     it('call garmin API', async () => {
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
 
       const service = new GarminService();
       const result = await service.getAuth(1);
@@ -81,34 +83,34 @@ describe('Garmin service', () => {
 
   describe('deauthorize', () => {
     it('throws if no matching user is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'getGarminInfo');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getGarminInfo');
 
       const service = new GarminService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
 
       expect(userService.getGarminInfo).not.toHaveBeenCalled();
     });
 
     it('throws if no matching auth exists for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
 
       const service = new GarminService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
 
       expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
       expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
     });
 
     it('calls garmin API then updates DB', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new GarminService();
       await service.deauthorize(1);
@@ -128,13 +130,13 @@ describe('Garmin service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new GarminService();
       await service.deauthorize(1);
@@ -156,13 +158,13 @@ describe('Garmin service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
 
       const service = new GarminService();
       await service.deauthorize(1);
@@ -185,13 +187,13 @@ describe('Garmin service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
 
       const service = new GarminService();
       await service.deauthorize(1);
@@ -215,8 +217,8 @@ describe('Garmin service', () => {
 
   describe('requestBackfill', () => {
     it('requests a backfill for the given day window', async () => {
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
-      jest.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
 
       const service = new GarminService();
       await service.requestBackfill(1, 30);
@@ -231,22 +233,21 @@ describe('Garmin service', () => {
     });
 
     it('throws if no matching auth exists for user', async () => {
-      jest.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
 
       const service = new GarminService();
       await expect(service.requestBackfill(1, 30)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve Garmin auth for user 1"`,
+        `[Error: Unable to retrieve Garmin auth for user 1]`,
       );
     });
   });
 
   describe('handleActivityWebhook', () => {
     it('adds activities for each user', async () => {
-      jest
-        .spyOn(userRepository, 'findByGarminToken')
+      vi.spyOn(userRepository, 'findByGarminToken')
         .mockResolvedValueOnce({ c2cId: 1 })
         .mockResolvedValueOnce({ c2cId: 2 });
-      jest.spyOn(userService, 'addActivities').mockImplementation(() => Promise.resolve());
+      vi.spyOn(userService, 'addActivities').mockImplementation(() => Promise.resolve());
 
       const service = new GarminService();
       await service.handleActivityWebhook([
@@ -309,8 +310,8 @@ describe('Garmin service', () => {
     });
 
     it('filters out activities without samples', async () => {
-      jest.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'addActivities');
 
       const service = new GarminService();
       await service.handleActivityWebhook([
@@ -328,8 +329,8 @@ describe('Garmin service', () => {
     });
 
     it('logs and returns if user for activity cannot be found', async () => {
-      jest.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities');
 
       const service = new GarminService();
       await service.handleActivityWebhook([
@@ -349,8 +350,8 @@ describe('Garmin service', () => {
     });
 
     it(`logs if some activities couldn't be stored in db`, async () => {
-      jest.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new GarminService();
       await service.handleActivityWebhook([
@@ -376,12 +377,11 @@ describe('Garmin service', () => {
 
   describe('handleDeauthorizeWebhook', () => {
     it('calls garmin API then cleans DB', async () => {
-      jest
-        .spyOn(userRepository, 'findByGarminToken')
+      vi.spyOn(userRepository, 'findByGarminToken')
         .mockResolvedValueOnce({ c2cId: 1 })
         .mockResolvedValueOnce({ c2cId: 2 });
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementation(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementation(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new GarminService();
       await service.handleDeauthorizeWebhook([
@@ -401,9 +401,9 @@ describe('Garmin service', () => {
     });
 
     it('logs if matching user is not found', async () => {
-      jest.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor');
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor');
+      vi.spyOn(userRepository, 'update');
 
       const service = new GarminService();
       await service.handleDeauthorizeWebhook([{ userId: 'user1', userAccessToken: 'user1AccessToken' }]);

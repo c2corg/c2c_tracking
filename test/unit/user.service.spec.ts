@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { NotFoundError } from '../../src/errors';
 import log from '../../src/helpers/logger';
 import { miniatureService } from '../../src/miniature.service';
@@ -14,24 +16,24 @@ import { UserService } from '../../src/user.service';
 
 describe('User service', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
-    const timers = jest.useFakeTimers();
+    const timers = vi.useFakeTimers();
     timers.setSystemTime(new Date('1970-01-01'));
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
-    jest.useRealTimers();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   describe('getUserInfo', () => {
     it('should return user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
         suunto: { username: 'username' },
@@ -55,7 +57,7 @@ describe('User service', () => {
     });
 
     it('returns not configured state', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
       const info = await service.getUserInfo(1);
@@ -75,7 +77,7 @@ describe('User service', () => {
     });
 
     it('should return token lost state', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: { id: '1', webhookId: 'webhookId' },
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
@@ -102,7 +104,7 @@ describe('User service', () => {
     });
 
     it('should return configured state', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         coros: {
           id: 'id',
@@ -143,8 +145,8 @@ describe('User service', () => {
 
   describe('configureStrava', () => {
     it('creates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: StravaAuth = {
@@ -171,10 +173,11 @@ describe('User service', () => {
     });
 
     it('updates user info', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: StravaAuth = {
@@ -207,8 +210,8 @@ describe('User service', () => {
 
   describe('updateStravaAuth', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await expect(
@@ -223,8 +226,8 @@ describe('User service', () => {
     });
 
     it('throws if user is not yet configured for strava', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await expect(
@@ -240,7 +243,7 @@ describe('User service', () => {
     });
 
     it('updates strava info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: {
           id: 1,
@@ -249,7 +252,7 @@ describe('User service', () => {
           expiresAt: 1,
         },
       });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await service.updateStravaAuth(1, {
@@ -273,8 +276,8 @@ describe('User service', () => {
 
   describe('clearStravaTokens', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await expect(service.clearStravaTokens(1)).rejects.toBeInstanceOf(NotFoundError);
@@ -285,8 +288,8 @@ describe('User service', () => {
     });
 
     it('does nothing if no auth info is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await service.clearStravaTokens(1);
@@ -297,11 +300,11 @@ describe('User service', () => {
     });
 
     it('clears tokens', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
-      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'update').mockResolvedValueOnce({
         c2cId: 1,
         strava: { id: 1 },
       });
@@ -321,7 +324,7 @@ describe('User service', () => {
 
   describe('getStravaInfo', () => {
     it('retrieves user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
@@ -338,14 +341,14 @@ describe('User service', () => {
     });
 
     it('returns undefined if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
       expect(await service.getStravaInfo(1)).toMatchInlineSnapshot(`undefined`);
     });
 
     it('returns undefined if info does not exist for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new UserService();
       expect(await service.getStravaInfo(1)).toMatchInlineSnapshot(`undefined`);
@@ -354,17 +357,17 @@ describe('User service', () => {
 
   describe('configureSuunto', () => {
     beforeEach(() => {
-      const timers = jest.useFakeTimers();
+      const timers = vi.useFakeTimers();
       timers.setSystemTime(new Date('1970-01-01'));
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('creates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: SuuntoAuth = {
@@ -391,10 +394,11 @@ describe('User service', () => {
     });
 
     it('updates user info', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: SuuntoAuth = {
@@ -427,17 +431,17 @@ describe('User service', () => {
 
   describe('updateSuuntoAuth', () => {
     beforeEach(() => {
-      const timers = jest.useFakeTimers();
+      const timers = vi.useFakeTimers();
       timers.setSystemTime(new Date('1970-01-01'));
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await expect(
@@ -453,8 +457,8 @@ describe('User service', () => {
     });
 
     it('throws if user is not yet configured for suunto', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await expect(
@@ -470,7 +474,7 @@ describe('User service', () => {
     });
 
     it('updates suunto info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: {
           username: 'user1',
@@ -479,7 +483,7 @@ describe('User service', () => {
           expiresAt: 1,
         },
       });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await service.updateSuuntoAuth(1, {
@@ -503,8 +507,8 @@ describe('User service', () => {
 
   describe('clearSuuntoTokens', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await expect(service.clearSuuntoTokens(1)).rejects.toBeInstanceOf(NotFoundError);
@@ -515,8 +519,8 @@ describe('User service', () => {
     });
 
     it('does nothing if no auth info is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await service.clearSuuntoTokens(1);
@@ -527,11 +531,11 @@ describe('User service', () => {
     });
 
     it('clears tokens', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: { username: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
-      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'update').mockResolvedValueOnce({
         c2cId: 1,
         suunto: { username: '1' },
       });
@@ -551,7 +555,7 @@ describe('User service', () => {
 
   describe('getSuuntoInfo', () => {
     it('retrieves user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: { username: 'user1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
@@ -568,14 +572,14 @@ describe('User service', () => {
     });
 
     it('returns undefined if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
       expect(await service.getSuuntoInfo(1)).toMatchInlineSnapshot(`undefined`);
     });
 
     it('returns undefined if info does not exist for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new UserService();
       expect(await service.getSuuntoInfo(1)).toMatchInlineSnapshot(`undefined`);
@@ -584,8 +588,8 @@ describe('User service', () => {
 
   describe('configureGarmin', () => {
     it('creates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: GarminAuth = {
@@ -607,7 +611,7 @@ describe('User service', () => {
     });
 
     it('updates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: {
           accessToken: 'access_token',
@@ -616,7 +620,7 @@ describe('User service', () => {
           username: 'user1',
         },
       });
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: GarminAuth = {
@@ -646,9 +650,10 @@ describe('User service', () => {
 
   describe('getGarminInfo', () => {
     it('retrieves user info', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+      });
 
       const service = new UserService();
       expect(await service.getGarminInfo(1)).toMatchInlineSnapshot(`
@@ -660,14 +665,14 @@ describe('User service', () => {
     });
 
     it('returns undefined if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
       expect(await service.getGarminInfo(1)).toMatchInlineSnapshot(`undefined`);
     });
 
     it('returns undefined if info does not exist for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new UserService();
       expect(await service.getGarminInfo(1)).toMatchInlineSnapshot(`undefined`);
@@ -676,17 +681,17 @@ describe('User service', () => {
 
   describe('configureDecathlon', () => {
     beforeEach(() => {
-      const timers = jest.useFakeTimers();
+      const timers = vi.useFakeTimers();
       timers.setSystemTime(new Date('1970-01-01'));
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('creates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: DecathlonAuth = {
@@ -713,10 +718,11 @@ describe('User service', () => {
     });
 
     it('updates user info', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: DecathlonAuth = {
@@ -749,17 +755,17 @@ describe('User service', () => {
 
   describe('updateDecathlonAuth', () => {
     beforeEach(() => {
-      const timers = jest.useFakeTimers();
+      const timers = vi.useFakeTimers();
       timers.setSystemTime(new Date('1970-01-01'));
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await expect(
@@ -775,8 +781,8 @@ describe('User service', () => {
     });
 
     it('throws if user is not yet configured for decathlon', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await expect(
@@ -792,7 +798,7 @@ describe('User service', () => {
     });
 
     it('updates decathlon info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: '1',
@@ -802,7 +808,7 @@ describe('User service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await service.updateDecathlonAuth(1, {
@@ -827,8 +833,8 @@ describe('User service', () => {
 
   describe('clearDecathlonTokens', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await expect(service.clearDecathlonTokens(1)).rejects.toBeInstanceOf(NotFoundError);
@@ -839,8 +845,8 @@ describe('User service', () => {
     });
 
     it('does nothing if no auth info is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await service.clearDecathlonTokens(1);
@@ -851,7 +857,7 @@ describe('User service', () => {
     });
 
     it('clears tokens', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: '1',
@@ -861,7 +867,7 @@ describe('User service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'update').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: { id: '1', webhookId: 'webhookId' },
       });
@@ -881,7 +887,7 @@ describe('User service', () => {
 
   describe('getDecathlonInfo', () => {
     it('retrieves user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: '1',
@@ -905,14 +911,14 @@ describe('User service', () => {
     });
 
     it('returns undefined if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
       expect(await service.getDecathlonInfo(1)).toMatchInlineSnapshot(`undefined`);
     });
 
     it('returns undefined if info does not exist for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new UserService();
       expect(await service.getDecathlonInfo(1)).toMatchInlineSnapshot(`undefined`);
@@ -921,8 +927,8 @@ describe('User service', () => {
 
   describe('configurePolar', () => {
     it('creates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: PolarAuth = {
@@ -945,10 +951,11 @@ describe('User service', () => {
     });
 
     it('updates user info', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: PolarAuth = {
@@ -977,17 +984,17 @@ describe('User service', () => {
 
   describe('configureCoros', () => {
     beforeEach(() => {
-      const timers = jest.useFakeTimers();
+      const timers = vi.useFakeTimers();
       timers.setSystemTime(new Date('1970-01-01'));
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('creates user info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'insert').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: CorosAuth = {
@@ -1012,10 +1019,11 @@ describe('User service', () => {
     });
 
     it('updates user info', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, garmin: { token: 'token', tokenSecret: 'tokenSecret' } });
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token', tokenSecret: 'tokenSecret' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new UserService();
       const auth: CorosAuth = {
@@ -1046,8 +1054,8 @@ describe('User service', () => {
 
   describe('resetCorosAuthExpiration', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await expect(service.resetCorosAuthExpiration(1)).rejects.toMatchInlineSnapshot('[Error: User 1 not found]');
@@ -1056,8 +1064,8 @@ describe('User service', () => {
     });
 
     it('throws if user is not yet configured for suunto', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await expect(service.resetCorosAuthExpiration(1)).rejects.toMatchInlineSnapshot(
@@ -1068,7 +1076,7 @@ describe('User service', () => {
     });
 
     it('updates coros info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         coros: {
           id: '1',
@@ -1077,7 +1085,7 @@ describe('User service', () => {
           expiresAt: 1,
         },
       });
-      jest.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new UserService();
       await service.resetCorosAuthExpiration(1);
@@ -1096,8 +1104,8 @@ describe('User service', () => {
 
   describe('clearCorosTokens', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await expect(service.clearCorosTokens(1)).rejects.toBeInstanceOf(NotFoundError);
@@ -1108,8 +1116,8 @@ describe('User service', () => {
     });
 
     it('does nothing if no auth info is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userRepository, 'update');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update');
 
       const service = new UserService();
       await service.clearCorosTokens(1);
@@ -1120,11 +1128,11 @@ describe('User service', () => {
     });
 
     it('clears tokens', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         coros: { id: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
-      jest.spyOn(userRepository, 'update').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'update').mockResolvedValueOnce({
         c2cId: 1,
         coros: { id: '1' },
       });
@@ -1162,8 +1170,8 @@ describe('User service', () => {
           },
           miniature: `${k}.png`,
         }));
-      jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
-      jest.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
+      vi.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
 
       const service = new UserService();
       await service.addActivities(1, {
@@ -1207,10 +1215,10 @@ describe('User service', () => {
           },
           miniature: `${k}.png`,
         }));
-      jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
-      jest.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('toto.png');
-      jest.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
+      vi.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('toto.png');
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
 
       const service = new UserService();
       await service.addActivities(1, {
@@ -1246,7 +1254,7 @@ describe('User service', () => {
     });
 
     it('updates activity if already present', async () => {
-      jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -1256,7 +1264,7 @@ describe('User service', () => {
           type: 'RUN',
         },
       ]);
-      jest.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
 
       const service = new UserService();
       await service.addActivities(1, {
@@ -1302,7 +1310,7 @@ describe('User service', () => {
 
   describe('updateActivity', () => {
     it('updates activity', async () => {
-      jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -1313,7 +1321,7 @@ describe('User service', () => {
           type: 'RUN',
         },
       ]);
-      jest.spyOn(activityRepository, 'update').mockImplementationOnce((activity) => Promise.resolve(activity));
+      vi.spyOn(activityRepository, 'update').mockImplementationOnce((activity) => Promise.resolve(activity));
 
       const service = new UserService();
       await service.updateActivity(1, {
@@ -1337,7 +1345,7 @@ describe('User service', () => {
     });
 
     it('fails silently and do nothing if activity is not found', async () => {
-      jest.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -1348,7 +1356,7 @@ describe('User service', () => {
           type: 'RUN',
         },
       ]);
-      jest.spyOn(activityRepository, 'update').mockImplementationOnce((activity) => Promise.resolve(activity));
+      vi.spyOn(activityRepository, 'update').mockImplementationOnce((activity) => Promise.resolve(activity));
 
       const service = new UserService();
       await service.updateActivity(1, {
@@ -1365,9 +1373,9 @@ describe('User service', () => {
 
   describe('deleteActivity', () => {
     it('deletes in DB', async () => {
-      jest.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new UserService();
       await service.deleteActivity('strava', '1');
@@ -1380,9 +1388,9 @@ describe('User service', () => {
     });
 
     it('logs if miniature info cannot be retrieved', async () => {
-      jest.spyOn(activityRepository, 'getMiniatureByVendorId').mockRejectedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(activityRepository, 'getMiniatureByVendorId').mockRejectedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new UserService();
       await service.deleteActivity('strava', '1');
@@ -1397,9 +1405,9 @@ describe('User service', () => {
     });
 
     it('logs if miniature cannot be deleted', async () => {
-      jest.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce('miniature.png');
-      jest.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce('miniature.png');
+      vi.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
 
       const service = new UserService();
       await service.deleteActivity('strava', '1');
@@ -1415,9 +1423,9 @@ describe('User service', () => {
     });
 
     it('deletes miniature', async () => {
-      jest.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce('miniature.png');
-      jest.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce('miniature.png');
+      vi.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
 
       const service = new UserService();
       await service.deleteActivity('strava', '1');
@@ -1444,7 +1452,7 @@ describe('User service', () => {
           type: 'RUN',
         },
       ];
-      jest.spyOn(activityRepository, 'findByUser').mockImplementationOnce(() => Promise.resolve(activities));
+      vi.spyOn(activityRepository, 'findByUser').mockImplementationOnce(() => Promise.resolve(activities));
 
       const service = new UserService();
       const result = await service.getActivities(1);
@@ -1465,7 +1473,7 @@ describe('User service', () => {
         date: '2022-01-01T00:00:01Z',
         type: 'RUN',
       };
-      jest.spyOn(activityRepository, 'findByUserAndId').mockResolvedValueOnce(activity);
+      vi.spyOn(activityRepository, 'findByUserAndId').mockResolvedValueOnce(activity);
 
       const service = new UserService();
       const result = await service.getActivity(1, 2);
@@ -1476,7 +1484,7 @@ describe('User service', () => {
     });
 
     it('returns undefined if activity was not found', async () => {
-      jest.spyOn(activityRepository, 'findByUserAndId').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'findByUserAndId').mockResolvedValueOnce(undefined);
 
       const service = new UserService();
       const result = await service.getActivity(1, 2);

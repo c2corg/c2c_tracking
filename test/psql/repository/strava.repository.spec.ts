@@ -1,3 +1,5 @@
+import { afterEach, describe, expect, it } from 'vitest';
+
 import { database as db } from '../../../src/db';
 import { StravaRepository } from '../../../src/repository/strava.repository';
 

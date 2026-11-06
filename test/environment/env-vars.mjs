@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const os = require('os');
+import os from 'node:os';
 
 process.env['SERVER_BASE_URL'] = 'http://localhost:3000/';
 process.env['DB_CRYPTO'] = 'secret';

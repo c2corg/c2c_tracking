@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import log from '../../../../src/helpers/logger';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
@@ -8,32 +10,32 @@ import { userService } from '../../../../src/user.service';
 
 describe('Decathlon Service', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.resetAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('requestShortLivedAccessTokenAndSetupUser', () => {
     it('calls API then setups user', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
-      jest.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
+      vi.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([
         {
           id: '1',
           name: 'Morning run',
@@ -42,7 +44,7 @@ describe('Decathlon Service', () => {
           dataSummaries: { '18': 1.2, '5': 1.2, '24': 1.2 },
         },
       ]);
-      jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
         id: 'activityId',
         name: 'activity',
         sport: '/v2/sports/381',
@@ -53,7 +55,7 @@ describe('Decathlon Service', () => {
           '2': { latitude: 2.0, longitude: 2.0, elevation: 2.0 },
         },
       });
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -103,17 +105,17 @@ describe('Decathlon Service', () => {
     });
 
     it('re-uses existing hook if available', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce('webhookId');
-      jest.spyOn(decathlonApi, 'createWebhookSubscription');
-      jest.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce('webhookId');
+      vi.spyOn(decathlonApi, 'createWebhookSubscription');
+      vi.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([
         {
           id: '1',
           name: 'Morning run',
@@ -122,7 +124,7 @@ describe('Decathlon Service', () => {
           dataSummaries: {},
         },
       ]);
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -149,18 +151,18 @@ describe('Decathlon Service', () => {
     });
 
     it('filters out activities without geometry', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
-      jest.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([]);
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
+      vi.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([]);
+      vi.spyOn(userService, 'addActivities');
 
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -172,21 +174,21 @@ describe('Decathlon Service', () => {
     });
 
     it('throws if user id cannot be retrieved', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockRejectedValueOnce(new Error('test'));
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription');
-      jest.spyOn(userService, 'configureDecathlon');
-      jest.spyOn(decathlonApi, 'getActivities');
+      vi.spyOn(decathlonApi, 'getUserId').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription');
+      vi.spyOn(userService, 'configureDecathlon');
+      vi.spyOn(decathlonApi, 'getActivities');
 
       const service = new DecathlonService();
       await expect(
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
 
       expect(decathlonApi.getUserId).toHaveBeenCalledTimes(1);
       expect(decathlonApi.getExistingWebhookSubscription).not.toHaveBeenCalled();
@@ -194,81 +196,81 @@ describe('Decathlon Service', () => {
     });
 
     it('throws if exising webhooks cannot be retrieved', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockRejectedValueOnce(new Error('test'));
-      jest.spyOn(userService, 'configureDecathlon');
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(userService, 'configureDecathlon');
 
       const service = new DecathlonService();
       await expect(
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
 
       expect(decathlonApi.getExistingWebhookSubscription).toHaveBeenCalledTimes(1);
       expect(userService.configureDecathlon).not.toHaveBeenCalled();
     });
 
     it('throws if webhook cannot be setup', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'createWebhookSubscription').mockRejectedValueOnce(new Error('test'));
-      jest.spyOn(userService, 'configureDecathlon');
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'createWebhookSubscription').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(userService, 'configureDecathlon');
 
       const service = new DecathlonService();
       await expect(
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
 
       expect(decathlonApi.createWebhookSubscription).toHaveBeenCalledTimes(1);
       expect(userService.configureDecathlon).not.toHaveBeenCalled();
     });
 
     it('throws if auth cannot be configured', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
-      jest.spyOn(userService, 'configureDecathlon').mockRejectedValueOnce(new Error('test'));
-      jest.spyOn(decathlonApi, 'getActivities');
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
+      vi.spyOn(userService, 'configureDecathlon').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(decathlonApi, 'getActivities');
 
       const service = new DecathlonService();
       await expect(
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
 
       expect(userService.configureDecathlon).toHaveBeenCalledTimes(1);
       expect(decathlonApi.getActivities).not.toHaveBeenCalled();
     });
 
     it('logs if activity retrieval fails', async () => {
-      jest.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
       });
-      jest.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
-      jest.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
-      jest.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
-      jest.spyOn(decathlonApi, 'getActivities').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(decathlonApi, 'getUserId').mockResolvedValueOnce('userId');
+      vi.spyOn(decathlonApi, 'getExistingWebhookSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'createWebhookSubscription').mockResolvedValueOnce('webhookId');
+      vi.spyOn(userService, 'configureDecathlon').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'getActivities').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities');
 
       const service = new DecathlonService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -282,26 +284,26 @@ describe('Decathlon Service', () => {
 
   describe('deauthorize', () => {
     it('throws if no matching user is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'getDecathlonInfo');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getDecathlonInfo');
 
       const service = new DecathlonService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
 
       expect(userService.getDecathlonInfo).not.toHaveBeenCalled();
     });
 
     it('throws if no matching auth exists for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new DecathlonService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"No Decathlon auth defined for user 1"`,
+        `[Error: No Decathlon auth defined for user 1]`,
       );
     });
 
     it('throws if no auth can be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: 'userId',
@@ -311,17 +313,17 @@ describe('Decathlon Service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(decathlonApi, 'refreshAuth').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve token for user 1"`,
+        `[Error: Unable to retrieve token for user 1]`,
       );
     });
 
     it('calls decathlon API then updates DB', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: 'userId',
@@ -331,11 +333,11 @@ describe('Decathlon Service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature');
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new DecathlonService();
       await service.deauthorize(1);
@@ -353,7 +355,7 @@ describe('Decathlon Service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: 'userId',
@@ -363,11 +365,11 @@ describe('Decathlon Service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature');
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new DecathlonService();
       await service.deauthorize(1);
@@ -387,7 +389,7 @@ describe('Decathlon Service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: 'userId',
@@ -397,11 +399,11 @@ describe('Decathlon Service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new DecathlonService();
       await service.deauthorize(1);
@@ -422,7 +424,7 @@ describe('Decathlon Service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         decathlon: {
           id: 'userId',
@@ -432,11 +434,11 @@ describe('Decathlon Service', () => {
           webhookId: 'webhookId',
         },
       });
-      jest.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(decathlonApi, 'deleteWebhookSubscription').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new DecathlonService();
       await service.deauthorize(1);
@@ -458,22 +460,22 @@ describe('Decathlon Service', () => {
 
   describe('getToken', () => {
     beforeEach(() => {
-      jest.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
+      vi.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('returns access_token if still valid for 1 minute', async () => {
-      jest.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce({
         id: 'userId',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 62,
         webhookId: 'webhookId',
       });
-      jest.spyOn(decathlonApi, 'refreshAuth');
+      vi.spyOn(decathlonApi, 'refreshAuth');
 
       const service = new DecathlonService();
       const result = await service.getToken(1);
@@ -484,20 +486,20 @@ describe('Decathlon Service', () => {
     });
 
     it('retrieves a new access token if current one is expired', async () => {
-      jest.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce({
         id: 'userId',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
         webhookId: 'webhookId',
       });
-      jest.spyOn(decathlonApi, 'refreshAuth').mockResolvedValueOnce({
+      vi.spyOn(decathlonApi, 'refreshAuth').mockResolvedValueOnce({
         access_token: 'new_access_token',
         token_type: 'bearer',
         refresh_token: 'new_refresh_token',
         expires_in: 3540,
       });
-      jest.spyOn(userService, 'updateDecathlonAuth').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userService, 'updateDecathlonAuth').mockImplementationOnce(() => Promise.resolve());
 
       const service = new DecathlonService();
       const result = await service.getToken(1);
@@ -515,15 +517,15 @@ describe('Decathlon Service', () => {
     });
 
     it('returns undefined if refresh fails', async () => {
-      jest.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce({
         id: 'userId',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
         webhookId: 'webhookId',
       });
-      jest.spyOn(decathlonApi, 'refreshAuth').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       const result = await service.getToken(1);
@@ -537,9 +539,9 @@ describe('Decathlon Service', () => {
 
   describe('resyncActivities', () => {
     it('uses the given access token without calling getToken', async () => {
-      jest.spyOn(userService, 'getDecathlonInfo');
-      jest.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([]);
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getDecathlonInfo');
+      vi.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([]);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
       const result = await service.resyncActivities(1, 'access_token');
@@ -550,13 +552,13 @@ describe('Decathlon Service', () => {
     });
 
     it('throws if no valid token can be retrieved', async () => {
-      jest.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getDecathlonInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'clearDecathlonTokens').mockResolvedValueOnce(undefined);
 
       const service = new DecathlonService();
 
       await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve a valid Decathlon token for user 1"`,
+        `[Error: Unable to retrieve a valid Decathlon token for user 1]`,
       );
     });
   });
@@ -564,7 +566,7 @@ describe('Decathlon Service', () => {
   describe('handleWebhookEvent', () => {
     describe('activity create event', () => {
       it('warns if no matching user is found', async () => {
-        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce(undefined);
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce(undefined);
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -581,7 +583,7 @@ describe('Decathlon Service', () => {
       });
 
       it('warns if no token can be retrieved', async () => {
-        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({ c2cId: 1 });
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({ c2cId: 1 });
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -598,7 +600,7 @@ describe('Decathlon Service', () => {
       });
 
       it('warns if event activity cannot be retrieved', async () => {
-        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
           c2cId: 1,
           decathlon: {
             id: 'userId',
@@ -608,7 +610,7 @@ describe('Decathlon Service', () => {
             webhookId: 'webhookId',
           },
         });
-        jest.spyOn(decathlonApi, 'getActivity').mockRejectedValueOnce(undefined);
+        vi.spyOn(decathlonApi, 'getActivity').mockRejectedValueOnce(undefined);
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -627,7 +629,7 @@ describe('Decathlon Service', () => {
       });
 
       it('warns if event activity cannot be stored', async () => {
-        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
           c2cId: 1,
           decathlon: {
             id: 'userId',
@@ -637,7 +639,7 @@ describe('Decathlon Service', () => {
             webhookId: 'webhookId',
           },
         });
-        jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+        vi.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
           id: 'activityId',
           name: 'name',
           sport: '/v2/sports/381',
@@ -645,7 +647,7 @@ describe('Decathlon Service', () => {
           dataSummaries: {},
           locations: { '0': { latitude: 1.0, longitude: 1.0, elevation: 1.0 } },
         });
-        jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+        vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -673,7 +675,7 @@ describe('Decathlon Service', () => {
       });
 
       it('ignores activity without geometry', async () => {
-        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
           c2cId: 1,
           decathlon: {
             id: 'userId',
@@ -683,7 +685,7 @@ describe('Decathlon Service', () => {
             webhookId: 'webhookId',
           },
         });
-        jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+        vi.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
           id: 'activityId',
           name: 'name',
           sport: '/v2/sports/381',
@@ -691,7 +693,7 @@ describe('Decathlon Service', () => {
           dataSummaries: {},
           locations: {},
         });
-        jest.spyOn(userService, 'addActivities');
+        vi.spyOn(userService, 'addActivities');
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -707,7 +709,7 @@ describe('Decathlon Service', () => {
       });
 
       it('saves event activity', async () => {
-        jest.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
           c2cId: 1,
           decathlon: {
             id: 'userId',
@@ -717,7 +719,7 @@ describe('Decathlon Service', () => {
             webhookId: 'webhookId',
           },
         });
-        jest.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+        vi.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
           id: 'activityId',
           name: 'name',
           sport: '/v2/sports/381',
@@ -725,7 +727,7 @@ describe('Decathlon Service', () => {
           dataSummaries: {},
           locations: { '0': { latitude: 1.0, longitude: 1.0, elevation: 1.0 } },
         });
-        jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+        vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -752,7 +754,7 @@ describe('Decathlon Service', () => {
 
     describe('activity delete event', () => {
       it('warns if activity cannot be deleted', async () => {
-        jest.spyOn(userService, 'deleteActivity').mockRejectedValueOnce(undefined);
+        vi.spyOn(userService, 'deleteActivity').mockRejectedValueOnce(undefined);
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({
@@ -767,7 +769,7 @@ describe('Decathlon Service', () => {
       });
 
       it('deletes activity', async () => {
-        jest.spyOn(userService, 'deleteActivity').mockResolvedValueOnce(undefined);
+        vi.spyOn(userService, 'deleteActivity').mockResolvedValueOnce(undefined);
 
         const service = new DecathlonService();
         await service.handleWebhookEvent({

@@ -1,3 +1,5 @@
+import { afterEach, describe, expect, it } from 'vitest';
+
 import { database as db } from '../../../src/db';
 import { ActivityRepository } from '../../../src/repository/activity.repository';
 

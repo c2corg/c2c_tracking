@@ -1,6 +1,8 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import log from '../../../../src/helpers/logger';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
@@ -11,33 +13,33 @@ import { userService } from '../../../../src/user.service';
 
 describe('Suunto Service', () => {
   beforeEach(() => {
-    jest.restoreAllMocks();
-    jest.spyOn(log, 'debug').mockImplementation(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(log, 'debug').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('requestShortLivedAccessTokenAndSetupUser', () => {
     it('handles configuration failure', async () => {
-      jest.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      jest.spyOn(userService, 'configureSuunto').mockRejectedValueOnce(undefined);
-      jest.spyOn(suuntoApi, 'getWorkouts');
+      vi.spyOn(userService, 'configureSuunto').mockRejectedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'getWorkouts');
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -55,16 +57,16 @@ describe('Suunto Service', () => {
     });
 
     it('handles activities retrieval failure', async () => {
-      jest.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      jest.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
-      jest.spyOn(suuntoApi, 'getWorkouts').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'getWorkouts').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities');
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -84,15 +86,15 @@ describe('Suunto Service', () => {
     });
 
     it('handles activities retrieval failure (2)', async () => {
-      jest.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      jest.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
-      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
         payload: [
           {
             workoutId: 1,
@@ -108,9 +110,9 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -147,15 +149,15 @@ describe('Suunto Service', () => {
     });
 
     it('filters out activities without geometry', async () => {
-      jest.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      jest.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
-      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
         payload: [
           {
             workoutId: 1,
@@ -171,9 +173,9 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
-      const fit = new Uint8Array();
-      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      const fit = new ArrayBuffer(0);
+      vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -192,15 +194,15 @@ describe('Suunto Service', () => {
     });
 
     it('calls API then setups user', async () => {
-      jest.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
         token_type: 'bearer',
         refresh_token: 'refresh_token',
         expires_in: 1,
         user: 'user',
       });
-      jest.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
-      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(userService, 'configureSuunto').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
         payload: [
           {
             workoutId: 1,
@@ -216,9 +218,9 @@ describe('Suunto Service', () => {
         ],
         metadata: {},
       });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
       const service = new SuuntoService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -257,21 +259,21 @@ describe('Suunto Service', () => {
 
   describe('getToken', () => {
     beforeEach(() => {
-      jest.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
+      vi.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('returns access_token if still valid for 1 minute', async () => {
-      jest.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce({
         username: 'user',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 62,
       });
-      jest.spyOn(suuntoApi, 'refreshAuth');
+      vi.spyOn(suuntoApi, 'refreshAuth');
 
       const service = new SuuntoService();
       const result = await service.getToken(1);
@@ -282,19 +284,19 @@ describe('Suunto Service', () => {
     });
 
     it('retrieves a new access token if current one is expired', async () => {
-      jest.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce({
         username: 'user',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
       });
-      jest.spyOn(suuntoApi, 'refreshAuth').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'refreshAuth').mockResolvedValueOnce({
         access_token: 'new_access_token',
         refresh_token: 'new_refresh_token',
         expires_in: 3540,
         token_type: 'bearer',
       });
-      jest.spyOn(userService, 'updateSuuntoAuth').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userService, 'updateSuuntoAuth').mockImplementationOnce(() => Promise.resolve());
 
       const service = new SuuntoService();
       const result = await service.getToken(1);
@@ -312,14 +314,14 @@ describe('Suunto Service', () => {
     });
 
     it('returns undefined if refresh fails', async () => {
-      jest.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce({
         username: 'user',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
       });
-      jest.spyOn(suuntoApi, 'refreshAuth').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'clearSuuntoTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'clearSuuntoTokens').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       const result = await service.getToken(1);
@@ -333,9 +335,9 @@ describe('Suunto Service', () => {
 
   describe('resyncActivities', () => {
     it('uses the given access token without calling getToken', async () => {
-      jest.spyOn(userService, 'getSuuntoInfo');
-      jest.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({ payload: [], metadata: {} });
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getSuuntoInfo');
+      vi.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({ payload: [], metadata: {} });
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       const result = await service.resyncActivities(1, 'access_token');
@@ -346,13 +348,13 @@ describe('Suunto Service', () => {
     });
 
     it('throws if no valid token can be retrieved', async () => {
-      jest.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'clearSuuntoTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getSuuntoInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'clearSuuntoTokens').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
 
       await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve a valid Suunto token for user 1"`,
+        `[Error: Unable to retrieve a valid Suunto token for user 1]`,
       );
     });
   });
@@ -369,7 +371,7 @@ describe('Suunto Service', () => {
     });
 
     it('warns if user is not found', async () => {
-      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce(undefined);
       const service = new SuuntoService();
       await service.handleWebhookEvent(
         { username: 'user', workoutid: '1' },
@@ -383,8 +385,8 @@ describe('Suunto Service', () => {
     });
 
     it('warns if token cannot be retrieved', async () => {
-      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
-      const getTokenSpy = jest
+      vi.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce(undefined);
@@ -404,12 +406,12 @@ describe('Suunto Service', () => {
     });
 
     it('warns if activity data could not be retrieved', async () => {
-      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
-      const getTokenSpy = jest
+      vi.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'getWorkoutDetails').mockRejectedValueOnce(undefined);
+      vi.spyOn(suuntoApi, 'getWorkoutDetails').mockRejectedValueOnce(undefined);
 
       const service = new SuuntoService();
       await service.handleWebhookEvent(
@@ -426,12 +428,12 @@ describe('Suunto Service', () => {
     });
 
     it('warns if activity data cannot be saved', async () => {
-      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
-      const getTokenSpy = jest
+      vi.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
         payload: {
           workoutId: 1,
           workoutKey: '1',
@@ -445,9 +447,9 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new SuuntoService();
       await service.handleWebhookEvent(
@@ -464,12 +466,12 @@ describe('Suunto Service', () => {
     });
 
     it('ignores activity without geometry', async () => {
-      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
-      const getTokenSpy = jest
+      vi.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
         payload: {
           workoutId: 1,
           workoutKey: '1',
@@ -483,8 +485,8 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
-      jest.spyOn(suuntoApi, 'getFIT').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(suuntoApi, 'getFIT').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities');
 
       const service = new SuuntoService();
       await service.handleWebhookEvent(
@@ -499,12 +501,12 @@ describe('Suunto Service', () => {
     });
 
     it('handles event', async () => {
-      jest.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
-      const getTokenSpy = jest
+      vi.spyOn(userRepository, 'findBySuuntoUsername').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
+      vi.spyOn(suuntoApi, 'getWorkoutDetails').mockResolvedValueOnce({
         payload: {
           workoutId: 1,
           workoutKey: '1',
@@ -518,9 +520,9 @@ describe('Suunto Service', () => {
         },
         metadata: {},
       });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(suuntoApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       await service.handleWebhookEvent(
@@ -536,15 +538,15 @@ describe('Suunto Service', () => {
 
   describe('deauthorize', () => {
     it('throws if user is not found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`[Error: User 1 not found]`);
     });
 
     it('throws if token cannot be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      const getTokenSpy = jest
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce(undefined);
@@ -556,7 +558,7 @@ describe('Suunto Service', () => {
     });
 
     it('deauthorizes user and clears data', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: {
           username: 'user',
@@ -571,15 +573,15 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
       });
-      const getTokenSpy = jest
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
@@ -606,7 +608,7 @@ describe('Suunto Service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: {
           username: 'user',
@@ -621,15 +623,15 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
       });
-      const getTokenSpy = jest
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
@@ -658,7 +660,7 @@ describe('Suunto Service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: {
           username: 'user',
@@ -673,15 +675,15 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
       });
-      const getTokenSpy = jest
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);
@@ -711,7 +713,7 @@ describe('Suunto Service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         suunto: {
           username: 'user',
@@ -726,15 +728,15 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
       });
-      const getTokenSpy = jest
+      const getTokenSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
-      jest.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
-      jest.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);

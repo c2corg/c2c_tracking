@@ -1,3 +1,5 @@
+import { afterEach, describe, expect, it } from 'vitest';
+
 import { database as db } from '../../../src/db';
 import type { User } from '../../../src/repository/user';
 import { UserRepository } from '../../../src/repository/user.repository';

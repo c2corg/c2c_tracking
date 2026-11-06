@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     node: true,
     es2022: true,
@@ -16,7 +17,7 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 'latest',
-    project: './tsconfig.eslint.json',
+    project: './tsconfig.json',
     sourceType: 'module', // Allows for the use of imports,
   },
   rules: {
@@ -48,19 +49,16 @@ module.exports = {
       },
     },
     {
-      files: ['test/**/*.ts'],
-      plugins: ['jest'],
-      extends: ['plugin:jest/recommended'],
+      files: ['test/**/*.ts', 'vitest.config.mts'],
       rules: {
         'node/no-unpublished-import': 'off',
         'node/no-extraneous-import': 'off',
         '@typescript-eslint/unbound-method': 'off',
-        'jest/unbound-method': 'error',
       },
     },
   ],
   settings: {
-    'import/resolvers': {
+    'import/resolver': {
       typescript: {
         alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
         project: '.',

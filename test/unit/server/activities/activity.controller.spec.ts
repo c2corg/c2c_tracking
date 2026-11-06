@@ -2,6 +2,7 @@ import { Server } from 'http';
 
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -22,11 +23,11 @@ describe('Activities Controller', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -45,7 +46,7 @@ describe('Activities Controller', () => {
     });
 
     it('validates input', async () => {
-      jest.spyOn(activityService, 'getActivities');
+      vi.spyOn(activityService, 'getActivities');
 
       const response = await authenticated(request.get('/users/1/activities?lang=1'), 1);
 
@@ -54,7 +55,7 @@ describe('Activities Controller', () => {
     });
 
     it('responds with user activities summaries', async () => {
-      jest.spyOn(activityService, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(activityService, 'getActivities').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -90,7 +91,7 @@ describe('Activities Controller', () => {
     });
 
     it('responds with user activities summaries with specific lang', async () => {
-      jest.spyOn(activityService, 'getActivities').mockResolvedValueOnce([
+      vi.spyOn(activityService, 'getActivities').mockResolvedValueOnce([
         {
           id: 1,
           userId: 1,
@@ -139,7 +140,7 @@ describe('Activities Controller', () => {
     });
 
     it('returns  404 if no geometry can be retrieved', async () => {
-      jest.spyOn(activityService, 'getActivityGeometry').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityService, 'getActivityGeometry').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(request.get('/users/1/activities/1/geometry'), 1);
 
@@ -147,9 +148,10 @@ describe('Activities Controller', () => {
     });
 
     it('returns geometry', async () => {
-      jest
-        .spyOn(activityService, 'getActivityGeometry')
-        .mockResolvedValueOnce({ type: 'LineString', coordinates: [[1, 1, 1, 1]] });
+      vi.spyOn(activityService, 'getActivityGeometry').mockResolvedValueOnce({
+        type: 'LineString',
+        coordinates: [[1, 1, 1, 1]],
+      });
 
       const response = await authenticated(request.get('/users/1/activities/1/geometry'), 1);
 

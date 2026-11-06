@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger';
 import { miniatureService } from '../../../../src/miniature.service';
@@ -11,11 +12,11 @@ import { userService } from '../../../../src/user.service';
 
 describe('Strava Service', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.resetAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -34,15 +35,15 @@ describe('Strava Service', () => {
 
   describe('requestShortLivedAccessTokenAndSetupUser', () => {
     it('calls API then setups user', async () => {
-      jest.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
         athlete: { id: 1 },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
         expires_in: 1,
       });
-      jest.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
-      jest.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
+      vi.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {
           id: 1,
           name: 'Morning run',
@@ -54,7 +55,7 @@ describe('Strava Service', () => {
           total_elevation_gain: 1.2,
         },
       ]);
-      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
         distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
         latlng: {
           series_type: 'distance',
@@ -66,7 +67,7 @@ describe('Strava Service', () => {
           ],
         },
       });
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -104,15 +105,15 @@ describe('Strava Service', () => {
     });
 
     it('filters out activities without geometry', async () => {
-      jest.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
         athlete: { id: 1 },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
         expires_in: 1,
       });
-      jest.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
-      jest.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
+      vi.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {
           id: 1,
           name: 'Morning run',
@@ -124,8 +125,8 @@ describe('Strava Service', () => {
           total_elevation_gain: 1.2,
         },
       ]);
-      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({});
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({});
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -147,36 +148,36 @@ describe('Strava Service', () => {
     });
 
     it('throws if auth cannot be configured', async () => {
-      jest.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
         athlete: { id: 1 },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
         expires_in: 1,
       });
-      jest.spyOn(userService, 'configureStrava').mockRejectedValueOnce(new Error('test'));
-      jest.spyOn(stravaApi, 'getAthleteActivities');
+      vi.spyOn(userService, 'configureStrava').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(stravaApi, 'getAthleteActivities');
 
       const service = new StravaService();
       await expect(
         service.requestShortLivedAccessTokenAndSetupUser(1, 'code'),
-      ).rejects.toThrowErrorMatchingInlineSnapshot(`"test"`);
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
 
       expect(userService.configureStrava).toHaveBeenCalledTimes(1);
       expect(stravaApi.getAthleteActivities).not.toHaveBeenCalled();
     });
 
     it('logs if activity retrieval fails', async () => {
-      jest.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
         athlete: { id: 1 },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
         expires_in: 1,
       });
-      jest.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
-      jest.spyOn(stravaApi, 'getAthleteActivities').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities');
 
       const service = new StravaService();
       await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
@@ -188,9 +189,9 @@ describe('Strava Service', () => {
 
   describe('resyncActivities', () => {
     it('uses the given access token without calling getToken', async () => {
-      jest.spyOn(userService, 'getStravaInfo');
-      jest.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([]);
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getStravaInfo');
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([]);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       const result = await service.resyncActivities(1, 'access_token');
@@ -201,13 +202,13 @@ describe('Strava Service', () => {
     });
 
     it('falls back to getToken when no access token is given', async () => {
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'stored_access_token',
         refreshToken: 'refresh_token',
         expiresAt: dayjs().add(1, 'hour').unix(),
       });
-      jest.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {
           id: 1,
           name: 'Morning run',
@@ -219,7 +220,7 @@ describe('Strava Service', () => {
           total_elevation_gain: 1.2,
         },
       ]);
-      jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
         distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
         latlng: {
           series_type: 'distance',
@@ -231,7 +232,7 @@ describe('Strava Service', () => {
           ],
         },
       });
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       const result = await service.resyncActivities(1);
@@ -242,36 +243,36 @@ describe('Strava Service', () => {
     });
 
     it('throws if no valid token can be retrieved', async () => {
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
 
       await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve a valid Strava token for user 1"`,
+        `[Error: Unable to retrieve a valid Strava token for user 1]`,
       );
     });
   });
 
   describe('deauthorize', () => {
     it('throws if no matching user is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'getStravaInfo');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getStravaInfo');
 
       const service = new StravaService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
 
       expect(userService.getStravaInfo).not.toHaveBeenCalled();
     });
 
     it('throws if no matching auth exists for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve token for user 1"`,
+        `[Error: Unable to retrieve token for user 1]`,
       );
 
       expect(userService.getStravaInfo).toHaveBeenCalledTimes(1);
@@ -280,18 +281,18 @@ describe('Strava Service', () => {
     });
 
     it('calls strava API then updates DB', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
       });
-      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(stravaApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new StravaService();
       await service.deauthorize(1);
@@ -311,18 +312,18 @@ describe('Strava Service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
       });
-      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(stravaApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new StravaService();
       await service.deauthorize(1);
@@ -344,18 +345,18 @@ describe('Strava Service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
       });
-      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(stravaApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
 
       const service = new StravaService();
       await service.deauthorize(1);
@@ -378,18 +379,18 @@ describe('Strava Service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
       });
-      jest.spyOn(stravaApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(stravaApi, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service.deauthorize(1);
@@ -413,21 +414,21 @@ describe('Strava Service', () => {
 
   describe('getToken', () => {
     beforeEach(() => {
-      jest.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
+      vi.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('returns access_token if still valid for 1 minute', async () => {
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 62,
       });
-      jest.spyOn(stravaApi, 'refreshAuth');
+      vi.spyOn(stravaApi, 'refreshAuth');
 
       const service = new StravaService();
       const result = await service.getToken(1);
@@ -438,19 +439,19 @@ describe('Strava Service', () => {
     });
 
     it('retrieves a new access token if current one is expired', async () => {
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
       });
-      jest.spyOn(stravaApi, 'refreshAuth').mockResolvedValueOnce({
+      vi.spyOn(stravaApi, 'refreshAuth').mockResolvedValueOnce({
         access_token: 'new_access_token',
         refresh_token: 'new_refresh_token',
         expires_at: 3600,
         expires_in: 3540,
       });
-      jest.spyOn(userService, 'updateStravaAuth').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userService, 'updateStravaAuth').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       const result = await service.getToken(1);
@@ -468,14 +469,14 @@ describe('Strava Service', () => {
     });
 
     it('returns undefined if refresh fails', async () => {
-      jest.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
         id: 1,
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
       });
-      jest.spyOn(stravaApi, 'refreshAuth').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'clearStravaTokens').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       const result = await service.getToken(1);
@@ -489,8 +490,8 @@ describe('Strava Service', () => {
 
   describe('setupWebhook', () => {
     it('handles existing subscription', async () => {
-      jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-      jest.spyOn(stravaApi, 'getSubscriptions').mockResolvedValueOnce([
+      vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+      vi.spyOn(stravaApi, 'getSubscriptions').mockResolvedValueOnce([
         {
           id: 1,
           application_id: 1,
@@ -499,7 +500,7 @@ describe('Strava Service', () => {
           callback_url: 'http://localhost:3000/strava/webhook',
         },
       ]);
-      jest.spyOn(stravaApi, 'requestSubscriptionCreation');
+      vi.spyOn(stravaApi, 'requestSubscriptionCreation');
 
       const service = new StravaService();
       await service.setupWebhook();
@@ -512,12 +513,12 @@ describe('Strava Service', () => {
     });
 
     it('handles no subscription', async () => {
-      jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(undefined);
-      jest.spyOn(stravaApi, 'getSubscriptions');
-      const requestWebhookSpy = jest
+      vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'getSubscriptions');
+      const requestWebhookSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(StravaService.prototype as any, 'requestWebhookSubscription')
-        .mockImplementationOnce(() => Promise.resolve());
+        .mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service.setupWebhook();
@@ -532,12 +533,12 @@ describe('Strava Service', () => {
     });
 
     it('handles subscription check error', async () => {
-      jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-      jest.spyOn(stravaApi, 'getSubscriptions').mockRejectedValueOnce(undefined);
-      const requestWebhookSpy = jest
+      vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+      vi.spyOn(stravaApi, 'getSubscriptions').mockRejectedValueOnce(undefined);
+      const requestWebhookSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(StravaService.prototype as any, 'requestWebhookSubscription')
-        .mockImplementationOnce(() => Promise.resolve());
+        .mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service.setupWebhook();
@@ -554,8 +555,8 @@ describe('Strava Service', () => {
     });
 
     it('handles not matching strava subscription', async () => {
-      jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-      jest.spyOn(stravaApi, 'getSubscriptions').mockResolvedValueOnce([
+      vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+      vi.spyOn(stravaApi, 'getSubscriptions').mockResolvedValueOnce([
         {
           id: 1,
           application_id: 1,
@@ -564,10 +565,10 @@ describe('Strava Service', () => {
           callback_url: 'not a matching url',
         },
       ]);
-      const requestWebhookSpy = jest
+      const requestWebhookSpy = vi
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .spyOn(StravaService.prototype as any, 'requestWebhookSubscription')
-        .mockImplementationOnce(() => Promise.resolve());
+        .mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service.setupWebhook();
@@ -582,8 +583,8 @@ describe('Strava Service', () => {
     });
 
     it('logs if subscription cannot be created', async () => {
-      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockRejectedValueOnce(undefined);
-      jest.spyOn(stravaRepository, 'setSubscription');
+      vi.spyOn(stravaApi, 'requestSubscriptionCreation').mockRejectedValueOnce(undefined);
+      vi.spyOn(stravaRepository, 'setSubscription');
 
       const service = new StravaService();
       await service['requestWebhookSubscription']();
@@ -597,8 +598,8 @@ describe('Strava Service', () => {
     });
 
     it('logs if subscription cannot be stored in DB', async () => {
-      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce(1);
-      jest.spyOn(stravaRepository, 'setSubscription').mockRejectedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce(1);
+      vi.spyOn(stravaRepository, 'setSubscription').mockRejectedValueOnce(undefined);
 
       const service = new StravaService();
       await service['requestWebhookSubscription']();
@@ -611,8 +612,8 @@ describe('Strava Service', () => {
     });
 
     it('creates new subscription', async () => {
-      jest.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce(1);
-      jest.spyOn(stravaRepository, 'setSubscription').mockResolvedValueOnce(undefined);
+      vi.spyOn(stravaApi, 'requestSubscriptionCreation').mockResolvedValueOnce(1);
+      vi.spyOn(stravaRepository, 'setSubscription').mockResolvedValueOnce(undefined);
 
       const service = new StravaService();
       await service['requestWebhookSubscription']();
@@ -625,7 +626,7 @@ describe('Strava Service', () => {
 
   describe('handleWebhookEvent', () => {
     it('handles invalid event', async () => {
-      jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(9);
+      vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(9);
 
       const service = new StravaService();
       await service.handleWebhookEvent({
@@ -643,7 +644,7 @@ describe('Strava Service', () => {
     });
 
     it('ignores undesired events', async () => {
-      jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+      vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
 
       const service = new StravaService();
       await service.handleWebhookEvent({
@@ -662,8 +663,8 @@ describe('Strava Service', () => {
 
     describe('athlete delete event', () => {
       it('ignores if user does not match', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce(undefined);
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -683,8 +684,8 @@ describe('Strava Service', () => {
       });
 
       it('clears user strava data', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({
           c2cId: 1,
           strava: {
             accessToken: 'access_token',
@@ -693,8 +694,8 @@ describe('Strava Service', () => {
             expiresAt: 1,
           },
         });
-        jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-        jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+        vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+        vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -716,8 +717,8 @@ describe('Strava Service', () => {
 
     describe('activity create event', () => {
       it('logs if user does not match', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce(undefined);
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -737,12 +738,12 @@ describe('Strava Service', () => {
       });
 
       it('logs if access token cannot be retrieved', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve(undefined));
+          .mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -765,14 +766,14 @@ describe('Strava Service', () => {
       });
 
       it('logs if activity cannot be retrieved', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve('access_token'));
-        jest.spyOn(stravaApi, 'getActivity').mockRejectedValueOnce(undefined);
-        jest.spyOn(userService, 'addActivities');
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockRejectedValueOnce(undefined);
+        vi.spyOn(userService, 'addActivities');
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -798,13 +799,13 @@ describe('Strava Service', () => {
       });
 
       it('logs if activity cannot be saved to DB', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve('access_token'));
-        jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
           sport_type: 'Run',
@@ -814,7 +815,7 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+        vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
           distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
           latlng: {
             series_type: 'distance',
@@ -826,7 +827,7 @@ describe('Strava Service', () => {
             ],
           },
         });
-        jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+        vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -869,13 +870,13 @@ describe('Strava Service', () => {
       });
 
       it('adds activity to user', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve('access_token'));
-        jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
           sport_type: 'Run',
@@ -885,7 +886,7 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
+        vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({
           distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
           latlng: {
             series_type: 'distance',
@@ -897,7 +898,7 @@ describe('Strava Service', () => {
             ],
           },
         });
-        jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+        vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -939,8 +940,8 @@ describe('Strava Service', () => {
 
     describe('activity update event', () => {
       it('logs if user does not match', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce(undefined);
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -960,12 +961,12 @@ describe('Strava Service', () => {
       });
 
       it('logs if access token cannot be retrieved', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve(undefined));
+          .mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -988,14 +989,14 @@ describe('Strava Service', () => {
       });
 
       it('logs if activity cannot be retrieved', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve('access_token'));
-        jest.spyOn(stravaApi, 'getActivity').mockRejectedValueOnce(undefined);
-        jest.spyOn(userService, 'updateActivity');
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockRejectedValueOnce(undefined);
+        vi.spyOn(userService, 'updateActivity');
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -1021,13 +1022,13 @@ describe('Strava Service', () => {
       });
 
       it('logs if activity cannot be saved to DB', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve('access_token'));
-        jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
           sport_type: 'Run',
@@ -1037,7 +1038,7 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(userService, 'updateActivity').mockRejectedValueOnce(undefined);
+        vi.spyOn(userService, 'updateActivity').mockRejectedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -1070,13 +1071,13 @@ describe('Strava Service', () => {
       });
 
       it('updates user activity', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
-        const getTokenSpy = jest
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .spyOn(StravaService.prototype as any, 'getToken')
-          .mockImplementationOnce(() => Promise.resolve('access_token'));
-        jest.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
           id: 1,
           name: 'Morning Run',
           sport_type: 'Run',
@@ -1086,7 +1087,7 @@ describe('Strava Service', () => {
           elapsed_time: 1,
           total_elevation_gain: 1.2,
         });
-        jest.spyOn(userService, 'updateActivity');
+        vi.spyOn(userService, 'updateActivity');
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -1118,8 +1119,8 @@ describe('Strava Service', () => {
 
     describe('activity delete event', () => {
       it('logs if activity could not be deleted', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userService, 'deleteActivity').mockRejectedValueOnce(undefined);
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userService, 'deleteActivity').mockRejectedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -1141,8 +1142,8 @@ describe('Strava Service', () => {
       });
 
       it('deletes activity', async () => {
-        jest.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
-        jest.spyOn(userService, 'deleteActivity').mockResolvedValueOnce(undefined);
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userService, 'deleteActivity').mockResolvedValueOnce(undefined);
 
         const service = new StravaService();
         await service.handleWebhookEvent({
@@ -1190,7 +1191,7 @@ describe('Strava Service', () => {
           ],
           1,
         );
-      }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
+      }).toThrowErrorMatchingInlineSnapshot(`[Error: Available data cannot be converted to a valid geometry]`);
     });
 
     it('throws if streamset has no latlng stream', () => {
@@ -1215,7 +1216,7 @@ describe('Strava Service', () => {
           },
           1,
         );
-      }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
+      }).toThrowErrorMatchingInlineSnapshot(`[Error: Available data cannot be converted to a valid geometry]`);
     });
 
     it('throws if streams are not all synchronized with distance stream', () => {
@@ -1250,7 +1251,7 @@ describe('Strava Service', () => {
           },
           1,
         );
-      }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
+      }).toThrowErrorMatchingInlineSnapshot(`[Error: Available data cannot be converted to a valid geometry]`);
     });
 
     it('throws if streams are not all of same size', () => {
@@ -1282,7 +1283,7 @@ describe('Strava Service', () => {
           },
           1,
         );
-      }).toThrowErrorMatchingInlineSnapshot(`"Available data cannot be converted to a valid geometry"`);
+      }).toThrowErrorMatchingInlineSnapshot(`[Error: Available data cannot be converted to a valid geometry]`);
     });
 
     it('converts streamset to geojson', () => {

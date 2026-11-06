@@ -1,12 +1,13 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TokenChecker } from '../../../src/auth/c2c-token-check';
 import log from '../../../src/helpers/logger';
 
-jest.mock('axios');
+vi.mock('axios');
 
 const answer = (status: number, data: unknown = {}): void => {
-  jest.mocked(axios).get.mockResolvedValueOnce({ status, data });
+  vi.mocked(axios).get.mockResolvedValueOnce({ status, data });
 };
 
 describe('TokenChecker', () => {
@@ -15,9 +16,9 @@ describe('TokenChecker', () => {
 
   beforeEach(() => {
     now = 1_000_000;
-    jest.clearAllMocks();
-    jest.mocked(axios).get.mockReset();
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.mocked(axios).get.mockReset();
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -58,7 +59,7 @@ describe('TokenChecker', () => {
 
   it.each([
     ['a 5xx', (): void => answer(502)],
-    ['a network error', (): void => void jest.mocked(axios).get.mockRejectedValueOnce(new Error('ECONNREFUSED'))],
+    ['a network error', (): void => void vi.mocked(axios).get.mockRejectedValueOnce(new Error('ECONNREFUSED'))],
   ])('refuses without caching on %s', async (_, fail) => {
     const tokens = checker();
     fail();

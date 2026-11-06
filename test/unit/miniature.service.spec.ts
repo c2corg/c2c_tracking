@@ -1,16 +1,17 @@
 import axios from 'axios';
+import { describe, expect, it, vi } from 'vitest';
 
 import { MiniatureService } from '../../src/miniature.service';
 import { storage } from '../../src/storage/storage';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Miniature service', () => {
   describe('generateMiniature', () => {
     it('simplifies geometry and returns image from API', async () => {
       const data = new ArrayBuffer(1);
-      jest.mocked(axios).get.mockResolvedValueOnce({ data });
-      jest.spyOn(storage, 'put').mockResolvedValueOnce(undefined);
+      vi.mocked(axios).get.mockResolvedValueOnce({ data });
+      vi.spyOn(storage, 'put').mockResolvedValueOnce(undefined);
 
       const service = new MiniatureService();
       const id = await service.generateMiniature({
@@ -29,7 +30,7 @@ describe('Miniature service', () => {
 
   describe('deleteMiniature', () => {
     it('calls storage to delete miniature', async () => {
-      jest.spyOn(storage, 'delete').mockResolvedValueOnce(undefined);
+      vi.spyOn(storage, 'delete').mockResolvedValueOnce(undefined);
 
       const service = new MiniatureService();
       await service.deleteMiniature('id.png');

@@ -1,6 +1,8 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import log from '../../../../src/helpers/logger';
 import { miniatureService } from '../../../../src/miniature.service';
 import { activityRepository } from '../../../../src/repository/activity.repository';
@@ -13,28 +15,30 @@ const FAR_FUTURE = 10000000000;
 
 describe('Coros Service', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.resetAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
-    const timers = jest.useFakeTimers();
+    const timers = vi.useFakeTimers();
     timers.setSystemTime(new Date('1983-08-25'));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('requestAccessTokenAndSetupUser', () => {
     it('calls API and setups user', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: [
@@ -52,9 +56,9 @@ describe('Coros Service', () => {
           },
         ],
       });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -92,11 +96,13 @@ describe('Coros Service', () => {
     });
 
     it('filters out activities without geometry', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: [
@@ -111,7 +117,7 @@ describe('Coros Service', () => {
           },
         ],
       });
-      jest.spyOn(corosApi, 'getWorkoutDetails').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'getWorkoutDetails').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: {
@@ -124,8 +130,8 @@ describe('Coros Service', () => {
           endTimezone: 32,
         },
       });
-      jest.spyOn(corosApi, 'getFIT');
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(corosApi, 'getFIT');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -140,16 +146,18 @@ describe('Coros Service', () => {
     });
 
     it('throws if auth cannot be configured', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockRejectedValueOnce(new Error('test'));
-      jest.spyOn(corosApi, 'getWorkouts');
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(corosApi, 'getWorkouts');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
       await expect(service.requestAccessTokenAndSetupUser(1, 'code')).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"test"`,
+        `[Error: test]`,
       );
 
       expect(corosApi.exchangeToken).toHaveBeenCalledTimes(1);
@@ -159,12 +167,14 @@ describe('Coros Service', () => {
     });
 
     it('logs if activity retrieval fails', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(userService, 'addActivities');
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -178,11 +188,13 @@ describe('Coros Service', () => {
     });
 
     it('logs if activity FIT retrieval fails', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: [
@@ -198,8 +210,8 @@ describe('Coros Service', () => {
           },
         ],
       });
-      jest.spyOn(corosApi, 'getFIT').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(corosApi, 'getFIT').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(userService, 'addActivities');
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -217,11 +229,13 @@ describe('Coros Service', () => {
     });
 
     it('logs if activity details provide no FIT URL', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: [
@@ -236,7 +250,7 @@ describe('Coros Service', () => {
           },
         ],
       });
-      jest.spyOn(corosApi, 'getWorkoutDetails').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'getWorkoutDetails').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: {
@@ -249,7 +263,7 @@ describe('Coros Service', () => {
           endTimezone: 32,
         },
       });
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(userService, 'addActivities');
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -267,11 +281,13 @@ describe('Coros Service', () => {
     });
 
     it('logs if geometry cannot be extracted from FIT', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: [
@@ -289,8 +305,8 @@ describe('Coros Service', () => {
           },
         ],
       });
-      jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(new ArrayBuffer(1));
-      jest.spyOn(userService, 'addActivities');
+      vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(new ArrayBuffer(1));
+      vi.spyOn(userService, 'addActivities');
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -308,11 +324,13 @@ describe('Coros Service', () => {
     });
 
     it('logs if activities cannot be saved in DB', async () => {
-      jest
-        .spyOn(corosApi, 'exchangeToken')
-        .mockResolvedValueOnce({ access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' });
-      jest.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+      vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        openId: '1',
+      });
+      vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
         result: '0000',
         message: 'OK',
         data: [
@@ -330,9 +348,9 @@ describe('Coros Service', () => {
           },
         ],
       });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new CorosService();
       await service.requestAccessTokenAndSetupUser(1, 'code');
@@ -362,30 +380,31 @@ describe('Coros Service', () => {
 
   describe('deauthorize', () => {
     it('throws if no matching user is found', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
-      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`"User 1 not found"`);
+      await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
     });
 
     it('throws if no matching auth exists for user', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new CorosService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve Coros info for user 1"`,
+        `[Error: Unable to retrieve Coros info for user 1]`,
       );
     });
 
     it('calls coros API then updates DB', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      jest.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      vi.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new CorosService();
       await service.deauthorize(1);
@@ -402,14 +421,15 @@ describe('Coros Service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      jest.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      jest.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      vi.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(miniatureService, 'deleteMiniature');
 
       const service = new CorosService();
       await service.deauthorize(1);
@@ -428,14 +448,15 @@ describe('Coros Service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      jest.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      vi.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new CorosService();
       await service.deauthorize(1);
@@ -455,14 +476,15 @@ describe('Coros Service', () => {
     });
 
     it('deletes miniatures', async () => {
-      jest
-        .spyOn(userRepository, 'findById')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      jest.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
-      jest.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
-      jest.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      vi.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new CorosService();
       await service.deauthorize(1);
@@ -481,15 +503,15 @@ describe('Coros Service', () => {
 
   describe('getToken', () => {
     beforeEach(() => {
-      jest.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
+      vi.useFakeTimers({ now: new Date('1970-01-01T00:00:01Z') });
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     it('returns access_token if still valid for 1 minute', async () => {
-      jest.spyOn(corosApi, 'refreshAuth');
+      vi.spyOn(corosApi, 'refreshAuth');
 
       const service = new CorosService();
       const result = await service['getToken']({
@@ -501,8 +523,8 @@ describe('Coros Service', () => {
     });
 
     it('refreshes access token validity if current one is expired', async () => {
-      jest.spyOn(corosApi, 'refreshAuth').mockResolvedValueOnce(undefined);
-      jest.spyOn(userService, 'resetCorosAuthExpiration').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(corosApi, 'refreshAuth').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'resetCorosAuthExpiration').mockImplementationOnce(() => Promise.resolve());
 
       const service = new CorosService();
       const result = await service['getToken']({
@@ -518,8 +540,8 @@ describe('Coros Service', () => {
     });
 
     it('returns undefined if refresh fails', async () => {
-      jest.spyOn(corosApi, 'refreshAuth').mockRejectedValueOnce(undefined);
-      jest.spyOn(userService, 'clearCorosTokens').mockResolvedValueOnce(undefined);
+      vi.spyOn(corosApi, 'refreshAuth').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'clearCorosTokens').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
       const result = await service['getToken']({
@@ -536,9 +558,9 @@ describe('Coros Service', () => {
 
   describe('resyncActivities', () => {
     it('uses the given access token and openId without looking up the user', async () => {
-      jest.spyOn(userRepository, 'findById');
-      jest.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({ result: '0000', message: 'OK', data: [] });
-      jest.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findById');
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({ result: '0000', message: 'OK', data: [] });
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
       const result = await service.resyncActivities(1, 'access_token', 'openId');
@@ -554,12 +576,12 @@ describe('Coros Service', () => {
     });
 
     it('throws if the user has no Coros info', async () => {
-      jest.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
 
       const service = new CorosService();
 
       await expect(service.resyncActivities(1)).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Unable to retrieve Coros info for user 1"`,
+        `[Error: Unable to retrieve Coros info for user 1]`,
       );
     });
   });
@@ -581,7 +603,7 @@ describe('Coros Service', () => {
         ],
       };
 
-      jest.spyOn(userRepository, 'findByCorosId');
+      vi.spyOn(userRepository, 'findByCorosId');
 
       const service = new CorosService();
       await service.handleWebhookEvent(event, 'bad_client', 'secret');
@@ -606,7 +628,7 @@ describe('Coros Service', () => {
         ],
       };
 
-      jest.spyOn(userRepository, 'findByCorosId').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findByCorosId').mockResolvedValueOnce(undefined);
 
       const service = new CorosService();
       await service.handleWebhookEvent(
@@ -637,10 +659,11 @@ describe('Coros Service', () => {
           },
         ],
       };
-      jest
-        .spyOn(userRepository, 'findByCorosId')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      jest.spyOn(corosApi, 'getFIT').mockRejectedValueOnce('error');
+      vi.spyOn(userRepository, 'findByCorosId').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      vi.spyOn(corosApi, 'getFIT').mockRejectedValueOnce('error');
 
       const service = new CorosService();
       await service.handleWebhookEvent(
@@ -672,12 +695,13 @@ describe('Coros Service', () => {
           },
         ],
       };
-      jest
-        .spyOn(userRepository, 'findByCorosId')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockRejectedValueOnce('error');
+      vi.spyOn(userRepository, 'findByCorosId').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockRejectedValueOnce('error');
 
       const service = new CorosService();
       await service.handleWebhookEvent(
@@ -710,12 +734,13 @@ describe('Coros Service', () => {
           },
         ],
       };
-      jest
-        .spyOn(userRepository, 'findByCorosId')
-        .mockResolvedValueOnce({ c2cId: 1, coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE } });
-      const fit = readFileSync(resolve(__dirname, '../../../resources/mini.fit'));
-      jest.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
-      jest.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'findByCorosId').mockResolvedValueOnce({
+        c2cId: 1,
+        coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
+      });
+      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
+      vi.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
       const service = new CorosService();
       await service.handleWebhookEvent(

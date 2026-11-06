@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { AxiosError } from 'axios';
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -25,12 +26,12 @@ describe('Garmin Controller', () => {
   });
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     await garminController['keyv'].clear();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -49,9 +50,10 @@ describe('Garmin Controller', () => {
     });
 
     it('stores retrieved token secret in memory with 1 hour TTL and returns token', async () => {
-      jest
-        .spyOn(garminService, 'requestUnauthorizedRequestToken')
-        .mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminService, 'requestUnauthorizedRequestToken').mockResolvedValueOnce({
+        token: 'token',
+        tokenSecret: 'tokenSecret',
+      });
 
       const response = await authenticated(request.get('/garmin/request-token/1'), 1);
 
@@ -88,7 +90,7 @@ describe('Garmin Controller', () => {
 
     it('throws if user setup fails', async () => {
       await garminController['keyv'].set('1', 'tokenSecret', 100);
-      jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
+      vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await request
         .get('/garmin/exchange-token/1')
@@ -103,7 +105,7 @@ describe('Garmin Controller', () => {
 
     it('setups user', async () => {
       await garminController['keyv'].set('1', 'tokenSecret', 100);
-      jest.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await request
         .get('/garmin/exchange-token/1')
@@ -137,7 +139,7 @@ describe('Garmin Controller', () => {
     });
 
     it('throws if garmin API call fails', async () => {
-      jest.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(new AxiosError());
+      vi.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(new AxiosError());
 
       const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 
@@ -145,7 +147,7 @@ describe('Garmin Controller', () => {
     });
 
     it('throws if garmin API call fails (2)', async () => {
-      jest.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(undefined);
+      vi.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 
@@ -153,7 +155,7 @@ describe('Garmin Controller', () => {
     });
 
     it('deauthorizes user with garmin API', async () => {
-      jest.spyOn(garminService, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminService, 'deauthorize').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 
@@ -165,7 +167,7 @@ describe('Garmin Controller', () => {
 
   describe('POST /garmin/webhook/activities', () => {
     it('validates input', async () => {
-      jest.spyOn(garminService, 'handleActivityWebhook').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminService, 'handleActivityWebhook').mockResolvedValueOnce(undefined);
 
       const response = await request.post('/garmin/webhook/activities').send({ invalid: 'input' });
 
@@ -173,7 +175,7 @@ describe('Garmin Controller', () => {
     });
 
     it('handles webhook', async () => {
-      jest.spyOn(garminService, 'handleActivityWebhook').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminService, 'handleActivityWebhook').mockResolvedValueOnce(undefined);
 
       const body: {
         activityDetails: (GarminActivity & { userId: string; userAccessToken: string })[];
@@ -190,7 +192,7 @@ describe('Garmin Controller', () => {
 
   describe('POST /garmin/webhook/deauthorize', () => {
     it('validates input', async () => {
-      jest.spyOn(garminService, 'handleDeauthorizeWebhook').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminService, 'handleDeauthorizeWebhook').mockResolvedValueOnce(undefined);
 
       const response = await request.post('/garmin/webhook/deauthorize').send({ invalid: 'input' });
 
@@ -198,7 +200,7 @@ describe('Garmin Controller', () => {
     });
 
     it('handles webhook', async () => {
-      jest.spyOn(garminService, 'handleDeauthorizeWebhook').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminService, 'handleDeauthorizeWebhook').mockResolvedValueOnce(undefined);
 
       const body: { deregistrations: { userId: string; userAccessToken: string }[] } = {
         deregistrations: [],

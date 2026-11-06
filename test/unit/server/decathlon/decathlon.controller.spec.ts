@@ -2,6 +2,7 @@ import { Server } from 'http';
 
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -23,11 +24,11 @@ describe('Decathlon Controller', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -68,7 +69,7 @@ describe('Decathlon Controller', () => {
     });
 
     it('throws if user setup fails', async () => {
-      jest.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
+      vi.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(
         request.get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', state: '', scope: '' }),
@@ -80,7 +81,7 @@ describe('Decathlon Controller', () => {
     });
 
     it('setups user', async () => {
-      jest.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(
         request.get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', state: '', scope: '' }),
@@ -107,7 +108,7 @@ describe('Decathlon Controller', () => {
     });
 
     it('retuns 500 if service fails', async () => {
-      jest.spyOn(decathlonService, 'deauthorize').mockRejectedValueOnce(undefined);
+      vi.spyOn(decathlonService, 'deauthorize').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request.post('/decathlon/deauthorize/1'), 1);
 
@@ -116,7 +117,7 @@ describe('Decathlon Controller', () => {
     });
 
     it('deauthorizes user', async () => {
-      jest.spyOn(decathlonService, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonService, 'deauthorize').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(request.post('/decathlon/deauthorize/1'), 1);
 
@@ -134,7 +135,7 @@ describe('Decathlon Controller', () => {
     });
 
     it('handles event', async () => {
-      jest.spyOn(decathlonService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
+      vi.spyOn(decathlonService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
 
       const event: WebhookEvent = {
         user_id: '1',

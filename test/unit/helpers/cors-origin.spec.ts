@@ -1,6 +1,7 @@
-import { createMockContext } from '@shopify/jest-koa-mocks';
+import { describe, expect, it } from 'vitest';
 
 import { corsOrigin, parseExtraOrigins } from '../../../src/helpers/cors-origin';
+import { createMockContext } from '../../utils';
 
 describe('parseExtraOrigins', () => {
   it('returns an empty list for an empty string', () => {

@@ -2,6 +2,7 @@ import { Server } from 'http';
 
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -23,11 +24,11 @@ describe('Coros Controller', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.clearAllMocks();
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -59,7 +60,7 @@ describe('Coros Controller', () => {
     });
 
     it('throws if user setup fails', async () => {
-      jest.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
+      vi.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'longenoughcode' }), 1);
 
@@ -68,7 +69,7 @@ describe('Coros Controller', () => {
     });
 
     it('setups user', async () => {
-      jest.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+      vi.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'longenoughcode' }), 1);
 
@@ -92,7 +93,7 @@ describe('Coros Controller', () => {
     });
 
     it('retuns 500 if service fails', async () => {
-      jest.spyOn(corosService, 'deauthorize').mockRejectedValueOnce(undefined);
+      vi.spyOn(corosService, 'deauthorize').mockRejectedValueOnce(undefined);
 
       const response = await authenticated(request.post('/coros/deauthorize/1'), 1);
 
@@ -101,7 +102,7 @@ describe('Coros Controller', () => {
     });
 
     it('deauthorizes user', async () => {
-      jest.spyOn(corosService, 'deauthorize').mockResolvedValueOnce(undefined);
+      vi.spyOn(corosService, 'deauthorize').mockResolvedValueOnce(undefined);
 
       const response = await authenticated(request.post('/coros/deauthorize/1'), 1);
 
@@ -119,7 +120,7 @@ describe('Coros Controller', () => {
     });
 
     it('handles event', async () => {
-      jest.spyOn(corosService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
+      vi.spyOn(corosService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
 
       const event: WebhookEvent = {
         sportDataList: [

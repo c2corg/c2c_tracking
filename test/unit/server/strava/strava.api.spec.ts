@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   Activity,
@@ -9,11 +10,11 @@ import {
   Subscription,
 } from '../../../../src/server/strava/strava.api';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Strava API', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('exchangeToken', () => {
@@ -25,7 +26,7 @@ describe('Strava API', () => {
         expires_at: 1,
         expires_in: 1,
       };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
 
       const api = new StravaApi();
       const result = await api.exchangeToken('code');
@@ -49,7 +50,7 @@ describe('Strava API', () => {
 
   describe('deauthorize', () => {
     it('calls strava API', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
 
       const api = new StravaApi();
       await api.deauthorize('token');
@@ -71,7 +72,7 @@ describe('Strava API', () => {
         expires_at: 1,
         expires_in: 1,
       };
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: refreshAuth });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: refreshAuth });
 
       const api = new StravaApi();
       const result = await api.refreshAuth('refresh_token');
@@ -104,7 +105,7 @@ describe('Strava API', () => {
           total_elevation_gain: 1.2,
         },
       ];
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: activities });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: activities });
 
       const api = new StravaApi();
       const result = await api.getAthleteActivities('access_token');
@@ -140,7 +141,7 @@ describe('Strava API', () => {
         elapsed_time: 1,
         total_elevation_gain: 1.2,
       };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: activity });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: activity });
 
       const api = new StravaApi();
       const result = await api.getActivity('access_token', 123);
@@ -175,7 +176,7 @@ describe('Strava API', () => {
           ],
         },
       };
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: streamSet });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: streamSet });
 
       const api = new StravaApi();
       const result = await api.getActivityStream('access_token', 1);
@@ -201,14 +202,14 @@ describe('Strava API', () => {
 
   describe('requestSubscriptionCreation', () => {
     it('calls strava API', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({ data: { id: 123 } });
+      vi.mocked(axios).post.mockResolvedValueOnce({ data: { id: 123 } });
 
       const api = new StravaApi();
       const result = await api.requestSubscriptionCreation('http://redirect.to', 'verify_token');
 
       expect(result).toEqual(123);
       expect(axios.post).toHaveBeenCalledTimes(1);
-      const [url, body] = jest.mocked(axios).post.mock.calls[0]!;
+      const [url, body] = vi.mocked(axios).post.mock.calls[0]!;
       expect(url).toEqual('https://www.strava.com/api/v3/push_subscriptions');
       expect(body).toBeInstanceOf(URLSearchParams);
       expect(Object.fromEntries(body as URLSearchParams)).toEqual({
@@ -231,7 +232,7 @@ describe('Strava API', () => {
           updated_at: '2022-01-01T00:00:01Z',
         },
       ];
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
 
       const api = new StravaApi();
       const result = await api.getSubscriptions();
@@ -252,7 +253,7 @@ describe('Strava API', () => {
 
   describe('deleteSubscription', () => {
     it('calls strava API', async () => {
-      jest.mocked(axios).delete.mockImplementation(() => Promise.resolve());
+      vi.mocked(axios).delete.mockImplementation(() => Promise.resolve());
 
       const api = new StravaApi();
       await api.deleteSubscription('123');

@@ -1,24 +1,25 @@
 import axios from 'axios';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import log from '../../../../src/helpers/logger';
 import { SuuntoApi } from '../../../../src/server/suunto/suunto.api';
 
-jest.mock('axios');
+vi.mock('axios');
 
 describe('Suunto API', () => {
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('exchangeToken', () => {
     it('throws if request failed', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
@@ -29,7 +30,7 @@ describe('Suunto API', () => {
     });
 
     it('throws if request response is invalid', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({});
+      vi.mocked(axios).post.mockResolvedValueOnce({});
 
       const api = new SuuntoApi();
 
@@ -40,7 +41,7 @@ describe('Suunto API', () => {
     });
 
     it('returns auth', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({
+      vi.mocked(axios).post.mockResolvedValueOnce({
         data: {
           access_token: 'access_token',
           token_type: 'bearer',
@@ -68,7 +69,7 @@ describe('Suunto API', () => {
 
   describe('refreshAuth', () => {
     it('throws if request failed', async () => {
-      jest.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
@@ -79,7 +80,7 @@ describe('Suunto API', () => {
     });
 
     it('throws if request response is invalid', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({});
+      vi.mocked(axios).post.mockResolvedValueOnce({});
 
       const api = new SuuntoApi();
 
@@ -90,7 +91,7 @@ describe('Suunto API', () => {
     });
 
     it('returns refresh auth', async () => {
-      jest.mocked(axios).post.mockResolvedValueOnce({
+      vi.mocked(axios).post.mockResolvedValueOnce({
         data: {
           access_token: 'access_token',
           token_type: 'bearer',
@@ -117,7 +118,7 @@ describe('Suunto API', () => {
 
   describe('getWorkouts', () => {
     it('throws if request failed', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
@@ -128,7 +129,7 @@ describe('Suunto API', () => {
     });
 
     it('throws if request response is invalid', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({});
+      vi.mocked(axios).get.mockResolvedValueOnce({});
 
       const api = new SuuntoApi();
 
@@ -139,7 +140,7 @@ describe('Suunto API', () => {
     });
 
     it('returns workouts', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({
+      vi.mocked(axios).get.mockResolvedValueOnce({
         data: {
           payload: [
             {
@@ -185,7 +186,7 @@ describe('Suunto API', () => {
 
   describe('getWorkoutDetails', () => {
     it('throws if request failed', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
@@ -196,7 +197,7 @@ describe('Suunto API', () => {
     });
 
     it('throws if request response is invalid', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({});
+      vi.mocked(axios).get.mockResolvedValueOnce({});
 
       const api = new SuuntoApi();
 
@@ -207,7 +208,7 @@ describe('Suunto API', () => {
     });
 
     it('returns workout details', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({
+      vi.mocked(axios).get.mockResolvedValueOnce({
         data: {
           payload: {
             workoutId: 1,
@@ -249,7 +250,7 @@ describe('Suunto API', () => {
 
   describe('getFIT', () => {
     it('throws if request failed', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
@@ -260,7 +261,7 @@ describe('Suunto API', () => {
     });
 
     it('returns FIT', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
+      vi.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 
       const api = new SuuntoApi();
       const result = await api.getFIT('1', 'token', 'subscription');
@@ -276,7 +277,7 @@ describe('Suunto API', () => {
 
   describe('deauthorize', () => {
     it('throws if request failed', async () => {
-      jest.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new SuuntoApi();
 
@@ -287,7 +288,7 @@ describe('Suunto API', () => {
     });
 
     it('calls API', async () => {
-      jest.mocked(axios).get.mockResolvedValueOnce(undefined);
+      vi.mocked(axios).get.mockResolvedValueOnce(undefined);
 
       const api = new SuuntoApi();
       await api.deauthorize('token');

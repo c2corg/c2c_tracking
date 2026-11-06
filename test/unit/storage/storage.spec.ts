@@ -2,6 +2,8 @@ import { readFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { resolve } from 'path';
 
+import { beforeAll, describe, expect, it } from 'vitest';
+
 import { LocalStorage } from '../../../src/storage/storage';
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';

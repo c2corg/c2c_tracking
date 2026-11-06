@@ -2,6 +2,7 @@ import { Server } from 'http';
 
 import supertest from 'supertest';
 import TestAgent from 'supertest/lib/agent';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app';
 import log from '../../../../src/helpers/logger';
@@ -22,10 +23,10 @@ describe('User Controller', () => {
   });
 
   beforeEach(() => {
-    jest.spyOn(log, 'info').mockImplementation(() => {
+    vi.spyOn(log, 'info').mockImplementation(() => {
       /* do nothing */
     });
-    jest.spyOn(log, 'warn').mockImplementation(() => {
+    vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
   });
@@ -44,7 +45,7 @@ describe('User Controller', () => {
     });
 
     it('responds with user activities summaries', async () => {
-      jest.spyOn(userService, 'getUserInfo').mockResolvedValueOnce({
+      vi.spyOn(userService, 'getUserInfo').mockResolvedValueOnce({
         decathlon: 'configured',
         garmin: 'not-configured',
         strava: 'token-lost',
