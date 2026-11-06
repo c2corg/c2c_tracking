@@ -44,7 +44,7 @@
     "@c2corg/fit-parser-extract-geometry": "2.0.0",
     "@keyv/redis": "6.1.0",
     "@mapbox/polyline": "1.2.1",
-    "@paralleldrive/cuid2": "2.2.2",
+    "@paralleldrive/cuid2": "3.3.0",
     "async": "3.2.6",
     "axios": "1.21.0",
     "convict": "6.2.5",
