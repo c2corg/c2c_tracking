@@ -1489,4 +1489,29 @@ describe('Strava Service', () => {
       `);
     });
   });
+
+  // activities without GPS track are common (indoor, manual entries): no warning for them
+  describe('activity geometry', () => {
+    it('is undefined, without warning, for an activity without stream', async () => {
+      vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce(undefined);
+
+      const service = new StravaService();
+
+      await expect(service['retrieveActivityGeometry']('token', 1, '2022-01-01T01:00:01Z')).resolves.toBeUndefined();
+      expect(log.warn).not.toHaveBeenCalled();
+    });
+
+    it('is undefined, without warning, for a stream without coordinates', async () => {
+      vi.spyOn(stravaApi, 'getActivityStream').mockResolvedValueOnce({});
+
+      const service = new StravaService();
+
+      await expect(service['retrieveActivityGeometry']('token', 1, '2022-01-01T01:00:01Z')).resolves.toBeUndefined();
+      expect(log.warn).not.toHaveBeenCalled();
+      expect(log.info).toHaveBeenCalledWith(
+        { err: new Error('Available data cannot be converted to a valid geometry') },
+        'Unable to retrieve Strava geometry for 1',
+      );
+    });
+  });
 });
