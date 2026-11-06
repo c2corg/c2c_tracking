@@ -230,12 +230,21 @@ describe('Coros API', () => {
   });
 
   describe('getFIT', () => {
+    it('refuses URLs that are not external', async () => {
+      const api = new CorosApi();
+
+      await expect(api.getFIT('http://169.254.169.254/latest/meta-data/')).rejects.toThrow(/not an external URL/);
+      expect(axios.get).not.toHaveBeenCalled();
+    });
+
     it('throws if request fails', async () => {
       vi.mocked(axios).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
-      await expect(api.getFIT('url')).rejects.toMatchInlineSnapshot(`[Error: Error on Coros getFIT request]`);
+      await expect(api.getFIT('https://oss.coros.com/fit/1.fit')).rejects.toMatchInlineSnapshot(
+        `[Error: Error on Coros getFIT request]`,
+      );
       expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
@@ -243,7 +252,7 @@ describe('Coros API', () => {
       vi.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
 
       const api = new CorosApi();
-      const result = await api.getFIT('url');
+      const result = await api.getFIT('https://oss.coros.com/fit/1.fit');
 
       expect(result).toMatchInlineSnapshot(`
         ArrayBuffer [

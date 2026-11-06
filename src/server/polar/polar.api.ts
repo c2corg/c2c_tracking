@@ -329,7 +329,7 @@ export class PolarApi {
 
   public async getExercise(token: string, exerciseId: string): Promise<Exercise> {
     try {
-      const response = await axios.get(`${this.baseUrl}exercises/${exerciseId}`, {
+      const response = await axios.get(`${this.baseUrl}exercises/${encodeURIComponent(exerciseId)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return Exercise.parse(response.data);
@@ -340,7 +340,7 @@ export class PolarApi {
 
   public async getExerciseFit(token: string, exerciseId: string): Promise<ArrayBuffer> {
     try {
-      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}exercises/${exerciseId}/fit`, {
+      const response = await axios.get<ArrayBuffer>(`${this.baseUrl}exercises/${encodeURIComponent(exerciseId)}/fit`, {
         responseType: 'arraybuffer',
         headers: { Authorization: `Bearer ${token}` },
       });
