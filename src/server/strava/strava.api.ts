@@ -138,7 +138,7 @@ export type StreamSet = z.infer<typeof StreamSet>;
 export const Subscription = z.object({
   id: z.number().int().positive(),
   application_id: z.number().int().positive(),
-  callback_url: z.string().url(),
+  callback_url: z.url(),
   created_at: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
@@ -159,7 +159,7 @@ export const WebhookEvent = z.object({
   object_type: z.enum(['activity', 'athlete']),
   object_id: z.number().int().positive(),
   aspect_type: z.enum(['create', 'update', 'delete']),
-  updates: z.record(z.string()).optional(),
+  updates: z.record(z.string(), z.string()).optional(),
   owner_id: z.number().int().positive(),
   subscription_id: z.number().int().positive(),
   event_time: z.number().int().positive(),

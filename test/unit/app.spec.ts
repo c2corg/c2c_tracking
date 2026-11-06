@@ -121,7 +121,7 @@ describe('Application', () => {
       const response = await request.post('/strava/webhook').set('Content-Type', 'text/plain').send('hello');
 
       expect(response.status).toBe(400);
-      expect(response.text).toMatch(/"_errors"/);
+      expect(response.text).toMatch(/"errors"/);
     });
   });
 
@@ -160,7 +160,9 @@ describe('Application', () => {
 
       expect(response.status).toBe(400);
       expect(response.headers['content-type']).toMatch(/^text\/plain/);
-      expect(JSON.parse(response.text)).toMatchObject({ object_type: { _errors: [expect.any(String)] } });
+      expect(JSON.parse(response.text)).toMatchObject({
+        properties: { object_type: { errors: [expect.any(String)] } },
+      });
     });
 
     it('answers HTTP errors with their message', async () => {

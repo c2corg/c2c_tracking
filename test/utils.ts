@@ -9,12 +9,11 @@ import {
   type MockResponse,
   type RequestOptions,
 } from 'node-mocks-http';
-import type { VerifiedCallback } from 'passport-custom';
-import { Strategy as CustomStrategy } from 'passport-custom';
+import CustomStrategy from 'passport-custom';
 import type { Test } from 'supertest';
 
 export const AuthenticatedUserStrategy = (userId?: number): CustomStrategy =>
-  new CustomStrategy((_req: Request, callback: VerifiedCallback) => {
+  new CustomStrategy((_req: Request, callback: CustomStrategy.VerifiedCallback) => {
     if (userId) {
       callback(null, { id: userId });
     } else {

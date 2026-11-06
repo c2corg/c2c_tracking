@@ -27,7 +27,7 @@ function validateObject(object: unknown, label: string, schema: ZodType | undefi
           .map((issue) => `[message: ${issue.message}, path: ${issue.path.join('.')}, type: ${issue.code}]`)
           .join(' - ')}`,
       );
-      throw new FieldValidationError(`Invalid ${label}`, result.error.format());
+      throw new FieldValidationError(`Invalid ${label}`, z.treeifyError(result.error));
     }
   }
 }
