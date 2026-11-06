@@ -103,6 +103,17 @@ jobs:
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           build-args: version=${{ fromJSON(steps.docker_meta.outputs.json).labels['org.opencontainers.image.version'] }}
+      # the production hosts (Docker 1.12) only pull the classic manifest: fail if an OCI index was published
+      - name: Check the manifest of the published image
+        if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
+        env:
+          TAGS: ${{ steps.docker_meta.outputs.tags }}
+        run: |
+          for tag in $TAGS; do
+            type=$(docker buildx imagetools inspect --raw "$tag" | jq -r .mediaType)
+            echo "$tag: $type"
+            test "$type" = application/vnd.docker.distribution.manifest.v2+json
+          done
 
   create-release:
     needs: build
