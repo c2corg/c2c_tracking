@@ -1,13 +1,17 @@
-import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { TokenChecker } from '../../../src/auth/c2c-token-check.ts';
+import { http } from '../../../src/helpers/http.ts';
 import log from '../../../src/helpers/logger.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 const answer = (status: number, data: unknown = {}): void => {
-  vi.mocked(axios).get.mockResolvedValueOnce({ status, data });
+  vi.mocked(http).get.mockResolvedValueOnce({ status, data });
 };
 
 describe('TokenChecker', () => {
@@ -17,7 +21,7 @@ describe('TokenChecker', () => {
   beforeEach(() => {
     now = 1_000_000;
     vi.clearAllMocks();
-    vi.mocked(axios).get.mockReset();
+    vi.mocked(http).get.mockReset();
     vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
     });
@@ -26,7 +30,7 @@ describe('TokenChecker', () => {
   it('asks the API with the token', async () => {
     answer(200, { user: 123, expire: 1 });
     expect(await checker().isValid('a.b.c', 123)).toBe(true);
-    expect(axios.get).toHaveBeenCalledWith('https://api.example.org/users/token', {
+    expect(http.get).toHaveBeenCalledWith('https://api.example.org/users/token', {
       headers: { Authorization: 'JWT token="a.b.c"' },
       timeout: 5_000,
       validateStatus: expect.any(Function) as unknown,
@@ -49,17 +53,17 @@ describe('TokenChecker', () => {
     expect(await tokens.isValid('a.b.c', 123)).toBe(true);
     now += 59_000;
     expect(await tokens.isValid('a.b.c', 123)).toBe(true);
-    expect(axios.get).toHaveBeenCalledTimes(1);
+    expect(http.get).toHaveBeenCalledTimes(1);
 
     now += 2_000;
     answer(401);
     expect(await tokens.isValid('a.b.c', 123)).toBe(false);
-    expect(axios.get).toHaveBeenCalledTimes(2);
+    expect(http.get).toHaveBeenCalledTimes(2);
   });
 
   it.each([
     ['a 5xx', (): void => answer(502)],
-    ['a network error', (): void => void vi.mocked(axios).get.mockRejectedValueOnce(new Error('ECONNREFUSED'))],
+    ['a network error', (): void => void vi.mocked(http).get.mockRejectedValueOnce(new Error('ECONNREFUSED'))],
   ])('refuses without caching on %s', async (_, fail) => {
     const tokens = checker();
     fail();

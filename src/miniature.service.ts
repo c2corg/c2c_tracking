@@ -1,8 +1,8 @@
 import polyline from '@mapbox/polyline';
 import { createId } from '@paralleldrive/cuid2';
-import axios from 'axios';
 
 import config from './config.ts';
+import { http } from './helpers/http.ts';
 import { simplify } from './helpers/simplify.ts';
 import type { LineString } from './repository/geojson.ts';
 import { storage } from './storage/storage.ts';
@@ -13,7 +13,7 @@ const mapboxToken = config.get('miniatures.mapbox.token');
 export class MiniatureService {
   public async generateMiniature(geometry: LineString): Promise<string> {
     const id = createId() + '.png';
-    const response = await axios.get<ArrayBuffer>(this.mapboxUrl(geometry), { responseType: 'arraybuffer' });
+    const response = await http.get<ArrayBuffer>(this.mapboxUrl(geometry), { responseType: 'arraybuffer' });
     await storage.put(id, Buffer.from(response.data));
     return id;
   }

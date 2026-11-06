@@ -1,9 +1,8 @@
-import axios from 'axios';
-
 import { AppError, ExternalApiError } from '../errors.ts';
 import { promApiErrorsCounter } from '../metrics/prometheus.ts';
 import type { Vendor } from '../repository/activity.ts';
 
+import { isHttpError } from './http.ts';
 import log from './logger.ts';
 
 export function handleExternalApiError(vendor: Vendor, message: string, error: unknown): AppError {
@@ -11,12 +10,9 @@ export function handleExternalApiError(vendor: Vendor, message: string, error: u
     // do not overwrite error if it's already specified as an app error
     throw error;
   }
-  if (axios.isAxiosError(error)) {
-    promApiErrorsCounter
-      .labels({ vendor, ...(error.config && { name: error.config?.url }), ...(error.code && { code: error.code }) })
-      .inc(1);
+  if (isHttpError(error)) {
+    promApiErrorsCounter.labels({ vendor, name: error.url, ...(error.code && { code: error.code }) }).inc(1);
     log.warn(error);
-    log.warn(error.response?.data);
     throw new ExternalApiError(message, error);
   }
   if (error instanceof Error) {

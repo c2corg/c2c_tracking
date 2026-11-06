@@ -1,11 +1,11 @@
 import { createHmac, randomBytes } from 'crypto';
 
-import axios from 'axios';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { ExternalApiError } from '../../errors.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
+import { http } from '../../helpers/http.ts';
 import { nowSeconds } from '../../helpers/time.ts';
 
 export const GarminAuth = z.object({
@@ -158,7 +158,7 @@ export class GarminApi {
       const nonce = randomBytes(16).toString('hex');
       const signature = encodeURIComponent(this.generateUnauthorizedRequestTokenSignature(timestamp, nonce));
       const authorization = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${this.#consumerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
-      const response = await axios.post(`${this.oauthUrl}oauth/request_token`, null, {
+      const response = await http.post(`${this.oauthUrl}oauth/request_token`, null, {
         headers: { Authorization: authorization },
         responseType: 'text',
       });
@@ -188,7 +188,7 @@ export class GarminApi {
         this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
       );
       const authorization = `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${this.#consumerKey}", oauth_token="${requestToken}", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_signature_method="HMAC-SHA1", oauth_signature="${signature}"`;
-      const response = await axios.post<string>(`${this.oauthUrl}oauth/access_token`, null, {
+      const response = await http.post<string>(`${this.oauthUrl}oauth/access_token`, null, {
         headers: { Authorization: authorization },
         responseType: 'text',
       });
@@ -224,7 +224,7 @@ export class GarminApi {
   ): Promise<void> {
     try {
       const url = `${this.apiUrl}wellness-api/rest/backfill/activityDetails`;
-      await axios.get(`${url}?summaryStartTimeInSeconds=${startInSeconds}&summaryEndTimeInSeconds=${endInSeconds}`, {
+      await http.get(`${url}?summaryStartTimeInSeconds=${startInSeconds}&summaryEndTimeInSeconds=${endInSeconds}`, {
         headers: {
           Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, startInSeconds, endInSeconds),
         },
@@ -237,7 +237,7 @@ export class GarminApi {
   public async deauthorize(token: string, tokenSecret: string): Promise<void> {
     try {
       const url = `${this.apiUrl}wellness-api/rest/user/registration`;
-      await axios.delete<void>(`${url}`, {
+      await http.delete<void>(`${url}`, {
         headers: {
           Authorization: this.generateApiRequestAuth('DELETE', url, token, tokenSecret),
         },

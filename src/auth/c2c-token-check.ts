@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import axios from 'axios';
-
+import { http } from '../helpers/http.ts';
 import log from '../helpers/logger.ts';
 
 const CACHE_TTL_MS = 60_000;
@@ -49,7 +48,7 @@ export class TokenChecker {
   /** Returns the answer of the API, undefined without one. */
   private async ask(token: string, userId: number): Promise<boolean | undefined> {
     try {
-      const response = await axios.get<{ user?: unknown }>(new URL('users/token', this.apiBaseUrl).toString(), {
+      const response = await http.get<{ user?: unknown }>(new URL('users/token', this.apiBaseUrl).toString(), {
         headers: { Authorization: `JWT token="${token}"` },
         timeout: REQUEST_TIMEOUT_MS,
         validateStatus: () => true,
