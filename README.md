@@ -29,6 +29,12 @@ To check it (chain and host name, `DB_HOST` must be a name of the certificate):
 
 You can debug server and tests within Visual Studio Code using the predefined configurations in `launch.json`.
 
+### Routes
+
+Every route validates its input (URL parameters, query, headers, body) with `validate(...)` and zod schemas
+(`src/server/*/*.validators.ts`); routes that read nothing use `validate(noInput)`. The local ESLint rule
+`local/require-route-validation` (`eslint-rules/`) enforces it.
+
 ### Tests
 
 Tests run with [Vitest](https://vitest.dev), in three projects:

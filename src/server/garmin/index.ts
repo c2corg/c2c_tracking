@@ -5,7 +5,7 @@ import { methodNotAllowed } from '../method-not-allowed.ts';
 import { validate } from '../validator.ts';
 
 import { controller } from './garmin.controller.ts';
-import { activityWebhook, deauthorizeWebhook, exchangeToken } from './garmin.validators.ts';
+import { activityWebhook, deauthorize, deauthorizeWebhook, exchangeToken, requestToken } from './garmin.validators.ts';
 
 const router = Router();
 
@@ -15,6 +15,7 @@ router
     ensureAuthenticated,
     ensureUserFromParamsMatchesAuthUser,
     userRateLimit,
+    validate(requestToken),
     controller.requestUnauthorizedRequestToken.bind(controller),
   )
   .all(methodNotAllowed);
@@ -28,6 +29,7 @@ router
     ensureAuthenticated,
     ensureUserFromParamsMatchesAuthUser,
     userRateLimit,
+    validate(deauthorize),
     controller.deauthorize.bind(controller),
   )
   .all(methodNotAllowed);
