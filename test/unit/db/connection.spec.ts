@@ -25,4 +25,11 @@ describe('Database connection', () => {
     expect(retry).toHaveBeenCalledTimes(2);
     expect(retry).toHaveBeenCalledWith(expect.any(Function), { times: 3, interval: 1000 });
   }, 10_000);
+
+  it('is not reachable, within the given time', async () => {
+    const start = Date.now();
+
+    await expect(unreachable.isReachable(200)).resolves.toBe(false);
+    expect(Date.now() - start).toBeLessThan(1000);
+  });
 });
