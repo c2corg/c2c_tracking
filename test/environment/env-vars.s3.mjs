@@ -17,8 +17,6 @@ process.env['MAPBOX_TOKEN'] = 'mapbox-token';
 process.env['STORAGE_BACKEND'] = 's3';
 process.env['S3_ENDPOINT'] = 'http://localhost:9000/';
 process.env['S3_BUCKET'] = 'tracking';
-process.env['S3_REGION'] = 'garage';
-process.env['S3_ACCESS_KEY_ID'] = 'GK000000000000000000000001';
-process.env['S3_SECRET_KEY'] = '0000000000000000000000000000000000000000000000000000000000000002';
-// Garage ignores ACLs and has no anonymous access on its S3 API: the public read is not testable with it
-process.env['S3_SKIP_PUBLIC_CHECK'] = 'true';
+process.env['S3_REGION'] = 'us-east-1';
+process.env['S3_ACCESS_KEY_ID'] = 'tracking-access-key';
+process.env['S3_SECRET_KEY'] = 'tracking-secret-key';

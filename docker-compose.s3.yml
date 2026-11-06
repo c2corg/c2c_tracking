@@ -1,10 +1,14 @@
-# S3 server for the tests of the S3 storage (npm run test:ci:s3). Garage: MinIO's
-# community images are no longer published. Initialise it with
-# test/environment/init-s3.sh once started.
+# S3 server for the tests of the S3 storage (npm run test:s3): Scality CloudServer, in memory. Unlike Garage, it
+# applies the per-object ACLs and serves public objects anonymously, as Exoscale SOS does in production. The bucket
+# is created by the tests (test/environment/s3-global-setup.ts).
 services:
-  garage:
-    image: docker.io/dxflrs/garage:v2.2.0
+  s3:
+    image: ghcr.io/scality/cloudserver:8.8.32@sha256:e958e5547d69120ee4c1064de4bc6e009597766e0674af897cf22c04f4a1c93d
+    environment:
+      S3BACKEND: mem
+      REMOTE_MANAGEMENT_DISABLE: '1'
+      # the credentials of test/environment/env-vars.s3.mjs
+      SCALITY_ACCESS_KEY_ID: tracking-access-key
+      SCALITY_SECRET_ACCESS_KEY: tracking-secret-key
     ports:
-      - 9000:3900
-    volumes:
-      - ./test/environment/garage.toml:/etc/garage.toml:ro
+      - 9000:8000

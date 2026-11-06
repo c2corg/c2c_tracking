@@ -56,11 +56,9 @@ jobs:
           npm run lint
         env:
           CI: ${{ true }}
-      # Garage needs a configuration file and an initialisation: docker-compose.
       - name: Run an S3 server for testing s3
         run: |
-          docker compose -f docker-compose.s3.yml up -d garage
-          test/environment/init-s3.sh
+          docker compose -f docker-compose.s3.yml up -d s3
       - name: npm test & build
         run: |
           npm run test:ci
