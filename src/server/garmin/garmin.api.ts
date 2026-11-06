@@ -1,4 +1,4 @@
-import { createHmac, randomBytes } from 'crypto';
+import { createHash, createHmac, randomBytes } from 'node:crypto';
 
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -6,14 +6,16 @@ import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 import { z } from 'zod';
 
 import config from '../../config.ts';
-import { ExternalApiError } from '../../errors.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 
 dayjs.extend(dayjsPluginUTC);
 
+// OAuth 2 token response. Lifetimes are in seconds.
 export const GarminAuth = z.object({
-  token: z.string().min(10).max(5000),
-  tokenSecret: z.string().min(10).max(5000),
+  access_token: z.string().min(10).max(5000),
+  refresh_token: z.string().min(10).max(5000),
+  expires_in: z.number().int().positive(),
+  refresh_token_expires_in: z.number().int().positive().optional(),
 });
 export type GarminAuth = z.infer<typeof GarminAuth>;
 
@@ -147,130 +149,155 @@ export type GarminActivity = z.infer<typeof GarminActivity>;
 dayjs.extend(dayjsPluginUTC);
 
 export class GarminApi {
-  private readonly oauthUrl = 'https://connectapi.garmin.com/oauth-service/';
+  // OAuth 2 (PKCE): user consent page and token endpoint
+  private readonly authorizeUrl = 'https://connect.garmin.com/oauth2Confirm';
+  private readonly tokenUrl = 'https://diauth.garmin.com/di-oauth2-service/oauth/token';
   private readonly apiUrl = 'https://apis.garmin.com/';
-  readonly #consumerKey: string;
+  readonly #clientId: string;
+  readonly #clientSecret: string;
+  // OAuth 1 credentials, only needed to exchange the legacy user tokens (see scripts/migrate-garmin-oauth2.ts)
   readonly #consumerSecret: string;
+  readonly #redirectUri: string;
 
   constructor() {
-    this.#consumerKey = config.get('trackers.garmin.consumerKey');
+    this.#clientId = config.get('trackers.garmin.consumerKey');
+    this.#clientSecret = config.get('trackers.garmin.clientSecret');
     this.#consumerSecret = config.get('trackers.garmin.consumerSecret');
+    this.#redirectUri = config.get('c2c.frontend.baseUrl') + config.get('trackers.garmin.redirectPath');
   }
 
-  public async requestUnauthorizedRequestToken(): Promise<GarminAuth> {
+  /** PKCE: random code verifier (RFC 7636, 43 chars) and its S256 challenge */
+  public generatePkce(): { codeVerifier: string; codeChallenge: string } {
+    const codeVerifier = randomBytes(32).toString('base64url');
+    const codeChallenge = createHash('sha256').update(codeVerifier).digest('base64url');
+    return { codeVerifier, codeChallenge };
+  }
+
+  public generateState(): string {
+    return randomBytes(16).toString('hex');
+  }
+
+  public getAuthorizationUrl(state: string, codeChallenge: string): string {
+    const params = new URLSearchParams({
+      client_id: this.#clientId,
+      response_type: 'code',
+      redirect_uri: this.#redirectUri,
+      state,
+      code_challenge: codeChallenge,
+      code_challenge_method: 'S256',
+    });
+    return `${this.authorizeUrl}?${params.toString()}`;
+  }
+
+  public async exchangeCode(code: string, codeVerifier: string, state: string): Promise<GarminAuth> {
     try {
-      const timestamp = dayjs().unix();
-      const nonce = randomBytes(16).toString('hex');
-      const signature = encodeURIComponent(this.generateUnauthorizedRequestTokenSignature(timestamp, nonce));
-      const authorization = `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_consumer_key="${this.#consumerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
-      const response = await axios.post(`${this.oauthUrl}oauth/request_token`, null, {
-        headers: { Authorization: authorization },
-        responseType: 'text',
+      return await this.requestToken({
+        grant_type: 'authorization_code',
+        client_id: this.#clientId,
+        client_secret: this.#clientSecret,
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: this.#redirectUri,
+        state,
       });
-      const found = /oauth_token=([\w-]+)&oauth_token_secret=([\w-]+)/.exec(z.string().parse(response.data));
-      if (!found || found.length < 3) {
-        throw new ExternalApiError('Unable to acquire Garmin unauthorized request token');
-      }
-      return { token: found[1]!, tokenSecret: found[2]! };
     } catch (error: unknown) {
-      throw handleExternalApiError('garmin', 'Unable to acquire Garmin unauthorized request token', error);
+      throw handleExternalApiError('garmin', 'Error on Garmin token exchange request', error);
     }
   }
 
-  private generateUnauthorizedRequestTokenSignature(timestamp: number, nonce: string): string {
-    const normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_version=1.0`;
-    const signatureBaseString = `POST&${encodeURIComponent(this.oauthUrl + 'oauth/request_token')}&${encodeURIComponent(
-      normalizedParameters,
-    )}`;
-    return createHmac('sha1', `${this.#consumerSecret}&`).update(signatureBaseString).digest('base64');
-  }
-
-  public async exchangeToken(requestToken: string, requestTokenSecret: string, verifier: string): Promise<GarminAuth> {
+  public async refreshAuth(refreshToken: string): Promise<GarminAuth> {
     try {
-      const timestamp = dayjs().unix();
-      const nonce = randomBytes(16).toString('hex');
-      const signature = encodeURIComponent(
-        this.generateExchangeTokenSignature(timestamp, nonce, requestToken, requestTokenSecret, verifier),
-      );
-      const authorization = `OAuth oauth_verifier="${verifier}", oauth_version="1.0", oauth_consumer_key="${this.#consumerKey}", oauth_token="${requestToken}", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_signature_method="HMAC-SHA1", oauth_signature="${signature}"`;
-      const response = await axios.post<string>(`${this.oauthUrl}oauth/access_token`, null, {
-        headers: { Authorization: authorization },
-        responseType: 'text',
+      return await this.requestToken({
+        grant_type: 'refresh_token',
+        client_id: this.#clientId,
+        client_secret: this.#clientSecret,
+        refresh_token: refreshToken,
       });
-      const found = /oauth_token=([\w-]+)&oauth_token_secret=([\w-]+)/.exec(z.string().parse(response.data));
-      if (!found || found.length < 3) {
-        throw new ExternalApiError('Unable to acquire Garmin access request token');
-      }
-      return { token: found[1]!, tokenSecret: found[2]! };
     } catch (error: unknown) {
-      throw handleExternalApiError('garmin', 'Unable to acquire Garmin access request token', error);
+      throw handleExternalApiError('garmin', 'Error on Garmin refresh token request', error);
     }
   }
 
-  private generateExchangeTokenSignature(
-    timestamp: number,
-    nonce: string,
-    token: string,
-    tokenSecret: string,
-    verifier: string,
-  ): string {
-    const normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_verifier=${verifier}&oauth_version=1.0`;
-    const signatureBaseString = `POST&${encodeURIComponent(this.oauthUrl + 'oauth/access_token')}&${encodeURIComponent(
-      normalizedParameters,
-    )}`;
-    return createHmac('sha1', `${this.#consumerSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64');
+  private async requestToken(params: Record<string, string>): Promise<GarminAuth> {
+    const response = await axios.post<unknown>(this.tokenUrl, new URLSearchParams(params), {
+      headers: { Accept: 'application/json' },
+    });
+    return GarminAuth.parse(response.data);
   }
 
-  public async backfillActivities(
-    startInSeconds: number,
-    endInSeconds: number,
-    token: string,
-    tokenSecret: string,
-  ): Promise<void> {
+  /** Garmin API user id: stable across tokens, and the only user identifier sent in the webhooks with OAuth 2 */
+  public async getUserId(accessToken: string): Promise<string> {
     try {
-      const url = `${this.apiUrl}wellness-api/rest/backfill/activityDetails`;
-      await axios.get(`${url}?summaryStartTimeInSeconds=${startInSeconds}&summaryEndTimeInSeconds=${endInSeconds}`, {
-        headers: {
-          Authorization: this.generateApiRequestAuth('GET', url, token, tokenSecret, startInSeconds, endInSeconds),
-        },
+      const response = await axios.get<unknown>(`${this.apiUrl}wellness-api/rest/user/id`, {
+        headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+      });
+      return z.object({ userId: z.string().min(1) }).parse(response.data).userId;
+    } catch (error: unknown) {
+      throw handleExternalApiError('garmin', 'Unable to retrieve Garmin user id', error);
+    }
+  }
+
+  public async backfillActivities(startInSeconds: number, endInSeconds: number, accessToken: string): Promise<void> {
+    try {
+      await axios.get(`${this.apiUrl}wellness-api/rest/backfill/activityDetails`, {
+        params: { summaryStartTimeInSeconds: startInSeconds, summaryEndTimeInSeconds: endInSeconds },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
     } catch (error: unknown) {
       throw handleExternalApiError('garmin', 'Unable to request Garmin summary activity backfill', error);
     }
   }
 
-  public async deauthorize(token: string, tokenSecret: string): Promise<void> {
+  public async deauthorize(accessToken: string): Promise<void> {
     try {
-      const url = `${this.apiUrl}wellness-api/rest/user/registration`;
-      await axios.delete<void>(`${url}`, {
-        headers: {
-          Authorization: this.generateApiRequestAuth('DELETE', url, token, tokenSecret),
-        },
+      await axios.delete<void>(`${this.apiUrl}wellness-api/rest/user/registration`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
     } catch (error: unknown) {
       throw handleExternalApiError('garmin', 'Error on Garmin deauthorize request', error);
     }
   }
 
-  private generateApiRequestAuth(
-    method: 'GET' | 'POST' | 'DELETE',
-    url: string,
-    token: string,
-    tokenSecret: string,
-    start?: number,
-    end?: number,
-  ): string {
+  /*
+   * Legacy OAuth 1 -> OAuth 2 migration. Only usable once Garmin has enabled OAuth 2 for the app.
+   * Both calls are signed with the user's OAuth 1 token. The OAuth 1 token remains valid 30 days after the exchange.
+   */
+  public async getLegacyUserId(token: string, tokenSecret: string): Promise<string> {
+    try {
+      const url = `${this.apiUrl}wellness-api/rest/user/id`;
+      const response = await axios.get<unknown>(url, {
+        headers: { Authorization: this.generateLegacyAuth('GET', url, token, tokenSecret), Accept: 'application/json' },
+      });
+      return z.object({ userId: z.string().min(1) }).parse(response.data).userId;
+    } catch (error: unknown) {
+      throw handleExternalApiError('garmin', 'Unable to retrieve Garmin user id (OAuth 1)', error);
+    }
+  }
+
+  public async exchangeLegacyToken(token: string, tokenSecret: string): Promise<GarminAuth> {
+    try {
+      const url = `${this.apiUrl}partner-gateway/rest/user/token-exchange`;
+      const response = await axios.post<unknown>(url, null, {
+        headers: {
+          Authorization: this.generateLegacyAuth('POST', url, token, tokenSecret),
+          Accept: 'application/json',
+        },
+      });
+      return GarminAuth.parse(response.data);
+    } catch (error: unknown) {
+      throw handleExternalApiError('garmin', 'Unable to exchange Garmin OAuth 1 token', error);
+    }
+  }
+
+  private generateLegacyAuth(method: 'GET' | 'POST', url: string, token: string, tokenSecret: string): string {
     const timestamp = dayjs().unix();
     const nonce = randomBytes(16).toString('hex');
-    let normalizedParameters = `oauth_consumer_key=${this.#consumerKey}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
-    if (start != undefined && end != undefined) {
-      normalizedParameters += `&summaryEndTimeInSeconds=${end}&summaryStartTimeInSeconds=${start}`;
-    }
+    const normalizedParameters = `oauth_consumer_key=${this.#clientId}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
     const signatureBaseString = `${method}&${encodeURIComponent(url)}&${encodeURIComponent(normalizedParameters)}`;
     const signature = encodeURIComponent(
       createHmac('sha1', `${this.#consumerSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64'),
     );
-    return `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_token="${token}", oauth_consumer_key="${this.#consumerKey}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
+    return `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_token="${token}", oauth_consumer_key="${this.#clientId}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
   }
 }
 

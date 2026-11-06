@@ -19,6 +19,11 @@ type AbstractUserRow = {
   suunto_refresh_token: string | undefined | null;
   garmin_token: string | undefined | null;
   garmin_token_secret: string | undefined | null;
+  garmin_user_id: string | undefined | null;
+  garmin_access_token: string | undefined | null;
+  garmin_expires_at: Date | undefined | null;
+  garmin_refresh_token: string | undefined | null;
+  garmin_refresh_expires_at: Date | undefined | null;
   decathlon_id: string | undefined | null;
   decathlon_access_token: string | undefined | null;
   decathlon_expires_at: Date | undefined | null;
@@ -107,6 +112,23 @@ export class UserRepository {
     }
   }
 
+  public async findByGarminUserId(garminUserId: string): Promise<User | undefined> {
+    try {
+      const conn = await db.getConnection();
+      if (!conn) {
+        throw new IOError('No connection to database');
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const row: UserQueryRow | undefined = await conn(this.#TABLE).where({ garmin_user_id: garminUserId }).first();
+      if (!row) {
+        return undefined;
+      }
+      return this.rowToUser(row);
+    } catch {
+      return undefined;
+    }
+  }
+
   public async findByDecathlonId(decathlonId: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
@@ -157,8 +179,22 @@ export class UserRepository {
     return this.findAllUserIdsWithColumn('coros_id');
   }
 
+  /** Users linked through OAuth 2 */
   public async findAllGarminUserIds(): Promise<number[]> {
-    return this.findAllUserIdsWithColumn('garmin_token');
+    return this.findAllUserIdsWithColumn('garmin_user_id');
+  }
+
+  /** Users still linked through OAuth 1 only (not migrated yet) */
+  public async findAllGarminLegacyUserIds(): Promise<number[]> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+    const rows: { c2c_id: number }[] = await conn(this.#TABLE)
+      .whereNotNull('garmin_token')
+      .whereNull('garmin_user_id')
+      .select('c2c_id');
+    return rows.map((row) => row.c2c_id);
   }
 
   private async findAllUserIdsWithColumn(column: keyof UserQueryRow): Promise<number[]> {
@@ -231,13 +267,25 @@ export class UserRepository {
             refreshToken: decrypt(row.suunto_refresh_token),
           },
         }),
-      ...(row.garmin_token &&
-        row.garmin_token_secret && {
-          garmin: {
-            token: row.garmin_token,
-            tokenSecret: decrypt(row.garmin_token_secret),
-          },
-        }),
+      ...(((row.garmin_user_id && row.garmin_refresh_token) || (row.garmin_token && row.garmin_token_secret)) && {
+        garmin: {
+          ...(row.garmin_user_id &&
+            row.garmin_refresh_token && {
+              userId: row.garmin_user_id,
+              ...(row.garmin_access_token && { accessToken: decrypt(row.garmin_access_token) }),
+              ...(row.garmin_expires_at && { expiresAt: dayjs(row.garmin_expires_at).unix() }),
+              refreshToken: decrypt(row.garmin_refresh_token),
+              ...(row.garmin_refresh_expires_at && {
+                refreshExpiresAt: dayjs(row.garmin_refresh_expires_at).unix(),
+              }),
+            }),
+          ...(row.garmin_token &&
+            row.garmin_token_secret && {
+              token: row.garmin_token,
+              tokenSecret: decrypt(row.garmin_token_secret),
+            }),
+        },
+      }),
       ...(row.decathlon_id &&
         row.decathlon_access_token &&
         row.decathlon_expires_at &&
@@ -302,14 +350,37 @@ export class UserRepository {
           suunto_expires_at: null,
           suunto_refresh_token: null,
         };
-    const garmin: Pick<UserInputRow, 'garmin_token' | 'garmin_token_secret'> | undefined = user.garmin
+    const garmin:
+      | Pick<
+          UserInputRow,
+          | 'garmin_token'
+          | 'garmin_token_secret'
+          | 'garmin_user_id'
+          | 'garmin_access_token'
+          | 'garmin_expires_at'
+          | 'garmin_refresh_token'
+          | 'garmin_refresh_expires_at'
+        >
+      | undefined = user.garmin
       ? {
-          garmin_token: user.garmin.token,
-          garmin_token_secret: encrypt(user.garmin.tokenSecret),
+          garmin_token: user.garmin.token ?? null,
+          garmin_token_secret: user.garmin.tokenSecret ? encrypt(user.garmin.tokenSecret) : null,
+          garmin_user_id: user.garmin.userId ?? null,
+          garmin_access_token: user.garmin.accessToken ? encrypt(user.garmin.accessToken) : null,
+          garmin_expires_at: user.garmin.expiresAt ? dayjs.unix(user.garmin.expiresAt).toDate() : null,
+          garmin_refresh_token: user.garmin.refreshToken ? encrypt(user.garmin.refreshToken) : null,
+          garmin_refresh_expires_at: user.garmin.refreshExpiresAt
+            ? dayjs.unix(user.garmin.refreshExpiresAt).toDate()
+            : null,
         }
       : {
           garmin_token: null,
           garmin_token_secret: null,
+          garmin_user_id: null,
+          garmin_access_token: null,
+          garmin_expires_at: null,
+          garmin_refresh_token: null,
+          garmin_refresh_expires_at: null,
         };
     const decathlon:
       | Pick<

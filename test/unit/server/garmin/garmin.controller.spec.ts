@@ -49,22 +49,27 @@ describe('Garmin Controller', () => {
       expect(response.status).toBe(403);
     });
 
-    it('stores retrieved token secret in memory with 1 hour TTL and returns token', async () => {
-      vi.spyOn(garminService, 'requestUnauthorizedRequestToken').mockResolvedValueOnce({
-        token: 'token',
-        tokenSecret: 'tokenSecret',
+    it('stores the PKCE verifier and state in memory with 1 hour TTL and returns the authorization URL', async () => {
+      vi.spyOn(garminService, 'startAuthorization').mockReturnValueOnce({
+        url: 'https://garmin/consent',
+        state: 'a-state-123456',
+        codeVerifier: 'a-verifier',
       });
 
       const response = await authenticated(request.get('/garmin/request-token/1'), 1);
 
-      expect(await garminController['keyv'].get('1')).toBe('tokenSecret');
-      expect(response.body).toEqual({ token: 'token' });
+      expect(await garminController['keyv'].get('garmin-pkce-1')).toEqual({
+        state: 'a-state-123456',
+        codeVerifier: 'a-verifier',
+      });
+      expect(response.body).toEqual({ url: 'https://garmin/consent' });
     });
 
-    it('fails if the token secret cannot be stored', async () => {
-      vi.spyOn(garminService, 'requestUnauthorizedRequestToken').mockResolvedValueOnce({
-        token: 'token',
-        tokenSecret: 'tokenSecret',
+    it('fails if the PKCE verifier cannot be stored', async () => {
+      vi.spyOn(garminService, 'startAuthorization').mockReturnValueOnce({
+        url: 'https://garmin/consent',
+        state: 'a-state-123456',
+        codeVerifier: 'a-verifier',
       });
       vi.spyOn(garminController['keyv'], 'set').mockResolvedValueOnce(false);
 
@@ -74,74 +79,75 @@ describe('Garmin Controller', () => {
       expect(response.text).toBe('setup-failed');
     });
 
-    it('logs the errors of the token secret store instead of crashing', () => {
+    it('logs the errors of the store instead of crashing', () => {
       const warn = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
 
       expect(() => garminController['keyv'].emit('error', new Error('connection lost'))).not.toThrow();
-      expect(warn).toHaveBeenCalledWith({ err: new Error('connection lost') }, 'Garmin token secret store error');
+      expect(warn).toHaveBeenCalledWith(
+        { err: new Error('connection lost') },
+        'Garmin pending authorization store error',
+      );
     });
   });
 
-  describe('POST /garmin/exchange-token/:userId', () => {
+  describe('GET /garmin/exchange-token/:userId', () => {
     it('requires valid input', async () => {
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'short', oauth_verifier: 'watever' });
+      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'short' });
       expect(response.status).toBe(400);
     });
 
     it('acknowledges authorization denial from user', async () => {
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'NULL' });
+      const response = await request.get('/garmin/exchange-token/1').query({ error: 'access_denied' });
 
       expect(response.status).toBe(403);
       expect(response.text).toEqual('auth-denied');
     });
 
-    it('needs a token secret still stored in keyv', async () => {
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+    it('needs a pending authorization still stored in keyv', async () => {
+      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
+    });
+
+    it('rejects a state that does not match the pending authorization', async () => {
+      await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
+      vi.spyOn(garminService, 'requestAccessTokenAndSetupUser');
+
+      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'another-state-1' });
+
+      expect(response.status).toBe(502);
+      expect(response.text).toEqual('setup-failed');
+      expect(garminService.requestAccessTokenAndSetupUser).not.toHaveBeenCalled();
+
+      await garminController['keyv'].delete('garmin-pkce-1');
     });
 
     it('throws if user setup fails', async () => {
-      await garminController['keyv'].set('1', 'tokenSecret', 100);
+      await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
-
-      // ensure we clear the entry
-      await garminController['keyv'].delete('1');
     });
 
-    it('setups user', async () => {
-      await garminController['keyv'].set('1', 'tokenSecret', 100);
+    it('setups user and consumes the pending authorization', async () => {
+      await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
 
       expect(response.status).toBe(204);
       expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
       expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledWith(
         1,
-        'oauth_token',
-        'tokenSecret',
-        'oauth_verifier',
+        'code',
+        'a-verifier',
+        'a-state-123456',
       );
-
-      // ensure we clear the entry
-      await garminController['keyv'].delete('1');
+      expect(await garminController['keyv'].get('garmin-pkce-1')).toBeUndefined();
     });
   });
 
@@ -198,7 +204,7 @@ describe('Garmin Controller', () => {
       vi.spyOn(garminService, 'handleActivityWebhook').mockResolvedValueOnce(undefined);
 
       const body: {
-        activityDetails: (GarminActivity & { userId: string; userAccessToken: string })[];
+        activityDetails: (GarminActivity & { userId: string; userAccessToken?: string })[];
       } = {
         activityDetails: [],
       };
@@ -222,7 +228,7 @@ describe('Garmin Controller', () => {
     it('handles webhook', async () => {
       vi.spyOn(garminService, 'handleDeauthorizeWebhook').mockResolvedValueOnce(undefined);
 
-      const body: { deregistrations: { userId: string; userAccessToken: string }[] } = {
+      const body: { deregistrations: { userId: string; userAccessToken?: string }[] } = {
         deregistrations: [],
       };
       const response = await request.post('/garmin/webhook/deauthorize').send(body);

@@ -8,6 +8,19 @@ import { garminApi, type GarminAuth } from '../../../../src/server/garmin/garmin
 import { GarminService } from '../../../../src/server/garmin/garmin.service.ts';
 import { userService } from '../../../../src/user.service.ts';
 
+const AUTH: GarminAuth = {
+  access_token: 'access-token',
+  refresh_token: 'refresh-token',
+  expires_in: 86400,
+  refresh_token_expires_in: 7776000,
+};
+const GARMIN = {
+  userId: 'garminUser',
+  accessToken: 'access-token',
+  expiresAt: Math.floor(Date.now() / 1000) + 86400,
+  refreshToken: 'refresh-token',
+};
+
 describe('Garmin service', () => {
   beforeEach(() => {
     vi.spyOn(log, 'info').mockImplementation(() => {
@@ -22,44 +35,112 @@ describe('Garmin service', () => {
     vi.restoreAllMocks();
   });
 
-  describe('requestUnauthorizedRequestToken', () => {
-    it('calls garmin API', async () => {
-      const auth: GarminAuth = {
-        token: 'token',
-        tokenSecret: 'tokenSecret',
-      };
-      vi.spyOn(garminApi, 'requestUnauthorizedRequestToken').mockResolvedValueOnce(auth);
+  describe('startAuthorization', () => {
+    it('generates a PKCE pair and returns the authorization URL', () => {
+      vi.spyOn(garminApi, 'generatePkce').mockReturnValueOnce({ codeVerifier: 'verifier', codeChallenge: 'challenge' });
+      vi.spyOn(garminApi, 'generateState').mockReturnValueOnce('a-state');
+      vi.spyOn(garminApi, 'getAuthorizationUrl').mockReturnValueOnce('https://garmin/consent');
 
       const service = new GarminService();
-      expect(await service.requestUnauthorizedRequestToken()).toEqual(auth);
+      expect(service.startAuthorization()).toEqual({
+        url: 'https://garmin/consent',
+        state: 'a-state',
+        codeVerifier: 'verifier',
+      });
+      expect(garminApi.getAuthorizationUrl).toHaveBeenCalledWith('a-state', 'challenge');
     });
   });
 
   describe('requestAccessTokenAndSetupUser', () => {
     it('calls garmin API and setups user', async () => {
-      vi.spyOn(garminApi, 'exchangeToken').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'exchangeCode').mockResolvedValueOnce(AUTH);
+      vi.spyOn(garminApi, 'getUserId').mockResolvedValueOnce('garminUser');
       vi.spyOn(userService, 'configureGarmin').mockResolvedValueOnce(undefined);
       vi.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
-      vi.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 
       const service = new GarminService();
-      await service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier');
+      await service.requestAccessTokenAndSetupUser(1, 'code', 'verifier', 'state');
 
-      expect(garminApi.exchangeToken).toHaveBeenCalledTimes(1);
-      expect(garminApi.exchangeToken).toHaveBeenCalledWith('requestToken', 'requestTokenSecret', 'verifier');
+      expect(garminApi.exchangeCode).toHaveBeenCalledTimes(1);
+      expect(garminApi.exchangeCode).toHaveBeenCalledWith('code', 'verifier', 'state');
+      expect(garminApi.getUserId).toHaveBeenCalledWith('access-token');
       expect(userService.configureGarmin).toHaveBeenCalledTimes(1);
-      expect(userService.configureGarmin).toHaveBeenCalledWith(1, { token: 'token', tokenSecret: 'tokenSecret' });
+      expect(userService.configureGarmin).toHaveBeenCalledWith(1, AUTH, 'garminUser');
       expect(garminApi.backfillActivities).toHaveBeenCalledTimes(1);
+      expect(garminApi.backfillActivities).toHaveBeenCalledWith(expect.any(Number), expect.any(Number), 'access-token');
     });
 
     it('throws if auth cannot be configured', async () => {
-      vi.spyOn(garminApi, 'exchangeToken').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(garminApi, 'exchangeCode').mockResolvedValueOnce(AUTH);
+      vi.spyOn(garminApi, 'getUserId').mockResolvedValueOnce('garminUser');
       vi.spyOn(userService, 'configureGarmin').mockRejectedValueOnce(new Error('test'));
 
       const service = new GarminService();
       await expect(
-        service.requestAccessTokenAndSetupUser(1, 'requestToken', 'requestTokenSecret', 'verifier'),
+        service.requestAccessTokenAndSetupUser(1, 'code', 'verifier', 'state'),
       ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: test]`);
+    });
+
+    it('does not fail if the initial backfill request fails', async () => {
+      vi.spyOn(garminApi, 'exchangeCode').mockResolvedValueOnce(AUTH);
+      vi.spyOn(garminApi, 'getUserId').mockResolvedValueOnce('garminUser');
+      vi.spyOn(userService, 'configureGarmin').mockResolvedValueOnce(undefined);
+      vi.spyOn(garminApi, 'backfillActivities').mockRejectedValueOnce(new Error('boom'));
+
+      const service = new GarminService();
+      await expect(service.requestAccessTokenAndSetupUser(1, 'code', 'verifier', 'state')).resolves.toBeUndefined();
+    });
+  });
+
+  describe('migrateLegacyUser', () => {
+    it('reads the user id then exchanges the OAuth 1 token, keeping the legacy credentials', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({
+        token: 'token-123456',
+        tokenSecret: 'secret-123456',
+      });
+      vi.spyOn(garminApi, 'getLegacyUserId').mockResolvedValueOnce('garminUser');
+      vi.spyOn(garminApi, 'exchangeLegacyToken').mockResolvedValueOnce(AUTH);
+      vi.spyOn(userService, 'configureGarmin').mockResolvedValueOnce(undefined);
+
+      const service = new GarminService();
+      await service.migrateLegacyUser(1);
+
+      expect(garminApi.getLegacyUserId).toHaveBeenCalledWith('token-123456', 'secret-123456');
+      expect(garminApi.exchangeLegacyToken).toHaveBeenCalledWith('token-123456', 'secret-123456');
+      expect(userService.configureGarmin).toHaveBeenCalledWith(1, AUTH, 'garminUser', true);
+    });
+
+    it('skips users already migrated', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
+      vi.spyOn(garminApi, 'exchangeLegacyToken');
+
+      const service = new GarminService();
+      await service.migrateLegacyUser(1);
+
+      expect(garminApi.exchangeLegacyToken).not.toHaveBeenCalled();
+    });
+
+    it('throws if the user has no OAuth 1 credentials', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
+
+      const service = new GarminService();
+      await expect(service.migrateLegacyUser(1)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: User 1 has no Garmin OAuth 1 credentials]`,
+      );
+    });
+
+    it('does not touch the user if the token exchange fails', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({
+        token: 'token-123456',
+        tokenSecret: 'secret-123456',
+      });
+      vi.spyOn(garminApi, 'getLegacyUserId').mockResolvedValueOnce('garminUser');
+      vi.spyOn(garminApi, 'exchangeLegacyToken').mockRejectedValueOnce(new Error('exchange failed'));
+      vi.spyOn(userService, 'configureGarmin');
+
+      const service = new GarminService();
+      await expect(service.migrateLegacyUser(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: exchange failed]`);
+      expect(userService.configureGarmin).not.toHaveBeenCalled();
     });
   });
 
@@ -81,6 +162,46 @@ describe('Garmin service', () => {
     });
   });
 
+  describe('getAccessToken', () => {
+    it('returns the access token if still valid', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
+      vi.spyOn(garminApi, 'refreshAuth');
+
+      const service = new GarminService();
+      expect(await service.getAccessToken(1)).toBe('access-token');
+      expect(garminApi.refreshAuth).not.toHaveBeenCalled();
+    });
+
+    it('refreshes the access token if expired', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ ...GARMIN, expiresAt: 1 });
+      vi.spyOn(garminApi, 'refreshAuth').mockResolvedValueOnce({ ...AUTH, access_token: 'new-access-token' });
+      vi.spyOn(userService, 'updateGarminAuth').mockResolvedValueOnce(undefined);
+
+      const service = new GarminService();
+      expect(await service.getAccessToken(1)).toBe('new-access-token');
+      expect(garminApi.refreshAuth).toHaveBeenCalledWith('refresh-token');
+      expect(userService.updateGarminAuth).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns undefined if the refresh fails', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ ...GARMIN, expiresAt: 1 });
+      vi.spyOn(garminApi, 'refreshAuth').mockRejectedValueOnce(new Error('expired'));
+
+      const service = new GarminService();
+      expect(await service.getAccessToken(1)).toBeUndefined();
+    });
+
+    it('returns undefined for users not migrated to OAuth 2', async () => {
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({
+        token: 'token-123456',
+        tokenSecret: 'secret-123456',
+      });
+
+      const service = new GarminService();
+      expect(await service.getAccessToken(1)).toBeUndefined();
+    });
+  });
+
   describe('deauthorize', () => {
     it('throws if no matching user is found', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
@@ -94,18 +215,39 @@ describe('Garmin service', () => {
 
     it('throws if no matching auth exists for user', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(undefined);
+      vi.spyOn(userService, 'getGarminInfo');
 
       const service = new GarminService();
       await expect(service.deauthorize(1)).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: User 1 not found]`);
 
-      expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
-      expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
+      expect(userService.getGarminInfo).not.toHaveBeenCalled();
+    });
+
+    it('only cleans up on our side if no valid access token is available', async () => {
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'token-123456', tokenSecret: 'secret-123456' },
+      });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({
+        token: 'token-123456',
+        tokenSecret: 'secret-123456',
+      });
+      vi.spyOn(garminApi, 'deauthorize');
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new GarminService();
+      await service.deauthorize(1);
+
+      expect(garminApi.deauthorize).not.toHaveBeenCalled();
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(userRepository.update).toHaveBeenCalledWith({ c2cId: 1 });
     });
 
     it('calls garmin API then updates DB', async () => {
-      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, garmin: GARMIN });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
       vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce([]);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -118,7 +260,7 @@ describe('Garmin service', () => {
       expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
       expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
       expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
-      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('access-token');
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
@@ -130,8 +272,8 @@ describe('Garmin service', () => {
     });
 
     it('warns if no miniature info could be retrieved', async () => {
-      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, garmin: GARMIN });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
       vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(undefined);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -144,7 +286,7 @@ describe('Garmin service', () => {
       expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
       expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
       expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
-      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('access-token');
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
       expect(log.warn).toHaveBeenCalledTimes(1);
@@ -158,8 +300,8 @@ describe('Garmin service', () => {
     });
 
     it('warns if miniature could not be deleted', async () => {
-      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, garmin: GARMIN });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
       vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -172,7 +314,7 @@ describe('Garmin service', () => {
       expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
       expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
       expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
-      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('access-token');
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
@@ -187,8 +329,8 @@ describe('Garmin service', () => {
     });
 
     it('deletes miniatures', async () => {
-      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
-      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1, garmin: GARMIN });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
       vi.spyOn(garminApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
@@ -201,7 +343,7 @@ describe('Garmin service', () => {
       expect(userService.getGarminInfo).toHaveBeenCalledTimes(1);
       expect(userService.getGarminInfo).toHaveBeenCalledWith(1);
       expect(garminApi.deauthorize).toHaveBeenCalledTimes(1);
-      expect(garminApi.deauthorize).toHaveBeenCalledWith('token', 'tokenSecret');
+      expect(garminApi.deauthorize).toHaveBeenCalledWith('access-token');
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledTimes(1);
       expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
@@ -217,19 +359,14 @@ describe('Garmin service', () => {
 
   describe('requestBackfill', () => {
     it('requests a backfill for the given day window', async () => {
-      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce({ token: 'token', tokenSecret: 'tokenSecret' });
+      vi.spyOn(userService, 'getGarminInfo').mockResolvedValueOnce(GARMIN);
       vi.spyOn(garminApi, 'backfillActivities').mockResolvedValueOnce();
 
       const service = new GarminService();
       await service.requestBackfill(1, 30);
 
       expect(garminApi.backfillActivities).toHaveBeenCalledTimes(1);
-      expect(garminApi.backfillActivities).toHaveBeenCalledWith(
-        expect.any(Number),
-        expect.any(Number),
-        'token',
-        'tokenSecret',
-      );
+      expect(garminApi.backfillActivities).toHaveBeenCalledWith(expect.any(Number), expect.any(Number), 'access-token');
     });
 
     it('throws if no matching auth exists for user', async () => {
@@ -244,7 +381,7 @@ describe('Garmin service', () => {
 
   describe('handleActivityWebhook', () => {
     it('adds activities for each user', async () => {
-      vi.spyOn(userRepository, 'findByGarminToken')
+      vi.spyOn(userRepository, 'findByGarminUserId')
         .mockResolvedValueOnce({ c2cId: 1 })
         .mockResolvedValueOnce({ c2cId: 2 });
       vi.spyOn(userService, 'addActivities').mockImplementation(() => Promise.resolve());
@@ -277,9 +414,9 @@ describe('Garmin service', () => {
         },
       ]);
 
-      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(2);
-      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(1, 'user1Token');
-      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(2, 'user2Token');
+      expect(userRepository.findByGarminUserId).toHaveBeenCalledTimes(2);
+      expect(userRepository.findByGarminUserId).toHaveBeenNthCalledWith(1, '1');
+      expect(userRepository.findByGarminUserId).toHaveBeenNthCalledWith(2, '2');
       expect(userService.addActivities).toHaveBeenCalledTimes(2);
       expect(userService.addActivities).toHaveBeenNthCalledWith(1, 1, {
         date: '1970-01-01T00:00:01Z',
@@ -310,7 +447,7 @@ describe('Garmin service', () => {
     });
 
     it('filters out activities without samples', async () => {
-      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findByGarminUserId').mockResolvedValueOnce({ c2cId: 1 });
       vi.spyOn(userService, 'addActivities');
 
       const service = new GarminService();
@@ -323,12 +460,54 @@ describe('Garmin service', () => {
         },
       ]);
 
-      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(1);
+      expect(userRepository.findByGarminUserId).toHaveBeenCalledTimes(1);
+      expect(userRepository.findByGarminUserId).toHaveBeenCalledWith('1');
+      expect(userService.addActivities).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the OAuth 1 token for users not migrated yet', async () => {
+      vi.spyOn(userRepository, 'findByGarminUserId').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userService, 'addActivities').mockImplementation(() => Promise.resolve());
+
+      const service = new GarminService();
+      await service.handleActivityWebhook([
+        {
+          userId: '1',
+          userAccessToken: 'user1Token',
+          activityId: 1,
+          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
+          samples: [
+            { latitudeInDegree: 1.0, longitudeInDegree: 1.0, startTimeInSeconds: 1 },
+            { latitudeInDegree: 2.0, longitudeInDegree: 2.0, startTimeInSeconds: 2 },
+          ],
+        },
+      ]);
+
       expect(userRepository.findByGarminToken).toHaveBeenCalledWith('user1Token');
+      expect(userService.addActivities).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not look up by token when the notification has none', async () => {
+      vi.spyOn(userRepository, 'findByGarminUserId').mockResolvedValueOnce(undefined);
+      vi.spyOn(userRepository, 'findByGarminToken');
+      vi.spyOn(userService, 'addActivities');
+
+      const service = new GarminService();
+      await service.handleActivityWebhook([
+        {
+          userId: '1',
+          activityId: 1,
+          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
+        },
+      ]);
+
+      expect(userRepository.findByGarminToken).not.toHaveBeenCalled();
       expect(userService.addActivities).not.toHaveBeenCalled();
     });
 
     it('logs and returns if user for activity cannot be found', async () => {
+      vi.spyOn(userRepository, 'findByGarminUserId').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce(undefined);
       vi.spyOn(userService, 'addActivities');
 
@@ -345,12 +524,12 @@ describe('Garmin service', () => {
       expect(userService.addActivities).not.toHaveBeenCalled();
       expect(log.warn).toHaveBeenCalledTimes(1);
       expect(log.warn).toHaveBeenCalledWith(
-        `Garmin activity webhook event for Garmin token user1TokenNotMatchingInDb couldn't be processed: unable to find matching user in DB`,
+        `Garmin activity webhook event for Garmin user 1 couldn't be processed: unable to find matching user in DB`,
       );
     });
 
     it(`logs if some activities couldn't be stored in db`, async () => {
-      vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findByGarminUserId').mockResolvedValueOnce({ c2cId: 1 });
       vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
       const service = new GarminService();
@@ -377,7 +556,7 @@ describe('Garmin service', () => {
 
   describe('handleDeauthorizeWebhook', () => {
     it('calls garmin API then cleans DB', async () => {
-      vi.spyOn(userRepository, 'findByGarminToken')
+      vi.spyOn(userRepository, 'findByGarminUserId')
         .mockResolvedValueOnce({ c2cId: 1 })
         .mockResolvedValueOnce({ c2cId: 2 });
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementation(() => Promise.resolve());
@@ -389,9 +568,9 @@ describe('Garmin service', () => {
         { userId: 'user2', userAccessToken: 'user2AccessToken' },
       ]);
 
-      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(2);
-      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(1, 'user1AccessToken');
-      expect(userRepository.findByGarminToken).toHaveBeenNthCalledWith(2, 'user2AccessToken');
+      expect(userRepository.findByGarminUserId).toHaveBeenCalledTimes(2);
+      expect(userRepository.findByGarminUserId).toHaveBeenNthCalledWith(1, 'user1');
+      expect(userRepository.findByGarminUserId).toHaveBeenNthCalledWith(2, 'user2');
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(2);
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenNthCalledWith(1, 1, 'garmin');
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenNthCalledWith(2, 2, 'garmin');
@@ -401,6 +580,7 @@ describe('Garmin service', () => {
     });
 
     it('logs if matching user is not found', async () => {
+      vi.spyOn(userRepository, 'findByGarminUserId').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'findByGarminToken').mockResolvedValueOnce(undefined);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor');
       vi.spyOn(userRepository, 'update');
@@ -408,8 +588,8 @@ describe('Garmin service', () => {
       const service = new GarminService();
       await service.handleDeauthorizeWebhook([{ userId: 'user1', userAccessToken: 'user1AccessToken' }]);
 
-      expect(userRepository.findByGarminToken).toHaveBeenCalledTimes(1);
-      expect(userRepository.findByGarminToken).toHaveBeenCalledWith('user1AccessToken');
+      expect(userRepository.findByGarminUserId).toHaveBeenCalledTimes(1);
+      expect(userRepository.findByGarminUserId).toHaveBeenCalledWith('user1');
       expect(activityRepository.deleteByUserAndVendor).not.toHaveBeenCalled();
       expect(userRepository.update).not.toHaveBeenCalled();
     });
