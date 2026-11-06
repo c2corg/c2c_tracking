@@ -78,7 +78,7 @@
     "zod": "3.25.48"
   },
   "devDependencies": {
-    "@tsconfig/node20": "20.1.6",
+    "@tsconfig/node20": "20.1.10",
     "@tsconfig/strictest": "2.0.8",
     "@types/async": "3.2.25",
     "@types/convict": "6.1.6",
