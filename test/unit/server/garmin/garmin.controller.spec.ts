@@ -60,6 +60,26 @@ describe('Garmin Controller', () => {
       expect(await garminController['keyv'].get('1')).toBe('tokenSecret');
       expect(response.body).toEqual({ token: 'token' });
     });
+
+    it('fails if the token secret cannot be stored', async () => {
+      vi.spyOn(garminService, 'requestUnauthorizedRequestToken').mockResolvedValueOnce({
+        token: 'token',
+        tokenSecret: 'tokenSecret',
+      });
+      vi.spyOn(garminController['keyv'], 'set').mockResolvedValueOnce(false);
+
+      const response = await authenticated(request.get('/garmin/request-token/1'), 1);
+
+      expect(response.status).toBe(502);
+      expect(response.text).toBe('setup-failed');
+    });
+
+    it('logs the errors of the token secret store instead of crashing', () => {
+      const warn = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+
+      expect(() => garminController['keyv'].emit('error', new Error('connection lost'))).not.toThrow();
+      expect(warn).toHaveBeenCalledWith({ err: new Error('connection lost') }, 'Garmin token secret store error');
+    });
   });
 
   describe('POST /garmin/exchange-token/:userId', () => {
