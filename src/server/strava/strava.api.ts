@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import config from '../../config.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
-import { http } from '../../helpers/http.ts';
+import { http, isHttpError } from '../../helpers/http.ts';
 
 export const Athlete = z.object({
   id: z.number().int().positive(),
@@ -243,7 +243,8 @@ export class StravaApi {
     }
   }
 
-  public async getActivityStream(accessToken: string, id: number): Promise<StreamSet> {
+  // undefined for an activity without GPS track (indoor, manual entry...): Strava answers 404
+  public async getActivityStream(accessToken: string, id: number): Promise<StreamSet | undefined> {
     try {
       const response = await http.get(`${this.baseUrl}activities/${id}/streams`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -251,6 +252,9 @@ export class StravaApi {
       });
       return StreamSet.parse(response.data);
     } catch (error: unknown) {
+      if (isHttpError(error) && error.status === 404) {
+        return undefined;
+      }
       throw handleExternalApiError('strava', 'Error on Strava getActivityStream request', error);
     }
   }

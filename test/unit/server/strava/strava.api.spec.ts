@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { http } from '../../../../src/helpers/http.ts';
+import { http, HttpError } from '../../../../src/helpers/http.ts';
+import log from '../../../../src/helpers/logger.ts';
+import { promApiErrorsCounter } from '../../../../src/metrics/prometheus.ts';
 import type {
   Activity,
   StravaAuth,
@@ -202,6 +204,33 @@ describe('Strava API', () => {
         headers: { Authorization: 'Bearer access_token' },
         params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
       });
+    });
+
+    it('gives nothing, without warning nor API error count, for an activity without GPS track (404)', async () => {
+      const warn = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+      const errors = vi.spyOn(promApiErrorsCounter, 'labels');
+      vi.mocked(http).get.mockRejectedValueOnce(
+        new HttpError('Request failed with status code 404', { method: 'GET', url: 'https://strava' }, { status: 404 }),
+      );
+
+      const api = new StravaApi();
+
+      await expect(api.getActivityStream('access_token', 1)).resolves.toBeUndefined();
+      expect(warn).not.toHaveBeenCalled();
+      expect(errors).not.toHaveBeenCalled();
+    });
+
+    it('still fails on other errors', async () => {
+      vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(
+        new HttpError('Request failed with status code 401', { method: 'GET', url: 'https://strava' }, { status: 401 }),
+      );
+
+      const api = new StravaApi();
+
+      await expect(api.getActivityStream('access_token', 1)).rejects.toThrow(
+        'Error on Strava getActivityStream request',
+      );
     });
   });
 
