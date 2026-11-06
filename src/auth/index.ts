@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import createHttpError from 'http-errors';
 import passport from 'passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
@@ -38,6 +39,15 @@ const ensureUserFromParamsMatchesAuthUser: RequestHandler = (req, _res, next) =>
   next(authenticatedUser?.id === requiredUser ? undefined : createHttpError(403));
 };
 
+// Requests of an authenticated user, per minute. Keyed by user, not by IP: behind the proxy, all users would share it
+const userRateLimit: RequestHandler = rateLimit({
+  windowMs: 60_000,
+  limit: config.get('server.userRateLimit'),
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  keyGenerator: (req) => `user-${(req.user as { id: number } | undefined)?.id ?? 'anonymous'}`,
+});
+
 passport.use(
   new JwtStrategy(
     {
@@ -66,4 +76,4 @@ if (jwtSecretExtra) {
   );
 }
 
-export { passport, ensureAuthenticated, ensureUserFromParamsMatchesAuthUser };
+export { passport, ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, userRateLimit };

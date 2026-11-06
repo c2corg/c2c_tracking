@@ -82,6 +82,12 @@ const config = convict({
       env: 'PORT',
       arg: 'port',
     },
+    userRateLimit: {
+      doc: 'Requests per minute an authenticated user can make',
+      format: 'nat',
+      default: 30,
+      env: 'SERVER_USER_RATE_LIMIT',
+    },
     payload: {
       limit: {
         doc: 'The JSON payload size limit',

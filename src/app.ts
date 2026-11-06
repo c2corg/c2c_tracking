@@ -7,7 +7,7 @@ import createHttpError from 'http-errors';
 import type { LevelWithSilent } from 'pino';
 import { pinoHttp } from 'pino-http';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from './auth/index.ts';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport, userRateLimit } from './auth/index.ts';
 import config from './config.ts';
 import { corsOrigin } from './helpers/cors-origin.ts';
 import enabledIf from './helpers/enabled-if.ts';
@@ -111,8 +111,14 @@ app.use('/garmin', enabledIf(config.get('trackers.garmin.enabled')), garmin);
 app.use('/decathlon', enabledIf(config.get('trackers.decathlon.enabled')), decathlon);
 app.use('/polar', enabledIf(config.get('trackers.polar.enabled')), polar);
 app.use('/coros', enabledIf(config.get('trackers.coros.enabled')), coros);
-app.use('/users/:userId/activities', ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, activities);
-app.use('/users/:userId', ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, users);
+app.use(
+  '/users/:userId/activities',
+  ensureAuthenticated,
+  ensureUserFromParamsMatchesAuthUser,
+  userRateLimit,
+  activities,
+);
+app.use('/users/:userId', ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, userRateLimit, users);
 
 app.use((_req, _res, next) => {
   next(createHttpError(404));

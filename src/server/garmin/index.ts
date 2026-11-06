@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.ts';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, userRateLimit } from '../../auth/index.ts';
 import { methodNotAllowed } from '../method-not-allowed.ts';
 import { validate } from '../validator.ts';
 
@@ -14,6 +14,7 @@ router
   .get(
     ensureAuthenticated,
     ensureUserFromParamsMatchesAuthUser,
+    userRateLimit,
     controller.requestUnauthorizedRequestToken.bind(controller),
   )
   .all(methodNotAllowed);
@@ -23,7 +24,12 @@ router
   .all(methodNotAllowed);
 router
   .route('/deauthorize/:userId')
-  .post(ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, controller.deauthorize.bind(controller))
+  .post(
+    ensureAuthenticated,
+    ensureUserFromParamsMatchesAuthUser,
+    userRateLimit,
+    controller.deauthorize.bind(controller),
+  )
   .all(methodNotAllowed);
 router
   .route('/webhook/activities')
