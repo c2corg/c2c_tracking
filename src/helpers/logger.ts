@@ -1,6 +1,6 @@
 import axios from 'axios';
 import rTracer from 'cls-rtracer';
-import pino, { type DestinationStream, type Logger } from 'pino';
+import { type DestinationStream, type Logger, pino } from 'pino';
 
 /*
  * The request of a failed API call holds secrets: client secrets and tokens in its parameters, body, headers and

@@ -36,7 +36,7 @@ export class ActivityRepository {
       const rows = await conn<ActivityRow>(this.#TABLE).where({ user_id: userId }).orderBy('date', 'desc');
 
       return rows?.map((row) => this.rowToActivity(row));
-    } catch (err) {
+    } catch {
       return [];
     }
   }
@@ -54,7 +54,7 @@ export class ActivityRepository {
       }
 
       return this.rowToActivity(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }

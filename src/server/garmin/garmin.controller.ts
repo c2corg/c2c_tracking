@@ -1,6 +1,5 @@
 import { createKeyv } from '@keyv/redis';
-// eslint-disable-next-line import/no-named-as-default
-import Keyv from 'keyv';
+import { Keyv } from 'keyv';
 import type { Context } from 'koa';
 
 import config from '../../config';

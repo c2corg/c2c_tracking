@@ -118,7 +118,7 @@ describe('Polar Service', () => {
       vi.spyOn(polarApi, 'deleteUser').mockResolvedValueOnce(undefined);
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
-      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
       vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new PolarService();

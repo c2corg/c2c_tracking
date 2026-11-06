@@ -23,7 +23,7 @@ export const isISO8601Duration = (duration: string | undefined): boolean => {
   try {
     parse(duration);
     return true;
-  } catch (error: unknown) {
+  } catch {
     return false;
   }
 };

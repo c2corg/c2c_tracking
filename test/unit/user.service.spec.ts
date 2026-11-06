@@ -1407,7 +1407,7 @@ describe('User service', () => {
     it('logs if miniature cannot be deleted', async () => {
       vi.spyOn(activityRepository, 'getMiniatureByVendorId').mockResolvedValueOnce('miniature.png');
       vi.spyOn(activityRepository, 'deleteByVendorId').mockImplementationOnce(() => Promise.resolve());
-      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
 
       const service = new UserService();
       await service.deleteActivity('strava', '1');

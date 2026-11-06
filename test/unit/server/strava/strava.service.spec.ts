@@ -320,7 +320,7 @@ describe('Strava Service', () => {
         expiresAt: 99999999999,
       });
       vi.spyOn(stravaApi, 'deauthorize').mockResolvedValueOnce(undefined);
-      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(new Error('test'));
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
       vi.spyOn(miniatureService, 'deleteMiniature');
@@ -356,7 +356,7 @@ describe('Strava Service', () => {
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
 
       const service = new StravaService();
       await service.deauthorize(1);

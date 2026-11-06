@@ -4,7 +4,7 @@ import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import type { DecathlonInfo } from '../../repository/user';
@@ -31,7 +31,7 @@ export class DecathlonService {
 
     try {
       await this.resyncActivities(c2cId, auth.access_token);
-    } catch (error: unknown) {
+    } catch {
       // not retrieving past activities should not block the registration process
       log.info(`Unable to retrieve Decathlon activities for user ${c2cId}`);
     }
@@ -95,14 +95,14 @@ export class DecathlonService {
     const miniatures: string[] = [];
     try {
       miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'decathlon')));
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor decathlon`);
     }
     await activityRepository.deleteByUserAndVendor(c2cId, 'decathlon');
     for (const miniature of miniatures) {
       try {
         await miniatureService.deleteMiniature(miniature);
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
     }
@@ -130,7 +130,7 @@ export class DecathlonService {
         const auth = await decathlonApi.refreshAuth(refreshToken);
         await userService.updateDecathlonAuth(c2cId, auth);
         return auth.access_token;
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Decathlon access token refresh failed for user ${c2cId}`);
       }
     }
@@ -188,14 +188,14 @@ export class DecathlonService {
       return;
     }
     let activity: Activity;
-    let geojson: LineString | undefined = undefined;
+    let geojson: LineString | undefined;
     try {
       activity = await decathlonApi.getActivity(token, activityId);
       geojson = this.retrieveActivityGeometry(activity);
       if (!geojson) {
         return;
       }
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
@@ -205,7 +205,7 @@ export class DecathlonService {
     try {
       await userService.addActivities(user.c2cId, this.asRepositoryActivity(activity, geojson));
       promWebhookCounter.labels({ vendor: 'decathlon', subject: 'activity', event: 'create' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
@@ -217,7 +217,7 @@ export class DecathlonService {
     try {
       await userService.deleteActivity('decathlon', activityId);
       promWebhookCounter.labels({ vendor: 'decathlon', subject: 'activity', event: 'delete' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'decathlon', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Decathlon activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
@@ -251,7 +251,7 @@ export class DecathlonService {
     }
     const length = activity.dataSummaries['5'];
     return {
-      vendor: 'decathlon' as Vendor,
+      vendor: 'decathlon',
       vendorId: activity.id.toString(),
       date: activity.startdate,
       name: activity.name,

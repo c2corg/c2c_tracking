@@ -23,7 +23,7 @@ export class PolarRepository {
       }
 
       return decrypt(rows[0].webhook_secret);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }

@@ -66,7 +66,7 @@ export async function start(): Promise<void> {
   process.on('uncaughtException', (error: Error) => {
     // I just received an error that was never handled, time to handle it and then decide whether a restart is needed
     log.error(error);
-    // eslint-disable-next-line no-process-exit
+    // eslint-disable-next-line n/no-process-exit -- the process manager restarts the service
     process.exit(1);
   });
 

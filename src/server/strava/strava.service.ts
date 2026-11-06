@@ -7,7 +7,7 @@ import log from '../../helpers/logger';
 import { truthy } from '../../helpers/utils';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, UpdateActivity, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry, UpdateActivity } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import { stravaRepository } from '../../repository/strava.repository';
@@ -51,7 +51,7 @@ export class StravaService {
 
     try {
       await this.resyncActivities(c2cId, auth.access_token);
-    } catch (error: unknown) {
+    } catch {
       // failing to retrieve activities should not break the registration process
       log.info(`Unable to retrieve Strava activities for user ${c2cId}`);
     }
@@ -114,14 +114,14 @@ export class StravaService {
     const miniatures: string[] = [];
     try {
       miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'strava')));
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor strava`);
     }
     await activityRepository.deleteByUserAndVendor(c2cId, 'strava');
     for (const miniature of miniatures) {
       try {
         await miniatureService.deleteMiniature(miniature);
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
     }
@@ -142,7 +142,7 @@ export class StravaService {
         const auth = await stravaApi.refreshAuth(refreshToken);
         await userService.updateStravaAuth(c2cId, auth);
         return auth.access_token;
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Strava access token refresh failed for user ${c2cId}`);
       }
     }
@@ -189,7 +189,7 @@ export class StravaService {
       throw new NotFoundError('Available data cannot be converted to a valid geometry');
     }
 
-    const layout = !!altStream ? (!!timeStream ? 'XYZM' : 'XYZ') : !!timeStream ? 'XYM' : 'XY';
+    const layout = altStream ? (timeStream ? 'XYZM' : 'XYZ') : timeStream ? 'XYM' : 'XY';
     const coordinates: number[][] = [];
     for (let i = 0; i < distanceStream.original_size; i++) {
       // eslint-disable-next-line security/detect-object-injection
@@ -215,7 +215,9 @@ export class StravaService {
   }
 
   public async setupWebhook(): Promise<void> {
-    (await this.checkWebhookSubscription()) || void this.requestWebhookSubscription();
+    if (!(await this.checkWebhookSubscription())) {
+      void this.requestWebhookSubscription();
+    }
   }
 
   private async checkWebhookSubscription(): Promise<boolean> {
@@ -232,7 +234,7 @@ export class StravaService {
         foundCurrent ? 'Found matching Strava webhook subscription' : 'No matching Strava webhook subscription found',
       );
       return foundCurrent;
-    } catch (error: unknown) {
+    } catch {
       log.warn(
         `Strava webhook subscription status couldn't be checked: unable to retrieve current subscription. Assuming not set`,
       );
@@ -248,13 +250,13 @@ export class StravaService {
         webhookCallbackUrl,
         this.stravaWebhookSubscriptionVerifyToken,
       );
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Strava subscription couldn't be requested, maybe another webhook is already registered`);
       return;
     }
     try {
       await stravaRepository.setSubscription(subscriptionId);
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Strava subscription couldn't be stored in DB`);
     }
   }
@@ -269,7 +271,9 @@ export class StravaService {
       case 'athlete':
         switch (event.aspect_type) {
           case 'delete':
-            event.updates?.['authorized'] === 'false' && (await this.handleAthleteDeleteEvent(event.owner_id));
+            if (event.updates?.['authorized'] === 'false') {
+              await this.handleAthleteDeleteEvent(event.owner_id);
+            }
             break;
           default:
             promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'not_handled' }).inc(1);
@@ -343,7 +347,7 @@ export class StravaService {
       return;
     }
     let activity: Activity;
-    let geojson: LineString | undefined = undefined;
+    let geojson: LineString | undefined;
     try {
       activity = await stravaApi.getActivity(token, activityId);
       geojson = await this.retrieveActivityGeometry(
@@ -354,7 +358,7 @@ export class StravaService {
       if (!geojson) {
         return;
       }
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
@@ -364,7 +368,7 @@ export class StravaService {
     try {
       await userService.addActivities(user.c2cId, this.asNewRepositoryActivity(activity, geojson));
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'create' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
@@ -396,7 +400,7 @@ export class StravaService {
     let activity: Activity;
     try {
       activity = await stravaApi.getActivity(token, activityId);
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
@@ -406,7 +410,7 @@ export class StravaService {
     try {
       await userService.updateActivity(user.c2cId, this.asUpdateRepositoryActivity(activity));
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'update' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity update webhook event for user ${user.c2cId} couldn't be processed: unable to update activity data in DB`,
@@ -418,7 +422,7 @@ export class StravaService {
     try {
       await userService.deleteActivity('strava', activityId.toString());
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'delete' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Strava activity delete webhook event for activity ${activityId} couldn't be processed: unable to delete activity data in DB`,
@@ -428,7 +432,7 @@ export class StravaService {
 
   private asNewRepositoryActivity(activity: Activity, geojson: LineString): NewActivityWithGeometry {
     return {
-      vendor: 'strava' as Vendor,
+      vendor: 'strava',
       vendorId: activity.id.toString(),
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
@@ -442,7 +446,7 @@ export class StravaService {
 
   private asUpdateRepositoryActivity(activity: Activity): UpdateActivity {
     return {
-      vendor: 'strava' as Vendor,
+      vendor: 'strava',
       vendorId: activity.id.toString(),
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,

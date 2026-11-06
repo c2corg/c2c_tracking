@@ -5,7 +5,7 @@ import { NotFoundError } from '../../errors';
 import log from '../../helpers/logger';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
-import { hasGeometry, NewActivity, NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import { hasGeometry, NewActivity, NewActivityWithGeometry } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import type { GarminInfo } from '../../repository/user';
@@ -68,7 +68,9 @@ export class GarminService {
       .filter((sample) => !!sample.latitudeInDegree && !!sample.longitudeInDegree)
       .map((sample) => {
         const coord: number[] = [sample.longitudeInDegree!, sample.latitudeInDegree!, sample.elevationInMeters || 0];
-        sample.startTimeInSeconds && coord.push(sample.startTimeInSeconds);
+        if (sample.startTimeInSeconds) {
+          coord.push(sample.startTimeInSeconds);
+        }
         return coord;
       });
 
@@ -104,14 +106,14 @@ export class GarminService {
     const miniatures: string[] = [];
     try {
       miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'garmin')));
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor garmin`);
     }
     await activityRepository.deleteByUserAndVendor(c2cId, 'garmin');
     for (const miniature of miniatures) {
       try {
         await miniatureService.deleteMiniature(miniature);
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
     }
@@ -149,7 +151,7 @@ export class GarminService {
       try {
         await userService.addActivities(c2cId, ...activities);
         promWebhookCounter.labels({ vendor: 'garmin', subject: 'activity', event: 'create' });
-      } catch (error: unknown) {
+      } catch {
         promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'processing_failed' }).inc(1);
         log.warn(
           `Garmin activity creation webhook event for user ${c2cId} couldn't be processed: unable to insert activity data`,
@@ -175,7 +177,7 @@ export class GarminService {
         const { garmin, ...userWithoutData } = user;
         await userRepository.update({ ...userWithoutData });
         promWebhookCounter.labels({ vendor: 'garmin', subject: 'user', event: 'delete' });
-      } catch (error: unknown) {
+      } catch {
         promWebhookErrorsCounter.labels({ vendor: 'garmin', cause: 'processing_failed' }).inc(1);
       }
     }
@@ -184,7 +186,7 @@ export class GarminService {
   private asRepositoryActivity(activity: GarminActivity): NewActivity {
     const geojson = this.toGeoJSON(activity.samples);
     return {
-      vendor: 'garmin' as Vendor,
+      vendor: 'garmin',
       vendorId: activity.activityId.toString(),
       date: dayjs
         .unix(activity.summary.startTimeInSeconds)

@@ -19,7 +19,7 @@ const PolarAuth = z.object({
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         return BigInt(value);
-      } catch (error) {
+      } catch {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value;
       }
@@ -75,7 +75,7 @@ const WebhookExerciseEvent = z.object({
       try {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         return BigInt(value);
-      } catch (error) {
+      } catch {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return value;
       }
