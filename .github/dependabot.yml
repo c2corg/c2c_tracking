@@ -1,21 +1,33 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: 'weekly'
-  open-pull-requests-limit: 99
-  labels:
-  - dependabot
-- package-ecosystem: docker
-  directory: '/'
-  schedule:
-    interval: 'weekly'
-  labels:
-    - dependabot
-- package-ecosystem: github-actions
-  directory: '/'
-  schedule:
-    interval: 'weekly'
-  labels:
-    - dependabot
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+    # wait a week before proposing a new release: compromised versions are usually caught and yanked by then
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 20
+    labels:
+      - dependabot
+    groups:
+      # one pull request for the minor and patch updates, one per major update
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: docker
+    directory: '/'
+    schedule:
+      interval: weekly
+    labels:
+      - dependabot
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    labels:
+      - dependabot
+    groups:
+      github-actions:
+        patterns: ['*']
