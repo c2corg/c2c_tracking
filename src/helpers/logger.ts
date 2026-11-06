@@ -1,6 +1,7 @@
 import axios from 'axios';
-import rTracer from 'cls-rtracer';
 import { type DestinationStream, type Logger, pino } from 'pino';
+
+import { currentRequestId } from './request-id.ts';
 
 /*
  * The request of a failed API call holds secrets: client secrets and tokens in its parameters, body, headers and
@@ -25,7 +26,7 @@ export const serializeError = (error: unknown): unknown => {
 export const createLogger = (destination?: DestinationStream): Logger => {
   const options = {
     mixin(): object {
-      return { requestId: rTracer.id() };
+      return { requestId: currentRequestId() };
     },
     serializers: { err: serializeError },
   };

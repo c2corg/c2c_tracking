@@ -11,4 +11,4 @@ router.get(config.get('metrics.path'), async (ctx) => {
 });
 koa.use(router.routes());
 
-export const metricsKoa = koa;
+export const metricsApp = koa;

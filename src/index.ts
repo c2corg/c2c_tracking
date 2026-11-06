@@ -10,7 +10,7 @@ import config from './config.ts';
 import { database as db } from './db/index.ts';
 import log from './helpers/logger.ts';
 import { watchMaintenanceFile } from './helpers/maintenance.ts';
-import { metricsKoa } from './metrics/index.ts';
+import { metricsApp } from './metrics/index.ts';
 import { polarService } from './server/polar/polar.service.ts';
 import { stravaService } from './server/strava/strava.service.ts';
 
@@ -94,7 +94,7 @@ export async function start(): Promise<void> {
         void polarService.setupWebhook();
       }),
     );
-    servers.push(metricsKoa.listen(config.get('metrics.port')));
+    servers.push(metricsApp.listen(config.get('metrics.port')));
 
     process.once('SIGINT', (signal: string): void => {
       void closeGracefully(signal, servers);
