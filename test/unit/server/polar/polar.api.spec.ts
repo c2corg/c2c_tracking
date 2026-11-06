@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { CreatedWebhookInfo, Exercise, PolarApi, PolarAuth, WebhookInfo } from '../../../../src/server/polar/polar.api';
+import log from '../../../../src/helpers/logger.ts';
+import type { CreatedWebhookInfo, Exercise, PolarAuth, WebhookInfo } from '../../../../src/server/polar/polar.api.ts';
+import { PolarApi } from '../../../../src/server/polar/polar.api.ts';
 
 vi.mock('axios');
 

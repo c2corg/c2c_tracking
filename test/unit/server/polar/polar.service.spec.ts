@@ -1,17 +1,18 @@
 import JSONBig from 'json-bigint';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import * as utils from '../../../../src/helpers/utils';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { polarRepository } from '../../../../src/repository/polar.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { polarApi, WebhookEvent } from '../../../../src/server/polar/polar.api';
-import { PolarService } from '../../../../src/server/polar/polar.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.ts';
+import * as utils from '../../../../src/helpers/utils.ts';
+import { miniatureService } from '../../../../src/miniature.service.ts';
+import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import { polarRepository } from '../../../../src/repository/polar.repository.ts';
+import { userRepository } from '../../../../src/repository/user.repository.ts';
+import type { WebhookEvent } from '../../../../src/server/polar/polar.api.ts';
+import { polarApi } from '../../../../src/server/polar/polar.api.ts';
+import { PolarService } from '../../../../src/server/polar/polar.service.ts';
+import { userService } from '../../../../src/user.service.ts';
 
-vi.mock('../../../../src/helpers/utils');
+vi.mock('../../../../src/helpers/utils.ts');
 
 describe('Polar Service', () => {
   beforeEach(() => {

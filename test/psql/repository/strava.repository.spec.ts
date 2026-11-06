@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { database as db } from '../../../src/db';
-import { StravaRepository } from '../../../src/repository/strava.repository';
+import { database as db } from '../../../src/db/index.ts';
+import { StravaRepository } from '../../../src/repository/strava.repository.ts';
 
 describe('Strava Repository', () => {
   afterEach(async () => {

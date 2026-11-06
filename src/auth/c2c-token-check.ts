@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 
 import axios from 'axios';
 
-import log from '../helpers/logger';
+import log from '../helpers/logger.ts';
 
 const CACHE_TTL_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 5_000;
@@ -20,12 +20,15 @@ type CacheEntry = { valid: boolean; until: number };
  */
 export class TokenChecker {
   private readonly cache = new Map<string, CacheEntry>();
+  private readonly apiBaseUrl: string;
+  private readonly ttl: number;
+  private readonly now: () => number;
 
-  constructor(
-    private readonly apiBaseUrl: string,
-    private readonly ttl = CACHE_TTL_MS,
-    private readonly now: () => number = Date.now,
-  ) {}
+  constructor(apiBaseUrl: string, ttl = CACHE_TTL_MS, now: () => number = Date.now) {
+    this.apiBaseUrl = apiBaseUrl;
+    this.ttl = ttl;
+    this.now = now;
+  }
 
   public async isValid(token: string, userId: number): Promise<boolean> {
     const key = createHash('sha256').update(token).digest('hex');

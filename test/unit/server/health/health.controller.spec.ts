@@ -1,12 +1,12 @@
-import { Server } from 'http';
+import type { Server } from 'http';
 
 import supertest from 'supertest';
-import TestAgent from 'supertest/lib/agent';
+import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { app } from '../../../../src/app';
-import type { Status } from '../../../../src/health.service';
-import { semverRegex } from '../../../../src/helpers/utils';
+import { app } from '../../../../src/app.ts';
+import type { Status } from '../../../../src/health.service.ts';
+import { semverRegex } from '../../../../src/helpers/utils.ts';
 
 describe('GET /health', () => {
   let server: Server;

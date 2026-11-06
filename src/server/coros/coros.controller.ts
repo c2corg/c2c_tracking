@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent } from './coros.api';
-import { corosService as service } from './coros.service';
+import type { WebhookEvent } from './coros.api.ts';
+import { corosService as service } from './coros.service.ts';
 
 class CorosController {
   public async exchangeToken(ctx: Context): Promise<void> {
@@ -29,7 +29,7 @@ class CorosController {
   }
 
   public webhook(ctx: Context): void {
-    const event = <WebhookEvent>ctx.request.body;
+    const event = ctx.request.body as WebhookEvent;
     void service.handleWebhookEvent(event, ctx.get('client'), ctx.get('secret')); // async handling
     ctx.status = 200; // acknowledge event
     ctx.body = { message: 'ok', result: '0000' };

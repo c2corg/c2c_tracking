@@ -1,10 +1,10 @@
 import Router from '@koa/router';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth';
-import { validate } from '../validator';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.ts';
+import { validate } from '../validator.ts';
 
-import { controller } from './polar.controller';
-import { exchangeToken, webhook } from './polar.validators';
+import { controller } from './polar.controller.ts';
+import { exchangeToken, webhook } from './polar.validators.ts';
 
 const router = new Router();
 

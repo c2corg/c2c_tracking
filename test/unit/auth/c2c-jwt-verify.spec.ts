@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 import { describe, expect, it, vi } from 'vitest';
 
-import verify, { verifyWithOffset } from '../../../src/auth/c2c-jwt-verify';
-import type { TokenChecker } from '../../../src/auth/c2c-token-check';
+import verify, { verifyWithOffset } from '../../../src/auth/c2c-jwt-verify.ts';
+import type { TokenChecker } from '../../../src/auth/c2c-token-check.ts';
 
 const request = (token?: string): Request =>
   ({ headers: token ? { authorization: `JWT token="${token}"` } : {} }) as unknown as Request;

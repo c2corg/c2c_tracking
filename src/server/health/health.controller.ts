@@ -1,9 +1,13 @@
 import type { Context } from 'koa';
 
-import type { HealthService } from '../../health.service';
+import type { HealthService } from '../../health.service.ts';
 
 export default class HealthController {
-  constructor(private readonly health: HealthService) {}
+  private readonly health: HealthService;
+
+  constructor(health: HealthService) {
+    this.health = health;
+  }
 
   public getHealth(ctx: Context): void {
     ctx.body = this.health.getStatus();

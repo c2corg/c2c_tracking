@@ -1,8 +1,8 @@
 import type { Request } from 'express';
 import type { VerifiedCallback } from 'passport-jwt';
 
-import c2cJwtExtractor from './c2c-jwt-extractor';
-import type { TokenChecker } from './c2c-token-check';
+import c2cJwtExtractor from './c2c-jwt-extractor.ts';
+import type { TokenChecker } from './c2c-token-check.ts';
 
 // Largest value of a PostgreSQL `integer`, the type of the user ids
 const MAX_USER_ID = 2_147_483_647;

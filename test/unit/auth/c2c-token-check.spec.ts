@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { TokenChecker } from '../../../src/auth/c2c-token-check';
-import log from '../../../src/helpers/logger';
+import { TokenChecker } from '../../../src/auth/c2c-token-check.ts';
+import log from '../../../src/helpers/logger.ts';
 
 vi.mock('axios');
 

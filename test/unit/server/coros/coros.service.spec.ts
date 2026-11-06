@@ -3,13 +3,14 @@ import { resolve } from 'path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { corosApi, WebhookEvent } from '../../../../src/server/coros/coros.api';
-import { CorosService } from '../../../../src/server/coros/coros.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.ts';
+import { miniatureService } from '../../../../src/miniature.service.ts';
+import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import { userRepository } from '../../../../src/repository/user.repository.ts';
+import type { WebhookEvent } from '../../../../src/server/coros/coros.api.ts';
+import { corosApi } from '../../../../src/server/coros/coros.api.ts';
+import { CorosService } from '../../../../src/server/coros/coros.service.ts';
+import { userService } from '../../../../src/user.service.ts';
 
 const FAR_FUTURE = 10000000000;
 
@@ -56,7 +57,7 @@ describe('Coros Service', () => {
           },
         ],
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
 
@@ -348,7 +349,7 @@ describe('Coros Service', () => {
           },
         ],
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockRejectedValueOnce(undefined);
 
@@ -699,7 +700,7 @@ describe('Coros Service', () => {
         c2cId: 1,
         coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockRejectedValueOnce('error');
 
@@ -738,7 +739,7 @@ describe('Coros Service', () => {
         c2cId: 1,
         coros: { id: '1', accessToken: 'token', expiresAt: FAR_FUTURE },
       });
-      const fit = new Uint8Array(readFileSync(resolve(__dirname, '../../../resources/mini.fit'))).buffer;
+      const fit = new Uint8Array(readFileSync(resolve(import.meta.dirname, '../../../resources/mini.fit'))).buffer;
       vi.spyOn(corosApi, 'getFIT').mockResolvedValueOnce(fit);
       vi.spyOn(userService, 'addActivities').mockImplementationOnce(() => Promise.resolve());
 

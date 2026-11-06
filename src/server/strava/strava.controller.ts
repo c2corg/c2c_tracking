@@ -1,7 +1,7 @@
 import type { Context } from 'koa';
 
-import type { WebhookEvent, WebhookSubscription } from './strava.api';
-import { stravaService as service } from './strava.service';
+import type { WebhookEvent, WebhookSubscription } from './strava.api.ts';
+import { stravaService as service } from './strava.service.ts';
 
 class StravaController {
   public async exchangeToken(ctx: Context): Promise<void> {
@@ -35,7 +35,7 @@ class StravaController {
   }
 
   public webhookSubscription(ctx: Context): void {
-    const query = <WebhookSubscription>(ctx.request.query as unknown);
+    const query = ctx.request.query as unknown as WebhookSubscription;
     if (query['hub.verify_token'] !== service.stravaWebhookSubscriptionVerifyToken) {
       ctx.throw(502, 'Invalid verify token');
     }
@@ -43,7 +43,7 @@ class StravaController {
   }
 
   public webhook(ctx: Context): void {
-    const event = <WebhookEvent>ctx.request.body;
+    const event = ctx.request.body as WebhookEvent;
     void service.handleWebhookEvent(event); // async handling
     ctx.status = 200; // acknowledge event
   }

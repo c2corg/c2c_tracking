@@ -2,10 +2,10 @@ import { createKeyv } from '@keyv/redis';
 import { Keyv } from 'keyv';
 import type { Context } from 'koa';
 
-import config from '../../config';
+import config from '../../config.ts';
 
-import type { GarminActivity } from './garmin.api';
-import { garminService as service } from './garmin.service';
+import type { GarminActivity } from './garmin.api.ts';
+import { garminService as service } from './garmin.service.ts';
 
 class GarminController {
   private readonly keyv;

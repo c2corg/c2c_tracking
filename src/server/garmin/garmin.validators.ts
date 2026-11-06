@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import type { ValidationSchema } from '../validator';
+import type { ValidationSchema } from '../validator.ts';
 
-import { GarminActivity } from './garmin.api';
+import { GarminActivity } from './garmin.api.ts';
 
 export const exchangeToken: ValidationSchema = {
   query: z

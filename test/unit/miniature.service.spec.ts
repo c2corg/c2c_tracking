@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MiniatureService } from '../../src/miniature.service';
-import { storage } from '../../src/storage/storage';
+import { MiniatureService } from '../../src/miniature.service.ts';
+import { storage } from '../../src/storage/storage.ts';
 
 vi.mock('axios');
 

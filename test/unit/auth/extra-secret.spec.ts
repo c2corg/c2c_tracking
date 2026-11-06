@@ -1,9 +1,10 @@
 import { sign } from 'jsonwebtoken';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createMockContext } from '../../utils';
+import type * as AuthModule from '../../../src/auth/index.ts';
+import { createMockContext } from '../../utils.ts';
 
-type Auth = typeof import('../../../src/auth');
+type Auth = typeof AuthModule;
 
 const MAIN_SECRET = 'secret'; // JWT_SECRET_KEY of test/environment/env-vars.mjs
 const EXTRA_SECRET = 'the-extra-secret';
@@ -14,7 +15,7 @@ const loadAuth = async (env: Record<string, string>): Promise<Auth> => {
   Object.assign(process.env, env);
   try {
     vi.resetModules();
-    return await import('../../../src/auth/index.js');
+    return await import('../../../src/auth/index.ts');
   } finally {
     process.env = previous;
   }

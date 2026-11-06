@@ -9,13 +9,13 @@
  * code, so it recovers everything Strava's API can still return. Safe to re-run: userService.addActivities
  * dedupes by vendor+vendorId.
  *
- * Usage: npm run backfill:strava
+ * Usage: npm run backfill:strava (in the Docker image: node scripts/backfill-strava-activities.js)
  * Env: BACKFILL_DELAY_MS (default 1000) - delay between users, to stay under Strava's rate limits.
  */
-import { userRepository } from '../src/repository/user.repository';
-import { stravaService } from '../src/server/strava/strava.service';
+import { userRepository } from '../src/repository/user.repository.ts';
+import { stravaService } from '../src/server/strava/strava.service.ts';
 
-import { runBackfill } from './backfill-common';
+import { runBackfill } from './backfill-common.ts';
 
 void runBackfill(
   'Strava',

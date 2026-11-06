@@ -5,11 +5,11 @@ import { ObjectCannedACL } from '@aws-sdk/client-s3';
 import request from 'supertest';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import config from '../../../src/config';
-import { S3Storage } from '../../../src/storage/storage';
+import config from '../../../src/config.ts';
+import { S3Storage } from '../../../src/storage/storage.ts';
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';
-const buffer = readFileSync(resolve(__dirname, '../../resources/piano.png'));
+const buffer = readFileSync(resolve(import.meta.dirname, '../../resources/piano.png'));
 
 describe('S3 storage', () => {
   let storage: S3Storage;

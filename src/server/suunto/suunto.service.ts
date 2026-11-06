@@ -1,19 +1,24 @@
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 
-import config from '../../config';
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { fitToGeoJSON } from '../../helpers/utils';
-import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import config from '../../config.ts';
+import { NotFoundError } from '../../errors.ts';
+import log from '../../helpers/logger.ts';
+import { fitToGeoJSON } from '../../helpers/utils.ts';
+import {
+  promTokenRenewalErrorsCounter,
+  promWebhookCounter,
+  promWebhookErrorsCounter,
+} from '../../metrics/prometheus.ts';
+import { miniatureService } from '../../miniature.service.ts';
+import { activityRepository } from '../../repository/activity.repository.ts';
+import type { NewActivityWithGeometry } from '../../repository/activity.ts';
+import type { LineString } from '../../repository/geojson.ts';
+import { userRepository } from '../../repository/user.repository.ts';
+import { userService } from '../../user.service.ts';
 
-import { SuuntoAuth, WebhookEvent, Workout, WorkoutSummary, Workouts, suuntoApi, workoutTypes } from './suunto.api';
+import type { SuuntoAuth, WebhookEvent, Workout, WorkoutSummary, Workouts } from './suunto.api.ts';
+import { suuntoApi, workoutTypes } from './suunto.api.ts';
 
 dayjs.extend(dayjsPluginUTC);
 

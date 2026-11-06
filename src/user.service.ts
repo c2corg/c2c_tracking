@@ -1,20 +1,20 @@
 import dayjs from 'dayjs';
 
-import config from './config';
-import { NotFoundError } from './errors';
-import log from './helpers/logger';
-import type { Optional } from './helpers/utils';
-import { miniatureService } from './miniature.service';
-import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity';
-import { activityRepository } from './repository/activity.repository';
-import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user';
-import { userRepository } from './repository/user.repository';
-import type { CorosAuth } from './server/coros/coros.api';
-import type { DecathlonAuth } from './server/decathlon/decathlon.api';
-import type { GarminAuth } from './server/garmin/garmin.api';
-import type { PolarAuth } from './server/polar/polar.api';
-import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api';
-import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api';
+import config from './config.ts';
+import { NotFoundError } from './errors.ts';
+import log from './helpers/logger.ts';
+import type { Optional } from './helpers/utils.ts';
+import { miniatureService } from './miniature.service.ts';
+import { activityRepository } from './repository/activity.repository.ts';
+import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity.ts';
+import { userRepository } from './repository/user.repository.ts';
+import type { DecathlonInfo, GarminInfo, StravaInfo, SuuntoInfo, User } from './repository/user.ts';
+import type { CorosAuth } from './server/coros/coros.api.ts';
+import type { DecathlonAuth } from './server/decathlon/decathlon.api.ts';
+import type { GarminAuth } from './server/garmin/garmin.api.ts';
+import type { PolarAuth } from './server/polar/polar.api.ts';
+import type { StravaAuth, StravaRefreshAuth } from './server/strava/strava.api.ts';
+import type { SuuntoAuth, SuuntoRefreshAuth } from './server/suunto/suunto.api.ts';
 
 type Status = 'not-configured' | 'configured' | 'token-lost';
 

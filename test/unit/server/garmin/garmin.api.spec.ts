@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { GarminApi } from '../../../../src/server/garmin/garmin.api';
+import log from '../../../../src/helpers/logger.ts';
+import { GarminApi } from '../../../../src/server/garmin/garmin.api.ts';
 
 vi.mock('axios');
 

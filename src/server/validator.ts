@@ -2,8 +2,8 @@ import type { Middleware } from '@koa/router';
 import type { Context } from 'koa';
 import type { Schema } from 'zod';
 
-import { FieldValidationError } from '../errors';
-import log from '../helpers/logger';
+import { FieldValidationError } from '../errors.ts';
+import log from '../helpers/logger.ts';
 
 export type ValidationSchema = {
   query?: Schema<object>;

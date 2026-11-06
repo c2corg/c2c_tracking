@@ -1,18 +1,20 @@
 import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc';
+import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 
-import { NotFoundError } from '../../errors';
-import log from '../../helpers/logger';
-import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
-import { miniatureService } from '../../miniature.service';
-import { hasGeometry, NewActivity, NewActivityWithGeometry } from '../../repository/activity';
-import { activityRepository } from '../../repository/activity.repository';
-import type { LineString } from '../../repository/geojson';
-import type { GarminInfo } from '../../repository/user';
-import { userRepository } from '../../repository/user.repository';
-import { userService } from '../../user.service';
+import { NotFoundError } from '../../errors.ts';
+import log from '../../helpers/logger.ts';
+import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.ts';
+import { miniatureService } from '../../miniature.service.ts';
+import { activityRepository } from '../../repository/activity.repository.ts';
+import type { NewActivity, NewActivityWithGeometry } from '../../repository/activity.ts';
+import { hasGeometry } from '../../repository/activity.ts';
+import type { LineString } from '../../repository/geojson.ts';
+import { userRepository } from '../../repository/user.repository.ts';
+import type { GarminInfo } from '../../repository/user.ts';
+import { userService } from '../../user.service.ts';
 
-import { GarminActivity, garminApi, GarminAuth, GarminSample } from './garmin.api';
+import type { GarminActivity, GarminAuth, GarminSample } from './garmin.api.ts';
+import { garminApi } from './garmin.api.ts';
 
 dayjs.extend(dayjsPluginUTC);
 

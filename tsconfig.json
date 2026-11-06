@@ -1,31 +1,23 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
+  "extends": ["@tsconfig/strictest/tsconfig.json", "@tsconfig/node26/tsconfig.json"],
   "compilerOptions": {
     "noEmit": true,
     "resolveJsonModule": true,
-    "useUnknownInCatchVariables": true,
-
-    // strictest until tsnode support extends arrays
-    "strict": true,
-    "allowUnusedLabels": false,
-    "allowUnreachableCode": false,
-    "exactOptionalPropertyTypes": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-
-    "isolatedModules": true,
-
     "checkJs": true,
 
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    // the sources run as they are on Node (type stripping): erasable syntax only, `import type` for types,
+    // and imports with their .ts extension, rewritten to .js in the build
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "test/**/*.mjs", "scripts/**/*.ts", "vitest.config.mts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "test/**/*.mjs",
+    "scripts/**/*.ts",
+    "vitest.config.ts",
+    "eslint.config.mjs"
+  ]
 }

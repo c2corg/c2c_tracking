@@ -2,12 +2,12 @@ import type { Context, Middleware } from 'koa';
 import passport from 'koa-passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 
-import config from '../config';
-import log from '../helpers/logger';
+import config from '../config.ts';
+import log from '../helpers/logger.ts';
 
-import c2cJwtExtractor from './c2c-jwt-extractor';
-import { verifyWithOffset } from './c2c-jwt-verify';
-import { TokenChecker } from './c2c-token-check';
+import c2cJwtExtractor from './c2c-jwt-extractor.ts';
+import { verifyWithOffset } from './c2c-jwt-verify.ts';
+import { TokenChecker } from './c2c-token-check.ts';
 
 const jwtSecret = config.get('auth.jwtSecret');
 const jwtSecretExtra = config.get('auth.jwtSecretExtra');

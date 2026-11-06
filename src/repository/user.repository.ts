@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
 
-import config from '../config';
-import { database as db } from '../db';
-import { IOError } from '../errors';
-import { decrypt, encrypt } from '../helpers/utils';
+import config from '../config.ts';
+import { database as db } from '../db/index.ts';
+import { IOError } from '../errors.ts';
+import { decrypt, encrypt } from '../helpers/utils.ts';
 
-import type { User } from './user';
+import type { User } from './user.ts';
 
 type AbstractUserRow = {
   c2c_id: number;

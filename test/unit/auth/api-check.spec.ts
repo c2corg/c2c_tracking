@@ -2,12 +2,13 @@ import axios from 'axios';
 import { sign } from 'jsonwebtoken';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../src/helpers/logger';
-import { createMockContext } from '../../utils';
+import type * as AuthModule from '../../../src/auth/index.ts';
+import log from '../../../src/helpers/logger.ts';
+import { createMockContext } from '../../utils.ts';
 
 vi.mock('axios');
 
-type Auth = typeof import('../../../src/auth');
+type Auth = typeof AuthModule;
 
 const SECRET = 'secret'; // JWT_SECRET_KEY of test/environment/env-vars.mjs
 
@@ -17,7 +18,7 @@ const loadAuth = async (env: Record<string, string>): Promise<Auth> => {
   Object.assign(process.env, env);
   try {
     vi.resetModules();
-    return await import('../../../src/auth/index.js');
+    return await import('../../../src/auth/index.ts');
   } finally {
     process.env = previous;
   }

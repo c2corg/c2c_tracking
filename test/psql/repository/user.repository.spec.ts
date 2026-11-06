@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { database as db } from '../../../src/db';
-import type { User } from '../../../src/repository/user';
-import { UserRepository } from '../../../src/repository/user.repository';
+import { database as db } from '../../../src/db/index.ts';
+import { UserRepository } from '../../../src/repository/user.repository.ts';
+import type { User } from '../../../src/repository/user.ts';
 
 describe('User Repository', () => {
   afterEach(async () => {

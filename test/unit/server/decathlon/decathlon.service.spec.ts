@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import log from '../../../../src/helpers/logger';
-import { miniatureService } from '../../../../src/miniature.service';
-import { activityRepository } from '../../../../src/repository/activity.repository';
-import { userRepository } from '../../../../src/repository/user.repository';
-import { decathlonApi } from '../../../../src/server/decathlon/decathlon.api';
-import { DecathlonService } from '../../../../src/server/decathlon/decathlon.service';
-import { userService } from '../../../../src/user.service';
+import log from '../../../../src/helpers/logger.ts';
+import { miniatureService } from '../../../../src/miniature.service.ts';
+import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import { userRepository } from '../../../../src/repository/user.repository.ts';
+import { decathlonApi } from '../../../../src/server/decathlon/decathlon.api.ts';
+import { DecathlonService } from '../../../../src/server/decathlon/decathlon.service.ts';
+import { userService } from '../../../../src/user.service.ts';
 
 describe('Decathlon Service', () => {
   beforeEach(() => {

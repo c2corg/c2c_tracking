@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import config from '../../src/config';
-import { HealthService } from '../../src/health.service';
-import { semverRegex } from '../../src/helpers/utils';
+import config from '../../src/config.ts';
+import { HealthService } from '../../src/health.service.ts';
+import { semverRegex } from '../../src/helpers/utils.ts';
 
-vi.mock('../../src/config');
+vi.mock('../../src/config.ts');
 
 describe('Health service', () => {
   it('computes uptime and apps status', () => {

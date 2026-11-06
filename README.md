@@ -6,6 +6,8 @@ Tiny server to handle connection with activity trackers such as Strava, Garmin o
 
 ## Install
 
+Requires Node.js 26 (see `engines`).
+
 ```sh
 npm install
 ```

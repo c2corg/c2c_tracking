@@ -4,13 +4,13 @@
  * general recovery tool, not a fix for a known incident. Safe to re-run: addActivities dedupes by
  * vendor+vendorId.
  *
- * Usage: npm run backfill:coros
+ * Usage: npm run backfill:coros (in the Docker image: node scripts/backfill-coros-activities.js)
  * Env: BACKFILL_DELAY_MS (default 1000) - delay between users, to stay under Coros's rate limits.
  */
-import { userRepository } from '../src/repository/user.repository';
-import { corosService } from '../src/server/coros/coros.service';
+import { userRepository } from '../src/repository/user.repository.ts';
+import { corosService } from '../src/server/coros/coros.service.ts';
 
-import { runBackfill } from './backfill-common';
+import { runBackfill } from './backfill-common.ts';
 
 void runBackfill(
   'Coros',

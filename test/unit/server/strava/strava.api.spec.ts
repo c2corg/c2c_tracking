@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
+import type {
   Activity,
-  StravaApi,
   StravaAuth,
   StravaRefreshAuth,
   StreamSet,
   Subscription,
-} from '../../../../src/server/strava/strava.api';
+} from '../../../../src/server/strava/strava.api.ts';
+import { StravaApi } from '../../../../src/server/strava/strava.api.ts';
 
 vi.mock('axios');
 

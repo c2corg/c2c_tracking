@@ -5,15 +5,15 @@
  * replay requests, it doesn't recover activities directly. Garmin caps each request to roughly a 90-day
  * window, so longer ranges are chunked into multiple sequential calls per user.
  *
- * Usage: BACKFILL_GARMIN_DAYS=180 npm run backfill:garmin
+ * Usage: BACKFILL_GARMIN_DAYS=180 npm run backfill:garmin (in the Docker image: node scripts/backfill-garmin-activities.js)
  * Env:
  *   BACKFILL_GARMIN_DAYS (default 30) - total number of days of history to request.
  *   BACKFILL_DELAY_MS (default 1000) - delay between requests, to stay under Garmin's rate limits.
  */
-import { database } from '../src/db';
-import log from '../src/helpers/logger';
-import { userRepository } from '../src/repository/user.repository';
-import { garminService } from '../src/server/garmin/garmin.service';
+import { database } from '../src/db/index.ts';
+import log from '../src/helpers/logger.ts';
+import { userRepository } from '../src/repository/user.repository.ts';
+import { garminService } from '../src/server/garmin/garmin.service.ts';
 
 const DELAY_MS = Number.parseInt(process.env['BACKFILL_DELAY_MS'] ?? '1000', 10);
 const TOTAL_DAYS = Number.parseInt(process.env['BACKFILL_GARMIN_DAYS'] ?? '30', 10);

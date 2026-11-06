@@ -4,10 +4,10 @@ import { resolve } from 'path';
 
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { LocalStorage } from '../../../src/storage/storage';
+import { LocalStorage } from '../../../src/storage/storage.ts';
 
 const key = 'mtctivk0hjf1wkbckcnyz2rd.png';
-const buffer = readFileSync(resolve(__dirname, '../../resources/piano.png'));
+const buffer = readFileSync(resolve(import.meta.dirname, '../../resources/piano.png'));
 
 describe('Local storage', () => {
   let storage: LocalStorage;

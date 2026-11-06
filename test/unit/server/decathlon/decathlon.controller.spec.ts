@@ -1,14 +1,14 @@
-import { Server } from 'http';
+import type { Server } from 'http';
 
 import supertest from 'supertest';
-import TestAgent from 'supertest/lib/agent';
+import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import type { WebhookEvent } from '../../../../src/server/decathlon/decathlon.api';
-import { decathlonService } from '../../../../src/server/decathlon/decathlon.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.ts';
+import log from '../../../../src/helpers/logger.ts';
+import type { WebhookEvent } from '../../../../src/server/decathlon/decathlon.api.ts';
+import { decathlonService } from '../../../../src/server/decathlon/decathlon.service.ts';
+import { authenticated } from '../../../utils.ts';
 
 describe('Decathlon Controller', () => {
   let server: Server;

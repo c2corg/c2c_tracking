@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth';
-import log from '../../../src/helpers/logger';
-import { AuthenticatedUserStrategy, createMockContext } from '../../utils';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth/index.ts';
+import log from '../../../src/helpers/logger.ts';
+import { AuthenticatedUserStrategy, createMockContext } from '../../utils.ts';
 
 describe('ensureAuthenticated', () => {
   beforeEach(() => {

@@ -1,14 +1,14 @@
-import { Server } from 'http';
+import type { Server } from 'http';
 
 import supertest from 'supertest';
-import TestAgent from 'supertest/lib/agent';
+import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { app } from '../../../../src/app';
-import log from '../../../../src/helpers/logger';
-import type { WebhookEvent } from '../../../../src/server/coros/coros.api';
-import { corosService } from '../../../../src/server/coros/coros.service';
-import { authenticated } from '../../../utils';
+import { app } from '../../../../src/app.ts';
+import log from '../../../../src/helpers/logger.ts';
+import type { WebhookEvent } from '../../../../src/server/coros/coros.api.ts';
+import { corosService } from '../../../../src/server/coros/coros.service.ts';
+import { authenticated } from '../../../utils.ts';
 
 describe('Coros Controller', () => {
   let server: Server;
