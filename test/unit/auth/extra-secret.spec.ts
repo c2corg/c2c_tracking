@@ -2,7 +2,7 @@ import { sign } from 'jsonwebtoken';
 import { describe, expect, it, vi } from 'vitest';
 
 import type * as AuthModule from '../../../src/auth/index.ts';
-import { createMockContext } from '../../utils.ts';
+import { runMiddleware } from '../../utils.ts';
 
 type Auth = typeof AuthModule;
 
@@ -23,9 +23,8 @@ const loadAuth = async (env: Record<string, string>): Promise<Auth> => {
 
 const authenticate = async (auth: Auth, secret: string, sub: number): Promise<unknown> => {
   const token = sign({}, secret, { expiresIn: '1m', subject: sub.toString() });
-  const ctx = createMockContext({ headers: { authorization: `JWT token="${token}"` } });
-  await auth.ensureAuthenticated(ctx, () => Promise.resolve(undefined));
-  return ctx.state['user'] as unknown;
+  const { req } = await runMiddleware(auth.ensureAuthenticated, { headers: { authorization: `JWT token="${token}"` } });
+  return req.user;
 };
 
 describe('JWT with an extra secret', () => {

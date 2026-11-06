@@ -150,10 +150,7 @@ export class DecathlonService {
       const coordinates = this.locationsToGeoJson(activity);
       return coordinates.length ? { type: 'LineString', coordinates } : undefined;
     } catch (error: unknown) {
-      log.info(
-        `Unable to retrieve Decathlon geometry for activity ${activity.id}`,
-        error instanceof Error ? error : undefined,
-      );
+      log.info({ err: error }, `Unable to retrieve Decathlon geometry for activity ${activity.id}`);
       return undefined;
     }
   }

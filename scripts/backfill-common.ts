@@ -30,7 +30,7 @@ export async function runBackfill(
         log.info(`User ${c2cId}: ${count} activity(ies) synced`);
       } catch (error: unknown) {
         failed++;
-        log.warn(`User ${c2cId}: resync failed`, error instanceof Error ? error : undefined);
+        log.warn({ err: error }, `User ${c2cId}: resync failed`);
       }
       processed++;
       await sleep(DELAY_MS);
@@ -40,7 +40,7 @@ export async function runBackfill(
       `Done: ${processed} user(s) processed, ${activitiesRecovered} activity(ies) recovered, ${failed} user(s) failed`,
     );
   } catch (error: unknown) {
-    log.error(`${vendorName} backfill aborted`, error instanceof Error ? error : undefined);
+    log.error({ err: error }, `${vendorName} backfill aborted`);
     process.exitCode = 1;
   } finally {
     await database.closeDatabase();

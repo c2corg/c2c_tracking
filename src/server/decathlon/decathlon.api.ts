@@ -147,13 +147,16 @@ export class DecathlonApi {
 
   public async getActivity(accessToken: string, activityId: string): Promise<Activity> {
     try {
-      const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/activities/${activityId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'x-api-key': this.#apiKey,
-          Accept: 'application/json',
+      const response = await axios.get(
+        `${this.baseUrl}sportstrackingdata/v2/activities/${encodeURIComponent(activityId)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'x-api-key': this.#apiKey,
+            Accept: 'application/json',
+          },
         },
-      });
+      );
       return Activity.parse(response.data);
     } catch (error: unknown) {
       throw handleExternalApiError('decathlon', 'Error on Decathlon getActivity request', error);

@@ -224,8 +224,8 @@ describe('Coros Service', () => {
       expect(userService.addActivities).toHaveBeenCalledWith(1);
       expect(log.info).toHaveBeenCalledTimes(1);
       expect(log.info).toHaveBeenCalledWith(
+        { err: new Error('test') },
         `Unable to retrieve Coros geometry for 1234 (https://coros.com/fit)`,
-        new Error('test'),
       );
     });
 
@@ -675,8 +675,8 @@ describe('Coros Service', () => {
 
       expect(log.info).toHaveBeenCalledTimes(1);
       expect(log.info).toHaveBeenCalledWith(
+        { err: 'error' },
         `Unable to retrieve Coros geometry for 1234 (https://coros.com/fit)`,
-        undefined,
       );
     });
 

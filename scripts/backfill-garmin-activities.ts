@@ -45,7 +45,7 @@ void (async (): Promise<void> => {
         log.info(`User ${c2cId}: backfill requested for the last ${TOTAL_DAYS} day(s)`);
       } catch (error: unknown) {
         failed++;
-        log.warn(`User ${c2cId}: backfill request failed`, error instanceof Error ? error : undefined);
+        log.warn({ err: error }, `User ${c2cId}: backfill request failed`);
       }
       processed++;
     }
@@ -55,7 +55,7 @@ void (async (): Promise<void> => {
         `Garmin delivers the actual activity data asynchronously via the normal webhook over the following while.`,
     );
   } catch (error: unknown) {
-    log.error('Garmin backfill aborted', error instanceof Error ? error : undefined);
+    log.error({ err: error }, 'Garmin backfill aborted');
     process.exitCode = 1;
   } finally {
     await database.closeDatabase();

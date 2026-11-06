@@ -1,5 +1,7 @@
-import type { Context, Middleware } from 'koa';
-import passport from 'koa-passport';
+import type { RequestHandler } from 'express';
+import { rateLimit } from 'express-rate-limit';
+import createHttpError from 'http-errors';
+import passport from 'passport';
 import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 
 import config from '../config.ts';
@@ -29,21 +31,22 @@ const checker = (apiBaseUrl: string, name: string): TokenChecker | undefined => 
 // Passport tries the strategies in order and accepts the first one that validates the token
 const strategies = jwtSecretExtra ? ['jwt', 'jwt-extra'] : ['jwt'];
 
-const ensureAuthenticated: Middleware = (ctx: Context, next: () => Promise<unknown>): Promise<unknown> =>
-  passport.authenticate(strategies, { session: false })(ctx, next);
+const ensureAuthenticated: RequestHandler = passport.authenticate(strategies, { session: false }) as RequestHandler;
 
-const ensureUserFromParamsMatchesAuthUser: Middleware = async (
-  ctx: Context,
-  next: () => Promise<unknown>,
-): Promise<unknown> => {
-  const authenticatedUser: { id: number } | undefined = ctx.state['user'] as { id: number } | undefined;
-  const requiredUser = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
-  if (authenticatedUser?.id === requiredUser) {
-    await next();
-    return;
-  }
-  ctx.throw(403);
+const ensureUserFromParamsMatchesAuthUser: RequestHandler = (req, _res, next) => {
+  const authenticatedUser = req.user as { id: number } | undefined;
+  const requiredUser = Number.parseInt(req.params['userId'] ?? '', 10);
+  next(authenticatedUser?.id === requiredUser ? undefined : createHttpError(403));
 };
+
+// Requests of an authenticated user, per minute. Keyed by user, not by IP: behind the proxy, all users would share it
+const userRateLimit: RequestHandler = rateLimit({
+  windowMs: 60_000,
+  limit: config.get('server.userRateLimit'),
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  keyGenerator: (req) => `user-${(req.user as { id: number } | undefined)?.id ?? 'anonymous'}`,
+});
 
 passport.use(
   new JwtStrategy(
@@ -73,4 +76,4 @@ if (jwtSecretExtra) {
   );
 }
 
-export { passport, ensureAuthenticated, ensureUserFromParamsMatchesAuthUser };
+export { passport, ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, userRateLimit };

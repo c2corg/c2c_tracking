@@ -234,7 +234,7 @@ export class SuuntoApi {
   // id is workout key
   public async getWorkoutDetails(id: string, token: string, subscriptionKey: string): Promise<WorkoutSummary> {
     try {
-      const response = await axios.get(`${this.baseUrl}workouts/${id}`, {
+      const response = await axios.get(`${this.baseUrl}workouts/${encodeURIComponent(id)}`, {
         headers: { Authorization: `Bearer ${token}`, 'Ocp-Apim-Subscription-Key': subscriptionKey },
       });
       return WorkoutSummary.parse(response.data);

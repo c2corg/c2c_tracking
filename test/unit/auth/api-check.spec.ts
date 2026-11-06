@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type * as AuthModule from '../../../src/auth/index.ts';
 import log from '../../../src/helpers/logger.ts';
-import { createMockContext } from '../../utils.ts';
+import { runMiddleware } from '../../utils.ts';
 
 vi.mock('axios');
 
@@ -26,9 +26,8 @@ const loadAuth = async (env: Record<string, string>): Promise<Auth> => {
 
 const authenticate = async (auth: Auth, sub: number): Promise<unknown> => {
   const token = sign({}, SECRET, { expiresIn: '1m', subject: sub.toString() });
-  const ctx = createMockContext({ headers: { authorization: `JWT token="${token}"` } });
-  await auth.ensureAuthenticated(ctx, () => Promise.resolve(undefined));
-  return ctx.state['user'] as unknown;
+  const { req } = await runMiddleware(auth.ensureAuthenticated, { headers: { authorization: `JWT token="${token}"` } });
+  return req.user;
 };
 
 describe('JWT checked by the API', () => {

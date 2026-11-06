@@ -1,26 +1,33 @@
-import Router from '@koa/router';
+import { Router } from 'express';
 
-import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser } from '../../auth/index.ts';
+import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, userRateLimit } from '../../auth/index.ts';
+import { methodNotAllowed } from '../method-not-allowed.ts';
 import { validate } from '../validator.ts';
 
 import { controller } from './suunto.controller.ts';
 import { exchangeToken, webhook } from './suunto.validators.ts';
 
-const router = new Router();
+const router = Router();
 
-router.get(
-  '/exchange-token/:userId',
-  ensureAuthenticated,
-  ensureUserFromParamsMatchesAuthUser,
-  validate(exchangeToken),
-  controller.exchangeToken.bind(controller),
-);
-router.post(
-  '/deauthorize/:userId',
-  ensureAuthenticated,
-  ensureUserFromParamsMatchesAuthUser,
-  controller.deauthorize.bind(controller),
-);
-router.post('/webhook', validate(webhook), controller.webhook.bind(controller));
+router
+  .route('/exchange-token/:userId')
+  .get(
+    ensureAuthenticated,
+    ensureUserFromParamsMatchesAuthUser,
+    userRateLimit,
+    validate(exchangeToken),
+    controller.exchangeToken.bind(controller),
+  )
+  .all(methodNotAllowed);
+router
+  .route('/deauthorize/:userId')
+  .post(
+    ensureAuthenticated,
+    ensureUserFromParamsMatchesAuthUser,
+    userRateLimit,
+    controller.deauthorize.bind(controller),
+  )
+  .all(methodNotAllowed);
+router.route('/webhook').post(validate(webhook), controller.webhook.bind(controller)).all(methodNotAllowed);
 
 export default router;

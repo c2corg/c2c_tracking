@@ -1,13 +1,14 @@
-import Router from '@koa/router';
+import { Router } from 'express';
 
+import { methodNotAllowed } from '../method-not-allowed.ts';
 import { validate } from '../validator.ts';
 
 import { controller } from './activity.controller.ts';
 import { activities } from './activity.validators.ts';
 
-const router = new Router();
+const router = Router({ mergeParams: true });
 
-router.get('/', validate(activities), controller.getUserActivities.bind(controller));
-router.get('/:activityId/geometry', controller.getUserActivityGeometry.bind(controller));
+router.route('/').get(validate(activities), controller.getUserActivities.bind(controller)).all(methodNotAllowed);
+router.route('/:activityId/geometry').get(controller.getUserActivityGeometry.bind(controller)).all(methodNotAllowed);
 
 export default router;

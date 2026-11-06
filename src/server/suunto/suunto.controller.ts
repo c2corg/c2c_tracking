@@ -1,37 +1,38 @@
-import type { Context } from 'koa';
+import type { Request, Response } from 'express';
+import createHttpError from 'http-errors';
 
 import type { WebhookEvent } from './suunto.api.ts';
 import { suuntoService as service } from './suunto.service.ts';
 
 class SuuntoController {
-  public async exchangeToken(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
-    if (ctx.query['error']) {
-      ctx.log.info(`User ${c2cId} denied Suunto authorization`);
-      ctx.throw(403, 'auth-denied');
+  public async exchangeToken(req: Request, res: Response): Promise<void> {
+    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    if (req.query['error']) {
+      req.log.info(`User ${c2cId} denied Suunto authorization`);
+      throw createHttpError(403, 'auth-denied');
     }
-    const authorizationCode = ctx.query['code'] as string;
+    const authorizationCode = req.query['code'] as string;
 
     try {
       await service.requestShortLivedAccessTokenAndSetupUser(c2cId, authorizationCode);
-      ctx.status = 204;
+      res.sendStatus(204);
     } catch (error: unknown) {
-      ctx.log.info(error);
-      ctx.throw(502, 'setup-failed');
+      req.log.info(error);
+      throw createHttpError(502, 'setup-failed');
     }
   }
 
-  public webhook(ctx: Context): void {
-    const event = ctx.request.body as WebhookEvent;
-    const auth = ctx.request.header.authorization;
+  public webhook(req: Request, res: Response): void {
+    const event = req.body as WebhookEvent;
+    const auth = req.headers.authorization;
     void service.handleWebhookEvent(event, auth); // async handling
-    ctx.status = 200; // acknowledge event
+    res.sendStatus(200); // acknowledge event
   }
 
-  public async deauthorize(ctx: Context): Promise<void> {
-    const c2cId = Number.parseInt((ctx['params'] as { userId: string }).userId, 10);
+  public async deauthorize(req: Request, res: Response): Promise<void> {
+    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
     await service.deauthorize(c2cId);
-    ctx.status = 204;
+    res.sendStatus(204);
   }
 }
 

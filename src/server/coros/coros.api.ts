@@ -2,7 +2,9 @@ import axios from 'axios';
 import { z } from 'zod';
 
 import config from '../../config.ts';
+import { ExternalApiError } from '../../errors.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
+import { isExternalUrl } from '../../helpers/external-url.ts';
 
 export const CorosAuth = z.object({
   access_token: z.string().min(5).max(50),
@@ -202,6 +204,10 @@ export class CorosApi {
   }
 
   public async getFIT(url: string): Promise<ArrayBuffer> {
+    // the URL comes from the webhook event: never fetch an internal resource with it
+    if (!isExternalUrl(url)) {
+      throw new ExternalApiError(`Coros FIT URL refused, not an external URL: ${url}`);
+    }
     try {
       const response = await axios.get<ArrayBuffer>(url, {
         responseType: 'arraybuffer',

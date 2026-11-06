@@ -1,14 +1,12 @@
-import Router from '@koa/router';
-import Koa from 'koa';
+import express from 'express';
 import { register } from 'prom-client';
 
 import config from '../config.ts';
 
-const koa = new Koa();
-const router = new Router();
-router.get(config.get('metrics.path'), async (ctx) => {
-  ctx.body = await register.metrics();
+const app = express();
+app.disable('x-powered-by');
+app.get(config.get('metrics.path'), async (_req, res) => {
+  res.type(register.contentType).send(await register.metrics());
 });
-koa.use(router.routes());
 
-export const metricsApp = koa;
+export const metricsApp = app;

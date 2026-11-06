@@ -1,13 +1,11 @@
-import type { Context, Middleware } from 'koa';
+import type { RequestHandler } from 'express';
+import createHttpError from 'http-errors';
 
-const enabledIf: (condition: boolean) => Middleware =
-  (condition: boolean) =>
-  async (ctx: Context, next: () => Promise<unknown>): Promise<unknown> => {
-    if (condition) {
-      await next();
-      return;
-    }
-    ctx.throw(405);
+// The routes of a disabled tracker answer 405
+const enabledIf =
+  (condition: boolean): RequestHandler =>
+  (_req, _res, next) => {
+    next(condition ? undefined : createHttpError(405));
   };
 
 export default enabledIf;

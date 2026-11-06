@@ -49,7 +49,7 @@ async function closeGracefully(signal: string, servers: Server[]): Promise<void>
     try {
       await s;
     } catch (e) {
-      log.error('Error in graceful shutdown ', e);
+      log.error({ err: e }, 'Error in graceful shutdown');
     }
   }
 
