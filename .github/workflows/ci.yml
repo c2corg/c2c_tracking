@@ -94,7 +94,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push Docker images
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           # the classic Docker manifest, without attestation: the older Docker Engines of the production hosts cannot
           # pull an OCI index ("missing signature key"). Tags stay on the `tags` input: `outputs` has no `name`
