@@ -164,7 +164,7 @@ describe('Garmin service', () => {
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
       vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
-      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
 
       const service = new GarminService();
       await service.deauthorize(1);

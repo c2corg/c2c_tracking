@@ -51,7 +51,7 @@ export class UserRepository {
       }
 
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -68,7 +68,7 @@ export class UserRepository {
         return undefined;
       }
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -85,7 +85,7 @@ export class UserRepository {
         return undefined;
       }
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -102,7 +102,7 @@ export class UserRepository {
         return undefined;
       }
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -119,7 +119,7 @@ export class UserRepository {
         return undefined;
       }
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -136,7 +136,7 @@ export class UserRepository {
         return undefined;
       }
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -182,7 +182,7 @@ export class UserRepository {
         return undefined;
       }
       return this.rowToUser(row);
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -345,20 +345,20 @@ export class UserRepository {
           polar_token: null,
         };
     const coros:
-      | Pick<UserInputRow, 'coros_id' | 'coros_access_token' | 'coros_expires_at' | 'coros_refresh_token'>
-      | undefined = user.coros
-      ? {
-          coros_id: user.coros.id,
-          coros_access_token: user.coros.accessToken ? encrypt(user.coros.accessToken) : null,
-          coros_expires_at: user.coros.expiresAt ? dayjs.unix(user.coros.expiresAt).toDate() : null,
-          coros_refresh_token: user.coros.refreshToken ? encrypt(user.coros.refreshToken) : null,
-        }
-      : {
-          coros_id: null,
-          coros_access_token: null,
-          coros_expires_at: null,
-          coros_refresh_token: null,
-        };
+      Pick<UserInputRow, 'coros_id' | 'coros_access_token' | 'coros_expires_at' | 'coros_refresh_token'> | undefined =
+      user.coros
+        ? {
+            coros_id: user.coros.id,
+            coros_access_token: user.coros.accessToken ? encrypt(user.coros.accessToken) : null,
+            coros_expires_at: user.coros.expiresAt ? dayjs.unix(user.coros.expiresAt).toDate() : null,
+            coros_refresh_token: user.coros.refreshToken ? encrypt(user.coros.refreshToken) : null,
+          }
+        : {
+            coros_id: null,
+            coros_access_token: null,
+            coros_expires_at: null,
+            coros_refresh_token: null,
+          };
     return {
       c2c_id: user.c2cId,
       ...(strava && { ...strava }),

@@ -10,7 +10,7 @@ import log from '../../helpers/logger';
 import { fitToGeoJSON } from '../../helpers/utils';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import { polarRepository } from '../../repository/polar.repository';
@@ -44,14 +44,14 @@ export class PolarService {
     const miniatures: string[] = [];
     try {
       miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'polar')));
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor polar`);
     }
     await activityRepository.deleteByUserAndVendor(c2cId, 'polar');
     for (const miniature of miniatures) {
       try {
         await miniatureService.deleteMiniature(miniature);
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
     }
@@ -61,7 +61,9 @@ export class PolarService {
   }
 
   public async setupWebhook(): Promise<void> {
-    (await this.checkWebhookSubscription()) || void this.requestWebhookSubscription();
+    if (!(await this.checkWebhookSubscription())) {
+      void this.requestWebhookSubscription();
+    }
   }
 
   private async checkWebhookSubscription(): Promise<boolean> {
@@ -81,7 +83,7 @@ export class PolarService {
         foundCurrent ? 'Found matching Polar webhook subscription' : 'No matching Polar webhook subscription found',
       );
       return foundCurrent;
-    } catch (error: unknown) {
+    } catch {
       log.warn(
         `Polar webhook subscription status couldn't be checked: unable to retrieve current subscription. Assuming not set`,
       );
@@ -94,13 +96,13 @@ export class PolarService {
     let webhookSecret: string;
     try {
       webhookSecret = await polarApi.createWebhook();
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Polar subscription couldn't be requested, maybe another webhook is already registered`);
       return;
     }
     try {
       await polarRepository.setWebhookSecret(webhookSecret);
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Polar webhook secret couldn't be stored in DB`);
     }
   }
@@ -131,7 +133,7 @@ export class PolarService {
     let exercise: Exercise;
     try {
       exercise = await polarApi.getExercise(user.polar.token, exerciseId);
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Polar exercise webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve exercise data`,
@@ -141,7 +143,7 @@ export class PolarService {
     let fit: ArrayBuffer;
     try {
       fit = await polarApi.getExerciseFit(user.polar.token, exerciseId);
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Polar exercise webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve exercise FIT data`,
@@ -158,7 +160,7 @@ export class PolarService {
     try {
       await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise, geojson));
       promWebhookCounter.labels({ vendor: 'polar', subject: 'activity', event: 'create' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Polar activity creation webhook event for user ${user.c2cId} couldn't be processed: unable to insert activity data`,
@@ -172,7 +174,7 @@ export class PolarService {
 
   private asRepositoryActivity(exercise: Exercise, geojson: LineString): NewActivityWithGeometry {
     return {
-      vendor: 'polar' as Vendor,
+      vendor: 'polar',
       vendorId: exercise.id,
       date: this.localDate(exercise),
       type: exercise.sport,

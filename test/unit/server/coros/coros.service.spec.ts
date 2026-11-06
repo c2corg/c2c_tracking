@@ -173,7 +173,7 @@ describe('Coros Service', () => {
         openId: '1',
       });
       vi.spyOn(userService, 'configureCoros').mockImplementationOnce(() => Promise.resolve());
-      vi.spyOn(corosApi, 'getWorkouts').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(corosApi, 'getWorkouts').mockRejectedValueOnce(new Error('test'));
       vi.spyOn(userService, 'addActivities');
 
       const service = new CorosService();
@@ -210,7 +210,7 @@ describe('Coros Service', () => {
           },
         ],
       });
-      vi.spyOn(corosApi, 'getFIT').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(corosApi, 'getFIT').mockRejectedValueOnce(new Error('test'));
       vi.spyOn(userService, 'addActivities');
 
       const service = new CorosService();
@@ -224,7 +224,7 @@ describe('Coros Service', () => {
       expect(log.info).toHaveBeenCalledTimes(1);
       expect(log.info).toHaveBeenCalledWith(
         `Unable to retrieve Coros geometry for 1234 (https://coros.com/fit)`,
-        undefined,
+        new Error('test'),
       );
     });
 
@@ -455,7 +455,7 @@ describe('Coros Service', () => {
       vi.spyOn(corosApi, 'deauthorize').mockImplementationOnce(() => Promise.resolve());
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementationOnce(() => Promise.resolve());
-      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
       vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
       const service = new CorosService();

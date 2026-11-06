@@ -9,7 +9,7 @@ import log from '../../helpers/logger';
 import { fitToGeoJSON } from '../../helpers/utils';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import type { User } from '../../repository/user';
@@ -36,7 +36,7 @@ export class CorosService {
 
     try {
       await this.resyncActivities(c2cId, auth.access_token, auth.openId);
-    } catch (error: unknown) {
+    } catch {
       // failing to retrieve workouts should not break the registration process
       log.info(`Unable to retrieve Coros workouts for user ${c2cId}`);
     }
@@ -150,14 +150,14 @@ export class CorosService {
     const miniatures: string[] = [];
     try {
       miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'coros')));
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor coros`);
     }
     await activityRepository.deleteByUserAndVendor(c2cId, 'coros');
     for (const miniature of miniatures) {
       try {
         await miniatureService.deleteMiniature(miniature);
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
     }
@@ -178,7 +178,7 @@ export class CorosService {
         await corosApi.refreshAuth(refreshToken);
         await userService.resetCorosAuthExpiration(user.c2cId);
         return accessToken;
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Coros access token refresh failed for user ${user.c2cId}`);
       }
     }
@@ -225,7 +225,7 @@ export class CorosService {
       try {
         await userService.addActivities(c2cId, ...activities);
         promWebhookCounter.labels({ vendor: 'coros', subject: 'activity', event: 'create' });
-      } catch (error: unknown) {
+      } catch {
         promWebhookErrorsCounter.labels({ vendor: 'coros', cause: 'processing_failed' }).inc(1);
         log.warn(`Coros webhook event for user ${c2cId} couldn't be processed: unable to insert activity data`);
       }
@@ -238,7 +238,7 @@ export class CorosService {
 
   private asRepositoryActivity(workout: Workout, geojson: LineString): NewActivityWithGeometry {
     return {
-      vendor: 'coros' as Vendor,
+      vendor: 'coros',
       vendorId: workout.labelId,
       date: this.localDate(workout.startTime, workout.startTimezone),
       type: corosApi.getSport(workout.mode, workout.subMode),

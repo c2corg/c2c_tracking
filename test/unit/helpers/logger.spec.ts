@@ -1,6 +1,7 @@
 import { Writable } from 'stream';
 
 import { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
+import { describe, expect, it } from 'vitest';
 
 import { createLogger } from '../../../src/helpers/logger';
 

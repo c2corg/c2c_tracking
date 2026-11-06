@@ -628,7 +628,7 @@ describe('Suunto Service', () => {
         .spyOn(SuuntoService.prototype as any, 'getToken')
         .mockResolvedValueOnce('token');
       vi.spyOn(suuntoApi, 'deauthorize').mockResolvedValueOnce(undefined);
-      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(new Error('test'));
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
       vi.spyOn(miniatureService, 'deleteMiniature');
@@ -683,7 +683,7 @@ describe('Suunto Service', () => {
       vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'update').mockRejectedValueOnce(undefined);
-      vi.spyOn(miniatureService, 'deleteMiniature').mockImplementationOnce(() => Promise.reject());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
 
       const service = new SuuntoService();
       await expect(service.deauthorize(1)).rejects.toMatchInlineSnapshot(`undefined`);

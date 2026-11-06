@@ -15,7 +15,7 @@ class DecathlonController {
     try {
       await service.requestShortLivedAccessTokenAndSetupUser(c2cId, authorizationCode);
       ctx.status = 204;
-    } catch (error: unknown) {
+    } catch {
       ctx.throw(502, 'setup-failed');
     }
   }

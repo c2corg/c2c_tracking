@@ -7,7 +7,7 @@ import log from '../../helpers/logger';
 import { fitToGeoJSON } from '../../helpers/utils';
 import { promTokenRenewalErrorsCounter, promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus';
 import { miniatureService } from '../../miniature.service';
-import type { NewActivityWithGeometry, Vendor } from '../../repository/activity';
+import type { NewActivityWithGeometry } from '../../repository/activity';
 import { activityRepository } from '../../repository/activity.repository';
 import type { LineString } from '../../repository/geojson';
 import { userRepository } from '../../repository/user.repository';
@@ -87,7 +87,7 @@ export class SuuntoService {
         const auth = await suuntoApi.refreshAuth(refreshToken);
         await userService.updateSuuntoAuth(c2cId, auth);
         return auth.access_token;
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Suunto access token refresh failed for user ${c2cId}`);
       }
     }
@@ -136,14 +136,14 @@ export class SuuntoService {
       return;
     }
     let workout: WorkoutSummary;
-    let geojson: LineString | undefined = undefined;
+    let geojson: LineString | undefined;
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
       geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutKey);
       if (!geojson) {
         return;
       }
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Suunto workout webhook event for user ${user.c2cId} couldn't be processed: unable to retrieve activity data`,
@@ -153,7 +153,7 @@ export class SuuntoService {
     try {
       await userService.addActivities(user.c2cId, this.asRepositoryActivity(workout.payload, geojson));
       promWebhookCounter.labels({ vendor: 'suunto', subject: 'activity', event: 'create' });
-    } catch (error: unknown) {
+    } catch {
       promWebhookErrorsCounter.labels({ vendor: 'suunto', cause: 'processing_failed' }).inc(1);
       log.warn(
         `Suunto activity update/creation webhook event for user ${user.c2cId} couldn't be processed: unable to upsert activity data`,
@@ -181,14 +181,14 @@ export class SuuntoService {
     const miniatures: string[] = [];
     try {
       miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'suunto')));
-    } catch (error: unknown) {
+    } catch {
       log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor suunto`);
     }
     await activityRepository.deleteByUserAndVendor(c2cId, 'suunto');
     for (const miniature of miniatures) {
       try {
         await miniatureService.deleteMiniature(miniature);
-      } catch (error: unknown) {
+      } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
     }
@@ -199,7 +199,7 @@ export class SuuntoService {
 
   private asRepositoryActivity(workout: Workout, geojson: LineString): NewActivityWithGeometry {
     return {
-      vendor: 'suunto' as Vendor,
+      vendor: 'suunto',
       vendorId: workout.workoutKey,
       date: dayjs(workout.startTime).utcOffset(workout.timeOffsetInMinutes).format(),
       type: workoutTypes[workout.activityId] || 'Unknown',

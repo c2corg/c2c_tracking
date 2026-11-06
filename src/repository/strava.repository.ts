@@ -22,7 +22,7 @@ export class StravaRepository {
       }
 
       return rows[0].subscription_id;
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }

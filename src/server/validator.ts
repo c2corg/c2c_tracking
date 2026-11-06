@@ -28,9 +28,15 @@ function validateObject(object: unknown = {}, label: string, schema: Schema | un
 
 export function validate(schema: ValidationSchema): Middleware {
   return async (ctx: Context, next: () => Promise<unknown>): Promise<void> => {
-    ctx.headers && validateObject(ctx.headers, 'Headers', schema.headers);
-    ctx.query && validateObject(ctx.query, 'URL query', schema.query);
-    ctx.request.body && validateObject(ctx.request.body, 'Body', schema.body);
+    if (ctx.headers) {
+      validateObject(ctx.headers, 'Headers', schema.headers);
+    }
+    if (ctx.query) {
+      validateObject(ctx.query, 'URL query', schema.query);
+    }
+    if (ctx.request.body) {
+      validateObject(ctx.request.body, 'Body', schema.body);
+    }
     await next();
   };
 }

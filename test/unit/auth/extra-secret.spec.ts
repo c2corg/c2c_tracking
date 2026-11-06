@@ -14,7 +14,7 @@ const loadAuth = async (env: Record<string, string>): Promise<Auth> => {
   Object.assign(process.env, env);
   try {
     vi.resetModules();
-    return (await import('../../../src/auth/index.js')) as Auth;
+    return await import('../../../src/auth/index.js');
   } finally {
     process.env = previous;
   }
