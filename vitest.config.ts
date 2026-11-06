@@ -38,6 +38,7 @@ export default defineConfig({
           name: 's3',
           include: ['test/s3/**/*.spec.ts'],
           setupFiles: ['test/environment/env-vars.s3.mjs'],
+          globalSetup: ['test/environment/s3-global-setup.ts'],
           // the tests share one bucket
           fileParallelism: false,
         },

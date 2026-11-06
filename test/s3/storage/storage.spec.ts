@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 import { ObjectCannedACL } from '@aws-sdk/client-s3';
-import request from 'supertest';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import config from '../../../src/config.ts';
@@ -44,12 +43,15 @@ describe('S3 storage', () => {
     await expect(storage.delete('does_not_exist.png')).resolves.toBeUndefined();
   });
 
-  // needs an S3 server that applies the public-read ACL (not Garage, used in CI)
-  (process.env['S3_SKIP_PUBLIC_CHECK'] === 'true' ? it.skip : it)('serves the files publicly', async () => {
+  it('serves the files publicly', async () => {
     await storage.put(key, buffer);
 
     try {
-      await request(storage.baseUrl).get(`/${key}`).expect(200).expect('Content-Type', 'image/png');
+      // anonymous request, as a browser showing the miniature
+      const response = await fetch(`${storage.baseUrl}/${key}`);
+      expect(response.status).toBe(200);
+      expect(response.headers.get('Content-Type')).toBe('image/png');
+      expect(Buffer.from(await response.arrayBuffer())).toEqual(buffer);
     } finally {
       await storage.delete(key);
     }
