@@ -116,4 +116,9 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
-export { app };
+// Maintenance mode or shutdown: the application then answers 503 to every request
+const setShuttingDown = (value: boolean): void => {
+  app.context['shuttingDown'] = value;
+};
+
+export { app, setShuttingDown };

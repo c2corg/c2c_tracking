@@ -5,12 +5,12 @@ import type { Server } from 'http';
 import type { ErrorCallback } from 'async';
 import { retry } from 'async';
 
-import { app } from './app.ts';
+import { app, setShuttingDown } from './app.ts';
 import config from './config.ts';
 import { database as db } from './db/index.ts';
 import log from './helpers/logger.ts';
 import { watchMaintenanceFile } from './helpers/maintenance.ts';
-import { metricsKoa } from './metrics/index.ts';
+import { metricsApp } from './metrics/index.ts';
 import { polarService } from './server/polar/polar.service.ts';
 import { stravaService } from './server/strava/strava.service.ts';
 
@@ -41,7 +41,7 @@ async function closeServer(server: Server): Promise<void> {
 async function closeGracefully(signal: string, servers: Server[]): Promise<void> {
   log.info(`Received signal to terminate: ${signal}`);
 
-  app.context['shuttingDown'] = true;
+  setShuttingDown(true);
 
   const shutdown = [...servers.map((server) => closeServer(server)), db.closeDatabase()];
 
@@ -76,7 +76,7 @@ export async function start(): Promise<void> {
   });
 
   watchMaintenanceFile('.', () => {
-    app.context['shuttingDown'] = true;
+    setShuttingDown(true);
     log.info('Received signal to switch to maintenance mode');
   });
 
@@ -94,7 +94,7 @@ export async function start(): Promise<void> {
         void polarService.setupWebhook();
       }),
     );
-    servers.push(metricsKoa.listen(config.get('metrics.port')));
+    servers.push(metricsApp.listen(config.get('metrics.port')));
 
     process.once('SIGINT', (signal: string): void => {
       void closeGracefully(signal, servers);
