@@ -1,6 +1,6 @@
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
-import { expiresLater, utcDay } from '../../helpers/time.ts';
+import { expiresLater, formatWithOffset, utcDay } from '../../helpers/time.ts';
 import {
   promTokenRenewalErrorsCounter,
   promWebhookCounter,

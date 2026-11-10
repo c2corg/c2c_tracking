@@ -149,15 +149,14 @@ export class GarminApi {
   private readonly tokenUrl = 'https://diauth.garmin.com/di-oauth2-service/oauth/token';
   private readonly apiUrl = 'https://apis.garmin.com/';
   readonly #clientId: string;
+  // OAuth 2 client secret, also the OAuth 1 consumer secret that signs the legacy user token exchange
+  // (see scripts/migrate-garmin-oauth2.ts): the Garmin portal has a single secret per application
   readonly #clientSecret: string;
-  // OAuth 1 credentials, only needed to exchange the legacy user tokens (see scripts/migrate-garmin-oauth2.ts)
-  readonly #consumerSecret: string;
   readonly #redirectUri: string;
 
   constructor() {
     this.#clientId = config.get('trackers.garmin.consumerKey');
-    this.#clientSecret = config.get('trackers.garmin.clientSecret');
-    this.#consumerSecret = config.get('trackers.garmin.consumerSecret');
+    this.#clientSecret = config.get('trackers.garmin.consumerSecret');
     this.#redirectUri = config.get('c2c.frontend.baseUrl') + config.get('trackers.garmin.redirectPath');
   }
 
@@ -290,7 +289,7 @@ export class GarminApi {
     const normalizedParameters = `oauth_consumer_key=${this.#clientId}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
     const signatureBaseString = `${method}&${encodeURIComponent(url)}&${encodeURIComponent(normalizedParameters)}`;
     const signature = encodeURIComponent(
-      createHmac('sha1', `${this.#consumerSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64'),
+      createHmac('sha1', `${this.#clientSecret}&${tokenSecret}`).update(signatureBaseString).digest('base64'),
     );
     return `OAuth oauth_nonce="${nonce}", oauth_signature="${signature}", oauth_token="${token}", oauth_consumer_key="${this.#clientId}", oauth_timestamp="${timestamp}", oauth_signature_method="HMAC-SHA1", oauth_version="1.0"`;
   }

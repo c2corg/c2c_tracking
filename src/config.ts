@@ -326,17 +326,10 @@ const config = convict({
         env: 'GARMIN_CONSUMER_KEY',
       },
       consumerSecret: {
-        doc: 'Garmin consumer secret (OAuth 1). Only used to migrate the users linked before the switch to OAuth 2',
+        doc: 'Garmin client secret (OAuth 2; also the OAuth 1 consumer secret, used to migrate the users linked before the switch to OAuth 2)',
         format: 'notEmptyString',
         default: '',
         env: 'GARMIN_CONSUMER_SECRET',
-        sensitive: true,
-      },
-      clientSecret: {
-        doc: 'Garmin OAuth 2 client secret (the consumer key is the client ID)',
-        format: 'notEmptyString',
-        default: '',
-        env: 'GARMIN_CLIENT_SECRET',
         sensitive: true,
       },
       redirectPath: {

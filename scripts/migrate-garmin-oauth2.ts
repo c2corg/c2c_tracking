@@ -5,7 +5,7 @@
  *
  * Prerequisites:
  *   - Garmin has enabled OAuth 2 for the application (request it to connect-support@developer.garmin.com),
- *   - GARMIN_CLIENT_SECRET (OAuth 2) and GARMIN_CONSUMER_SECRET (OAuth 1) are both set.
+ *   - GARMIN_CONSUMER_SECRET is set (the application's single Garmin secret).
  *
  * Usage: npm run migrate:garmin
  * Env:

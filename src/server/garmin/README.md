@@ -27,7 +27,7 @@ With OAuth 2 the notifications no longer carry the OAuth 1 `userAccessToken`: us
 Once Garmin has enabled OAuth 2 for the application:
 
 ```sh
-GARMIN_CLIENT_SECRET=... GARMIN_CONSUMER_SECRET=... npm run migrate:garmin
+npm run migrate:garmin
 ```
 
 For each user, it reads the Garmin user id then exchanges the OAuth 1 token for an OAuth 2 token pair
@@ -40,6 +40,5 @@ untouched.
 | Variable                 | Description                                                                 |
 | ------------------------ | --------------------------------------------------------------------------- |
 | `GARMIN_CONSUMER_KEY`    | Consumer key, also the OAuth 2 client ID                                    |
-| `GARMIN_CLIENT_SECRET`   | OAuth 2 client secret (new secret shown on the Garmin developer portal)     |
-| `GARMIN_CONSUMER_SECRET` | OAuth 1 secret, only needed by the migration script                         |
+| `GARMIN_CONSUMER_SECRET` | Client secret: OAuth 2 client secret, and OAuth 1 secret for the migration  |
 | `GARMIN_REDIRECT_URI`    | Path appended to `FRONTEND_BASE_URL`, must match the redirect URI on Garmin |
