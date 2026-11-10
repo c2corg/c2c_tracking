@@ -24,7 +24,8 @@
     "test:s3": "vitest run --project s3",
     "test:watch": "vitest --project unit",
     "test:ci": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=reports/junit/tests.xml",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "migrate:garmin": "node --env-file-if-exists=.env scripts/migrate-garmin-oauth2.ts | pino-pretty -c -t"
   },
   "repository": {
     "type": "git",

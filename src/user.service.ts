@@ -191,27 +191,50 @@ export class UserService {
     return user?.suunto;
   }
 
-  public async configureGarmin(c2cId: number, auth: GarminAuth): Promise<void> {
+  /*
+   * Links the user to Garmin through OAuth 2. With `keepLegacy`, the OAuth 1 credentials of a user being migrated
+   * are kept so that webhooks still carrying the OAuth 1 token can be matched until Garmin stops sending it.
+   */
+  public async configureGarmin(
+    c2cId: number,
+    auth: GarminAuth,
+    garminUserId: string,
+    keepLegacy = false,
+  ): Promise<void> {
     let user: User | undefined = await userRepository.findById(c2cId);
+    const garmin: GarminInfo = {
+      userId: garminUserId,
+      ...this.#garminTokens(auth),
+      ...(keepLegacy && user?.garmin?.token && { token: user.garmin.token, tokenSecret: user.garmin.tokenSecret }),
+    };
     if (user) {
-      user = {
-        ...user,
-        garmin: {
-          token: auth.token,
-          tokenSecret: auth.tokenSecret,
-        },
-      };
+      user = { ...user, garmin };
       await userRepository.update(user);
     } else {
-      user = {
-        c2cId,
-        garmin: {
-          token: auth.token,
-          tokenSecret: auth.tokenSecret,
-        },
-      };
+      user = { c2cId, garmin };
       await userRepository.insert(user);
     }
+  }
+
+  public async updateGarminAuth(c2cId: number, auth: GarminAuth): Promise<void> {
+    let user: User | undefined = await userRepository.findById(c2cId);
+    if (!user) {
+      throw new NotFoundError(`User ${c2cId} not found`);
+    }
+    if (!user.garmin?.userId) {
+      throw new NotFoundError(`User ${c2cId} not configured for Garmin OAuth 2`);
+    }
+    user = { ...user, garmin: { ...user.garmin, ...this.#garminTokens(auth) } };
+    await userRepository.update(user);
+  }
+
+  #garminTokens(auth: GarminAuth): Pick<GarminInfo, 'accessToken' | 'expiresAt' | 'refreshToken' | 'refreshExpiresAt'> {
+    return {
+      accessToken: auth.access_token,
+      expiresAt: this.#expiresAt(auth.expires_in),
+      refreshToken: auth.refresh_token,
+      ...(auth.refresh_token_expires_in && { refreshExpiresAt: this.#expiresAt(auth.refresh_token_expires_in) }),
+    };
   }
 
   public async getGarminInfo(c2cId: number): Promise<GarminInfo | undefined> {

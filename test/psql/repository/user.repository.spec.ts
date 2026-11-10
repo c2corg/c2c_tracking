@@ -54,4 +54,38 @@ describe('User Repository', () => {
     await expect(repository.findByCorosId('1')).resolves.toEqual(user1);
     await expect(repository.findByCorosId('2')).resolves.toBeUndefined();
   });
+
+  it('stores Garmin OAuth 2 credentials, alone or next to the legacy OAuth 1 ones', async () => {
+    const repository = new UserRepository();
+
+    const oauth2 = {
+      userId: 'garmin-user-10',
+      accessToken: 'garmin_access_token',
+      expiresAt: 1000,
+      refreshToken: 'garmin_refresh_token',
+      refreshExpiresAt: 2000,
+    };
+    const user10: User = { c2cId: 10, garmin: oauth2 };
+    await repository.insert({ c2cId: 10 });
+    await expect(repository.update(user10)).resolves.toEqual(user10);
+    await expect(repository.findByGarminUserId('garmin-user-10')).resolves.toEqual(user10);
+    await expect(repository.findByGarminUserId('unknown')).resolves.toBeUndefined();
+    await expect(repository.findAllGarminUserIds()).resolves.toContain(10);
+    await expect(repository.findAllGarminLegacyUserIds()).resolves.not.toContain(10);
+
+    // user being migrated: both kinds of credentials
+    const user11: User = {
+      c2cId: 11,
+      garmin: { ...oauth2, userId: 'garmin-user-11', token: 'legacy_token_11', tokenSecret: 'legacy_secret_11' },
+    };
+    await repository.insert({ c2cId: 11 });
+    await expect(repository.update(user11)).resolves.toEqual(user11);
+    await expect(repository.findByGarminUserId('garmin-user-11')).resolves.toEqual(user11);
+    await expect(repository.findByGarminToken('legacy_token_11')).resolves.toEqual(user11);
+
+    // user not migrated yet
+    await repository.insert({ c2cId: 12, garmin: { token: 'legacy_token_12', tokenSecret: 'legacy_secret_12' } });
+    await expect(repository.findAllGarminLegacyUserIds()).resolves.toContain(12);
+    await expect(repository.findAllGarminLegacyUserIds()).resolves.not.toContain(11);
+  });
 });
