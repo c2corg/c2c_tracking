@@ -1,9 +1,9 @@
-import axios from 'axios';
 import validator from 'validator';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
+import { http, isHttpError } from '../../helpers/http.ts';
 
 export const Athlete = z.object({
   id: z.number().int().positive(),
@@ -180,7 +180,7 @@ export class StravaApi {
 
   public async exchangeToken(code: string): Promise<StravaAuth> {
     try {
-      const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
+      const response = await http.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -196,7 +196,7 @@ export class StravaApi {
 
   public async deauthorize(accessToken: string): Promise<void> {
     try {
-      await axios.post<void>(`${this.oauthUrl}revoke`, null, {
+      await http.post<void>(`${this.oauthUrl}revoke`, null, {
         params: { token: accessToken },
         auth: { username: this.#clientId, password: this.#clientSecret },
       });
@@ -207,7 +207,7 @@ export class StravaApi {
 
   public async refreshAuth(refreshToken: string): Promise<StravaRefreshAuth> {
     try {
-      const response = await axios.post(`${this.baseUrl}oauth/token`, null, {
+      const response = await http.post(`${this.baseUrl}oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -223,7 +223,7 @@ export class StravaApi {
 
   public async getAthleteActivities(accessToken: string): Promise<Activity[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}athlete/activities`, {
+      const response = await http.get(`${this.baseUrl}athlete/activities`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return z.array(Activity).parse(response.data);
@@ -234,7 +234,7 @@ export class StravaApi {
 
   public async getActivity(accessToken: string, id: number): Promise<Activity> {
     try {
-      const response = await axios.get(`${this.baseUrl}activities/${id}`, {
+      const response = await http.get(`${this.baseUrl}activities/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return Activity.parse(response.data);
@@ -243,14 +243,18 @@ export class StravaApi {
     }
   }
 
-  public async getActivityStream(accessToken: string, id: number): Promise<StreamSet> {
+  // undefined for an activity without GPS track (indoor, manual entry...): Strava answers 404
+  public async getActivityStream(accessToken: string, id: number): Promise<StreamSet | undefined> {
     try {
-      const response = await axios.get(`${this.baseUrl}activities/${id}/streams`, {
+      const response = await http.get(`${this.baseUrl}activities/${id}/streams`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
       });
       return StreamSet.parse(response.data);
     } catch (error: unknown) {
+      if (isHttpError(error) && error.status === 404) {
+        return undefined;
+      }
       throw handleExternalApiError('strava', 'Error on Strava getActivityStream request', error);
     }
   }
@@ -258,14 +262,14 @@ export class StravaApi {
   public async requestSubscriptionCreation(callbackUrl: string, verifyToken: string): Promise<number> {
     try {
       // Strava requires these params as HTTP form data (application/x-www-form-urlencoded), not JSON.
-      // A URLSearchParams body makes axios encode and set the content-type accordingly.
+      // A URLSearchParams body is sent as a form, with its content type.
       const params = new URLSearchParams({
         client_id: this.#clientId,
         client_secret: this.#clientSecret,
         callback_url: callbackUrl,
         verify_token: verifyToken,
       });
-      const response = await axios.post(`${this.baseUrl}push_subscriptions`, params);
+      const response = await http.post(`${this.baseUrl}push_subscriptions`, params);
       return z.object({ id: z.number().int().positive() }).parse(response.data).id;
     } catch (error: unknown) {
       throw handleExternalApiError('strava', 'Error on Strava requestSubscriptionCreation request', error);
@@ -274,7 +278,7 @@ export class StravaApi {
 
   public async getSubscriptions(): Promise<Subscription[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}push_subscriptions`, {
+      const response = await http.get(`${this.baseUrl}push_subscriptions`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
       return z.array(Subscription).parse(response.data);
@@ -285,7 +289,7 @@ export class StravaApi {
 
   public async deleteSubscription(id: string): Promise<void> {
     try {
-      await axios.delete<void>(`${this.baseUrl}push_subscriptions/${id}`, {
+      await http.delete<void>(`${this.baseUrl}push_subscriptions/${id}`, {
         params: { client_id: this.#clientId, client_secret: this.#clientSecret },
       });
     } catch (error: unknown) {

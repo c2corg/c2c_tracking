@@ -55,6 +55,23 @@ export class Database {
     return this.connection;
   }
 
+  // Whether the database answers within `timeout` ms (readiness check)
+  public async isReachable(timeout = 2000): Promise<boolean> {
+    const check = async (): Promise<boolean> => {
+      const connection = await this.getConnection();
+      await connection?.raw('select 1');
+      return !!connection;
+    };
+    try {
+      return await Promise.race([
+        check(),
+        new Promise<boolean>((resolve) => setTimeout(() => resolve(false), timeout).unref()),
+      ]);
+    } catch {
+      return false;
+    }
+  }
+
   public async closeDatabase(): Promise<void> {
     if (this.connection) {
       await this.connection.destroy();

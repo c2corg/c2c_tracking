@@ -1,12 +1,17 @@
 import { createHash } from 'node:crypto';
 
-import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { http } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { GarminApi } from '../../../../src/server/garmin/garmin.api.ts';
+import { respond } from '../../../utils.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 const tokenResponse = {
   access_token: 'an-access-token',
@@ -57,19 +62,19 @@ describe('Garmin API', () => {
 
   describe('exchangeCode', () => {
     it('throws if the response is not a valid token', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: { whatever: true } });
+      vi.mocked(http).post.mockResolvedValueOnce(respond({ whatever: true }));
 
       await expect(new GarminApi().exchangeCode('code', 'verifier', 'state')).rejects.toThrow();
     });
 
     it('exchanges the code for tokens', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: tokenResponse });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(tokenResponse));
 
       const auth = await new GarminApi().exchangeCode('code', 'verifier', 'state');
 
       expect(auth).toMatchObject({ access_token: 'an-access-token', refresh_token: 'a-refresh-token' });
-      expect(vi.mocked(axios).post).toHaveBeenCalledTimes(1);
-      const [url, body] = vi.mocked(axios).post.mock.calls[0] as [string, URLSearchParams];
+      expect(vi.mocked(http).post).toHaveBeenCalledTimes(1);
+      const [url, body] = vi.mocked(http).post.mock.calls[0] as [string, URLSearchParams];
       expect(url).toBe('https://diauth.garmin.com/di-oauth2-service/oauth/token');
       expect(body.get('grant_type')).toBe('authorization_code');
       expect(body.get('code')).toBe('code');
@@ -81,12 +86,12 @@ describe('Garmin API', () => {
 
   describe('refreshAuth', () => {
     it('refreshes tokens', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: tokenResponse });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(tokenResponse));
 
       const auth = await new GarminApi().refreshAuth('a-refresh-token');
 
       expect(auth.access_token).toBe('an-access-token');
-      const [url, body] = vi.mocked(axios).post.mock.calls[0] as [string, URLSearchParams];
+      const [url, body] = vi.mocked(http).post.mock.calls[0] as [string, URLSearchParams];
       expect(url).toBe('https://diauth.garmin.com/di-oauth2-service/oauth/token');
       expect(body.get('grant_type')).toBe('refresh_token');
       expect(body.get('refresh_token')).toBe('a-refresh-token');
@@ -95,10 +100,10 @@ describe('Garmin API', () => {
 
   describe('getUserId', () => {
     it('returns the Garmin user id', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: { userId: 'garmin-user-1' } });
+      vi.mocked(http).get.mockResolvedValueOnce(respond({ userId: 'garmin-user-1' }));
 
       expect(await new GarminApi().getUserId('an-access-token')).toBe('garmin-user-1');
-      expect(vi.mocked(axios).get).toHaveBeenCalledWith(
+      expect(vi.mocked(http).get).toHaveBeenCalledWith(
         'https://apis.garmin.com/wellness-api/rest/user/id',
         expect.objectContaining({
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -108,7 +113,7 @@ describe('Garmin API', () => {
     });
 
     it('throws if there is no user id', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: {} });
+      vi.mocked(http).get.mockResolvedValueOnce(respond({}));
 
       await expect(new GarminApi().getUserId('an-access-token')).rejects.toThrow();
     });
@@ -116,12 +121,12 @@ describe('Garmin API', () => {
 
   describe('backfillActivities', () => {
     it('requests activities backfill', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: [] });
+      vi.mocked(http).get.mockResolvedValueOnce(respond([]));
 
       await new GarminApi().backfillActivities(1583020800, 1585699199, 'an-access-token');
 
-      expect(vi.mocked(axios).get).toHaveBeenCalledTimes(1);
-      expect(vi.mocked(axios).get).toHaveBeenCalledWith(
+      expect(vi.mocked(http).get).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(http).get).toHaveBeenCalledWith(
         `https://apis.garmin.com/wellness-api/rest/backfill/activityDetails`,
         {
           params: { summaryStartTimeInSeconds: 1583020800, summaryEndTimeInSeconds: 1585699199 },
@@ -133,12 +138,12 @@ describe('Garmin API', () => {
 
   describe('deauthorize', () => {
     it('deauthorizes user', async () => {
-      vi.mocked(axios).delete.mockResolvedValueOnce(undefined);
+      vi.mocked(http).delete.mockResolvedValueOnce(respond());
 
       await new GarminApi().deauthorize('an-access-token');
 
-      expect(vi.mocked(axios).delete).toHaveBeenCalledTimes(1);
-      expect(vi.mocked(axios).delete).toHaveBeenCalledWith(
+      expect(vi.mocked(http).delete).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(http).delete).toHaveBeenCalledWith(
         `https://apis.garmin.com/wellness-api/rest/user/registration`,
         { headers: { Authorization: 'Bearer an-access-token' } },
       );
@@ -147,23 +152,23 @@ describe('Garmin API', () => {
 
   describe('legacy OAuth 1 migration', () => {
     it('reads the user id with an OAuth 1 signed request', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: { userId: 'garmin-user-1' } });
+      vi.mocked(http).get.mockResolvedValueOnce(respond({ userId: 'garmin-user-1' }));
 
       expect(await new GarminApi().getLegacyUserId('token-123456', 'secret-123456')).toBe('garmin-user-1');
 
-      const [, options] = vi.mocked(axios).get.mock.calls[0] as [string, { headers: { Authorization: string } }];
+      const [, options] = vi.mocked(http).get.mock.calls[0] as [string, { headers: { Authorization: string } }];
       expect(options.headers.Authorization).toMatch(/^OAuth /);
       expect(options.headers.Authorization).toContain('oauth_token="token-123456"');
       expect(options.headers.Authorization).toContain('oauth_signature="');
     });
 
     it('exchanges the OAuth 1 token for OAuth 2 tokens', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: tokenResponse });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(tokenResponse));
 
       const auth = await new GarminApi().exchangeLegacyToken('token-123456', 'secret-123456');
 
       expect(auth.refresh_token).toBe('a-refresh-token');
-      const [url, , options] = vi.mocked(axios).post.mock.calls[0] as [
+      const [url, , options] = vi.mocked(http).post.mock.calls[0] as [
         string,
         unknown,
         { headers: { Authorization: string } },

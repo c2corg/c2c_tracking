@@ -2,9 +2,10 @@ import type { Server } from 'http';
 
 import supertest from 'supertest';
 import type TestAgent from 'supertest/lib/agent.js';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app.ts';
+import { database } from '../../../../src/db/index.ts';
 import type { Status } from '../../../../src/health.service.ts';
 import { semverRegex } from '../../../../src/helpers/utils.ts';
 
@@ -44,5 +45,41 @@ describe('GET /health', () => {
     `,
     );
     expect(response.status).toBe(200);
+  });
+});
+
+describe('GET /health/ready', () => {
+  let server: Server;
+  let request: TestAgent;
+
+  beforeAll(() => {
+    server = app.listen();
+    request = supertest(server);
+  });
+
+  afterAll(() => {
+    server.close();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('is ready when the database answers', async () => {
+    vi.spyOn(database, 'isReachable').mockResolvedValueOnce(true);
+
+    const response = await request.get('/health/ready');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({ status: 'ok', checks: { database: 'ok' } });
+  });
+
+  it('is not ready when the database does not answer', async () => {
+    vi.spyOn(database, 'isReachable').mockResolvedValueOnce(false);
+
+    const response = await request.get('/health/ready');
+
+    expect(response.status).toBe(503);
+    expect(response.body).toEqual({ status: 'unavailable', checks: { database: 'unavailable' } });
   });
 });

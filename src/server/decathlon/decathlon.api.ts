@@ -1,9 +1,9 @@
-import axios from 'axios';
 import validator from 'validator';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
+import { http } from '../../helpers/http.ts';
 
 export const DecathlonAuth = z.object({
   access_token: z.string().min(10).max(5000),
@@ -76,7 +76,7 @@ export class DecathlonApi {
 
   public async exchangeToken(code: string): Promise<DecathlonAuth> {
     try {
-      const response = await axios.post(`${this.baseUrl}connect/oauth/token`, null, {
+      const response = await http.post(`${this.baseUrl}connect/oauth/token`, null, {
         params: {
           client_id: this.#clientId,
           client_secret: this.#clientSecret,
@@ -93,7 +93,7 @@ export class DecathlonApi {
 
   public async refreshAuth(refreshToken: string): Promise<DecathlonAuth> {
     try {
-      const response = await axios.postForm(
+      const response = await http.postForm(
         `${this.baseUrl}connect/oauth/token`,
         {
           grant_type: 'refresh_token',
@@ -112,7 +112,7 @@ export class DecathlonApi {
 
   public async getUserId(accessToken: string): Promise<string> {
     try {
-      const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/me`, {
+      const response = await http.get(`${this.baseUrl}sportstrackingdata/v2/me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'x-api-key': this.#apiKey,
@@ -132,7 +132,7 @@ export class DecathlonApi {
   // first page retrieved will contain at most 30 activities
   public async getActivities(accessToken: string): Promise<ActivitySummary[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/activities`, {
+      const response = await http.get(`${this.baseUrl}sportstrackingdata/v2/activities`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'x-api-key': this.#apiKey,
@@ -147,7 +147,7 @@ export class DecathlonApi {
 
   public async getActivity(accessToken: string, activityId: string): Promise<Activity> {
     try {
-      const response = await axios.get(
+      const response = await http.get(
         `${this.baseUrl}sportstrackingdata/v2/activities/${encodeURIComponent(activityId)}`,
         {
           headers: {
@@ -165,7 +165,7 @@ export class DecathlonApi {
 
   public async getExistingWebhookSubscription(accessToken: string): Promise<string | undefined> {
     try {
-      const response = await axios.get(`${this.baseUrl}sportstrackingdata/v2/user_web_hooks`, {
+      const response = await http.get(`${this.baseUrl}sportstrackingdata/v2/user_web_hooks`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'x-api-key': this.#apiKey,
@@ -183,7 +183,7 @@ export class DecathlonApi {
 
   public async createWebhookSubscription(userId: string, accessToken: string): Promise<string> {
     try {
-      const response = await axios.post(
+      const response = await http.post(
         `${this.baseUrl}sportstrackingdata/v2/user_web_hooks`,
         {
           user: `/v2/users/${userId}`,
@@ -206,7 +206,7 @@ export class DecathlonApi {
 
   public async deleteWebhookSubscription(id: string, accessToken: string): Promise<void> {
     try {
-      await axios.delete(`${this.baseUrl}sportstrackingdata/v2/user_web_hooks/${id}`, {
+      await http.delete(`${this.baseUrl}sportstrackingdata/v2/user_web_hooks/${id}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'x-api-key': this.#apiKey,

@@ -1,11 +1,9 @@
-import dayjs from 'dayjs';
-import dayjsPluginTimezone from 'dayjs/plugin/timezone.js';
-import dayjsPluginUtc from 'dayjs/plugin/utc.js';
 import type { SetNonNullable, SetRequired } from 'type-fest';
 
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
+import { expiresLater, formatWithOffset, utcDateNumber } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
 import {
   promTokenRenewalErrorsCounter,
@@ -22,9 +20,6 @@ import { userService } from '../../user.service.ts';
 
 import type { CorosAuth, WebhookEvent, Workout, WorkoutRecords } from './coros.api.ts';
 import { corosApi } from './coros.api.ts';
-
-dayjs.extend(dayjsPluginUtc);
-dayjs.extend(dayjsPluginTimezone);
 
 type UserWithCorosInfo = SetNonNullable<SetRequired<User, 'coros'>, 'coros'>;
 
@@ -68,12 +63,7 @@ export class CorosService {
       throw new NotFoundError(`Unable to retrieve a valid Coros token for user ${c2cId}`);
     }
     // retrieve workouts from last 30 days
-    const workouts: WorkoutRecords = await corosApi.getWorkouts(
-      token,
-      id,
-      Number.parseInt(dayjs().subtract(30, 'days').format('YYYYMMDD'), 10),
-      Number.parseInt(dayjs().format('YYYYMMDD'), 10),
-    );
+    const workouts: WorkoutRecords = await corosApi.getWorkouts(token, id, utcDateNumber(30), utcDateNumber());
     const geometries = (
       await Promise.allSettled(
         workouts.data.map(async (workout) => await this.retrieveWorkoutGeometry(workout, token, id)),
@@ -171,7 +161,7 @@ export class CorosService {
   private async getToken(user: UserWithCorosInfo): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
     const { accessToken, expiresAt, refreshToken } = user.coros;
-    if (accessToken && expiresAt && dayjs.unix(expiresAt).isAfter(dayjs().add(1, 'minute'))) {
+    if (accessToken && expiresAt && expiresLater(expiresAt)) {
       return accessToken;
     }
     if (refreshToken) {
@@ -251,10 +241,7 @@ export class CorosService {
   }
 
   private localDate(time: number, timezone: number): string {
-    return dayjs
-      .unix(time)
-      .utcOffset(timezone * 15)
-      .format();
+    return formatWithOffset(time, timezone * 15);
   }
 }
 

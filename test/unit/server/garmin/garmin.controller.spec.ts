@@ -1,11 +1,11 @@
 import type { Server } from 'http';
 
-import { AxiosError } from 'axios';
 import supertest from 'supertest';
 import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app.ts';
+import { HttpError } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { GarminActivity } from '../../../../src/server/garmin/garmin.api.ts';
 import { controller as garminController } from '../../../../src/server/garmin/garmin.controller.ts';
@@ -165,7 +165,9 @@ describe('Garmin Controller', () => {
     });
 
     it('throws if garmin API call fails', async () => {
-      vi.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(new AxiosError());
+      vi.spyOn(garminService, 'deauthorize').mockRejectedValueOnce(
+        new HttpError('failed', { method: 'DELETE', url: 'https://garmin' }, { status: 500 }),
+      );
 
       const response = await authenticated(request.post('/garmin/deauthorize/1'), 1);
 

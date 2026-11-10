@@ -12,6 +12,8 @@ import {
 import CustomStrategy from 'passport-custom';
 import type { Test } from 'supertest';
 
+import type { HttpResponse } from '../src/helpers/http.ts';
+
 export const AuthenticatedUserStrategy = (userId?: number): CustomStrategy =>
   new CustomStrategy((_req: Request, callback: CustomStrategy.VerifiedCallback) => {
     if (userId) {
@@ -44,3 +46,6 @@ export const runMiddleware = (handler: RequestHandler, options: RequestOptions =
     res.on('end', () => resolve({ req, res, next: false }));
     void handler(req, res, (error?: unknown) => resolve({ req, res, next: true, error }));
   });
+
+// A successful response of the mocked HTTP client
+export const respond = <T>(data?: T): HttpResponse<T | undefined> => ({ status: 200, data });

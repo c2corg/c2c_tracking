@@ -1,9 +1,7 @@
-import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc.js';
-
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
+import { epochSeconds, expiresLater, formatWithOffset } from '../../helpers/time.ts';
 import { truthy } from '../../helpers/utils.ts';
 import {
   promTokenRenewalErrorsCounter,
@@ -29,8 +27,6 @@ import type {
   WebhookEvent,
 } from './strava.api.ts';
 import { stravaApi } from './strava.api.ts';
-
-dayjs.extend(dayjsPluginUTC);
 
 const webhookCallbackUrl = `${config.get('server.baseUrl')}strava/webhook`;
 
@@ -137,7 +133,7 @@ export class StravaService {
   public async getToken(c2cId: number): Promise<string | undefined> {
     // regenerate auth tokens as needed if expired
     const { accessToken, expiresAt, refreshToken } = (await userService.getStravaInfo(c2cId)) ?? {};
-    if (accessToken && expiresAt && dayjs.unix(expiresAt).isAfter(dayjs().add(1, 'minute'))) {
+    if (accessToken && expiresAt && expiresLater(expiresAt)) {
       return accessToken;
     }
     if (refreshToken) {
@@ -163,7 +159,11 @@ export class StravaService {
   ): Promise<LineString | undefined> {
     try {
       const stream = await stravaApi.getActivityStream(token, activityId);
-      return this.streamSetToGeoJSON(stream, dayjs(startDateLocal).unix());
+      if (!stream) {
+        log.debug(`Strava activity ${activityId} has no GPS track`);
+        return undefined;
+      }
+      return this.streamSetToGeoJSON(stream, epochSeconds(startDateLocal));
     } catch (error: unknown) {
       log.info({ err: error }, `Unable to retrieve Strava geometry for ${activityId}`);
       return undefined;
@@ -177,7 +177,8 @@ export class StravaService {
     const altStream: AltitudeStream | undefined = stream.altitude;
 
     if (!distanceStream || !latlngStream) {
-      throw new NotFoundError('Available data cannot be converted to a valid geometry');
+      // a plain error, not a NotFoundError, which would log a warning: an activity without coordinates is expected
+      throw new Error('Available data cannot be converted to a valid geometry');
     }
     if (
       Object.values(stream)
@@ -190,7 +191,7 @@ export class StravaService {
       )?.size > 1
     ) {
       // for now, we cannot handle streams where not everything is synchronized with the distance stream
-      throw new NotFoundError('Available data cannot be converted to a valid geometry');
+      throw new Error('Available data cannot be converted to a valid geometry');
     }
 
     const layout = altStream ? (timeStream ? 'XYZM' : 'XYZ') : timeStream ? 'XYM' : 'XY';
@@ -459,9 +460,9 @@ export class StravaService {
   }
 
   private localDate(startDateString: string, startDateLocalString: string): string {
-    const startDate = dayjs(startDateString);
-    const startDateLocal = dayjs(startDateLocalString);
-    return startDate.utcOffset(startDateLocal.diff(startDate, 'hours')).format();
+    // start_date_local is the local time written as UTC: the difference is the offset of the activity time zone
+    const start = epochSeconds(startDateString);
+    return formatWithOffset(start, Math.round((epochSeconds(startDateLocalString) - start) / 60));
   }
 }
 

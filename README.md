@@ -29,6 +29,11 @@ To check it (chain and host name, `DB_HOST` must be a name of the certificate):
 
 You can debug server and tests within Visual Studio Code using the predefined configurations in `launch.json`.
 
+### Health
+
+- `GET /health`: liveness, the process answers (version, uptime, enabled trackers). Used by the Docker health check.
+- `GET /health/ready`: readiness, 200 when the database answers within 2 s, 503 otherwise.
+
 ### Routes
 
 Every route validates its input (URL parameters, query, headers, body) with `validate(...)` and zod schemas
@@ -42,8 +47,8 @@ Tests run with [Vitest](https://vitest.dev), in three projects:
 - `npm run test:unit`: unit tests, no external service needed (`npm run test:watch` to rerun them on change);
 - `npm run test:psql`: repository tests, against the PostgreSQL of `docker compose -f docker-compose.psql.yml up -d`.
   The schema of the `postgres` database is recreated before the run;
-- `npm run test:s3`: storage tests, against the Garage server of `docker compose -f docker-compose.s3.yml up -d garage`
-  (then `test/environment/init-s3.sh`).
+- `npm run test:s3`: storage tests, against the in-memory S3 server (Scality CloudServer) of
+  `docker compose -f docker-compose.s3.yml up -d s3`. The tests create the bucket.
 
 `npm test` runs the unit and psql tests.
 

@@ -1,7 +1,6 @@
-import dayjs from 'dayjs';
-
 import { NotFoundError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
+import { epochSeconds, expiresLater } from '../../helpers/time.ts';
 import {
   promTokenRenewalErrorsCounter,
   promWebhookCounter,
@@ -126,7 +125,7 @@ export class DecathlonService {
     }
     // regenerate auth tokens as needed if expired
     const { accessToken, expiresAt, refreshToken } = info;
-    if (accessToken && expiresAt && dayjs.unix(expiresAt).isAfter(dayjs().add(1, 'minute'))) {
+    if (accessToken && expiresAt && expiresLater(expiresAt)) {
       return accessToken;
     }
     if (refreshToken) {
@@ -231,7 +230,7 @@ export class DecathlonService {
     if (!activity.locations) {
       return [];
     }
-    const start = dayjs(activity.startdate).unix();
+    const start = epochSeconds(activity.startdate);
     return Object.entries(activity.locations)
       .map(([seconds, value]): [number, number, number, number] => {
         const date = start + Number.parseInt(seconds, 10);

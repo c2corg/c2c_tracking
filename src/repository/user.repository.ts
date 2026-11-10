@@ -1,8 +1,7 @@
-import dayjs from 'dayjs';
-
 import config from '../config.ts';
 import { database as db } from '../db/index.ts';
 import { IOError } from '../errors.ts';
+import { epochSeconds } from '../helpers/time.ts';
 import { decrypt, encrypt } from '../helpers/utils.ts';
 
 import type { User } from './user.ts';
@@ -252,7 +251,7 @@ export class UserRepository {
           strava: {
             id: row.strava_id,
             accessToken: decrypt(row.strava_access_token),
-            expiresAt: dayjs(row.strava_expires_at).unix(),
+            expiresAt: epochSeconds(row.strava_expires_at),
             refreshToken: decrypt(row.strava_refresh_token),
           },
         }),
@@ -263,7 +262,7 @@ export class UserRepository {
           suunto: {
             username: row.suunto_username,
             accessToken: decrypt(row.suunto_access_token),
-            expiresAt: dayjs(row.suunto_expires_at).unix(),
+            expiresAt: epochSeconds(row.suunto_expires_at),
             refreshToken: decrypt(row.suunto_refresh_token),
           },
         }),
@@ -273,10 +272,10 @@ export class UserRepository {
             row.garmin_refresh_token && {
               userId: row.garmin_user_id,
               ...(row.garmin_access_token && { accessToken: decrypt(row.garmin_access_token) }),
-              ...(row.garmin_expires_at && { expiresAt: dayjs(row.garmin_expires_at).unix() }),
+              ...(row.garmin_expires_at && { expiresAt: epochSeconds(row.garmin_expires_at) }),
               refreshToken: decrypt(row.garmin_refresh_token),
               ...(row.garmin_refresh_expires_at && {
-                refreshExpiresAt: dayjs(row.garmin_refresh_expires_at).unix(),
+                refreshExpiresAt: epochSeconds(row.garmin_refresh_expires_at),
               }),
             }),
           ...(row.garmin_token &&
@@ -294,7 +293,7 @@ export class UserRepository {
           decathlon: {
             id: row.decathlon_id,
             accessToken: decrypt(row.decathlon_access_token),
-            expiresAt: dayjs(row.decathlon_expires_at).unix(),
+            expiresAt: epochSeconds(row.decathlon_expires_at),
             refreshToken: decrypt(row.decathlon_refresh_token),
             webhookId: row.decathlon_webhook_id,
           },
@@ -312,7 +311,7 @@ export class UserRepository {
           coros: {
             id: row.coros_id,
             accessToken: decrypt(row.coros_access_token),
-            expiresAt: dayjs(row.coros_expires_at).unix(),
+            ...(row.coros_expires_at && { expiresAt: epochSeconds(row.coros_expires_at) }),
             refreshToken: decrypt(row.coros_refresh_token),
           },
         }),
@@ -326,7 +325,7 @@ export class UserRepository {
       ? {
           strava_id: user.strava.id,
           strava_access_token: user.strava.accessToken ? encrypt(user.strava.accessToken) : null,
-          strava_expires_at: user.strava.expiresAt ? dayjs.unix(user.strava.expiresAt).toDate() : null,
+          strava_expires_at: user.strava.expiresAt ? new Date(user.strava.expiresAt * 1000) : null,
           strava_refresh_token: user.strava.refreshToken ? encrypt(user.strava.refreshToken) : null,
         }
       : {
@@ -341,7 +340,7 @@ export class UserRepository {
       ? {
           suunto_username: user.suunto.username,
           suunto_access_token: user.suunto.accessToken ? encrypt(user.suunto.accessToken) : null,
-          suunto_expires_at: user.suunto.expiresAt ? dayjs.unix(user.suunto.expiresAt).toDate() : null,
+          suunto_expires_at: user.suunto.expiresAt ? new Date(user.suunto.expiresAt * 1000) : null,
           suunto_refresh_token: user.suunto.refreshToken ? encrypt(user.suunto.refreshToken) : null,
         }
       : {
@@ -367,10 +366,10 @@ export class UserRepository {
           garmin_token_secret: user.garmin.tokenSecret ? encrypt(user.garmin.tokenSecret) : null,
           garmin_user_id: user.garmin.userId ?? null,
           garmin_access_token: user.garmin.accessToken ? encrypt(user.garmin.accessToken) : null,
-          garmin_expires_at: user.garmin.expiresAt ? dayjs.unix(user.garmin.expiresAt).toDate() : null,
+          garmin_expires_at: user.garmin.expiresAt ? new Date(user.garmin.expiresAt * 1000) : null,
           garmin_refresh_token: user.garmin.refreshToken ? encrypt(user.garmin.refreshToken) : null,
           garmin_refresh_expires_at: user.garmin.refreshExpiresAt
-            ? dayjs.unix(user.garmin.refreshExpiresAt).toDate()
+            ? new Date(user.garmin.refreshExpiresAt * 1000)
             : null,
         }
       : {
@@ -395,7 +394,7 @@ export class UserRepository {
       ? {
           decathlon_id: user.decathlon.id,
           decathlon_access_token: user.decathlon.accessToken ? encrypt(user.decathlon.accessToken) : null,
-          decathlon_expires_at: user.decathlon.expiresAt ? dayjs.unix(user.decathlon.expiresAt).toDate() : null,
+          decathlon_expires_at: user.decathlon.expiresAt ? new Date(user.decathlon.expiresAt * 1000) : null,
           decathlon_refresh_token: user.decathlon.refreshToken ? encrypt(user.decathlon.refreshToken) : null,
           decathlon_webhook_id: user.decathlon.webhookId,
         }
@@ -421,7 +420,7 @@ export class UserRepository {
         ? {
             coros_id: user.coros.id,
             coros_access_token: user.coros.accessToken ? encrypt(user.coros.accessToken) : null,
-            coros_expires_at: user.coros.expiresAt ? dayjs.unix(user.coros.expiresAt).toDate() : null,
+            coros_expires_at: user.coros.expiresAt ? new Date(user.coros.expiresAt * 1000) : null,
             coros_refresh_token: user.coros.refreshToken ? encrypt(user.coros.refreshToken) : null,
           }
         : {

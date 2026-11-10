@@ -25,14 +25,17 @@ jobs:
           - 5432:5432
     permissions:
       contents: read
+      # the coverage comment of the pull requests, and the coverage of main to compare with
+      pull-requests: write
+      actions: read
     strategy:
       matrix:
         node-version: [lts/*]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Cache node modules
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         env:
           cache-name: cache-node-modules
         with:
@@ -43,7 +46,7 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
@@ -53,11 +56,9 @@ jobs:
           npm run lint
         env:
           CI: ${{ true }}
-      # Garage needs a configuration file and an initialisation: docker-compose.
       - name: Run an S3 server for testing s3
         run: |
-          docker compose -f docker-compose.s3.yml up -d garage
-          test/environment/init-s3.sh
+          docker compose -f docker-compose.s3.yml up -d s3
       - name: npm test & build
         run: |
           npm run test:ci
@@ -70,13 +71,42 @@ jobs:
       - name: Send coverage to codacy
         # secrets are not available for PR from forks, and dependabot PRs
         if: ${{ !github.event.pull_request.head.repo.fork && github.actor != 'dependabot[bot]' }}
-        uses: codacy/codacy-coverage-reporter-action@v1
+        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: reports/coverage/unit/lcov.info,reports/coverage/psql/lcov.info,reports/coverage/s3/lcov.info
+          coverage-reports: reports/coverage/lcov.info
+      # main keeps its coverage summary, which the pull requests compare with
+      - name: Keep the coverage of main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-main
+          path: reports/coverage/coverage-summary.json
+      - name: Get the coverage of main
+        id: main_coverage
+        # the token of pull requests from forks and of Dependabot cannot comment
+        if: ${{ github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && github.actor != 'dependabot[bot]' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --branch main --workflow ci.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -n "$run_id" ]; then
+            gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name coverage-main --dir reports/coverage-main || true
+          fi
+          # empty when main has no coverage yet: the comment then has no trend
+          if [ -f reports/coverage-main/coverage-summary.json ]; then
+            echo "path=reports/coverage-main/coverage-summary.json" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Comment the coverage
+        if: ${{ github.event_name == 'pull_request' && !github.event.pull_request.head.repo.fork && github.actor != 'dependabot[bot]' }}
+        uses: davelosert/vitest-coverage-report-action@74c2d9210b4fc44c84d8213f61d7ec99837b7aa0 # v2.13.2
+        with:
+          json-summary-path: reports/coverage/coverage-summary.json
+          json-final-path: reports/coverage/coverage-final.json
+          json-summary-compare-path: ${{ steps.main_coverage.outputs.path }}
       - name: Docker meta
         id: docker_meta
-        uses: docker/metadata-action@v6.2.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           # list of Docker images to use as base name for tags
           images: ${{ github.repository }}
@@ -88,13 +118,13 @@ jobs:
             type=ref,event=pr
       - name: Login to DockerHub
         if: "contains(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'"
-        uses: docker/login-action@v3
+        uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
       # pull requests build the image too (without pushing it), so that Dockerfile changes are checked
       - name: Build and push Docker images
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           # the classic Docker manifest, without attestation: the older Docker Engines of the production hosts cannot
           # pull an OCI index ("missing signature key"). Tags stay on the `tags` input: `outputs` has no `name`
@@ -123,11 +153,11 @@ jobs:
       contents: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Create or update release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}

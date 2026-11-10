@@ -1,11 +1,16 @@
-import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { http } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { CorosAuth, WorkoutRecord, WorkoutRecords } from '../../../../src/server/coros/coros.api.ts';
 import { CorosApi } from '../../../../src/server/coros/coros.api.ts';
+import { respond } from '../../../utils.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 describe('Coros API', () => {
   beforeEach(() => {
@@ -20,25 +25,25 @@ describe('Coros API', () => {
 
   describe('exchangeToken', () => {
     it('throws if request fails', async () => {
-      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(http).post.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
       await expect(api.exchangeToken('code')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros token exchange request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
       const auth: CorosAuth = { access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' };
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(auth));
 
       const api = new CorosApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith(
         'https://open.coros.com/oauth2/accesstoken',
         {
           code: 'code',
@@ -61,24 +66,24 @@ describe('Coros API', () => {
 
   describe('deauthorize', () => {
     it('throws if request fails', async () => {
-      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(http).post.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
       await expect(api.deauthorize('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros deauthorize request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(http).post.mockResolvedValueOnce(respond());
 
       const api = new CorosApi();
       await api.deauthorize('token');
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith(
         'https://open.coros.com/oauth2/deauthorize',
         { token: 'token' },
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
@@ -88,24 +93,24 @@ describe('Coros API', () => {
 
   describe('refreshAuth', () => {
     it('throws if request fails', async () => {
-      vi.mocked(axios).post.mockRejectedValueOnce(undefined);
+      vi.mocked(http).post.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
       await expect(api.refreshAuth('token')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros refresh token request]`,
       );
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(http).post.mockResolvedValueOnce(respond());
 
       const api = new CorosApi();
       await api.refreshAuth('token');
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith(
         'https://open.coros.com/oauth2/refresh-token',
         {
           grant_type: 'refresh_token',
@@ -120,14 +125,14 @@ describe('Coros API', () => {
 
   describe('getWorkouts', () => {
     it('throws if request fails', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
       await expect(api.getWorkouts('token', '1', 20230201, 20230228)).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros getWorkouts request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -147,13 +152,13 @@ describe('Coros API', () => {
         message: 'OK',
         result: '0000',
       };
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: workouts });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(workouts));
 
       const api = new CorosApi();
       const result = await api.getWorkouts('token', '1', 20230201, 20230228);
 
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://open.coros.com/v2/coros/sport/list', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://open.coros.com/v2/coros/sport/list', {
         params: { token: 'token', openId: '1', startDate: 20230201, endDate: 20230228 },
       });
       expect(result).toMatchInlineSnapshot(`
@@ -179,14 +184,14 @@ describe('Coros API', () => {
 
   describe('getWorkoutDetails', () => {
     it('throws if request fails', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
       await expect(api.getWorkoutDetails('token', 'workoutId', 8, 1, 'openId')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros getWorkoutDetails request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('calls coros API', async () => {
@@ -204,7 +209,7 @@ describe('Coros API', () => {
         message: 'OK',
         result: '0000',
       };
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: workout });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(workout));
 
       const api = new CorosApi();
       const result = await api.getWorkoutDetails('token', 'workoutId', 8, 1, 'openId');
@@ -225,7 +230,7 @@ describe('Coros API', () => {
           "result": "0000",
         }
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -234,22 +239,22 @@ describe('Coros API', () => {
       const api = new CorosApi();
 
       await expect(api.getFIT('http://169.254.169.254/latest/meta-data/')).rejects.toThrow(/not an external URL/);
-      expect(axios.get).not.toHaveBeenCalled();
+      expect(http.get).not.toHaveBeenCalled();
     });
 
     it('throws if request fails', async () => {
-      vi.mocked(axios).get.mockRejectedValueOnce(undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(undefined);
 
       const api = new CorosApi();
 
       await expect(api.getFIT('https://oss.coros.com/fit/1.fit')).rejects.toMatchInlineSnapshot(
         `[Error: Error on Coros getFIT request]`,
       );
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
 
     it('returns FIT', async () => {
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: new ArrayBuffer(1) });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(new ArrayBuffer(1)));
 
       const api = new CorosApi();
       const result = await api.getFIT('https://oss.coros.com/fit/1.fit');
@@ -259,7 +264,7 @@ describe('Coros API', () => {
           0,
         ]
       `);
-      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledTimes(1);
     });
   });
 

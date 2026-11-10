@@ -1,14 +1,11 @@
 import { createHash, createHmac, randomBytes } from 'node:crypto';
 
-import axios from 'axios';
-import dayjs from 'dayjs';
-import dayjsPluginUTC from 'dayjs/plugin/utc.js';
 import { z } from 'zod';
 
 import config from '../../config.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
-
-dayjs.extend(dayjsPluginUTC);
+import { http } from '../../helpers/http.ts';
+import { nowSeconds } from '../../helpers/time.ts';
 
 // OAuth 2 token response. Lifetimes are in seconds.
 export const GarminAuth = z.object({
@@ -146,8 +143,6 @@ export const GarminActivity = z.object({
 });
 export type GarminActivity = z.infer<typeof GarminActivity>;
 
-dayjs.extend(dayjsPluginUTC);
-
 export class GarminApi {
   // OAuth 2 (PKCE): user consent page and token endpoint
   private readonly authorizeUrl = 'https://connect.garmin.com/oauth2Confirm';
@@ -219,7 +214,7 @@ export class GarminApi {
   }
 
   private async requestToken(params: Record<string, string>): Promise<GarminAuth> {
-    const response = await axios.post<unknown>(this.tokenUrl, new URLSearchParams(params), {
+    const response = await http.post<unknown>(this.tokenUrl, new URLSearchParams(params), {
       headers: { Accept: 'application/json' },
     });
     return GarminAuth.parse(response.data);
@@ -228,7 +223,7 @@ export class GarminApi {
   /** Garmin API user id: stable across tokens, and the only user identifier sent in the webhooks with OAuth 2 */
   public async getUserId(accessToken: string): Promise<string> {
     try {
-      const response = await axios.get<unknown>(`${this.apiUrl}wellness-api/rest/user/id`, {
+      const response = await http.get<unknown>(`${this.apiUrl}wellness-api/rest/user/id`, {
         headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
       });
       return z.object({ userId: z.string().min(1) }).parse(response.data).userId;
@@ -239,7 +234,7 @@ export class GarminApi {
 
   public async backfillActivities(startInSeconds: number, endInSeconds: number, accessToken: string): Promise<void> {
     try {
-      await axios.get(`${this.apiUrl}wellness-api/rest/backfill/activityDetails`, {
+      await http.get(`${this.apiUrl}wellness-api/rest/backfill/activityDetails`, {
         params: { summaryStartTimeInSeconds: startInSeconds, summaryEndTimeInSeconds: endInSeconds },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -250,7 +245,7 @@ export class GarminApi {
 
   public async deauthorize(accessToken: string): Promise<void> {
     try {
-      await axios.delete<void>(`${this.apiUrl}wellness-api/rest/user/registration`, {
+      await http.delete<void>(`${this.apiUrl}wellness-api/rest/user/registration`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
     } catch (error: unknown) {
@@ -265,7 +260,7 @@ export class GarminApi {
   public async getLegacyUserId(token: string, tokenSecret: string): Promise<string> {
     try {
       const url = `${this.apiUrl}wellness-api/rest/user/id`;
-      const response = await axios.get<unknown>(url, {
+      const response = await http.get<unknown>(url, {
         headers: { Authorization: this.generateLegacyAuth('GET', url, token, tokenSecret), Accept: 'application/json' },
       });
       return z.object({ userId: z.string().min(1) }).parse(response.data).userId;
@@ -277,7 +272,7 @@ export class GarminApi {
   public async exchangeLegacyToken(token: string, tokenSecret: string): Promise<GarminAuth> {
     try {
       const url = `${this.apiUrl}partner-gateway/rest/user/token-exchange`;
-      const response = await axios.post<unknown>(url, null, {
+      const response = await http.post<unknown>(url, null, {
         headers: {
           Authorization: this.generateLegacyAuth('POST', url, token, tokenSecret),
           Accept: 'application/json',
@@ -290,7 +285,7 @@ export class GarminApi {
   }
 
   private generateLegacyAuth(method: 'GET' | 'POST', url: string, token: string, tokenSecret: string): string {
-    const timestamp = dayjs().unix();
+    const timestamp = nowSeconds();
     const nonce = randomBytes(16).toString('hex');
     const normalizedParameters = `oauth_consumer_key=${this.#clientId}&oauth_nonce=${nonce}&oauth_signature_method=HMAC-SHA1&oauth_timestamp=${timestamp}&oauth_token=${token}&oauth_version=1.0`;
     const signatureBaseString = `${method}&${encodeURIComponent(url)}&${encodeURIComponent(normalizedParameters)}`;

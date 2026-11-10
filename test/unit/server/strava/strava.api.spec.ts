@@ -1,6 +1,8 @@
-import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { http, HttpError } from '../../../../src/helpers/http.ts';
+import log from '../../../../src/helpers/logger.ts';
+import { promApiErrorsCounter } from '../../../../src/metrics/prometheus.ts';
 import type {
   Activity,
   StravaAuth,
@@ -9,8 +11,13 @@ import type {
   Subscription,
 } from '../../../../src/server/strava/strava.api.ts';
 import { StravaApi } from '../../../../src/server/strava/strava.api.ts';
+import { respond } from '../../../utils.ts';
 
-vi.mock('axios');
+// the HTTP calls are mocked, not the errors
+vi.mock('../../../../src/helpers/http.ts', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  http: { get: vi.fn(), post: vi.fn(), postForm: vi.fn(), delete: vi.fn() },
+}));
 
 describe('Strava API', () => {
   beforeEach(() => {
@@ -26,13 +33,13 @@ describe('Strava API', () => {
         expires_at: 1,
         expires_in: 1,
       };
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: auth });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(auth));
 
       const api = new StravaApi();
       const result = await api.exchangeToken('code');
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ code: 'code' }),
       });
@@ -50,13 +57,13 @@ describe('Strava API', () => {
 
   describe('deauthorize', () => {
     it('calls strava API', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce(undefined);
+      vi.mocked(http).post.mockResolvedValueOnce(respond());
 
       const api = new StravaApi();
       await api.deauthorize('token');
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/oauth/revoke', null, {
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith('https://www.strava.com/oauth/revoke', null, {
         params: { token: 'token' },
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         auth: expect.objectContaining({ username: expect.any(String), password: expect.any(String) }),
@@ -72,7 +79,7 @@ describe('Strava API', () => {
         expires_at: 1,
         expires_in: 1,
       };
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: refreshAuth });
+      vi.mocked(http).post.mockResolvedValueOnce(respond(refreshAuth));
 
       const api = new StravaApi();
       const result = await api.refreshAuth('refresh_token');
@@ -83,8 +90,8 @@ describe('Strava API', () => {
         expires_in: 1,
         refresh_token: 'refresh_token',
       });
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
+      expect(http.post).toHaveBeenCalledTimes(1);
+      expect(http.post).toHaveBeenCalledWith('https://www.strava.com/api/v3/oauth/token', null, {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         params: expect.objectContaining({ refresh_token: 'refresh_token' }),
       });
@@ -105,7 +112,7 @@ describe('Strava API', () => {
           total_elevation_gain: 1.2,
         },
       ];
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: activities });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(activities));
 
       const api = new StravaApi();
       const result = await api.getAthleteActivities('access_token');
@@ -122,8 +129,8 @@ describe('Strava API', () => {
           total_elevation_gain: 1.2,
         },
       ]);
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/athlete/activities', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/athlete/activities', {
         headers: { Authorization: 'Bearer access_token' },
       });
     });
@@ -141,7 +148,7 @@ describe('Strava API', () => {
         elapsed_time: 1,
         total_elevation_gain: 1.2,
       };
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: activity });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(activity));
 
       const api = new StravaApi();
       const result = await api.getActivity('access_token', 123);
@@ -156,8 +163,8 @@ describe('Strava API', () => {
         start_date_local: '2022-01-01T00:00:01Z',
         total_elevation_gain: 1.2,
       });
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/123', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/123', {
         headers: { Authorization: 'Bearer access_token' },
       });
     });
@@ -176,7 +183,7 @@ describe('Strava API', () => {
           ],
         },
       };
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: streamSet });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(streamSet));
 
       const api = new StravaApi();
       const result = await api.getActivityStream('access_token', 1);
@@ -192,24 +199,51 @@ describe('Strava API', () => {
           series_type: 'distance',
         },
       });
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/1/streams', {
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/1/streams', {
         headers: { Authorization: 'Bearer access_token' },
         params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
       });
+    });
+
+    it('gives nothing, without warning nor API error count, for an activity without GPS track (404)', async () => {
+      const warn = vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+      const errors = vi.spyOn(promApiErrorsCounter, 'labels');
+      vi.mocked(http).get.mockRejectedValueOnce(
+        new HttpError('Request failed with status code 404', { method: 'GET', url: 'https://strava' }, { status: 404 }),
+      );
+
+      const api = new StravaApi();
+
+      await expect(api.getActivityStream('access_token', 1)).resolves.toBeUndefined();
+      expect(warn).not.toHaveBeenCalled();
+      expect(errors).not.toHaveBeenCalled();
+    });
+
+    it('still fails on other errors', async () => {
+      vi.spyOn(log, 'warn').mockImplementation(() => undefined);
+      vi.mocked(http).get.mockRejectedValueOnce(
+        new HttpError('Request failed with status code 401', { method: 'GET', url: 'https://strava' }, { status: 401 }),
+      );
+
+      const api = new StravaApi();
+
+      await expect(api.getActivityStream('access_token', 1)).rejects.toThrow(
+        'Error on Strava getActivityStream request',
+      );
     });
   });
 
   describe('requestSubscriptionCreation', () => {
     it('calls strava API', async () => {
-      vi.mocked(axios).post.mockResolvedValueOnce({ data: { id: 123 } });
+      vi.mocked(http).post.mockResolvedValueOnce(respond({ id: 123 }));
 
       const api = new StravaApi();
       const result = await api.requestSubscriptionCreation('http://redirect.to', 'verify_token');
 
       expect(result).toEqual(123);
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      const [url, body] = vi.mocked(axios).post.mock.calls[0]!;
+      expect(http.post).toHaveBeenCalledTimes(1);
+      const [url, body] = vi.mocked(http).post.mock.calls[0]!;
       expect(url).toEqual('https://www.strava.com/api/v3/push_subscriptions');
       expect(body).toBeInstanceOf(URLSearchParams);
       expect(Object.fromEntries(body as URLSearchParams)).toEqual({
@@ -232,7 +266,7 @@ describe('Strava API', () => {
           updated_at: '2022-01-01T00:00:01Z',
         },
       ];
-      vi.mocked(axios).get.mockResolvedValueOnce({ data: subscriptions });
+      vi.mocked(http).get.mockResolvedValueOnce(respond(subscriptions));
 
       const api = new StravaApi();
       const result = await api.getSubscriptions();
@@ -246,20 +280,20 @@ describe('Strava API', () => {
           updated_at: '2022-01-01T00:00:01Z',
         },
       ]);
-      expect(axios.get).toHaveBeenCalledTimes(1);
-      expect(axios.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/push_subscriptions', expect.anything());
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/push_subscriptions', expect.anything());
     });
   });
 
   describe('deleteSubscription', () => {
     it('calls strava API', async () => {
-      vi.mocked(axios).delete.mockImplementation(() => Promise.resolve());
+      vi.mocked(http).delete.mockResolvedValue(respond());
 
       const api = new StravaApi();
       await api.deleteSubscription('123');
 
-      expect(axios.delete).toHaveBeenCalledTimes(1);
-      expect(axios.delete).toHaveBeenCalledWith(
+      expect(http.delete).toHaveBeenCalledTimes(1);
+      expect(http.delete).toHaveBeenCalledWith(
         'https://www.strava.com/api/v3/push_subscriptions/123',
         expect.anything(),
       );
