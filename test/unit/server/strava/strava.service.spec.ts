@@ -103,6 +103,29 @@ describe('Strava Service', () => {
       });
     });
 
+    it('filters out activities never a c2c outing, without retrieving their geometry', async () => {
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
+        {
+          id: 1,
+          name: 'Zwift',
+          sport_type: 'VirtualRide',
+          start_date: '2022-01-01T00:00:01Z',
+          start_date_local: '2022-01-01T01:00:01Z',
+          distance: 1,
+          elapsed_time: 1,
+          total_elevation_gain: 0,
+        },
+      ]);
+      vi.spyOn(stravaApi, 'getActivityStream');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new StravaService();
+      await service.resyncActivities(1, 'access_token');
+
+      expect(stravaApi.getActivityStream).not.toHaveBeenCalled();
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
+    });
+
     it('filters out activities without geometry', async () => {
       vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
         athlete: { id: 1 },
@@ -864,6 +887,44 @@ describe('Strava Service', () => {
         expect(log.warn).toHaveBeenCalledWith(
           `Strava activity creation webhook event for user 1 couldn't be processed: unable to insert activity data`,
         );
+
+        getTokenSpy.mockRestore();
+      });
+
+      it('ignores an activity never a c2c outing, without retrieving its geometry', async () => {
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(StravaService.prototype as any, 'getToken')
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
+          id: 1,
+          name: 'Regatta',
+          sport_type: 'Sail',
+          start_date: '1970-01-01T00:00:01Z',
+          start_date_local: '1970-01-01T00:00:01Z',
+          distance: 1,
+          elapsed_time: 1,
+          total_elevation_gain: 0,
+        });
+        vi.spyOn(stravaApi, 'getActivityStream');
+        vi.spyOn(userService, 'addActivities');
+
+        const service = new StravaService();
+        await service.handleWebhookEvent({
+          subscription_id: 1,
+          object_id: 1,
+          object_type: 'activity',
+          aspect_type: 'create',
+          owner_id: 1,
+          event_time: 1,
+          updates: {},
+        });
+
+        expect(stravaApi.getActivityStream).not.toHaveBeenCalled();
+        expect(userService.addActivities).not.toHaveBeenCalled();
+        expect(log.warn).not.toHaveBeenCalled();
 
         getTokenSpy.mockRestore();
       });

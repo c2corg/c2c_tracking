@@ -150,6 +150,25 @@ describe('Decathlon Service', () => {
       );
     });
 
+    it('filters out activities never a c2c outing, without retrieving them', async () => {
+      vi.spyOn(decathlonApi, 'getActivities').mockResolvedValueOnce([
+        {
+          id: 'activityId',
+          sport: '/v2/sports/301', // sailing
+          startdate: '1970-01-01T00:00:01Z',
+          dataSummaries: {},
+        },
+      ]);
+      vi.spyOn(decathlonApi, 'getActivity');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new DecathlonService();
+      await service.resyncActivities(1, 'access_token');
+
+      expect(decathlonApi.getActivity).not.toHaveBeenCalled();
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
+    });
+
     it('filters out activities without geometry', async () => {
       vi.spyOn(decathlonApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',

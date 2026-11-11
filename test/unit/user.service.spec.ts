@@ -1151,6 +1151,29 @@ describe('User service', () => {
   });
 
   describe('addActivities', () => {
+    it('ignores the activities never a c2c outing', async () => {
+      vi.spyOn(activityRepository, 'findByUser');
+      vi.spyOn(activityRepository, 'upsert');
+
+      const service = new UserService();
+      await service.addActivities(1, {
+        vendor: 'strava',
+        vendorId: '1000',
+        date: '2022-06-06T00:00:01Z',
+        type: 'Sail',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(activityRepository.findByUser).not.toHaveBeenCalled();
+      expect(activityRepository.upsert).not.toHaveBeenCalled();
+    });
+
     it('sorts activities and keep only the most recent ones', async () => {
       const activities: Activity[] = [...Array(30).keys()]
         .map((k) => k + 1)
@@ -1309,6 +1332,29 @@ describe('User service', () => {
   });
 
   describe('updateActivity', () => {
+    it('deletes the activity changed to a type never a c2c outing', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          name: 'name',
+          type: 'Run',
+        },
+      ]);
+      vi.spyOn(activityRepository, 'update');
+      const deleteActivity = vi.spyOn(UserService.prototype, 'deleteActivity').mockResolvedValueOnce(undefined);
+
+      const service = new UserService();
+      await service.updateActivity(1, { vendor: 'strava', vendorId: '1', type: 'VirtualRun' });
+
+      expect(activityRepository.update).not.toHaveBeenCalled();
+      expect(deleteActivity).toHaveBeenCalledWith('strava', '1');
+      deleteActivity.mockRestore();
+    });
+
     it('updates activity', async () => {
       vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
         {

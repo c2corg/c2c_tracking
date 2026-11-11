@@ -1,4 +1,5 @@
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { epochSeconds, expiresLater } from '../../helpers/time.ts';
 import {
@@ -53,7 +54,9 @@ export class DecathlonService {
       throw new NotFoundError(`Unable to retrieve a valid Decathlon token for user ${c2cId}`);
     }
     // retrieve last 30 outings
-    const activities = await decathlonApi.getActivities(token);
+    const activities = (await decathlonApi.getActivities(token)).filter(
+      (activity) => !isExcludedActivityType('decathlon', this.sportName(activity)),
+    );
     const geometries = (
       await Promise.allSettled(
         activities.map(async (activity) => {
@@ -239,8 +242,11 @@ export class DecathlonService {
       .sort(([_lng1, _lat1, _ele1, d1], [_lng2, _lat2, _ele2, d2]) => d1 - d2);
   }
 
+  private sportName(activity: Activity): string | undefined {
+    return sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10))?.translatedNames['en'];
+  }
+
   private asRepositoryActivity(activity: Activity, geojson: LineString): NewActivityWithGeometry {
-    const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
     const coordinates = this.locationsToGeoJson(activity);
     let duration = activity.duration;
     if ((duration === undefined || duration === null) && activity.dataSummaries['24']) {
@@ -256,7 +262,7 @@ export class DecathlonService {
       vendorId: activity.id.toString(),
       date: activity.startdate,
       name: activity.name,
-      type: sport?.translatedNames?.['en'] || 'Unknown',
+      type: this.sportName(activity) || 'Unknown',
       geojson,
       ...(duration && { duration: Math.round(duration) }),
       ...(elevation && { heightDiffUp: Math.round(elevation) }),

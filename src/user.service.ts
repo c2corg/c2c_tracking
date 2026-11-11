@@ -1,5 +1,6 @@
 import config from './config.ts';
 import { NotFoundError } from './errors.ts';
+import { isExcludedActivityType } from './excluded-activity-types.ts';
 import log from './helpers/logger.ts';
 import { epochSeconds, nowSeconds } from './helpers/time.ts';
 import type { Optional } from './helpers/utils.ts';
@@ -372,7 +373,8 @@ export class UserService {
 
   private corosTokenDurationDays = 29; // 30, but let's have a lower limit because we aren't sur of the exact time
 
-  public async addActivities(c2cId: number, ...newActivities: NewActivityWithGeometry[]): Promise<void> {
+  public async addActivities(c2cId: number, ...activities: NewActivityWithGeometry[]): Promise<void> {
+    const newActivities = activities.filter(({ vendor, type }) => !isExcludedActivityType(vendor, type));
     if (!newActivities.length) {
       return;
     }
@@ -436,6 +438,11 @@ export class UserService {
       (act) => act.vendor === activity.vendor && act.vendorId === activity.vendorId,
     );
     if (!savedActivity) {
+      return;
+    }
+    if (isExcludedActivityType(activity.vendor, activity.type)) {
+      // the user changed the activity to a type that is never a c2c outing
+      await this.deleteActivity(activity.vendor, activity.vendorId);
       return;
     }
     await activityRepository.update({

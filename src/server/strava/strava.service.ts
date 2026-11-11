@@ -1,5 +1,6 @@
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { epochSeconds, expiresLater, formatWithOffset } from '../../helpers/time.ts';
 import { truthy } from '../../helpers/utils.ts';
@@ -69,7 +70,9 @@ export class StravaService {
       throw new NotFoundError(`Unable to retrieve a valid Strava token for user ${c2cId}`);
     }
     // retrieve last 30 outings
-    const activities: Activity[] = await stravaApi.getAthleteActivities(token);
+    const activities: Activity[] = (await stravaApi.getAthleteActivities(token)).filter(
+      ({ sport_type }) => !isExcludedActivityType('strava', sport_type),
+    );
     const geometries = (
       await Promise.allSettled(
         activities.map((activity) =>
@@ -355,6 +358,9 @@ export class StravaService {
     let geojson: LineString | undefined;
     try {
       activity = await stravaApi.getActivity(token, activityId);
+      if (isExcludedActivityType('strava', activity.sport_type)) {
+        return;
+      }
       geojson = await this.retrieveActivityGeometry(
         token,
         activityId,

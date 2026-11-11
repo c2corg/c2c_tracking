@@ -148,6 +148,33 @@ describe('Suunto Service', () => {
       expect(log.warn).toHaveBeenCalledTimes(1);
     });
 
+    it('filters out activities never a c2c outing, without retrieving their geometry', async () => {
+      vi.spyOn(suuntoApi, 'getWorkouts').mockResolvedValueOnce({
+        payload: [
+          {
+            workoutId: 1,
+            workoutKey: '1',
+            activityId: 71, // sailing
+            workoutName: 'name',
+            startTime: 1,
+            totalTime: 1,
+            totalAscent: 1.2,
+            totalDistance: 1.2,
+            timeOffsetInMinutes: 60,
+          },
+        ],
+        metadata: {},
+      });
+      vi.spyOn(suuntoApi, 'getFIT');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new SuuntoService();
+      await service.resyncActivities(1, 'access_token');
+
+      expect(suuntoApi.getFIT).not.toHaveBeenCalled();
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
+    });
+
     it('filters out activities without geometry', async () => {
       vi.spyOn(suuntoApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',
