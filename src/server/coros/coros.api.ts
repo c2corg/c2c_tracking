@@ -256,8 +256,11 @@ export class CorosApi {
   }
 
   public getSport(mode: number, subMode: number): string {
-    const key = `${mode}/${subMode}`;
-    return sportTypes.get(key) ?? unknownActivityType('coros', key);
+    return this.findSport(mode, subMode) ?? unknownActivityType('coros', `${mode}/${subMode}`);
+  }
+
+  public findSport(mode: number, subMode: number): string | undefined {
+    return sportTypes.get(`${mode}/${subMode}`);
   }
 }
 

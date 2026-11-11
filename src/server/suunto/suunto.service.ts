@@ -1,5 +1,6 @@
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import { unknownActivityType } from '../../helpers/activity-type.ts';
 import log from '../../helpers/logger.ts';
 import { expiresLater, formatWithOffset } from '../../helpers/time.ts';
@@ -55,20 +56,19 @@ export class SuuntoService {
     }
     // retrieve last 30 outings
     const workouts: Workouts = await suuntoApi.getWorkouts(token, this.#suuntoSubscriptionKey);
+    const payload = workouts.payload.filter(({ activityId }) => !this.isExcluded(activityId));
     const geometries = (
-      await Promise.allSettled(
-        workouts.payload.map((workout) => this.retrieveActivityGeometry(token, workout.workoutKey)),
-      )
+      await Promise.allSettled(payload.map((workout) => this.retrieveActivityGeometry(token, workout.workoutKey)))
     ).map((result, i) => {
       if (result.status === 'fulfilled') {
         return result.value;
       }
       // eslint-disable-next-line security/detect-object-injection
-      log.info(`Unable to retrieve geometry for Suunto activity ${workouts.payload[i]!.workoutId} for user ${c2cId}`);
+      log.info(`Unable to retrieve geometry for Suunto activity ${payload[i]!.workoutId} for user ${c2cId}`);
       return undefined;
     });
 
-    const activities = workouts.payload
+    const activities = payload
       // eslint-disable-next-line security/detect-object-injection
       .filter((_activity, i) => !!geometries?.[i])
       // eslint-disable-next-line security/detect-object-injection
@@ -141,6 +141,9 @@ export class SuuntoService {
     let geojson: LineString | undefined;
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
+      if (this.isExcluded(workout.payload.activityId)) {
+        return;
+      }
       geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutKey);
       if (!geojson) {
         return;
@@ -197,6 +200,11 @@ export class SuuntoService {
     // clear user Suunto data
     const { suunto, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
+  }
+
+  private isExcluded(activityId: number): boolean {
+    // eslint-disable-next-line security/detect-object-injection
+    return isExcludedActivityType('suunto', workoutTypes[activityId]);
   }
 
   private asRepositoryActivity(workout: Workout, geojson: LineString): NewActivityWithGeometry {

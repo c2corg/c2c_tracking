@@ -3,6 +3,7 @@ import { createHmac } from 'crypto';
 import invariant from 'tiny-invariant';
 
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { durationSeconds, offsetString } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
@@ -137,6 +138,10 @@ export class PolarService {
       );
       return;
     }
+    const type = sportType(exercise);
+    if (isExcludedActivityType('polar', type)) {
+      return;
+    }
     let fit: ArrayBuffer;
     try {
       fit = await polarApi.getExerciseFit(user.polar.token, exerciseId);
@@ -155,7 +160,7 @@ export class PolarService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise, geojson));
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise, type, geojson));
       promWebhookCounter.labels({ vendor: 'polar', subject: 'activity', event: 'create' });
     } catch {
       promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
@@ -169,12 +174,12 @@ export class PolarService {
     return signature === createHmac('sha256', webhookSecret).update(rawEvent).digest('hex');
   }
 
-  private asRepositoryActivity(exercise: Exercise, geojson: LineString): NewActivityWithGeometry {
+  private asRepositoryActivity(exercise: Exercise, type: string, geojson: LineString): NewActivityWithGeometry {
     return {
       vendor: 'polar',
       vendorId: exercise.id,
       date: this.localDate(exercise),
-      type: sportType(exercise),
+      type,
       geojson,
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
       ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API
