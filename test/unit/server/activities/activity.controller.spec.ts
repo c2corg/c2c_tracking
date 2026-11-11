@@ -64,6 +64,7 @@ describe('Activities Controller', () => {
           date: '2022-01-01T00:00:01Z',
           type: { en: 'Run', fr: 'Course à pied' },
           name: 'name',
+          c2cActivities: [],
         },
       ]);
 
@@ -73,6 +74,7 @@ describe('Activities Controller', () => {
       expect(response.body).toMatchInlineSnapshot(`
         [
           {
+            "c2cActivities": [],
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
@@ -100,6 +102,7 @@ describe('Activities Controller', () => {
           date: '2022-01-01T00:00:01Z',
           type: { en: 'Run' },
           name: 'name',
+          c2cActivities: [],
         },
       ]);
 
@@ -109,6 +112,7 @@ describe('Activities Controller', () => {
       expect(response.body).toMatchInlineSnapshot(`
         [
           {
+            "c2cActivities": [],
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",

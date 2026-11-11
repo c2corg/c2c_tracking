@@ -1,5 +1,6 @@
 import type { Except } from 'type-fest';
 
+import { type C2cActivity, toC2cActivities } from '../../c2c-activities.ts';
 import { NotFoundError } from '../../errors.ts';
 import { Lang, translations } from '../../helpers/i18n/index.ts';
 import type { Activity } from '../../repository/activity.ts';
@@ -10,7 +11,9 @@ export class ActivityService {
   public async getActivities(
     userId: number,
     lang?: Lang,
-  ): Promise<(Except<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
+  ): Promise<
+    (Except<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>>; c2cActivities: C2cActivity[] })[]
+  > {
     const langs: Lang[] = lang ? [lang] : Lang.options;
     return (await userService.getActivities(userId)).map(({ geojson, type, ...keep }) => {
       const translated = langs.reduce(
@@ -29,6 +32,8 @@ export class ActivityService {
       return {
         ...keep,
         type: translated,
+        // to prefill the outing
+        c2cActivities: toC2cActivities(keep.vendor, type),
       };
     });
   }
