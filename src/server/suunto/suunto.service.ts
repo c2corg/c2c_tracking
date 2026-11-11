@@ -1,5 +1,6 @@
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
+import { unknownActivityType } from '../../helpers/activity-type.ts';
 import log from '../../helpers/logger.ts';
 import { expiresLater, formatWithOffset } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
@@ -203,7 +204,7 @@ export class SuuntoService {
       vendor: 'suunto',
       vendorId: workout.workoutKey,
       date: formatWithOffset(Math.floor(workout.startTime / 1000), workout.timeOffsetInMinutes),
-      type: workoutTypes[workout.activityId] || 'Unknown',
+      type: workoutTypes[workout.activityId] ?? unknownActivityType('suunto', workout.activityId),
       geojson,
       ...(workout.totalDistance && { length: Math.round(workout.totalDistance) }),
       ...(workout.totalTime && { duration: Math.round(workout.totalTime) }),

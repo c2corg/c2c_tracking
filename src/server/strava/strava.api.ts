@@ -2,6 +2,7 @@ import validator from 'validator';
 import { z } from 'zod';
 
 import config from '../../config.ts';
+import { knownActivityType } from '../../helpers/activity-type.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { http, isHttpError } from '../../helpers/http.ts';
 
@@ -22,12 +23,16 @@ export type StravaAuth = z.infer<typeof StravaAuth>;
 export const StravaRefreshAuth = StravaAuth.omit({ athlete: true });
 export type StravaRefreshAuth = z.infer<typeof StravaRefreshAuth>;
 
-const sportTypes = [
+// https://developers.strava.com/docs/reference/#api-models-SportType
+const sportTypes = new Set([
   'AlpineSki',
   'BackcountrySki',
   'Badminton',
+  'Basketball',
   'Canoeing',
+  'Cricket',
   'Crossfit',
+  'Dance',
   'EBikeRide',
   'Elliptical',
   'EMountainBikeRide',
@@ -42,6 +47,8 @@ const sportTypes = [
   'Kitesurf',
   'MountainBikeRide',
   'NordicSki',
+  'Padel',
+  'PhysicalTherapy',
   'Pickleball',
   'Pilates',
   'Racquetball',
@@ -67,20 +74,15 @@ const sportTypes = [
   'VirtualRide',
   'VirtualRow',
   'VirtualRun',
+  'Volleyball',
   'Walk',
   'WeightTraining',
   'Wheelchair',
   'Windsurf',
   'Workout',
   'Yoga',
-];
-export const SportType = z.preprocess((val) => {
-  const s = String(val);
-  if (sportTypes.includes(s)) {
-    return s;
-  }
-  return 'Unknown';
-}, z.string());
+]);
+export const SportType = z.preprocess((val) => knownActivityType('strava', String(val), sportTypes), z.string());
 export type SportType = z.infer<typeof SportType>;
 
 export const Activity = z.object({

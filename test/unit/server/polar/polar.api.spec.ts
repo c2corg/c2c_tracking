@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { http } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { CreatedWebhookInfo, Exercise, PolarAuth, WebhookInfo } from '../../../../src/server/polar/polar.api.ts';
-import { PolarApi } from '../../../../src/server/polar/polar.api.ts';
+import { PolarApi, sportType } from '../../../../src/server/polar/polar.api.ts';
 import { respond } from '../../../utils.ts';
 
 // the HTTP calls are mocked, not the errors
@@ -152,7 +152,7 @@ describe('Polar API', () => {
           "distance": 1,
           "duration": "PT1S",
           "id": "exerciseId",
-          "sport": "Unknown",
+          "sport": "RUN",
           "start_time": "1970-01-01T00:00:01",
           "start_time_utc_offset": 0,
         }
@@ -247,6 +247,30 @@ describe('Polar API', () => {
         }
       `);
       expect(http.get).toHaveBeenCalledTimes(1);
+    });
+  });
+  describe('sportType', () => {
+    const exercise: Exercise = {
+      id: 'exerciseId',
+      start_time: '1970-01-01T00:00:01',
+      start_time_utc_offset: 0,
+    };
+
+    it('uses the detailed sport info', () => {
+      expect(sportType({ ...exercise, sport: 'OTHER', detailed_sport_info: 'BACKCOUNTRY_SKIING' })).toBe(
+        'BACKCOUNTRY_SKIING',
+      );
+      expect(sportType({ ...exercise, detailed_sport_info: 'CROSS-COUNTRY_SKIING' })).toBe('CROSS-COUNTRY_SKIING');
+    });
+
+    it('falls back on the sport', () => {
+      expect(sportType({ ...exercise, sport: 'HIKING', detailed_sport_info: 'NEW_SPORT' })).toBe('HIKING');
+      expect(sportType({ ...exercise, sport: 'HIKING' })).toBe('HIKING');
+    });
+
+    it('is unknown otherwise', () => {
+      expect(sportType({ ...exercise, sport: 'OTHER', detailed_sport_info: 'NEW_SPORT' })).toBe('Unknown');
+      expect(sportType(exercise)).toBe('Unknown');
     });
   });
 });

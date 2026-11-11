@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import config from '../../config.ts';
 import { ExternalApiError } from '../../errors.ts';
+import { knownActivityType } from '../../helpers/activity-type.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { http } from '../../helpers/http.ts';
 import { nowSeconds } from '../../helpers/time.ts';
@@ -14,7 +15,7 @@ export const GarminAuth = z.object({
 });
 export type GarminAuth = z.infer<typeof GarminAuth>;
 
-const activityTypes = [
+const activityTypes = new Set([
   'RUNNING',
   'INDOOR_RUNNING',
   'OBSTACLE_RUN',
@@ -106,14 +107,76 @@ const activityTypes = [
   'SKATING_WS',
   'SNOW_SHOE_WS',
   'SNOWMOBILING_WS',
-];
-export const GarminActivityType = z.preprocess((val) => {
-  const s = String(val).toUpperCase();
-  if (activityTypes.includes(s)) {
-    return s;
-  }
-  return 'UNKNOWN';
-}, z.string());
+  // not from Garmin's documentation (partner only): Validic changelog 2024-03-04 and Antavo docs
+  'AMERICAN_FOOTBALL',
+  'BADMINTON',
+  'BASEBALL',
+  'BASKETBALL',
+  'BOXING',
+  'CRICKET',
+  'FIELD_HOCKEY',
+  'ICE_HOCKEY',
+  'LACROSSE',
+  'MIXED_MARTIAL_ARTS',
+  'PADEL',
+  'PICKLEBALL',
+  'PLATFORM_TENNIS',
+  'RACKET_SPORTS',
+  'RACQUTBALL',
+  'RUGBY',
+  'SOCCER',
+  'SOFTBALL',
+  'SQUASH',
+  'TABLE_TENNIS',
+  'TEAM_SPORTS',
+  'ULTIMATE_DISC',
+  'VOLLEYBALL',
+  'DISC_GOLF',
+  'E_BIKE_FITNESS',
+  'E_BIKE_MOUNTAIN',
+  'HANDCYCLING',
+  'INDOOR_HANDCYCLING',
+  'WHEELCHAIR_PUSH_RUN',
+  'WHEELCHAIR_PUSH_WALK',
+  'PARA_SPORTS',
+  'KAYAKING',
+  'KITEBOARDING',
+  'SNORKELING',
+  'WATERSKIING',
+  'WINDSURFING',
+  'WATER_SPORTS',
+  'HIIT',
+  'MEDITATION',
+  'STOP_WATCH',
+  'BACKCOUNTRY_SNOWBOARDING',
+  'BACKCOUNTRY_SKIING',
+  'RESORT_SKIING',
+  'CROSS_COUNTRY_CLASSIC_SKIING',
+  'SNOWBOARDING',
+  'BIKE_TO_RUN_TRANSITION_V2',
+  'RUN_TO_BIKE_TRANSITION_V2',
+  'SWIM_TO_BIKE_TRANSITION_V2',
+  'TRANSITION_V2',
+  'BOATING_V2',
+  'FISHING_V2',
+  'KAYAKING_V2',
+  'KITEBOARDING_V2',
+  'OFFSHORE_GRINDING_V2',
+  'ONSHORE_GRINDING_V2',
+  'PADDLING_V2',
+  'ROWING_V2',
+  'SAILING_V2',
+  'STAND_UP_PADDLEBOARDING_V2',
+  'SURFING_V2',
+  'TENNIS_V2',
+  'WAKEBOARDING_V2',
+  'WHITEWATER_RAFTING_V2',
+  'WINDSURFING_V2',
+]);
+export const GarminActivityType = z.preprocess(
+  (val) => knownActivityType('garmin', String(val).toUpperCase(), activityTypes, 'UNKNOWN'),
+  z.string(),
+);
 export type GarminActivityType = z.infer<typeof GarminActivityType>;
 
 export const GarminActivitySummary = z.object({

@@ -274,6 +274,20 @@ describe('Coros API', () => {
       expect(api.getSport(8, 1)).toEqual('Outdoor Run');
       expect(api.getSport(8, 3)).toEqual('Unknown');
       expect(api.getSport(29, 1)).toEqual('Ski Touring');
+      expect(api.getSport(30, 1)).toEqual('Multi-Pitch');
+      expect(api.getSport(99, 2)).toEqual('Custom Sport Indoor');
+    });
+
+    it('does not mix up a subMode above 9 with the next mode', () => {
+      const api = new CorosApi();
+      expect(api.getSport(32, 10)).toEqual('Unknown');
+      expect(api.getSport(33, 3)).toEqual('Bouldering');
+    });
+
+    it('logs the unknown mode and subMode', () => {
+      const api = new CorosApi();
+      api.getSport(100, 12);
+      expect(log.warn).toHaveBeenCalledWith({ vendor: 'coros', activityType: '100/12' }, 'Unknown coros activity type');
     });
   });
 });
