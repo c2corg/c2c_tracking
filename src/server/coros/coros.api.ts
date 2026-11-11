@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import config from '../../config.ts';
 import { ExternalApiError } from '../../errors.ts';
+import { unknownActivityType } from '../../helpers/activity-type.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { isExternalUrl } from '../../helpers/external-url.ts';
 import { http } from '../../helpers/http.ts';
@@ -16,8 +17,8 @@ export type CorosAuth = z.infer<typeof CorosAuth>;
 
 export const Workout = z.object({
   labelId: z.string().regex(/\d+/),
-  mode: z.number().int().positive().max(99),
-  subMode: z.number().int().positive().max(99),
+  mode: z.number().int().nonnegative(),
+  subMode: z.number().int().nonnegative(),
   distance: z.number().nonnegative().optional(),
   duration: z.number().int().nonnegative().optional(),
   startTime: z.number().int().positive(),
@@ -28,8 +29,8 @@ export const Workout = z.object({
   triathlonItemList: z
     .array(
       z.object({
-        mode: z.number().int().positive().max(99),
-        subMode: z.number().int().positive().max(99),
+        mode: z.number().int().nonnegative(),
+        subMode: z.number().int().nonnegative(),
         distance: z.number().nonnegative().optional(),
         duration: z.number().int().nonnegative().optional(),
         fitUrl: z.url().optional(),
@@ -66,37 +67,73 @@ export const WebhookEvent = z.object({
 
 export type WebhookEvent = z.infer<typeof WebhookEvent>;
 
-const sportType = new Map<number, string>();
-sportType.set(81, 'Outdoor Run');
-sportType.set(82, 'Indoor Run');
-sportType.set(91, 'Outdoor Bike');
-sportType.set(92, 'Indoor Bike');
-sportType.set(101, 'Open Water');
-sportType.set(102, 'Pool Swim');
-sportType.set(131, 'Triathlon');
-sportType.set(132, 'Multisport');
-sportType.set(133, 'Ski Touring');
-sportType.set(141, 'Mountain Climb');
-sportType.set(151, 'Trail Run');
-sportType.set(161, 'Hike');
-sportType.set(181, 'GPS Cardio');
-sportType.set(182, 'Gym Cardio');
-sportType.set(191, 'XC Ski');
-sportType.set(201, 'Track Run');
-sportType.set(211, 'Ski');
-sportType.set(212, 'Snowboard');
-sportType.set(221, 'Pilot');
-sportType.set(232, 'Strength');
-sportType.set(241, 'Rowing');
-sportType.set(242, 'Indoor Rower');
-sportType.set(251, 'Whitewater');
-sportType.set(261, 'Flatwater');
-sportType.set(271, 'Windsurfing');
-sportType.set(281, 'Speedsurfing');
-sportType.set(291, 'Ski Touring');
-sportType.set(311, 'Walk');
-sportType.set(332, 'Single-Pitch');
-sportType.set(342, 'Jump Rope');
+// COROS API Reference V2.1.1, Appendix 3: Workout types (https://github.com/coroslab/coros-open-api)
+// keyed by mode/subMode: mode * 10 + subMode would be ambiguous for a subMode above 9
+const sportTypes = new Map<string, string>([
+  ['8/1', 'Outdoor Run'],
+  ['8/2', 'Indoor Run'],
+  ['9/1', 'Outdoor Bike'],
+  ['9/2', 'Indoor Bike'],
+  ['9/3', 'E-Bike'],
+  ['9/4', 'Mountain Bike'],
+  ['9/5', 'E-Mountain Bike'],
+  ['9/6', 'Gravel Bike'],
+  ['10/1', 'Open Water'],
+  ['10/2', 'Pool Swim'],
+  ['13/1', 'Triathlon'],
+  ['13/2', 'Multisport'],
+  ['13/3', 'Ski Touring'],
+  ['13/4', 'Outdoor Climb'],
+  ['14/1', 'Mountain Climb'],
+  ['15/1', 'Trail Run'],
+  ['16/1', 'Hike'],
+  ['18/1', 'GPS Cardio'],
+  ['18/2', 'Gym Cardio'],
+  ['19/1', 'XC Ski'],
+  ['20/1', 'Track Run'],
+  ['21/1', 'Ski'],
+  ['21/2', 'Snowboard'],
+  ['22/1', 'Pilot'],
+  ['23/2', 'Strength'],
+  ['24/1', 'Rowing'],
+  ['24/2', 'Indoor Rower'],
+  ['25/1', 'Whitewater'],
+  ['26/1', 'Flatwater'],
+  ['27/1', 'Windsurfing'],
+  ['28/1', 'Speedsurfing'],
+  ['29/1', 'Ski Touring'],
+  ['30/1', 'Multi-Pitch'],
+  ['31/1', 'Walk'],
+  ['32/1', 'Boat Fishing'],
+  ['32/2', 'Shore Fishing'],
+  ['32/4', 'Kayak Fishing'],
+  ['32/5', 'Inshore Fishing'],
+  ['32/6', 'Offshore Fishing'],
+  ['32/7', 'Boat Fly Fishing'],
+  ['32/8', 'Shore Fly Fishing'],
+  ['32/9', 'Surf Fishing'],
+  ['33/2', 'Single-Pitch'],
+  ['33/3', 'Bouldering'],
+  ['34/2', 'Jump Rope'],
+  ['35/2', 'Stair Climber'],
+  ['36/2', 'Badminton'],
+  ['37/2', 'Table Tennis'],
+  ['38/1', 'Basketball'],
+  ['39/1', 'Soccer'],
+  ['40/1', 'Pickleball'],
+  ['41/2', 'Elliptical'],
+  ['42/2', 'Yoga'],
+  ['43/2', 'Pilates'],
+  ['44/2', 'Boxing'],
+  ['45/1', 'Frisbee'],
+  ['46/1', 'Skateboard'],
+  ['47/1', 'Tennis'],
+  ['48/1', 'Padel'],
+  ['49/1', 'Outdoor Climbing'],
+  ['50/2', 'Mixed Training'],
+  ['98/1', 'Custom Sport Outdoor'],
+  ['99/2', 'Custom Sport Indoor'],
+]);
 
 export class CorosApi {
   private readonly redirectUrl: string;
@@ -219,7 +256,8 @@ export class CorosApi {
   }
 
   public getSport(mode: number, subMode: number): string {
-    return sportType.get(mode * 10 + subMode) ?? 'Unknown';
+    const key = `${mode}/${subMode}`;
+    return sportTypes.get(key) ?? unknownActivityType('coros', key);
   }
 }
 

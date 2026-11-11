@@ -16,7 +16,7 @@ import { userRepository } from '../../repository/user.repository.ts';
 import { userService } from '../../user.service.ts';
 
 import type { Exercise, WebhookEvent } from './polar.api.ts';
-import { polarApi, isWebhookPingEvent } from './polar.api.ts';
+import { polarApi, sportType, isWebhookPingEvent } from './polar.api.ts';
 
 export class PolarService {
   public async requestAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
@@ -174,7 +174,7 @@ export class PolarService {
       vendor: 'polar',
       vendorId: exercise.id,
       date: this.localDate(exercise),
-      type: exercise.sport,
+      type: sportType(exercise),
       geojson,
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
       ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API
