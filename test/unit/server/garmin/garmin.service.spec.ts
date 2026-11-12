@@ -380,7 +380,11 @@ describe('Garmin service', () => {
       vi.spyOn(userRepository, 'findByGarminToken')
         .mockResolvedValueOnce({ c2cId: 1 })
         .mockResolvedValueOnce({ c2cId: 2 });
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor')
+        .mockResolvedValueOnce(['miniature1.png'])
+        .mockResolvedValueOnce([]);
       vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockImplementation(() => Promise.resolve());
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
       vi.spyOn(userRepository, 'update').mockImplementation((user) => Promise.resolve(user));
 
       const service = new GarminService();
@@ -395,6 +399,8 @@ describe('Garmin service', () => {
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(2);
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenNthCalledWith(1, 1, 'garmin');
       expect(activityRepository.deleteByUserAndVendor).toHaveBeenNthCalledWith(2, 2, 'garmin');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature1.png');
       expect(userRepository.update).toHaveBeenCalledTimes(2);
       expect(userRepository.update).toHaveBeenNthCalledWith(1, { c2cId: 1 });
       expect(userRepository.update).toHaveBeenNthCalledWith(2, { c2cId: 2 });

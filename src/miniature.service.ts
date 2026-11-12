@@ -4,11 +4,17 @@ import { createId } from '@paralleldrive/cuid2';
 import config from './config.ts';
 import { http } from './helpers/http.ts';
 import { simplify } from './helpers/simplify.ts';
+import { activityRepository } from './repository/activity.repository.ts';
 import type { LineString } from './repository/geojson.ts';
 import { storage } from './storage/storage.ts';
 
 const miniatureSize = config.get('miniatures.size');
 const mapboxToken = config.get('miniatures.mapbox.token');
+
+// what generateMiniature names the miniatures: anything else in the storage is not ours to delete
+const miniatureKey = /^[a-z0-9]+\.png$/;
+// a miniature is generated before the activity referencing it is saved: leave time for that
+const orphanMinAgeMs = 60 * 60 * 1000;
 
 export class MiniatureService {
   public async generateMiniature(geometry: LineString): Promise<string> {
@@ -20,6 +26,25 @@ export class MiniatureService {
 
   public async deleteMiniature(id: string): Promise<void> {
     await storage.delete(id);
+  }
+
+  /** Miniatures no activity references; deletes them unless dryRun. */
+  public async cleanOrphanMiniatures(dryRun: boolean): Promise<string[]> {
+    // read the references first: a miniature created after that is younger than orphanMinAgeMs
+    const referenced = await activityRepository.getAllMiniatures();
+    const before = Date.now() - orphanMinAgeMs;
+    const orphans: string[] = [];
+    for await (const { key, lastModified } of storage.list()) {
+      if (miniatureKey.test(key) && !referenced.has(key) && lastModified.getTime() < before) {
+        orphans.push(key);
+      }
+    }
+    if (!dryRun) {
+      for (const key of orphans) {
+        await storage.delete(key);
+      }
+    }
+    return orphans;
   }
 
   private mapboxUrl(geometry: LineString): string {

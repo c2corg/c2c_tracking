@@ -11,8 +11,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { userRepository } from '../../repository/user.repository.ts';
@@ -139,20 +137,7 @@ export class CorosService {
     await corosApi.deauthorize(token);
 
     // clear user Coros activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'coros')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor coros`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'coros');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'coros');
     // clear user Coros data
     const { coros, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });

@@ -9,8 +9,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry, UpdateActivity } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { stravaRepository } from '../../repository/strava.repository.ts';
@@ -114,20 +112,7 @@ export class StravaService {
     await stravaApi.deauthorize(token);
 
     // clear user Strava activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'strava')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor strava`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'strava');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'strava');
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -326,7 +311,7 @@ export class StravaService {
       return;
     }
     // clear user Strava activities
-    await activityRepository.deleteByUserAndVendor(user.c2cId, 'strava');
+    await userService.deleteActivitiesByVendor(user.c2cId, 'strava');
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
