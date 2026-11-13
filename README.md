@@ -4,6 +4,15 @@
 
 Tiny server to handle connection with activity trackers such as Strava, Garmin or Suunto
 
+## Architecture diagrams
+
+Click a diagram to open its interactive version (zoom, search, details, links to the source code). All the diagrams of camptocamp.org: <https://c2corg.github.io/v6_api/>.
+
+### Tracker (c2c_tracking)
+
+[![Tracker (c2c_tracking)](docs/architecture/tracker.png)](https://c2corg.github.io/v6_api/architecture/tracker.html)
+
+
 ## Install
 
 Requires Node.js 26 (see `engines`).
