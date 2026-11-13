@@ -145,6 +145,17 @@ export class ActivityRepository {
     return result.map((row) => row.miniature).filter(isDefined);
   }
 
+  public async getAllMiniatures(): Promise<Set<string>> {
+    const conn = await db.getConnection();
+    if (!conn) {
+      throw new IOError('No connection to database');
+    }
+
+    const result = await conn<ActivityRow>(this.#TABLE).select('miniature').whereNotNull('miniature');
+
+    return new Set(result.map((row) => row.miniature).filter(isDefined));
+  }
+
   public async deleteByUserAndVendor(c2cId: number, vendor: Vendor): Promise<void> {
     const conn = await db.getConnection();
     if (!conn) {

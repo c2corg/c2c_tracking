@@ -3,7 +3,7 @@ import { NotFoundError } from './errors.ts';
 import { isExcludedActivityType } from './excluded-activity-types.ts';
 import log from './helpers/logger.ts';
 import { epochSeconds, nowSeconds } from './helpers/time.ts';
-import type { Optional } from './helpers/utils.ts';
+import { truthy, type Optional } from './helpers/utils.ts';
 import { miniatureService } from './miniature.service.ts';
 import { activityRepository } from './repository/activity.repository.ts';
 import type { Activity, NewActivityWithGeometry, UpdateActivity, Vendor } from './repository/activity.ts';
@@ -414,23 +414,32 @@ export class UserService {
     const activitiesToInsert = mergedActivities.slice(0, MAX_ACTIVITIES_PER_USER).filter((act) => !act.id);
     const activitiesToDelete = mergedActivities.slice(MAX_ACTIVITIES_PER_USER).filter(isInDb);
 
-    await Promise.allSettled(
-      activitiesToDelete.map(async (act) => {
-        if (act.miniature) {
-          await miniatureService.deleteMiniature(act.miniature);
-        }
-      }),
-    );
+    const generatedMiniatures: string[] = [];
+    const replacedMiniatures: string[] = [];
     await Promise.allSettled(
       [...activitiesToUpdate, ...activitiesToInsert].map(async (act) => {
         if (!act.geojson) {
           return;
         }
         const miniature = await miniatureService.generateMiniature(act.geojson);
+        generatedMiniatures.push(miniature);
+        if (act.miniature) {
+          replacedMiniatures.push(act.miniature);
+        }
         act.miniature = miniature;
       }),
     );
-    await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
+    try {
+      await activityRepository.upsert(activitiesToUpdate, activitiesToInsert, activitiesToDelete);
+    } catch (error: unknown) {
+      // nothing references the new miniatures, and the DB still references the old ones
+      await this.#deleteMiniatures(generatedMiniatures);
+      throw error;
+    }
+    await this.#deleteMiniatures([
+      ...replacedMiniatures,
+      ...activitiesToDelete.map(({ miniature }) => miniature).filter(truthy),
+    ]);
   }
 
   public async updateActivity(c2cId: number, activity: UpdateActivity): Promise<void> {
@@ -445,16 +454,35 @@ export class UserService {
       await this.deleteActivity(activity.vendor, activity.vendorId);
       return;
     }
-    await activityRepository.update({
-      ...savedActivity,
-      ...(activity.date && { date: activity.date }),
-      ...(activity.type && { type: activity.type }),
-      ...(activity.name && { name: activity.name }),
-      ...(activity.length && { length: activity.length }),
-      ...(activity.heightDiffUp && { heightDiffUp: activity.heightDiffUp }),
-      ...(activity.duration && { duration: activity.duration }),
-      ...(activity.geojson && { geojson: activity.geojson }),
-    });
+    let miniature: string | undefined;
+    if (activity.geojson) {
+      try {
+        miniature = await miniatureService.generateMiniature(activity.geojson);
+      } catch {
+        log.warn(`Failed generating miniature for ${activity.vendorId}`);
+      }
+    }
+    try {
+      await activityRepository.update({
+        ...savedActivity,
+        ...(activity.date && { date: activity.date }),
+        ...(activity.type && { type: activity.type }),
+        ...(activity.name && { name: activity.name }),
+        ...(activity.length && { length: activity.length }),
+        ...(activity.heightDiffUp && { heightDiffUp: activity.heightDiffUp }),
+        ...(activity.duration && { duration: activity.duration }),
+        ...(activity.geojson && { geojson: activity.geojson }),
+        ...(miniature && { miniature }),
+      });
+    } catch (error: unknown) {
+      if (miniature) {
+        await this.#deleteMiniatures([miniature]);
+      }
+      throw error;
+    }
+    if (miniature && savedActivity.miniature) {
+      await this.#deleteMiniatures([savedActivity.miniature]);
+    }
   }
 
   public async deleteActivity(vendor: Vendor, vendorId: string): Promise<void> {
@@ -466,12 +494,19 @@ export class UserService {
     }
     await activityRepository.deleteByVendorId(vendor, vendorId);
     if (miniature) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
+      await this.#deleteMiniatures([miniature]);
     }
+  }
+
+  public async deleteActivitiesByVendor(c2cId: number, vendor: Vendor): Promise<void> {
+    const miniatures: string[] = [];
+    try {
+      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, vendor)));
+    } catch {
+      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor ${vendor}`);
+    }
+    await activityRepository.deleteByUserAndVendor(c2cId, vendor);
+    await this.#deleteMiniatures(miniatures);
   }
 
   public async getActivities(c2cId: number): Promise<Activity[]> {
@@ -480,6 +515,16 @@ export class UserService {
 
   public async getActivity(c2cId: number, activityId: number): Promise<Activity | undefined> {
     return await activityRepository.findByUserAndId(c2cId, activityId);
+  }
+
+  async #deleteMiniatures(miniatures: string[]): Promise<void> {
+    for (const miniature of miniatures) {
+      try {
+        await miniatureService.deleteMiniature(miniature);
+      } catch {
+        log.warn(`Failed deleting miniature ${miniature}`);
+      }
+    }
   }
 
   #expiresAt(expiresIn: number): number {

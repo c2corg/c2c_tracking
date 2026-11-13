@@ -14,6 +14,7 @@
     "backfill:decathlon": "node --env-file-if-exists=.env scripts/backfill-decathlon-activities.ts | pino-pretty -c -t",
     "backfill:coros": "node --env-file-if-exists=.env scripts/backfill-coros-activities.ts | pino-pretty -c -t",
     "backfill:garmin": "node --env-file-if-exists=.env scripts/backfill-garmin-activities.ts | pino-pretty -c -t",
+    "clean:miniatures": "node --env-file-if-exists=.env scripts/clean-orphan-miniatures.ts | pino-pretty -c -t",
     "start:dev": "node --watch --env-file-if-exists=.env src/index.ts | pino-pretty -c -t -i req.headers,res.headers",
     "build": "tsc -p tsconfig.build.json",
     "lint": "prettier --check \"**/*.{ts,js,json,css,scss,less,md,html}\" && eslint . && tsc --noEmit",

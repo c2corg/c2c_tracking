@@ -105,6 +105,7 @@ describe('Activity Repository', () => {
     await expect(repository.getMiniaturesByUserAndVendor(2, 'suunto')).resolves.toEqual(['miniature.png']);
     await expect(repository.getMiniaturesByUserAndVendor(1, 'strava')).resolves.toEqual([]);
     await expect(repository.getMiniaturesByUserAndVendor(1, 'suunto')).resolves.toEqual([]);
+    await expect(repository.getAllMiniatures()).resolves.toEqual(new Set(['miniature.png']));
 
     await expect(repository.update({ ...activity1, type: 'Mountain Bike' })).resolves.toEqual({
       ...activity1,

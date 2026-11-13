@@ -716,7 +716,9 @@ describe('Strava Service', () => {
             expiresAt: 1,
           },
         });
+        vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
         vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+        vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
         vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
         const service = new StravaService();
@@ -732,6 +734,8 @@ describe('Strava Service', () => {
 
         expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
         expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+        expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+        expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
         expect(userRepository.update).toHaveBeenCalledTimes(1);
         expect(userRepository.update).toHaveBeenCalledWith({ c2cId: 1 });
       });

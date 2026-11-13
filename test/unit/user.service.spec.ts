@@ -1329,6 +1329,158 @@ describe('User service', () => {
         [],
       );
     });
+
+    it('deletes the miniature of an updated activity once replaced', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          miniature: 'old.png',
+        },
+      ]);
+      vi.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('new.png');
+      const deleteMiniature = vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      const upsert = vi.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new UserService();
+      await service.addActivities(1, {
+        vendor: 'strava',
+        vendorId: '1',
+        date: '2022-01-01T00:00:01Z',
+        type: 'RUN',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(activityRepository.upsert).toHaveBeenCalledWith(
+        [expect.objectContaining({ id: 1, miniature: 'new.png' })],
+        [],
+        [],
+      );
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('old.png');
+      expect(deleteMiniature.mock.invocationCallOrder[0]).toBeGreaterThan(upsert.mock.invocationCallOrder[0]!);
+    });
+
+    it('keeps the miniature of an updated activity if a new one cannot be generated', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          miniature: 'old.png',
+        },
+      ]);
+      vi.spyOn(miniatureService, 'generateMiniature').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new UserService();
+      await service.addActivities(1, {
+        vendor: 'strava',
+        vendorId: '1',
+        date: '2022-01-01T00:00:01Z',
+        type: 'RUN',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(activityRepository.upsert).toHaveBeenCalledWith(
+        [expect.objectContaining({ id: 1, miniature: 'old.png' })],
+        [],
+        [],
+      );
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+    });
+
+    it('deletes the new miniatures and keeps the old ones if DB cannot be updated', async () => {
+      const activities: Activity[] = [...Array(30).keys()]
+        .map((k) => k + 1)
+        .map((k) => ({
+          id: k,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: k.toString(),
+          date: '2022-01-' + k.toString().padStart(2, '0') + 'T00:00:01Z',
+          type: 'RUN',
+          miniature: `${k}.png`,
+        }));
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce(activities);
+      vi.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('toto.png');
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'upsert').mockRejectedValueOnce(new Error('test'));
+
+      const service = new UserService();
+      await expect(
+        service.addActivities(1, {
+          vendor: 'strava',
+          vendorId: '1000',
+          date: '2022-06-06T00:00:01Z',
+          type: 'RUN',
+          geojson: {
+            type: 'LineString',
+            coordinates: [
+              [1.0, 1.0],
+              [2.0, 2.0],
+            ],
+          },
+        }),
+      ).rejects.toThrow('test');
+
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('toto.png');
+    });
+
+    it('logs if a miniature cannot be deleted', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          miniature: 'old.png',
+        },
+      ]);
+      vi.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('new.png');
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(activityRepository, 'upsert').mockImplementationOnce(() => Promise.resolve());
+
+      const service = new UserService();
+      await service.addActivities(1, {
+        vendor: 'strava',
+        vendorId: '1',
+        date: '2022-01-01T00:00:01Z',
+        type: 'RUN',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(log.warn).toHaveBeenCalledWith('Failed deleting miniature old.png');
+    });
   });
 
   describe('updateActivity', () => {
@@ -1388,6 +1540,109 @@ describe('User service', () => {
         name: 'new name',
         type: 'FLY',
       });
+    });
+
+    it('replaces the miniature when the geometry changes', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          miniature: 'old.png',
+        },
+      ]);
+      vi.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('new.png');
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'update').mockImplementationOnce((activity) => Promise.resolve(activity));
+
+      const service = new UserService();
+      await service.updateActivity(1, {
+        vendor: 'strava',
+        vendorId: '1',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(activityRepository.update).toHaveBeenCalledWith(expect.objectContaining({ id: 1, miniature: 'new.png' }));
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('old.png');
+    });
+
+    it('keeps the miniature if a new one cannot be generated', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          miniature: 'old.png',
+        },
+      ]);
+      vi.spyOn(miniatureService, 'generateMiniature').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(miniatureService, 'deleteMiniature');
+      vi.spyOn(activityRepository, 'update').mockImplementationOnce((activity) => Promise.resolve(activity));
+
+      const service = new UserService();
+      await service.updateActivity(1, {
+        vendor: 'strava',
+        vendorId: '1',
+        geojson: {
+          type: 'LineString',
+          coordinates: [
+            [1.0, 1.0],
+            [2.0, 2.0],
+          ],
+        },
+      });
+
+      expect(activityRepository.update).toHaveBeenCalledWith(expect.objectContaining({ id: 1, miniature: 'old.png' }));
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(log.warn).toHaveBeenCalledWith('Failed generating miniature for 1');
+    });
+
+    it('deletes the new miniature if DB cannot be updated', async () => {
+      vi.spyOn(activityRepository, 'findByUser').mockResolvedValueOnce([
+        {
+          id: 1,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '1',
+          date: '2022-01-01T00:00:01Z',
+          type: 'RUN',
+          miniature: 'old.png',
+        },
+      ]);
+      vi.spyOn(miniatureService, 'generateMiniature').mockResolvedValueOnce('new.png');
+      vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
+      vi.spyOn(activityRepository, 'update').mockRejectedValueOnce(new Error('test'));
+
+      const service = new UserService();
+      await expect(
+        service.updateActivity(1, {
+          vendor: 'strava',
+          vendorId: '1',
+          geojson: {
+            type: 'LineString',
+            coordinates: [
+              [1.0, 1.0],
+              [2.0, 2.0],
+            ],
+          },
+        }),
+      ).rejects.toThrow('test');
+
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('new.png');
     });
 
     it('fails silently and do nothing if activity is not found', async () => {
@@ -1483,6 +1738,37 @@ describe('User service', () => {
       expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
       expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
       expect(log.warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteActivitiesByVendor', () => {
+    it('deletes activities in DB, then their miniatures', async () => {
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['1.png', '2.png']);
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature').mockRejectedValueOnce(new Error('test')).mockResolvedValueOnce();
+
+      const service = new UserService();
+      await service.deleteActivitiesByVendor(1, 'garmin');
+
+      expect(activityRepository.getMiniaturesByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(2);
+      expect(miniatureService.deleteMiniature).toHaveBeenNthCalledWith(1, '1.png');
+      expect(miniatureService.deleteMiniature).toHaveBeenNthCalledWith(2, '2.png');
+      expect(log.warn).toHaveBeenCalledWith('Failed deleting miniature 1.png');
+    });
+
+    it('deletes activities in DB even if miniatures cannot be retrieved', async () => {
+      vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockRejectedValueOnce(new Error('test'));
+      vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+      vi.spyOn(miniatureService, 'deleteMiniature');
+
+      const service = new UserService();
+      await service.deleteActivitiesByVendor(1, 'garmin');
+
+      expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'garmin');
+      expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(log.warn).toHaveBeenCalledWith('Failed retrieving miniatures info for user 1 and vendor garmin');
     });
   });
 
