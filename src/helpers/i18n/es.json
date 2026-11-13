@@ -1966,5 +1966,281 @@
   },
   "zumba": {
     "string": "Zumba"
+  },
+  "boatfishing": {
+    "string": "Boat fishing"
+  },
+  "boatflyfishing": {
+    "string": "Boat fly fishing"
+  },
+  "customsportindoor": {
+    "string": "Custom indoor sport"
+  },
+  "customsportoutdoor": {
+    "string": "Custom outdoor sport"
+  },
+  "emountainbike": {
+    "string": "E-mountain bike"
+  },
+  "gravelbike": {
+    "string": "Gravel bike"
+  },
+  "inshorefishing": {
+    "string": "Inshore fishing"
+  },
+  "mixedtraining": {
+    "string": "Mixed training"
+  },
+  "mountainbike": {
+    "string": "Mountain bike"
+  },
+  "multipitch": {
+    "string": "Multi-pitch climbing"
+  },
+  "offshorefishing": {
+    "string": "Offshore fishing"
+  },
+  "outdoorclimb": {
+    "string": "Outdoor climb"
+  },
+  "outdoorclimbing": {
+    "string": "Outdoor climbing"
+  },
+  "shorefishing": {
+    "string": "Shore fishing"
+  },
+  "shoreflyfishing": {
+    "string": "Shore fly fishing"
+  },
+  "stairclimber": {
+    "string": "Stair climber"
+  },
+  "surffishing": {
+    "string": "Surf fishing"
+  },
+  "calisthenics": {
+    "string": "Calisthenics"
+  },
+  "chores": {
+    "string": "Chores"
+  },
+  "classicskiing": {
+    "string": "Classic skiing"
+  },
+  "ebiking": {
+    "string": "E-biking"
+  },
+  "emtb": {
+    "string": "E-MTB"
+  },
+  "handcycling": {
+    "string": "Hand cycling"
+  },
+  "meditation": {
+    "string": "Meditation"
+  },
+  "mermaiding": {
+    "string": "Mermaiding"
+  },
+  "motorsports": {
+    "string": "Motorsports"
+  },
+  "skateskiing": {
+    "string": "Skate skiing"
+  },
+  "skimountaineering": {
+    "string": "Ski mountaineering"
+  },
+  "splitboarding": {
+    "string": "Splitboarding"
+  },
+  "trackandfield": {
+    "string": "Track and field"
+  },
+  "verticalrunning": {
+    "string": "Vertical running"
+  },
+  "wheelchairsport": {
+    "string": "Wheelchair sport"
+  },
+  "dance": {
+    "string": "Dance"
+  },
+  "physicaltherapy": {
+    "string": "Physical therapy"
+  },
+  "agility": {
+    "string": "Agility"
+  },
+  "beachtennis": {
+    "string": "Beach tennis"
+  },
+  "esports": {
+    "string": "Esports"
+  },
+  "fitnessboxing": {
+    "string": "Fitness boxing"
+  },
+  "fitnessracing": {
+    "string": "Fitness racing"
+  },
+  "gravel": {
+    "string": "Gravel"
+  },
+  "kickbike": {
+    "string": "Kickbike"
+  },
+  "obstaclecourseracing": {
+    "string": "Obstacle course racing"
+  },
+  "parasportshandcycling": {
+    "string": "Hand cycling"
+  },
+  "parasportssledhockey": {
+    "string": "Sled hockey"
+  },
+  "parasportswaterskiing": {
+    "string": "Para water skiing"
+  },
+  "parasportswheelchairbasketball": {
+    "string": "Wheelchair basketball"
+  },
+  "parasportswheelchairtennis": {
+    "string": "Wheelchair tennis"
+  },
+  "ringette": {
+    "string": "Ringette"
+  },
+  "rucking": {
+    "string": "Rucking"
+  },
+  "shootingsportindoor": {
+    "string": "Indoor shooting"
+  },
+  "shootingsportoutdoor": {
+    "string": "Outdoor shooting"
+  },
+  "skierg": {
+    "string": "SkiErg"
+  },
+  "stairworkout": {
+    "string": "Stair workout"
+  },
+  "ultimate": {
+    "string": "Ultimate"
+  },
+  "backcountrysnowboarding": {
+    "string": "Backcountry snowboarding"
+  },
+  "biketoruntransitionv2": {
+    "string": "Bike to run transition"
+  },
+  "boatingv2": {
+    "string": "Boating"
+  },
+  "crosscountryclassicskiing": {
+    "string": "Classic cross-country skiing"
+  },
+  "discgolf": {
+    "string": "Disc golf"
+  },
+  "ebikefitness": {
+    "string": "E-bike"
+  },
+  "ebikemountain": {
+    "string": "E-mountain bike"
+  },
+  "fishingv2": {
+    "string": "Pesca"
+  },
+  "indoorhandcycling": {
+    "string": "Indoor handcycling"
+  },
+  "kayakingv2": {
+    "string": "Kayaking"
+  },
+  "kiteboarding": {
+    "string": "Kiteboarding"
+  },
+  "kiteboardingv2": {
+    "string": "Kiteboarding"
+  },
+  "mixedmartialarts": {
+    "string": "Mixed martial arts"
+  },
+  "multigasdiving": {
+    "string": "Multi-gas diving"
+  },
+  "offshoregrindingv2": {
+    "string": "Offshore grinding"
+  },
+  "onshoregrindingv2": {
+    "string": "Onshore grinding"
+  },
+  "paddlingv2": {
+    "string": "Paddling"
+  },
+  "parasports": {
+    "string": "Para sports"
+  },
+  "platformtennis": {
+    "string": "Platform tennis"
+  },
+  "racketsports": {
+    "string": "Racket sports"
+  },
+  "racqutball": {
+    "string": "Racquetball"
+  },
+  "resortskiing": {
+    "string": "Resort skiing"
+  },
+  "rowingv2": {
+    "string": "Remo"
+  },
+  "runtobiketransitionv2": {
+    "string": "Run to bike transition"
+  },
+  "sailingv2": {
+    "string": "Vela"
+  },
+  "singlegasdiving": {
+    "string": "Single-gas diving"
+  },
+  "standuppaddleboardingv2": {
+    "string": "Stand up paddleboarding"
+  },
+  "surfingv2": {
+    "string": "Surf"
+  },
+  "swimtobiketransitionv2": {
+    "string": "Swim to bike transition"
+  },
+  "teamsports": {
+    "string": "Team sports"
+  },
+  "tennisv2": {
+    "string": "Tenis"
+  },
+  "transitionv2": {
+    "string": "Transition"
+  },
+  "ultimatedisc": {
+    "string": "Ultimate disc"
+  },
+  "wakeboardingv2": {
+    "string": "Wakeboarding"
+  },
+  "wheelchairpushrun": {
+    "string": "Wheelchair push run"
+  },
+  "wheelchairpushwalk": {
+    "string": "Wheelchair push walk"
+  },
+  "whitewaterraftingv2": {
+    "string": "Whitewater rafting"
+  },
+  "windsurfingv2": {
+    "string": "Windsurfing"
   }
 }
