@@ -12,7 +12,6 @@ Click a diagram to open its interactive version (zoom, search, details, links to
 
 [![Tracker (c2c_tracking)](docs/architecture/tracker.png)](https://c2corg.github.io/v6_api/architecture/tracker.html)
 
-
 ## Install
 
 Requires Node.js 26 (see `engines`).
