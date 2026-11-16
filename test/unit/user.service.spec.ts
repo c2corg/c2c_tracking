@@ -1408,6 +1408,10 @@ describe('User service', () => {
         [],
       );
       expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
+      expect(log.warn).toHaveBeenCalledWith(
+        { err: new Error('test'), points: 2 },
+        'Failed generating miniature for strava activity 1',
+      );
     });
 
     it('deletes the new miniatures and keeps the old ones if DB cannot be updated', async () => {
@@ -1607,7 +1611,10 @@ describe('User service', () => {
 
       expect(activityRepository.update).toHaveBeenCalledWith(expect.objectContaining({ id: 1, miniature: 'old.png' }));
       expect(miniatureService.deleteMiniature).not.toHaveBeenCalled();
-      expect(log.warn).toHaveBeenCalledWith('Failed generating miniature for 1');
+      expect(log.warn).toHaveBeenCalledWith(
+        { err: new Error('test'), points: 2 },
+        'Failed generating miniature for strava activity 1',
+      );
     });
 
     it('deletes the new miniature if DB cannot be updated', async () => {
