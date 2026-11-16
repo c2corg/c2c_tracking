@@ -421,7 +421,17 @@ export class UserService {
         if (!act.geojson) {
           return;
         }
-        const miniature = await miniatureService.generateMiniature(act.geojson);
+        let miniature: string;
+        try {
+          miniature = await miniatureService.generateMiniature(act.geojson);
+        } catch (error: unknown) {
+          // the activity is stored without miniature: say why
+          log.warn(
+            { err: error, points: act.geojson.coordinates.length },
+            `Failed generating miniature for ${act.vendor} activity ${act.vendorId}`,
+          );
+          return;
+        }
         generatedMiniatures.push(miniature);
         if (act.miniature) {
           replacedMiniatures.push(act.miniature);
@@ -458,8 +468,11 @@ export class UserService {
     if (activity.geojson) {
       try {
         miniature = await miniatureService.generateMiniature(activity.geojson);
-      } catch {
-        log.warn(`Failed generating miniature for ${activity.vendorId}`);
+      } catch (error: unknown) {
+        log.warn(
+          { err: error, points: activity.geojson.coordinates.length },
+          `Failed generating miniature for ${activity.vendor} activity ${activity.vendorId}`,
+        );
       }
     }
     try {
