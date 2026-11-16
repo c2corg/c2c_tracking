@@ -47,6 +47,13 @@ describe('Activity Service', () => {
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
+            "sources": [
+              {
+                "id": 1,
+                "vendor": "strava",
+                "vendorId": "1",
+              },
+            ],
             "type": {
               "ca": "Run",
               "de": "Run",
@@ -71,6 +78,13 @@ describe('Activity Service', () => {
             "date": "2022-01-02T00:00:01Z",
             "id": 2,
             "name": "name",
+            "sources": [
+              {
+                "id": 2,
+                "vendor": "strava",
+                "vendorId": "2",
+              },
+            ],
             "type": {
               "ca": "Backcountry Ski",
               "de": "Backcountry Ski",
@@ -117,6 +131,13 @@ describe('Activity Service', () => {
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
+            "sources": [
+              {
+                "id": 1,
+                "vendor": "strava",
+                "vendorId": "1",
+              },
+            ],
             "type": {
               "fr": "Course à pied",
             },
@@ -153,6 +174,13 @@ describe('Activity Service', () => {
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
+            "sources": [
+              {
+                "id": 1,
+                "vendor": "strava",
+                "vendorId": "1",
+              },
+            ],
             "type": {
               "fr": "Inconnu",
             },
