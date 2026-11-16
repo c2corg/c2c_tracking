@@ -75,11 +75,12 @@ export class CorosService {
       return undefined;
     });
 
-    const repositoryActivities = data
+    const repositoryActivities = data.flatMap((workout, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_workout, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((workout, i) => this.asRepositoryActivity(workout, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asRepositoryActivity(workout, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...repositoryActivities);
     return repositoryActivities.length;
   }

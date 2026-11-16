@@ -3,9 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import log from '../../../../src/helpers/logger.ts';
 import { miniatureService } from '../../../../src/miniature.service.ts';
 import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import type { NewActivityWithGeometry } from '../../../../src/repository/activity.ts';
 import { stravaRepository } from '../../../../src/repository/strava.repository.ts';
 import { userRepository } from '../../../../src/repository/user.repository.ts';
-import { stravaApi } from '../../../../src/server/strava/strava.api.ts';
+import { type Activity, stravaApi, type StreamSet } from '../../../../src/server/strava/strava.api.ts';
 import { StravaService } from '../../../../src/server/strava/strava.service.ts';
 import { userService } from '../../../../src/user.service.ts';
 
@@ -262,6 +263,46 @@ describe('Strava Service', () => {
       expect(result).toBe(1);
       expect(stravaApi.getAthleteActivities).toHaveBeenCalledWith('stored_access_token');
       expect(userService.addActivities).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps each activity with its own geometry when one has no GPS track', async () => {
+      const activity = (id: number): Activity => ({
+        id,
+        name: `Activity ${id}`,
+        sport_type: 'Hike',
+        start_date: `2022-01-0${id}T00:00:01Z`,
+        start_date_local: `2022-01-0${id}T01:00:01Z`,
+        distance: 1,
+        elapsed_time: 1,
+        total_elevation_gain: 1,
+      });
+      // the longitude tells which activity a geometry belongs to
+      const stream = (id: number): StreamSet => ({
+        distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
+        latlng: {
+          series_type: 'distance',
+          original_size: 2,
+          resolution: 'low',
+          data: [
+            [1.0, id],
+            [2.0, id],
+          ],
+        },
+      });
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([activity(3), activity(2), activity(1)]);
+      vi.spyOn(stravaApi, 'getActivityStream').mockImplementation((_token, id) =>
+        Promise.resolve(id === 3 ? undefined : stream(id)),
+      );
+      const addActivities = vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const result = await new StravaService().resyncActivities(1, 'access_token');
+
+      expect(result).toBe(2);
+      const added = addActivities.mock.calls[0]!.slice(1) as NewActivityWithGeometry[];
+      expect(added.map(({ vendorId, geojson }) => [vendorId, geojson?.coordinates[0]?.[0]])).toEqual([
+        ['2', 2],
+        ['1', 1],
+      ]);
     });
 
     it('throws if no valid token can be retrieved', async () => {

@@ -70,11 +70,12 @@ export class DecathlonService {
       log.info(`Unable to retrieve geometry for Decathlon activity ${activities[i]!.id} for user ${c2cId}`);
       return undefined;
     });
-    const repositoryActivities = activities
+    const repositoryActivities = activities.flatMap((activity, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_activity, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asRepositoryActivity(activity, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...repositoryActivities);
     return repositoryActivities.length;
   }
