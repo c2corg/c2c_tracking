@@ -66,11 +66,12 @@ export class SuuntoService {
       return undefined;
     });
 
-    const activities = payload
+    const activities = payload.flatMap((activity, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_activity, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asRepositoryActivity(activity, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...activities);
     return activities.length;
   }
