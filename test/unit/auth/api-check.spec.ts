@@ -45,7 +45,7 @@ describe('JWT checked by the API', () => {
   it('accepts a token the API confirms', async () => {
     vi.mocked(http).get.mockResolvedValueOnce({ status: 200, data: { user: 123 } });
     const auth = await loadAuth({ C2C_API_BASE_URL: 'https://api.example.org/' });
-    expect(await authenticate(auth, 123)).toEqual({ id: 123 });
+    expect(await authenticate(auth, 123)).toEqual({ id: 123, apiUserId: 123 });
     expect(http.get).toHaveBeenCalledWith('https://api.example.org/users/token', expect.anything());
   });
 
@@ -57,7 +57,7 @@ describe('JWT checked by the API', () => {
 
   it('checks the signature only without an API', async () => {
     const auth = await loadAuth({ C2C_API_BASE_URL: '' });
-    expect(await authenticate(auth, 123)).toEqual({ id: 123 });
+    expect(await authenticate(auth, 123)).toEqual({ id: 123, apiUserId: 123 });
     expect(http.get).not.toHaveBeenCalled();
   });
 });

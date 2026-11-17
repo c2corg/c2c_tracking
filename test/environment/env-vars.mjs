@@ -5,6 +5,8 @@ process.env['DB_CRYPTO'] = 'secret';
 // the tests make many requests as the same user
 process.env['SERVER_USER_RATE_LIMIT'] = '10000';
 process.env['JWT_SECRET_KEY'] = 'secret';
+// tokens of a second API (a preprod), whose user ids are shifted by 1_000_000_000
+process.env['JWT_SECRET_KEY_EXTRA'] = 'extra-secret';
 process.env['STRAVA_CLIENT_SECRET'] = 'd37d09886c3a92ced03feca580ccecd5630559ec';
 process.env['STRAVA_WEBHOOK_SUBSCRIPTION_VERIFY_TOKEN'] = '%trongpAssM0rd';
 process.env['SUUNTO_CLIENT_SECRET'] = 'secret';

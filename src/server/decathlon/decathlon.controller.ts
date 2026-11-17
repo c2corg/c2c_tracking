@@ -1,12 +1,14 @@
 import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
+import { authenticatedUserId } from '../../auth/user.ts';
+
 import type { WebhookEvent } from './decathlon.api.ts';
 import { decathlonService as service } from './decathlon.service.ts';
 
 class DecathlonController {
   public async exchangeToken(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     if (req.query['error']) {
       req.log.info(`User ${c2cId} denied Decathlon authorization`);
       throw createHttpError(403, 'auth-denied');
@@ -22,7 +24,7 @@ class DecathlonController {
   }
 
   public async deauthorize(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     await service.deauthorize(c2cId);
     res.sendStatus(204);
   }

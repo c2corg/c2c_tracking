@@ -10,7 +10,7 @@ import log from '../../../../src/helpers/logger.ts';
 import type { GarminActivity } from '../../../../src/server/garmin/garmin.api.ts';
 import { controller as garminController } from '../../../../src/server/garmin/garmin.controller.ts';
 import { garminService } from '../../../../src/server/garmin/garmin.service.ts';
-import { authenticated } from '../../../utils.ts';
+import { authenticated, authenticatedExtra } from '../../../utils.ts';
 
 describe('Garmin Controller', () => {
   let server: Server;
@@ -83,26 +83,65 @@ describe('Garmin Controller', () => {
   });
 
   describe('POST /garmin/exchange-token/:userId', () => {
-    it('requires valid input', async () => {
+    it('requires an authenticated user', async () => {
       const response = await request
         .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'short', oauth_verifier: 'watever' });
+        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('requires matching authenticated user', async () => {
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' }),
+        2,
+      );
+
+      expect(response.status).toBe(403);
+    });
+
+    it('uses the token secret stored for the shifted id of the extra secret user', async () => {
+      await garminController['keyv'].set('1000000001', 'tokenSecret', 100);
+      vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+
+      const response = await authenticatedExtra(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' }),
+        1,
+      );
+
+      expect(response.status).toBe(204);
+      expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledWith(
+        1_000_000_001,
+        'oauth_token',
+        'tokenSecret',
+        'oauth_verifier',
+      );
+      await garminController['keyv'].delete('1000000001');
+    });
+
+    it('requires valid input', async () => {
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'short', oauth_verifier: 'watever' }),
+        1,
+      );
       expect(response.status).toBe(400);
     });
 
     it('acknowledges authorization denial from user', async () => {
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'NULL' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'oauth_token', oauth_verifier: 'NULL' }),
+        1,
+      );
 
       expect(response.status).toBe(403);
       expect(response.text).toEqual('auth-denied');
     });
 
     it('needs a token secret still stored in keyv', async () => {
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' }),
+        1,
+      );
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
@@ -112,9 +151,10 @@ describe('Garmin Controller', () => {
       await garminController['keyv'].set('1', 'tokenSecret', 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' }),
+        1,
+      );
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
@@ -127,9 +167,10 @@ describe('Garmin Controller', () => {
       await garminController['keyv'].set('1', 'tokenSecret', 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
-      const response = await request
-        .get('/garmin/exchange-token/1')
-        .query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ oauth_token: 'oauth_token', oauth_verifier: 'oauth_verifier' }),
+        1,
+      );
 
       expect(response.status).toBe(204);
       expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);

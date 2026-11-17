@@ -7,7 +7,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { app } from '../../../../src/app.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { userService } from '../../../../src/user.service.ts';
-import { authenticated } from '../../../utils.ts';
+import { authenticated, authenticatedExtra } from '../../../utils.ts';
 
 describe('User Controller', () => {
   let server: Server;
@@ -67,6 +67,21 @@ describe('User Controller', () => {
       `);
       expect(userService.getUserInfo).toHaveBeenCalledTimes(1);
       expect(userService.getUserInfo).toHaveBeenCalledWith(1);
+    });
+
+    it('accepts a token of the extra secret with its own user id, and uses the shifted id', async () => {
+      vi.spyOn(userService, 'getUserInfo').mockResolvedValueOnce({ strava: 'not-configured' });
+
+      const response = await authenticatedExtra(request.get('/users/1/status'), 1);
+
+      expect(response.status).toBe(200);
+      expect(userService.getUserInfo).toHaveBeenCalledWith(1_000_000_001);
+    });
+
+    it('refuses a token of the extra secret for the shifted id', async () => {
+      const response = await authenticatedExtra(request.get('/users/1000000001/status'), 1);
+
+      expect(response.status).toBe(403);
     });
   });
 });

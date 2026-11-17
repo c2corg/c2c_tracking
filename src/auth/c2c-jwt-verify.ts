@@ -3,6 +3,7 @@ import type { VerifiedCallback } from 'passport-jwt';
 
 import c2cJwtExtractor from './c2c-jwt-extractor.ts';
 import type { TokenChecker } from './c2c-token-check.ts';
+import type { AuthenticatedUser } from './user.ts';
 
 // Largest value of a PostgreSQL `integer`, the type of the user ids
 const MAX_USER_ID = 2_147_483_647;
@@ -26,7 +27,7 @@ export const verifyWithOffset =
     if (idOffset !== 0 && (!Number.isInteger(sub) || sub < 0 || sub >= idOffset || sub + idOffset > MAX_USER_ID)) {
       return done(null, false);
     }
-    const user = { id: sub + idOffset };
+    const user: AuthenticatedUser = { id: sub + idOffset, apiUserId: sub };
     if (!checker) {
       return done(null, user);
     }

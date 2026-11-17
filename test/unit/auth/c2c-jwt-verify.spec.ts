@@ -13,7 +13,7 @@ describe('verify', () => {
     verify(request(), { sub: 123 }, done);
 
     expect(done).toHaveBeenCalledTimes(1);
-    expect(done).toHaveBeenCalledWith(null, { id: 123 });
+    expect(done).toHaveBeenCalledWith(null, { id: 123, apiUserId: 123 });
   });
 
   it('rejects paylaod without sub', () => {
@@ -32,7 +32,7 @@ describe('verifyWithOffset', () => {
     const done = vi.fn((): void => undefined);
     verifyWithOffset(offset)(request(), { sub: '123' }, done);
 
-    expect(done).toHaveBeenCalledWith(null, { id: offset + 123 });
+    expect(done).toHaveBeenCalledWith(null, { id: offset + 123, apiUserId: 123 });
   });
 
   it.each([offset, offset + 1, -1, 'abc', 2_000_000_000])('rejects the subject %p', (sub) => {
@@ -62,7 +62,7 @@ describe('verifyWithOffset with a checker', () => {
     await flush();
 
     expect(valid.isValid).toHaveBeenCalledWith('a.b.c', 123);
-    expect(done).toHaveBeenCalledWith(null, { id: 123 });
+    expect(done).toHaveBeenCalledWith(null, { id: 123, apiUserId: 123 });
   });
 
   it('checks the subject before the offset', async () => {
@@ -72,7 +72,7 @@ describe('verifyWithOffset with a checker', () => {
     await flush();
 
     expect(valid.isValid).toHaveBeenCalledWith('a.b.c', 123);
-    expect(done).toHaveBeenCalledWith(null, { id: 1_000_000_123 });
+    expect(done).toHaveBeenCalledWith(null, { id: 1_000_000_123, apiUserId: 123 });
   });
 
   it('rejects a token the API refuses', async () => {

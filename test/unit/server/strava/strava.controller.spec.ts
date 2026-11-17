@@ -8,7 +8,7 @@ import { app } from '../../../../src/app.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { WebhookEvent } from '../../../../src/server/strava/strava.api.ts';
 import { stravaService } from '../../../../src/server/strava/strava.service.ts';
-import { authenticated } from '../../../utils.ts';
+import { authenticated, authenticatedExtra } from '../../../utils.ts';
 
 describe('Strava Controller', () => {
   let server: Server;
@@ -98,6 +98,21 @@ describe('Strava Controller', () => {
       expect(response.status).toBe(204);
       expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
       expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
+    });
+
+    it('setups the user of the extra secret under the shifted id', async () => {
+      vi.spyOn(stravaService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+
+      const response = await authenticatedExtra(
+        request.get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'activity:read' }),
+        1,
+      );
+
+      expect(response.status).toBe(204);
+      expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(
+        1_000_000_001,
+        'longenoughcode',
+      );
     });
   });
 

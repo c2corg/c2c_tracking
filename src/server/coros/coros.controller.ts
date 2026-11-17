@@ -1,12 +1,14 @@
 import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
+import { authenticatedUserId } from '../../auth/user.ts';
+
 import type { WebhookEvent } from './coros.api.ts';
 import { corosService as service } from './coros.service.ts';
 
 class CorosController {
   public async exchangeToken(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     if (!req.query['code']) {
       req.log.info(`User ${c2cId} denied Coros authorization`);
       throw createHttpError(403, 'auth-denied');
@@ -24,7 +26,7 @@ class CorosController {
   }
 
   public async deauthorize(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     await service.deauthorize(c2cId);
     res.sendStatus(204);
   }
