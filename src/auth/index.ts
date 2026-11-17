@@ -10,6 +10,7 @@ import log from '../helpers/logger.ts';
 import c2cJwtExtractor from './c2c-jwt-extractor.ts';
 import { verifyWithOffset } from './c2c-jwt-verify.ts';
 import { TokenChecker } from './c2c-token-check.ts';
+import type { AuthenticatedUser } from './user.ts';
 
 const jwtSecret = config.get('auth.jwtSecret');
 const jwtSecretExtra = config.get('auth.jwtSecretExtra');
@@ -33,10 +34,12 @@ const strategies = jwtSecretExtra ? ['jwt', 'jwt-extra'] : ['jwt'];
 
 const ensureAuthenticated: RequestHandler = passport.authenticate(strategies, { session: false }) as RequestHandler;
 
+// The URL holds the user id of the API that issued the token (its UI knows no other): for the extra secret, not the
+// shifted id of tracking. The controllers then use the id in tracking, authenticatedUserId(req)
 const ensureUserFromParamsMatchesAuthUser: RequestHandler = (req, _res, next) => {
-  const authenticatedUser = req.user as { id: number } | undefined;
+  const authenticatedUser = req.user as AuthenticatedUser | undefined;
   const requiredUser = Number.parseInt(req.params['userId'] ?? '', 10);
-  next(authenticatedUser?.id === requiredUser ? undefined : createHttpError(403));
+  next(authenticatedUser?.apiUserId === requiredUser ? undefined : createHttpError(403));
 };
 
 // Requests of an authenticated user, per minute. Keyed by user, not by IP: behind the proxy, all users would share it

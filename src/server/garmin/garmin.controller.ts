@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import { Keyv } from 'keyv';
 
+import { authenticatedUserId } from '../../auth/user.ts';
 import config from '../../config.ts';
 import log from '../../helpers/logger.ts';
 
@@ -25,7 +26,7 @@ class GarminController {
   }
 
   public async requestUnauthorizedRequestToken(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     const { token, tokenSecret } = await service.requestUnauthorizedRequestToken();
     const stored = await this.keyv.set(c2cId.toString(), tokenSecret, 1000 * 60 * 60); // 1 hour TTL
     if (!stored) {
@@ -36,7 +37,7 @@ class GarminController {
   }
 
   public async exchangeToken(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
 
     const token = req.query['oauth_token'] as string;
     const verifier = req.query['oauth_verifier'] as string;
@@ -62,7 +63,7 @@ class GarminController {
   }
 
   public async deauthorize(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     await service.deauthorize(c2cId);
     res.sendStatus(204);
   }

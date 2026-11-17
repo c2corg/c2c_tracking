@@ -7,7 +7,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { app } from '../../../../src/app.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { activityService } from '../../../../src/server/activities/activity.service.ts';
-import { authenticated } from '../../../utils.ts';
+import { authenticated, authenticatedExtra } from '../../../utils.ts';
 
 describe('Activities Controller', () => {
   let server: Server;
@@ -98,6 +98,15 @@ describe('Activities Controller', () => {
       `);
       expect(activityService.getActivities).toHaveBeenCalledTimes(1);
       expect(activityService.getActivities).toHaveBeenCalledWith(1, undefined);
+    });
+
+    it('reads the activities of the extra secret user under the shifted id', async () => {
+      vi.spyOn(activityService, 'getActivities').mockResolvedValueOnce([]);
+
+      const response = await authenticatedExtra(request.get('/users/1/activities'), 1);
+
+      expect(response.status).toBe(200);
+      expect(activityService.getActivities).toHaveBeenCalledWith(1_000_000_001, undefined);
     });
 
     it('responds with user activities summaries with specific lang', async () => {

@@ -2,6 +2,7 @@ import type { RequestOptions } from 'node-mocks-http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ensureAuthenticated, ensureUserFromParamsMatchesAuthUser, passport } from '../../../src/auth/index.ts';
+import type { AuthenticatedUser } from '../../../src/auth/user.ts';
 import log from '../../../src/helpers/logger.ts';
 import { AuthenticatedUserStrategy, runMiddleware } from '../../utils.ts';
 
@@ -19,7 +20,7 @@ describe('ensureAuthenticated', () => {
     passport.use('jwt', AuthenticatedUserStrategy(123));
     const { req, next } = await runMiddleware(ensureAuthenticated);
     expect(next).toBe(true);
-    expect(req.user).toEqual({ id: 123 });
+    expect(req.user).toEqual({ id: 123, apiUserId: 123 });
   });
 
   it('disallows un-authenticated user', async () => {
@@ -33,16 +34,36 @@ describe('ensureAuthenticated', () => {
 
 describe('ensureUserFromParamsMatchesAuthUser', () => {
   // node-mocks-http sets the other options (here the authenticated user) on the request
-  const withUser = (user: { id: number } | undefined): RequestOptions => ({ params: { userId: '123' }, user });
+  const withUser = (user: AuthenticatedUser | undefined): RequestOptions => ({ params: { userId: '123' }, user });
 
   it('allows matching user', async () => {
-    const { next, error } = await runMiddleware(ensureUserFromParamsMatchesAuthUser, withUser({ id: 123 }));
+    const { next, error } = await runMiddleware(
+      ensureUserFromParamsMatchesAuthUser,
+      withUser({ id: 123, apiUserId: 123 }),
+    );
     expect(next).toBe(true);
     expect(error).toBeUndefined();
   });
 
   it('rejects not matching user', async () => {
-    const { error } = await runMiddleware(ensureUserFromParamsMatchesAuthUser, withUser({ id: 456 }));
+    const { error } = await runMiddleware(ensureUserFromParamsMatchesAuthUser, withUser({ id: 456, apiUserId: 456 }));
+    expect(error).toMatchObject({ status: 403 });
+  });
+
+  it('compares the id of the API that issued the token, not the shifted id', async () => {
+    const { next, error } = await runMiddleware(
+      ensureUserFromParamsMatchesAuthUser,
+      withUser({ id: 1_000_000_123, apiUserId: 123 }),
+    );
+    expect(next).toBe(true);
+    expect(error).toBeUndefined();
+  });
+
+  it('rejects the shifted id in the URL', async () => {
+    const { error } = await runMiddleware(ensureUserFromParamsMatchesAuthUser, {
+      params: { userId: '1000000123' },
+      user: { id: 1_000_000_123, apiUserId: 123 },
+    });
     expect(error).toMatchObject({ status: 403 });
   });
 
