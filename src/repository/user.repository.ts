@@ -8,7 +8,7 @@ import type { User } from './user.ts';
 
 type AbstractUserRow = {
   c2c_id: number;
-  strava_id: number | undefined | null;
+  strava_id: string | undefined | null;
   strava_access_token: string | undefined | null;
   strava_expires_at: Date | undefined | null;
   strava_refresh_token: string | undefined | null;
@@ -55,7 +55,7 @@ export class UserRepository {
     }
   }
 
-  public async findByStravaId(stravaId: number): Promise<User | undefined> {
+  public async findByStravaId(stravaId: string): Promise<User | undefined> {
     try {
       const conn = await db.getConnection();
       if (!conn) {

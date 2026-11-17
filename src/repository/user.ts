@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const StravaInfo = z.object({
-  id: z.number().int().positive(),
+  id: z.string().regex(/^[1-9]\d*$/),
   accessToken: z.string().min(10).max(5000).optional(),
   expiresAt: z.number().int().positive().optional(),
   refreshToken: z.string().min(10).max(5000).optional(),

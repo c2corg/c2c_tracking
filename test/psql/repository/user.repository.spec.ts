@@ -20,7 +20,12 @@ describe('User Repository', () => {
 
     const user1: User = {
       c2cId: 1,
-      strava: { id: 1, accessToken: 'strava_access_token', refreshToken: 'strava_refresh_token', expiresAt: 1 },
+      strava: {
+        id: '9007199254740993',
+        accessToken: 'strava_access_token',
+        refreshToken: 'strava_refresh_token',
+        expiresAt: 1,
+      },
       suunto: {
         username: '2',
         accessToken: 'suunto_access_token',
@@ -40,8 +45,8 @@ describe('User Repository', () => {
     };
     await expect(repository.update(user1)).resolves.toEqual(user1);
 
-    await expect(repository.findByStravaId(1)).resolves.toEqual(user1);
-    await expect(repository.findByStravaId(99)).resolves.toBeUndefined();
+    await expect(repository.findByStravaId('9007199254740993')).resolves.toEqual(user1);
+    await expect(repository.findByStravaId('99')).resolves.toBeUndefined();
     await expect(repository.findAllStravaUserIds()).resolves.toEqual([1]);
     await expect(repository.findBySuuntoUsername('2')).resolves.toEqual(user1);
     await expect(repository.findBySuuntoUsername('99')).resolves.toBeUndefined();

@@ -1,8 +1,23 @@
+import type { RequestHandler } from 'express';
+import JSONBig from 'json-bigint';
 import { z } from 'zod';
 
 import { type ValidationSchema, userIdParams } from '../validator.ts';
 
 import { WebhookEvent } from './strava.api.ts';
+
+export const parseWebhookBody: RequestHandler = (req, _res, next) => {
+  if (req.rawBody === undefined) {
+    next();
+    return;
+  }
+  try {
+    req.body = JSONBig({ storeAsString: true }).parse(req.rawBody) as unknown;
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
 export const exchangeToken: ValidationSchema = {
   params: userIdParams,

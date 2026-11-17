@@ -6,9 +6,16 @@ import { knownActivityType } from '../../helpers/activity-type.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { http, isHttpError } from '../../helpers/http.ts';
 
-export const Athlete = z.object({
-  id: z.number().int().positive(),
-});
+const StravaIdFields = {
+  id: z.number().positive().refine(Number.isInteger),
+  id_str: z.string().regex(/^[1-9]\d*$/),
+};
+
+export const Athlete = z
+  .object({
+    ...StravaIdFields,
+  })
+  .transform(({ id_str }) => ({ id: id_str }));
 export type Athlete = z.infer<typeof Athlete>;
 
 export const StravaAuth = z.object({
@@ -85,20 +92,22 @@ const sportTypes = new Set([
 export const SportType = z.preprocess((val) => knownActivityType('strava', String(val), sportTypes), z.string());
 export type SportType = z.infer<typeof SportType>;
 
-export const Activity = z.object({
-  id: z.number().int().positive(),
-  name: z.string(),
-  sport_type: SportType,
-  start_date: z.string().refine(validator.isISO8601, {
-    message: 'String must be an ISO-8601 date',
-  }),
-  start_date_local: z.string().refine(validator.isISO8601, {
-    message: 'String must be an ISO-8601 date',
-  }),
-  distance: z.number().nonnegative(), // in meters
-  elapsed_time: z.number().int().nonnegative(), // in seconds
-  total_elevation_gain: z.number().nonnegative(), // in meters
-});
+export const Activity = z
+  .object({
+    ...StravaIdFields,
+    name: z.string(),
+    sport_type: SportType,
+    start_date: z.string().refine(validator.isISO8601, {
+      message: 'String must be an ISO-8601 date',
+    }),
+    start_date_local: z.string().refine(validator.isISO8601, {
+      message: 'String must be an ISO-8601 date',
+    }),
+    distance: z.number().nonnegative(), // in meters
+    elapsed_time: z.number().int().nonnegative(), // in seconds
+    total_elevation_gain: z.number().nonnegative(), // in meters
+  })
+  .transform(({ id_str, ...activity }) => ({ ...activity, id: id_str }));
 export type Activity = z.infer<typeof Activity>;
 
 const ActivityStream = z.object({
@@ -159,10 +168,10 @@ export type WebhookSubscription = z.infer<typeof WebhookSubscription>;
 
 export const WebhookEvent = z.object({
   object_type: z.enum(['activity', 'athlete']),
-  object_id: z.number().int().positive(),
+  object_id: z.union([z.string().regex(/^[1-9]\d*$/), z.number().int().positive().refine(Number.isSafeInteger)]),
   aspect_type: z.enum(['create', 'update', 'delete']),
   updates: z.record(z.string(), z.string()).optional(),
-  owner_id: z.number().int().positive(),
+  owner_id: z.union([z.string().regex(/^[1-9]\d*$/), z.number().int().positive().refine(Number.isSafeInteger)]),
   subscription_id: z.number().int().positive(),
   event_time: z.number().int().positive(),
 });
@@ -234,9 +243,9 @@ export class StravaApi {
     }
   }
 
-  public async getActivity(accessToken: string, id: number): Promise<Activity> {
+  public async getActivity(accessToken: string, id: string): Promise<Activity> {
     try {
-      const response = await http.get(`${this.baseUrl}activities/${id}`, {
+      const response = await http.get(`${this.baseUrl}activities/${encodeURIComponent(id)}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return Activity.parse(response.data);
@@ -246,9 +255,9 @@ export class StravaApi {
   }
 
   // undefined for an activity without GPS track (indoor, manual entry...): Strava answers 404
-  public async getActivityStream(accessToken: string, id: number): Promise<StreamSet | undefined> {
+  public async getActivityStream(accessToken: string, id: string): Promise<StreamSet | undefined> {
     try {
-      const response = await http.get(`${this.baseUrl}activities/${id}/streams`, {
+      const response = await http.get(`${this.baseUrl}activities/${encodeURIComponent(id)}/streams`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
       });
