@@ -199,5 +199,59 @@ describe('Strava Controller', () => {
       expect(stravaService.handleWebhookEvent).toHaveBeenCalledTimes(1);
       expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith(event);
     });
+
+    it('preserves 64-bit object and owner IDs from the raw JSON body', async () => {
+      vi.spyOn(stravaService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
+
+      const response = await request
+        .post('/strava/webhook')
+        .set('Content-Type', 'application/json')
+        .send(
+          '{"object_type":"activity","object_id":9007199254740993,"aspect_type":"create","owner_id":9007199254740995,"subscription_id":1,"event_time":1}',
+        );
+
+      expect(response.status).toBe(200);
+      expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith({
+        object_type: 'activity',
+        object_id: '9007199254740993',
+        aspect_type: 'create',
+        owner_id: '9007199254740995',
+        subscription_id: 1,
+        event_time: 1,
+      });
+    });
+
+    it('keeps safe integer IDs and other fields as received', async () => {
+      vi.spyOn(stravaService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
+
+      const response = await request
+        .post('/strava/webhook')
+        .set('Content-Type', 'application/json')
+        .send(
+          '{"object_type":"activity","object_id":9007199254740991,"aspect_type":"update","updates":{"title":"9007199254740993"},"owner_id":9007199254740995,"subscription_id":120475,"event_time":1516126040}',
+        );
+
+      expect(response.status).toBe(200);
+      expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith({
+        object_type: 'activity',
+        object_id: 9007199254740991,
+        aspect_type: 'update',
+        updates: { title: '9007199254740993' },
+        owner_id: '9007199254740995',
+        subscription_id: 120475,
+        event_time: 1516126040,
+      });
+    });
+
+    it('rejects an ID that is not a positive integer', async () => {
+      const response = await request
+        .post('/strava/webhook')
+        .set('Content-Type', 'application/json')
+        .send(
+          '{"object_type":"activity","object_id":-9007199254740993,"aspect_type":"create","owner_id":1,"subscription_id":1,"event_time":1}',
+        );
+
+      expect(response.status).toBe(400);
+    });
   });
 });
