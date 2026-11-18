@@ -18,10 +18,26 @@ describe('Strava API', () => {
     vi.clearAllMocks();
   });
 
-  it('requires both athlete ID fields and uses id_str as the canonical ID', () => {
-    expect(Athlete.parse({ id: 123, id_str: '9007199254740993' }).id).toBe('9007199254740993');
-    expect(Athlete.safeParse({ id: 123 }).success).toBe(false);
-    expect(Athlete.safeParse({ id_str: '123' }).success).toBe(false);
+  describe('Athlete', () => {
+    it('uses id_str as the canonical ID', () => {
+      expect(Athlete.parse({ id: 9007199254740992, id_str: '9007199254740993' })).toEqual({ id: '9007199254740993' });
+    });
+
+    it('falls back to id when id_str is missing and id is a safe integer', () => {
+      expect(Athlete.parse({ id: 123 })).toEqual({ id: '123' });
+    });
+
+    it('rejects a missing id_str when id is not a safe integer', () => {
+      expect(Athlete.safeParse({ id: 9007199254740992 }).success).toBe(false);
+    });
+
+    it('requires id', () => {
+      expect(Athlete.safeParse({ id_str: '123' }).success).toBe(false);
+    });
+
+    it.each(['', '0', '0123', '-1', '12a', '1.5'])('rejects id_str %j', (idStr) => {
+      expect(Athlete.safeParse({ id: 123, id_str: idStr }).success).toBe(false);
+    });
   });
 
   describe('exchangeToken', () => {
@@ -172,19 +188,31 @@ describe('Strava API', () => {
     });
   });
 
-  it('requires id_str for activity IDs', () => {
-    expect(
-      Activity.safeParse({
-        id: 9007199254740992,
-        name: 'Afternoon Run',
-        sport_type: 'Run',
-        start_date: '2022-01-01T00:00:01Z',
-        start_date_local: '2022-01-01T00:00:01Z',
-        distance: 1.2,
-        elapsed_time: 1,
-        total_elevation_gain: 1.2,
-      }).success,
-    ).toBe(false);
+  describe('Activity', () => {
+    const activity = {
+      name: 'Afternoon Run',
+      sport_type: 'Run',
+      start_date: '2022-01-01T00:00:01Z',
+      start_date_local: '2022-01-01T00:00:01Z',
+      distance: 1.2,
+      elapsed_time: 1,
+      total_elevation_gain: 1.2,
+    };
+
+    it('uses id_str as the canonical ID', () => {
+      expect(Activity.parse({ ...activity, id: 9007199254740992, id_str: '9007199254740993' })).toEqual({
+        ...activity,
+        id: '9007199254740993',
+      });
+    });
+
+    it('falls back to id when id_str is missing and id is a safe integer', () => {
+      expect(Activity.parse({ ...activity, id: 123 }).id).toBe('123');
+    });
+
+    it('rejects a missing id_str when id is not a safe integer', () => {
+      expect(Activity.safeParse({ ...activity, id: 9007199254740992 }).success).toBe(false);
+    });
   });
 
   describe('getActivityStream', () => {

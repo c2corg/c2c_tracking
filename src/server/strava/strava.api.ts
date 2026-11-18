@@ -6,16 +6,32 @@ import { knownActivityType } from '../../helpers/activity-type.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { http, isHttpError } from '../../helpers/http.ts';
 
+// Activity and athlete IDs become 64-bit from 2027-06-01: `id` may then lose precision as a JS number,
+// `id_str` carries the exact value. `id` is used only when `id_str` is missing and `id` is still exact.
 const StravaIdFields = {
   id: z.number().positive().refine(Number.isInteger),
-  id_str: z.string().regex(/^[1-9]\d*$/),
+  id_str: z
+    .string()
+    .regex(/^[1-9]\d*$/)
+    .optional(),
 };
+
+function canonicalId({ id, id_str }: { id: number; id_str?: string | undefined }, ctx: z.RefinementCtx): string {
+  if (id_str !== undefined) {
+    return id_str;
+  }
+  if (!Number.isSafeInteger(id)) {
+    ctx.addIssue({ code: 'custom', message: 'id_str is required when id is not a safe integer', path: ['id_str'] });
+    return z.NEVER;
+  }
+  return id.toString();
+}
 
 export const Athlete = z
   .object({
     ...StravaIdFields,
   })
-  .transform(({ id_str }) => ({ id: id_str }));
+  .transform((athlete, ctx) => ({ id: canonicalId(athlete, ctx) }));
 export type Athlete = z.infer<typeof Athlete>;
 
 export const StravaAuth = z.object({
@@ -107,7 +123,7 @@ export const Activity = z
     elapsed_time: z.number().int().nonnegative(), // in seconds
     total_elevation_gain: z.number().nonnegative(), // in meters
   })
-  .transform(({ id_str, ...activity }) => ({ ...activity, id: id_str }));
+  .transform(({ id, id_str, ...activity }, ctx) => ({ ...activity, id: canonicalId({ id, id_str }, ctx) }));
 export type Activity = z.infer<typeof Activity>;
 
 const ActivityStream = z.object({
