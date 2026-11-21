@@ -29,6 +29,8 @@ export const createLogger = (destination?: DestinationStream): Logger => {
       return { requestId: currentRequestId() };
     },
     serializers: { err: serializeError },
+    // the request logs of pino-http hold the headers: the user's camptocamp.org JWT and cookies
+    redact: ['req.headers.authorization', 'req.headers.cookie', 'res.headers["set-cookie"]'],
   };
   return destination ? pino(options, destination) : pino(options);
 };
