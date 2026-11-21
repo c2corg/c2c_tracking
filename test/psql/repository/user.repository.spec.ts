@@ -60,6 +60,25 @@ describe('User Repository', () => {
     await expect(repository.findByCorosId('2')).resolves.toBeUndefined();
   });
 
+  it('stores Garmin OAuth 2 tokens longer than 1024 characters once encrypted', async () => {
+    const repository = new UserRepository();
+
+    // Garmin access tokens are JWTs of about 1 kB: encrypted, they exceed the 1024 characters of the first columns
+    const user13: User = {
+      c2cId: 13,
+      garmin: {
+        userId: 'garmin-user-13',
+        accessToken: 'a'.repeat(2000),
+        expiresAt: 1000,
+        refreshToken: 'r'.repeat(2000),
+        refreshExpiresAt: 2000,
+      },
+    };
+    await repository.insert({ c2cId: 13 });
+    await expect(repository.update(user13)).resolves.toEqual(user13);
+    await expect(repository.findById(13)).resolves.toEqual(user13);
+  });
+
   it('stores Garmin OAuth 2 credentials, alone or next to the legacy OAuth 1 ones', async () => {
     const repository = new UserRepository();
 
