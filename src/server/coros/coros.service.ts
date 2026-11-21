@@ -2,6 +2,7 @@ import type { SetNonNullable, SetRequired } from 'type-fest';
 
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { expiresLater, formatWithOffset, utcDateNumber } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
@@ -10,8 +11,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { userRepository } from '../../repository/user.repository.ts';
@@ -64,24 +63,24 @@ export class CorosService {
     }
     // retrieve workouts from last 30 days
     const workouts: WorkoutRecords = await corosApi.getWorkouts(token, id, utcDateNumber(30), utcDateNumber());
+    const data = workouts.data.filter((workout) => !this.isExcluded(workout));
     const geometries = (
-      await Promise.allSettled(
-        workouts.data.map(async (workout) => await this.retrieveWorkoutGeometry(workout, token, id)),
-      )
+      await Promise.allSettled(data.map(async (workout) => await this.retrieveWorkoutGeometry(workout, token, id)))
     ).map((result, i) => {
       if (result.status === 'fulfilled') {
         return result.value;
       }
       // eslint-disable-next-line security/detect-object-injection
-      log.info(`Unable to retrieve geometry for Coros workout ${workouts.data[i]!.labelId} for user ${c2cId}`);
+      log.info(`Unable to retrieve geometry for Coros workout ${data[i]!.labelId} for user ${c2cId}`);
       return undefined;
     });
 
-    const repositoryActivities = workouts.data
+    const repositoryActivities = data.flatMap((workout, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_workout, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((workout, i) => this.asRepositoryActivity(workout, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asRepositoryActivity(workout, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...repositoryActivities);
     return repositoryActivities.length;
   }
@@ -139,20 +138,7 @@ export class CorosService {
     await corosApi.deauthorize(token);
 
     // clear user Coros activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'coros')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor coros`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'coros');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'coros');
     // clear user Coros data
     const { coros, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -196,6 +182,9 @@ export class CorosService {
         );
         continue;
       }
+      if (this.isExcluded(workout)) {
+        continue;
+      }
       const token = await this.getToken(user);
       if (!token) {
         continue;
@@ -226,6 +215,10 @@ export class CorosService {
 
   private isWebhookEventValid(client: string, secret: string): boolean {
     return client === config.get('trackers.coros.clientId') && secret === config.get('trackers.coros.clientSecret');
+  }
+
+  private isExcluded({ mode, subMode }: Workout): boolean {
+    return isExcludedActivityType('coros', corosApi.findSport(mode, subMode));
   }
 
   private asRepositoryActivity(workout: Workout, geojson: LineString): NewActivityWithGeometry {

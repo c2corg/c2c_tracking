@@ -17,7 +17,7 @@ import type { HttpResponse } from '../src/helpers/http.ts';
 export const AuthenticatedUserStrategy = (userId?: number): CustomStrategy =>
   new CustomStrategy((_req: Request, callback: CustomStrategy.VerifiedCallback) => {
     if (userId) {
-      callback(null, { id: userId });
+      callback(null, { id: userId, apiUserId: userId });
     } else {
       callback(null, false);
     }
@@ -29,6 +29,13 @@ export const generateC2cValidToken = (id: number): string => {
 
 export const authenticated = (request: Test, c2cId: number): Test =>
   request.set('Authorization', `JWT token="${generateC2cValidToken(c2cId)}"`);
+
+// A token of the second API (JWT_SECRET_KEY_EXTRA), for its user `apiUserId`
+export const authenticatedExtra = (request: Test, apiUserId: number): Test =>
+  request.set(
+    'Authorization',
+    `JWT token="${sign({}, process.env['JWT_SECRET_KEY_EXTRA']!, { expiresIn: '1m', subject: apiUserId.toString() })}"`,
+  );
 
 export type MiddlewareResult = {
   req: MockRequest<Request>;

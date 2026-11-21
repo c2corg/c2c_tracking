@@ -1,18 +1,28 @@
 import type { Except } from 'type-fest';
 
+import { type C2cActivity, toC2cActivities } from '../../c2c-activities.ts';
 import { NotFoundError } from '../../errors.ts';
 import { Lang, translations } from '../../helpers/i18n/index.ts';
 import type { Activity } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { userService } from '../../user.service.ts';
 
+import { type ActivitySource, groupDuplicates } from './duplicates.ts';
+
 export class ActivityService {
   public async getActivities(
     userId: number,
     lang?: Lang,
-  ): Promise<(Except<Activity, 'geojson' | 'type'> & { type: Partial<Record<Lang, string>> })[]> {
+  ): Promise<
+    (Except<Activity, 'geojson' | 'type'> & {
+      type: Partial<Record<Lang, string>>;
+      c2cActivities: C2cActivity[];
+      // the vendors that have this outing, the one of `id` first
+      sources: ActivitySource[];
+    })[]
+  > {
     const langs: Lang[] = lang ? [lang] : Lang.options;
-    return (await userService.getActivities(userId)).map(({ geojson, type, ...keep }) => {
+    return groupDuplicates(await userService.getActivities(userId)).map(({ geojson, type, typeVendor, ...keep }) => {
       const translated = langs.reduce(
         (acc, l) => ({
           ...acc,
@@ -29,6 +39,8 @@ export class ActivityService {
       return {
         ...keep,
         type: translated,
+        // to prefill the outing
+        c2cActivities: toC2cActivities(typeVendor, type),
       };
     });
   }

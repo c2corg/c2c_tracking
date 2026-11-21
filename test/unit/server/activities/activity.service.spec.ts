@@ -26,6 +26,15 @@ describe('Activity Service', () => {
           type: 'RUN',
           name: 'name',
         },
+        {
+          id: 2,
+          userId: 1,
+          vendor: 'strava',
+          vendorId: '2',
+          date: '2022-01-02T00:00:01Z',
+          type: 'BackcountrySki',
+          name: 'name',
+        },
       ]);
 
       const service = new ActivityService();
@@ -34,9 +43,17 @@ describe('Activity Service', () => {
       expect(response).toMatchInlineSnapshot(`
         [
           {
+            "c2cActivities": [],
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
+            "sources": [
+              {
+                "id": 1,
+                "vendor": "strava",
+                "vendorId": "1",
+              },
+            ],
             "type": {
               "ca": "Run",
               "de": "Run",
@@ -53,6 +70,37 @@ describe('Activity Service', () => {
             "userId": 1,
             "vendor": "strava",
             "vendorId": "1",
+          },
+          {
+            "c2cActivities": [
+              "skitouring",
+            ],
+            "date": "2022-01-02T00:00:01Z",
+            "id": 2,
+            "name": "name",
+            "sources": [
+              {
+                "id": 2,
+                "vendor": "strava",
+                "vendorId": "2",
+              },
+            ],
+            "type": {
+              "ca": "Backcountry Ski",
+              "de": "Backcountry Ski",
+              "en": "Backcountry Ski",
+              "es": "Backcountry Ski",
+              "eu": "Backcountry Ski",
+              "fr": "Ski de randonnée",
+              "hu": "Backcountry Ski",
+              "it": "Backcountry Ski",
+              "ru": "Backcountry Ski",
+              "sl": "Backcountry Ski",
+              "zh_CN": "Backcountry Ski",
+            },
+            "userId": 1,
+            "vendor": "strava",
+            "vendorId": "2",
           },
         ]
       `);
@@ -79,9 +127,17 @@ describe('Activity Service', () => {
       expect(response).toMatchInlineSnapshot(`
         [
           {
+            "c2cActivities": [],
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
+            "sources": [
+              {
+                "id": 1,
+                "vendor": "strava",
+                "vendorId": "1",
+              },
+            ],
             "type": {
               "fr": "Course à pied",
             },
@@ -114,9 +170,17 @@ describe('Activity Service', () => {
       expect(response).toMatchInlineSnapshot(`
         [
           {
+            "c2cActivities": [],
             "date": "2022-01-01T00:00:01Z",
             "id": 1,
             "name": "name",
+            "sources": [
+              {
+                "id": 1,
+                "vendor": "strava",
+                "vendorId": "1",
+              },
+            ],
             "type": {
               "fr": "Inconnu",
             },

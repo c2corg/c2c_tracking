@@ -19,7 +19,7 @@ COPY --from=build-stage /usr/bin/dumb-init /usr/bin/dumb-init
 WORKDIR /usr/src/app
 COPY --from=build-stage --chown=node:node /usr/package.json ./
 COPY --from=build-stage --chown=node:node /usr/node_modules ./node_modules
-# dist/src and dist/scripts: the backfill scripts run with `node scripts/backfill-<vendor>-activities.js`
+# dist/src and dist/scripts: the scripts run with `node scripts/<script>.js`
 COPY --from=build-stage --chown=node:node /usr/dist ./
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

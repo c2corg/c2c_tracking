@@ -6,8 +6,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivity, NewActivityWithGeometry } from '../../repository/activity.ts';
 import { hasGeometry } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
@@ -148,20 +146,7 @@ export class GarminService {
     }
 
     // clear user Garmin activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'garmin')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor garmin`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'garmin');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'garmin');
     // clear user Garmin data
     const { garmin, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -230,7 +215,7 @@ export class GarminService {
       }
       try {
         // clear user Garmin activities
-        await activityRepository.deleteByUserAndVendor(user.c2cId, 'garmin');
+        await userService.deleteActivitiesByVendor(user.c2cId, 'garmin');
         // clear user Garmin data
         const { garmin, ...userWithoutData } = user;
         await userRepository.update({ ...userWithoutData });

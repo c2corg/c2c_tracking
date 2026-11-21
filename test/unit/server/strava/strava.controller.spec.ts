@@ -8,7 +8,7 @@ import { app } from '../../../../src/app.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { WebhookEvent } from '../../../../src/server/strava/strava.api.ts';
 import { stravaService } from '../../../../src/server/strava/strava.service.ts';
-import { authenticated } from '../../../utils.ts';
+import { authenticated, authenticatedExtra } from '../../../utils.ts';
 
 describe('Strava Controller', () => {
   let server: Server;
@@ -99,6 +99,21 @@ describe('Strava Controller', () => {
       expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);
       expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(1, 'longenoughcode');
     });
+
+    it('setups the user of the extra secret under the shifted id', async () => {
+      vi.spyOn(stravaService, 'requestShortLivedAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+
+      const response = await authenticatedExtra(
+        request.get('/strava/exchange-token/1').query({ code: 'longenoughcode', scope: 'activity:read' }),
+        1,
+      );
+
+      expect(response.status).toBe(204);
+      expect(stravaService.requestShortLivedAccessTokenAndSetupUser).toHaveBeenCalledWith(
+        1_000_000_001,
+        'longenoughcode',
+      );
+    });
   });
 
   describe('POST /strava/deauthorize/:userId', () => {
@@ -183,6 +198,60 @@ describe('Strava Controller', () => {
       expect(response.status).toBe(200);
       expect(stravaService.handleWebhookEvent).toHaveBeenCalledTimes(1);
       expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith(event);
+    });
+
+    it('preserves 64-bit object and owner IDs from the raw JSON body', async () => {
+      vi.spyOn(stravaService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
+
+      const response = await request
+        .post('/strava/webhook')
+        .set('Content-Type', 'application/json')
+        .send(
+          '{"object_type":"activity","object_id":9007199254740993,"aspect_type":"create","owner_id":9007199254740995,"subscription_id":1,"event_time":1}',
+        );
+
+      expect(response.status).toBe(200);
+      expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith({
+        object_type: 'activity',
+        object_id: '9007199254740993',
+        aspect_type: 'create',
+        owner_id: '9007199254740995',
+        subscription_id: 1,
+        event_time: 1,
+      });
+    });
+
+    it('keeps safe integer IDs and other fields as received', async () => {
+      vi.spyOn(stravaService, 'handleWebhookEvent').mockResolvedValueOnce(undefined);
+
+      const response = await request
+        .post('/strava/webhook')
+        .set('Content-Type', 'application/json')
+        .send(
+          '{"object_type":"activity","object_id":9007199254740991,"aspect_type":"update","updates":{"title":"9007199254740993"},"owner_id":9007199254740995,"subscription_id":120475,"event_time":1516126040}',
+        );
+
+      expect(response.status).toBe(200);
+      expect(stravaService.handleWebhookEvent).toHaveBeenCalledWith({
+        object_type: 'activity',
+        object_id: 9007199254740991,
+        aspect_type: 'update',
+        updates: { title: '9007199254740993' },
+        owner_id: '9007199254740995',
+        subscription_id: 120475,
+        event_time: 1516126040,
+      });
+    });
+
+    it('rejects an ID that is not a positive integer', async () => {
+      const response = await request
+        .post('/strava/webhook')
+        .set('Content-Type', 'application/json')
+        .send(
+          '{"object_type":"activity","object_id":-9007199254740993,"aspect_type":"create","owner_id":1,"subscription_id":1,"event_time":1}',
+        );
+
+      expect(response.status).toBe(400);
     });
   });
 });

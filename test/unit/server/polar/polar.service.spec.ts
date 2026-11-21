@@ -396,6 +396,38 @@ describe('Polar Service', () => {
       );
     });
 
+    it('ignores an exercise never a c2c outing, without retrieving its FIT', async () => {
+      const event: WebhookEvent = {
+        event: 'EXERCISE',
+        timestamp: '1970-01-01T00:00:01Z',
+        entity_id: 'entityId',
+        user_id: 1n,
+      };
+      const raw = JSONBig.stringify(event);
+      const signature = 'cc1d12ed8e5a82a564ec4b0e75c2bde2e5541d15dbb736dcf446a644b3609853';
+
+      vi.spyOn(userRepository, 'findByPolarId').mockResolvedValueOnce({ c2cId: 1, polar: { id: 1n, token: 'token' } });
+      vi.spyOn(polarRepository, 'findWebhookSecret').mockResolvedValueOnce('secret');
+      vi.spyOn(polarApi, 'getExercise').mockResolvedValueOnce({
+        id: 'id',
+        start_time: '1970-01-01T00:00:01',
+        start_time_utc_offset: 180,
+        duration: 'PT1S',
+        distance: 1,
+        sport: 'OTHER',
+        detailed_sport_info: 'WATERSPORTS_SAILING',
+      });
+      vi.spyOn(polarApi, 'getExerciseFit');
+      vi.spyOn(userService, 'addActivities');
+
+      const service = new PolarService();
+      await service.handleWebhookEvent(event, raw, signature);
+
+      expect(polarApi.getExerciseFit).not.toHaveBeenCalled();
+      expect(userService.addActivities).not.toHaveBeenCalled();
+      expect(log.warn).not.toHaveBeenCalled();
+    });
+
     it('logs and returns if exercise FIT cannot be retrieved', async () => {
       const event: WebhookEvent = {
         event: 'EXERCISE',

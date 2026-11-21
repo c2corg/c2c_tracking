@@ -5,7 +5,7 @@ import { methodNotAllowed } from '../method-not-allowed.ts';
 import { validate } from '../validator.ts';
 
 import { controller } from './strava.controller.ts';
-import { deauthorize, exchangeToken, webhook, webhookSubscription } from './strava.validators.ts';
+import { deauthorize, exchangeToken, parseWebhookBody, webhook, webhookSubscription } from './strava.validators.ts';
 
 const router = Router();
 
@@ -32,7 +32,7 @@ router
 router
   .route('/webhook')
   .get(validate(webhookSubscription), controller.webhookSubscription.bind(controller))
-  .post(validate(webhook), controller.webhook.bind(controller))
+  .post(parseWebhookBody, validate(webhook), controller.webhook.bind(controller))
   .all(methodNotAllowed);
 
 export default router;

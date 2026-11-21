@@ -3,9 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import log from '../../../../src/helpers/logger.ts';
 import { miniatureService } from '../../../../src/miniature.service.ts';
 import { activityRepository } from '../../../../src/repository/activity.repository.ts';
+import type { NewActivityWithGeometry } from '../../../../src/repository/activity.ts';
 import { stravaRepository } from '../../../../src/repository/strava.repository.ts';
 import { userRepository } from '../../../../src/repository/user.repository.ts';
-import { stravaApi } from '../../../../src/server/strava/strava.api.ts';
+import { type Activity, stravaApi, type StreamSet } from '../../../../src/server/strava/strava.api.ts';
 import { StravaService } from '../../../../src/server/strava/strava.service.ts';
 import { userService } from '../../../../src/user.service.ts';
 
@@ -35,7 +36,7 @@ describe('Strava Service', () => {
   describe('requestShortLivedAccessTokenAndSetupUser', () => {
     it('calls API then setups user', async () => {
       vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
-        athlete: { id: 1 },
+        athlete: { id: '1' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -44,7 +45,7 @@ describe('Strava Service', () => {
       vi.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
       vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {
-          id: 1,
+          id: '1',
           name: 'Morning run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
@@ -75,7 +76,7 @@ describe('Strava Service', () => {
       expect(stravaApi.exchangeToken).toHaveBeenCalledWith('code');
       expect(userService.configureStrava).toHaveBeenCalledTimes(1);
       expect(userService.configureStrava).toHaveBeenCalledWith(1, {
-        athlete: { id: 1 },
+        athlete: { id: '1' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -103,9 +104,32 @@ describe('Strava Service', () => {
       });
     });
 
+    it('filters out activities never a c2c outing, without retrieving their geometry', async () => {
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
+        {
+          id: '1',
+          name: 'Zwift',
+          sport_type: 'VirtualRide',
+          start_date: '2022-01-01T00:00:01Z',
+          start_date_local: '2022-01-01T01:00:01Z',
+          distance: 1,
+          elapsed_time: 1,
+          total_elevation_gain: 0,
+        },
+      ]);
+      vi.spyOn(stravaApi, 'getActivityStream');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new StravaService();
+      await service.resyncActivities(1, 'access_token');
+
+      expect(stravaApi.getActivityStream).not.toHaveBeenCalled();
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
+    });
+
     it('filters out activities without geometry', async () => {
       vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
-        athlete: { id: 1 },
+        athlete: { id: '1' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -114,7 +138,7 @@ describe('Strava Service', () => {
       vi.spyOn(userService, 'configureStrava').mockResolvedValueOnce(undefined);
       vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {
-          id: 1,
+          id: '1',
           name: 'Morning run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
@@ -134,7 +158,7 @@ describe('Strava Service', () => {
       expect(stravaApi.exchangeToken).toHaveBeenCalledWith('code');
       expect(userService.configureStrava).toHaveBeenCalledTimes(1);
       expect(userService.configureStrava).toHaveBeenCalledWith(1, {
-        athlete: { id: 1 },
+        athlete: { id: '1' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -148,7 +172,7 @@ describe('Strava Service', () => {
 
     it('throws if auth cannot be configured', async () => {
       vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
-        athlete: { id: 1 },
+        athlete: { id: '1' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -168,7 +192,7 @@ describe('Strava Service', () => {
 
     it('logs if activity retrieval fails', async () => {
       vi.spyOn(stravaApi, 'exchangeToken').mockResolvedValueOnce({
-        athlete: { id: 1 },
+        athlete: { id: '1' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -202,14 +226,14 @@ describe('Strava Service', () => {
 
     it('falls back to getToken when no access token is given', async () => {
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'stored_access_token',
         refreshToken: 'refresh_token',
         expiresAt: Math.floor(Date.now() / 1000) + 3600,
       });
       vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([
         {
-          id: 1,
+          id: '1',
           name: 'Morning run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
@@ -239,6 +263,46 @@ describe('Strava Service', () => {
       expect(result).toBe(1);
       expect(stravaApi.getAthleteActivities).toHaveBeenCalledWith('stored_access_token');
       expect(userService.addActivities).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps each activity with its own geometry when one has no GPS track', async () => {
+      const activity = (id: string): Activity => ({
+        id,
+        name: `Activity ${id}`,
+        sport_type: 'Hike',
+        start_date: `2022-01-0${id}T00:00:01Z`,
+        start_date_local: `2022-01-0${id}T01:00:01Z`,
+        distance: 1,
+        elapsed_time: 1,
+        total_elevation_gain: 1,
+      });
+      // the longitude tells which activity a geometry belongs to
+      const stream = (id: number): StreamSet => ({
+        distance: { series_type: 'distance', original_size: 2, resolution: 'low', data: [1.0, 2.0] },
+        latlng: {
+          series_type: 'distance',
+          original_size: 2,
+          resolution: 'low',
+          data: [
+            [1.0, id],
+            [2.0, id],
+          ],
+        },
+      });
+      vi.spyOn(stravaApi, 'getAthleteActivities').mockResolvedValueOnce([activity('3'), activity('2'), activity('1')]);
+      vi.spyOn(stravaApi, 'getActivityStream').mockImplementation((_token, id) =>
+        Promise.resolve(id === '3' ? undefined : stream(Number(id))),
+      );
+      const addActivities = vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const result = await new StravaService().resyncActivities(1, 'access_token');
+
+      expect(result).toBe(2);
+      const added = addActivities.mock.calls[0]!.slice(1) as NewActivityWithGeometry[];
+      expect(added.map(({ vendorId, geojson }) => [vendorId, geojson?.coordinates[0]?.[0]])).toEqual([
+        ['2', 2],
+        ['1', 1],
+      ]);
     });
 
     it('throws if no valid token can be retrieved', async () => {
@@ -282,7 +346,7 @@ describe('Strava Service', () => {
     it('calls strava API then updates DB', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
@@ -313,7 +377,7 @@ describe('Strava Service', () => {
     it('warns if no miniature info could be retrieved', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
@@ -346,7 +410,7 @@ describe('Strava Service', () => {
     it('warns if miniature could not be deleted', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
@@ -380,7 +444,7 @@ describe('Strava Service', () => {
     it('deletes miniatures', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 99999999999,
@@ -422,7 +486,7 @@ describe('Strava Service', () => {
 
     it('returns access_token if still valid for 1 minute', async () => {
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refreshSecret',
         expiresAt: 62,
@@ -439,7 +503,7 @@ describe('Strava Service', () => {
 
     it('retrieves a new access token if current one is expired', async () => {
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
@@ -469,7 +533,7 @@ describe('Strava Service', () => {
 
     it('returns undefined if refresh fails', async () => {
       vi.spyOn(userService, 'getStravaInfo').mockResolvedValueOnce({
-        id: 1,
+        id: '1',
         accessToken: 'access_token',
         refreshToken: 'refresh_token',
         expiresAt: 61,
@@ -689,11 +753,13 @@ describe('Strava Service', () => {
           strava: {
             accessToken: 'access_token',
             refreshToken: 'refresh_token',
-            id: 1,
+            id: '1',
             expiresAt: 1,
           },
         });
+        vi.spyOn(activityRepository, 'getMiniaturesByUserAndVendor').mockResolvedValueOnce(['miniature.png']);
         vi.spyOn(activityRepository, 'deleteByUserAndVendor').mockResolvedValueOnce(undefined);
+        vi.spyOn(miniatureService, 'deleteMiniature').mockResolvedValueOnce(undefined);
         vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
 
         const service = new StravaService();
@@ -709,6 +775,8 @@ describe('Strava Service', () => {
 
         expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledTimes(1);
         expect(activityRepository.deleteByUserAndVendor).toHaveBeenCalledWith(1, 'strava');
+        expect(miniatureService.deleteMiniature).toHaveBeenCalledTimes(1);
+        expect(miniatureService.deleteMiniature).toHaveBeenCalledWith('miniature.png');
         expect(userRepository.update).toHaveBeenCalledTimes(1);
         expect(userRepository.update).toHaveBeenCalledWith({ c2cId: 1 });
       });
@@ -787,7 +855,7 @@ describe('Strava Service', () => {
 
         expect(service.getToken).toHaveBeenCalledTimes(1);
         expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
-        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', '1');
         expect(log.warn).toHaveBeenCalledTimes(1);
         expect(log.warn).toHaveBeenCalledWith(
           `Strava activity creation webhook event for user 1 couldn't be processed: unable to retrieve activity data`,
@@ -805,7 +873,7 @@ describe('Strava Service', () => {
           .spyOn(StravaService.prototype as any, 'getToken')
           .mockResolvedValueOnce('access_token');
         vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
-          id: 1,
+          id: '1',
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
@@ -841,7 +909,7 @@ describe('Strava Service', () => {
 
         expect(service.getToken).toHaveBeenCalledTimes(1);
         expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
-        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', '1');
         expect(userService.addActivities).toHaveBeenCalledTimes(1);
         expect(userService.addActivities).toHaveBeenCalledWith(1, {
           vendor: 'strava',
@@ -868,6 +936,44 @@ describe('Strava Service', () => {
         getTokenSpy.mockRestore();
       });
 
+      it('ignores an activity never a c2c outing, without retrieving its geometry', async () => {
+        vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
+        vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
+        const getTokenSpy = vi
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .spyOn(StravaService.prototype as any, 'getToken')
+          .mockResolvedValueOnce('access_token');
+        vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
+          id: '1',
+          name: 'Regatta',
+          sport_type: 'Sail',
+          start_date: '1970-01-01T00:00:01Z',
+          start_date_local: '1970-01-01T00:00:01Z',
+          distance: 1,
+          elapsed_time: 1,
+          total_elevation_gain: 0,
+        });
+        vi.spyOn(stravaApi, 'getActivityStream');
+        vi.spyOn(userService, 'addActivities');
+
+        const service = new StravaService();
+        await service.handleWebhookEvent({
+          subscription_id: 1,
+          object_id: 1,
+          object_type: 'activity',
+          aspect_type: 'create',
+          owner_id: 1,
+          event_time: 1,
+          updates: {},
+        });
+
+        expect(stravaApi.getActivityStream).not.toHaveBeenCalled();
+        expect(userService.addActivities).not.toHaveBeenCalled();
+        expect(log.warn).not.toHaveBeenCalled();
+
+        getTokenSpy.mockRestore();
+      });
+
       it('adds activity to user', async () => {
         vi.spyOn(stravaRepository, 'findSubscription').mockResolvedValueOnce(1);
         vi.spyOn(userRepository, 'findByStravaId').mockResolvedValueOnce({ c2cId: 1 });
@@ -876,7 +982,7 @@ describe('Strava Service', () => {
           .spyOn(StravaService.prototype as any, 'getToken')
           .mockResolvedValueOnce('access_token');
         vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
-          id: 1,
+          id: '1',
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
@@ -912,7 +1018,7 @@ describe('Strava Service', () => {
 
         expect(service.getToken).toHaveBeenCalledTimes(1);
         expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
-        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', '1');
         expect(userService.addActivities).toHaveBeenCalledTimes(1);
         expect(userService.addActivities).toHaveBeenCalledWith(1, {
           vendor: 'strava',
@@ -1010,7 +1116,7 @@ describe('Strava Service', () => {
 
         expect(service.getToken).toHaveBeenCalledTimes(1);
         expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
-        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', '1');
         expect(log.warn).toHaveBeenCalledTimes(1);
         expect(log.warn).toHaveBeenCalledWith(
           `Strava activity update webhook event for user 1 couldn't be processed: unable to retrieve activity data`,
@@ -1028,7 +1134,7 @@ describe('Strava Service', () => {
           .spyOn(StravaService.prototype as any, 'getToken')
           .mockResolvedValueOnce('access_token');
         vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
-          id: 1,
+          id: '1',
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
@@ -1052,7 +1158,7 @@ describe('Strava Service', () => {
 
         expect(service.getToken).toHaveBeenCalledTimes(1);
         expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
-        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', '1');
         expect(userService.updateActivity).toHaveBeenCalledTimes(1);
         expect(userService.updateActivity).toHaveBeenCalledWith(1, {
           vendor: 'strava',
@@ -1077,7 +1183,7 @@ describe('Strava Service', () => {
           .spyOn(StravaService.prototype as any, 'getToken')
           .mockResolvedValueOnce('access_token');
         vi.spyOn(stravaApi, 'getActivity').mockResolvedValueOnce({
-          id: 1,
+          id: '1',
           name: 'Morning Run',
           sport_type: 'Run',
           start_date: '1970-01-01T00:00:01Z',
@@ -1101,7 +1207,7 @@ describe('Strava Service', () => {
 
         expect(service.getToken).toHaveBeenCalledTimes(1);
         expect(stravaApi.getActivity).toHaveBeenCalledTimes(1);
-        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', 1);
+        expect(stravaApi.getActivity).toHaveBeenCalledWith('access_token', '1');
         expect(userService.updateActivity).toHaveBeenCalledTimes(1);
         expect(userService.updateActivity).toHaveBeenCalledWith(1, {
           vendor: 'strava',
@@ -1497,7 +1603,7 @@ describe('Strava Service', () => {
 
       const service = new StravaService();
 
-      await expect(service['retrieveActivityGeometry']('token', 1, '2022-01-01T01:00:01Z')).resolves.toBeUndefined();
+      await expect(service['retrieveActivityGeometry']('token', '1', '2022-01-01T01:00:01Z')).resolves.toBeUndefined();
       expect(log.warn).not.toHaveBeenCalled();
     });
 
@@ -1506,7 +1612,7 @@ describe('Strava Service', () => {
 
       const service = new StravaService();
 
-      await expect(service['retrieveActivityGeometry']('token', 1, '2022-01-01T01:00:01Z')).resolves.toBeUndefined();
+      await expect(service['retrieveActivityGeometry']('token', '1', '2022-01-01T01:00:01Z')).resolves.toBeUndefined();
       expect(log.warn).not.toHaveBeenCalled();
       expect(log.info).toHaveBeenCalledWith(
         { err: new Error('Available data cannot be converted to a valid geometry') },

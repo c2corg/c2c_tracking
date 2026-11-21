@@ -2,6 +2,7 @@ import validator from 'validator';
 import { z } from 'zod';
 
 import config from '../../config.ts';
+import { knownActivityType } from '../../helpers/activity-type.ts';
 import { handleExternalApiError } from '../../helpers/error.ts';
 import { http } from '../../helpers/http.ts';
 import { isISO8601Duration } from '../../helpers/utils.ts';
@@ -90,8 +91,10 @@ export type WebhookPingEvent = z.infer<typeof WebhookPingEvent>;
 export type WebhookExerciseEvent = z.infer<typeof WebhookExerciseEvent>;
 export const isWebhookPingEvent = (event: WebhookEvent): event is WebhookPingEvent => event.event === 'PING';
 
-const sportTypes = [
+// detailed sport info values, https://www.polar.com/accesslink-api/ (appendix)
+const sportTypes = new Set([
   'AEROBICS',
+  'AGILITY',
   'AMERICAN_FOOTBALL',
   'AQUATICS',
   'BACKCOUNTRY_SKIING',
@@ -100,30 +103,35 @@ const sportTypes = [
   'BALLROOM_DANCING',
   'BASEBALL',
   'BASKETBALL',
+  'BEACH_TENNIS',
   'BEACH_VOLLEYBALL',
   'BIATHLON',
   'BODY_AND_MIND',
   'BOOTCAMP',
   'BOXING',
+  'CALISTHENICS',
   'CIRCUIT_TRAINING',
+  'CLIMBING',
   'CORE',
   'CRICKET',
-  'CROSS_TRAINER',
+  'CROSS-COUNTRY_SKIING',
   'CROSS_COUNTRY_RUNNING',
-  'CROSS',
-  'CYCLING',
-  'CLIMBING',
+  'CROSS_TRAINER',
   'CURLING',
+  'CYCLING',
   'DANCING',
   'DOWNHILL_SKIING',
   'DUATHLON',
   'DUATHLON_CYCLING',
   'DUATHLON_RUNNING',
+  'ESPORTS',
   'E_BIKE',
   'FIELD_HOCKEY',
   'FINNISH_BASEBALL',
+  'FITNESS_BOXING',
   'FITNESS_DANCING',
   'FITNESS_MARTIAL_ARTS',
+  'FITNESS_RACING',
   'FITNESS_STEP',
   'FLOORBALL',
   'FREE_MULTISPORT',
@@ -131,6 +139,7 @@ const sportTypes = [
   'FUNCTIONAL_TRAINING',
   'FUTSAL',
   'GOLF',
+  'GRAVEL',
   'GROUP_EXERCISE',
   'GYMNASTICK',
   'HANDBALL',
@@ -144,7 +153,9 @@ const sportTypes = [
   'JAZZ_DANCING',
   'JOGGING',
   'JUDO_MARTIAL_ARTS',
+  'JUMP_ROPE',
   'KETTLEBELL',
+  'KICKBIKE',
   'KICKBOXING_MARTIAL_ARTS',
   'LATIN_DANCING',
   'LES_MILLS_BARRE',
@@ -174,6 +185,7 @@ const sportTypes = [
   'MOTORSPORTS_SNOCROSS',
   'MOUNTAIN_BIKING',
   'NORDIC_WALKING',
+  'OBSTACLE_COURSE_RACING',
   'OFFROADDUATHLON',
   'OFFROADDUATHLON_CYCLING',
   'OFFROADDUATHLON_RUNNING',
@@ -188,30 +200,42 @@ const sportTypes = [
   'OTHER_INDOOR',
   'OTHER_OUTDOOR',
   'PADEL',
+  'PARASPORTS_HAND_CYCLING',
+  'PARASPORTS_SLED_HOCKEY',
+  'PARASPORTS_WATER_SKIING',
   'PARASPORTS_WHEELCHAIR',
+  'PARASPORTS_WHEELCHAIR_BASKETBALL',
+  'PARASPORTS_WHEELCHAIR_TENNIS',
+  'PICKLEBALL',
   'PILATES',
   'POOL_SWIMMING',
   'RIDING',
+  'RINGETTE',
   'ROAD_BIKING',
   'ROAD_RUNNING',
   'ROLLER_BLADING',
   'ROLLER_SKIING_CLASSIC',
   'ROLLER_SKIING_FREESTYLE',
   'ROWING',
+  'RUCKING',
   'RUGBY',
   'RUNNING',
+  'SHOOTING_SPORT_INDOOR',
+  'SHOOTING_SPORT_OUTDOOR',
   'SHOW_DANCING',
   'SKATEBOARDING',
   'SKATING',
+  'SKIERG',
   'SNOWBOARDING',
   'SNOWSHOE_TREKKING',
   'SOCCER',
   'SPINNING',
-  'SUP',
   'SQUASH',
+  'STAIR_WORKOUT',
   'STREET_DANCING',
   'STRENGTH_TRAINING',
   'STRETCHING',
+  'SUP',
   'SWIMMING',
   'TABLE_TENNIS',
   'TAEKWONDO_MARTIAL_ARTS',
@@ -225,13 +249,12 @@ const sportTypes = [
   'TRIATHLON_RUNNING',
   'TRIATHLON_SWIMMING',
   'TROTTING',
+  'ULTIMATE',
   'ULTRARUNNING_RUNNING',
-  'VERTICALSPORTS_WALLCLIMBING',
   'VERTICALSPORTS_OUTCLIMBING',
+  'VERTICALSPORTS_WALLCLIMBING',
   'VOLLEYBALL',
   'WALKING',
-  'WATER_EXERCISE',
-  'WATER_RUNNING',
   'WATERSPORTS_CANOEING',
   'WATERSPORTS_KAYAKING',
   'WATERSPORTS_KITESURFING',
@@ -240,18 +263,12 @@ const sportTypes = [
   'WATERSPORTS_WAKEBOARDING',
   'WATERSPORTS_WATERSKI',
   'WATERSPORTS_WINDSURFING',
+  'WATER_EXERCISE',
+  'WATER_RUNNING',
   'XC_SKIING_CLASSIC',
   'XC_SKIING_FREESTYLE',
   'YOGA',
-];
-export const SportType = z.preprocess((val) => {
-  const s = String(val);
-  if (sportTypes.includes(s)) {
-    return s;
-  }
-  return 'Unknown';
-}, z.string());
-export type SportType = z.infer<typeof SportType>;
+]);
 
 const Exercise = z.object({
   id: z.string().min(1).max(50),
@@ -263,9 +280,18 @@ const Exercise = z.object({
     message: 'String must be an ISO-8601 duration',
   }),
   distance: z.number().nonnegative().optional(), // meters
-  sport: SportType,
+  sport: z.string().max(100).optional(),
+  detailed_sport_info: z.string().max(100).optional(),
 });
 export type Exercise = z.infer<typeof Exercise>;
+
+/**
+ * The exercise's activity type: the known list holds detailed sport info values, sport is the fallback.
+ */
+export const sportType = ({ sport, detailed_sport_info }: Exercise): string =>
+  detailed_sport_info && sportTypes.has(detailed_sport_info)
+    ? detailed_sport_info
+    : knownActivityType('polar', sport, sportTypes);
 
 export class PolarApi {
   private readonly baseUrl = 'https://www.polaraccesslink.com/v3/';

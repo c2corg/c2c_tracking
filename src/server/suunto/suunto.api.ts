@@ -22,6 +22,7 @@ export type SuuntoAuth = z.infer<typeof SuuntoAuth>;
 export const SuuntoRefreshAuth = SuuntoAuth.omit({ user: true });
 export type SuuntoRefreshAuth = z.infer<typeof SuuntoRefreshAuth>;
 
+// Suunto App activity ids, https://aspartnercontent.blob.core.windows.net/apizone/docs/Activities.pdf (March 2025)
 export const workoutTypes = [
   'Walking', // 0
   'Running', // 1
@@ -49,12 +50,12 @@ export const workoutTypes = [
   'Gym', // 23
   'NordicWalking', // 24
   'HorsebackRiding', // 25
-  'Mototsports', // 26
+  'Motorsports', // 26
   'Skateboarding', // 27
   'WaterSports', // 28
   'Climbing', // 29
   'Snowboarding', // 30
-  'SkitTouring', // 31
+  'SkiTouring', // 31
   'FitnessClass', // 32
   'Soccer', // 33
   'Tennis', // 34
@@ -82,7 +83,7 @@ export const workoutTypes = [
   'RollerSkiing', // 56
   'IndoorRowing', // 57
   'Stretching', // 58
-  'rackAndField', // 59
+  'TrackAndField', // 59
   'Orienteering', // 60
   'StandupPaddling', // 61
   'CombatSport', // 62
@@ -98,7 +99,7 @@ export const workoutTypes = [
   'Kayaking', // 72
   'CircuitTraining', // 73
   'Triathlon', // 74
-  undefined,
+  'Padel', // 75
   'Cheerleading', // 76
   'Boxing', // 77
   'Scubadiving', // 78
@@ -122,6 +123,28 @@ export const workoutTypes = [
   'Fishing', // 96
   'Hunting', // 97
   'Transition', // 98
+  'GravelCycling', // 99
+  'Mermaiding', // 100
+  'Spearfishing', // 101
+  'JumpRope', // 102
+  'TrackRunning', // 103
+  'Calisthenics', // 104
+  'EBiking', // 105
+  'EMtb', // 106
+  'BackcountrySkiing', // 107
+  'WheelchairSport', // 108
+  'HandCycling', // 109
+  'Splitboarding', // 110
+  'Biathlon', // 111
+  'Meditation', // 112
+  'FieldHockey', // 113
+  'Cyclocross', // 114
+  'VerticalRunning', // 115
+  'SkiMountaineering', // 116
+  'SkateSkiing', // 117
+  'ClassicSkiing', // 118
+  'Chores', // 119
+  'Pilates', // 120
 ];
 
 export const Position = z.object({

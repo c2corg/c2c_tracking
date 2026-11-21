@@ -4,6 +4,7 @@ import createHttpError from 'http-errors';
 import { Keyv } from 'keyv';
 import { z } from 'zod';
 
+import { authenticatedUserId } from '../../auth/user.ts';
 import config from '../../config.ts';
 import log from '../../helpers/logger.ts';
 
@@ -34,7 +35,7 @@ class GarminController {
 
   /** Starts the OAuth 2 flow: remembers the PKCE verifier and returns the Garmin consent page URL */
   public async requestAuthorization(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     const { url, state, codeVerifier } = service.startAuthorization();
     const pending: PendingAuthorization = { state, codeVerifier };
     const stored = await this.keyv.set(this.pendingKey(c2cId), pending, 1000 * 60 * 60); // 1 hour TTL
@@ -46,7 +47,7 @@ class GarminController {
   }
 
   public async exchangeToken(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
 
     const code = req.query['code'] as string | undefined;
     const state = req.query['state'] as string | undefined;
@@ -77,7 +78,7 @@ class GarminController {
   }
 
   public async deauthorize(req: Request, res: Response): Promise<void> {
-    const c2cId = Number.parseInt(req.params['userId'] ?? '', 10);
+    const c2cId = authenticatedUserId(req);
     await service.deauthorize(c2cId);
     res.sendStatus(204);
   }

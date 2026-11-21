@@ -96,6 +96,32 @@ describe('Coros Service', () => {
       });
     });
 
+    it('filters out activities never a c2c outing, without retrieving their geometry', async () => {
+      vi.spyOn(corosApi, 'getWorkouts').mockResolvedValueOnce({
+        result: '0000',
+        message: 'OK',
+        data: [
+          {
+            labelId: '1234',
+            mode: 32,
+            subMode: 2,
+            startTime: 1516096869,
+            endTime: 1516097362,
+            startTimezone: 32,
+            endTimezone: 32,
+          },
+        ],
+      });
+      vi.spyOn(corosApi, 'getWorkoutDetails');
+      vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+      const service = new CorosService();
+      await service.resyncActivities(1, 'access_token', '1');
+
+      expect(corosApi.getWorkoutDetails).not.toHaveBeenCalled();
+      expect(userService.addActivities).toHaveBeenCalledWith(1);
+    });
+
     it('filters out activities without geometry', async () => {
       vi.spyOn(corosApi, 'exchangeToken').mockResolvedValueOnce({
         access_token: 'access_token',

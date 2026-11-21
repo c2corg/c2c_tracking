@@ -3,12 +3,11 @@ import { createHmac } from 'crypto';
 import invariant from 'tiny-invariant';
 
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { durationSeconds, offsetString } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
 import { promWebhookCounter, promWebhookErrorsCounter } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { polarRepository } from '../../repository/polar.repository.ts';
@@ -16,7 +15,7 @@ import { userRepository } from '../../repository/user.repository.ts';
 import { userService } from '../../user.service.ts';
 
 import type { Exercise, WebhookEvent } from './polar.api.ts';
-import { polarApi, isWebhookPingEvent } from './polar.api.ts';
+import { polarApi, sportType, isWebhookPingEvent } from './polar.api.ts';
 
 export class PolarService {
   public async requestAccessTokenAndSetupUser(c2cId: number, authorizationCode: string): Promise<void> {
@@ -38,20 +37,7 @@ export class PolarService {
     await polarApi.deleteUser(token, polarId);
 
     // clear user Polar activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'polar')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor polar`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'polar');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'polar');
     // clear user Polar data
     const { polar, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -137,6 +123,10 @@ export class PolarService {
       );
       return;
     }
+    const type = sportType(exercise);
+    if (isExcludedActivityType('polar', type)) {
+      return;
+    }
     let fit: ArrayBuffer;
     try {
       fit = await polarApi.getExerciseFit(user.polar.token, exerciseId);
@@ -155,7 +145,7 @@ export class PolarService {
       return;
     }
     try {
-      await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise, geojson));
+      await userService.addActivities(user.c2cId, this.asRepositoryActivity(exercise, type, geojson));
       promWebhookCounter.labels({ vendor: 'polar', subject: 'activity', event: 'create' });
     } catch {
       promWebhookErrorsCounter.labels({ vendor: 'polar', cause: 'processing_failed' }).inc(1);
@@ -169,12 +159,12 @@ export class PolarService {
     return signature === createHmac('sha256', webhookSecret).update(rawEvent).digest('hex');
   }
 
-  private asRepositoryActivity(exercise: Exercise, geojson: LineString): NewActivityWithGeometry {
+  private asRepositoryActivity(exercise: Exercise, type: string, geojson: LineString): NewActivityWithGeometry {
     return {
       vendor: 'polar',
       vendorId: exercise.id,
       date: this.localDate(exercise),
-      type: exercise.sport,
+      type,
       geojson,
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
       ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API

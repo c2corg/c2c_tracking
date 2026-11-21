@@ -1,5 +1,6 @@
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { epochSeconds, expiresLater, formatWithOffset } from '../../helpers/time.ts';
 import { truthy } from '../../helpers/utils.ts';
@@ -8,8 +9,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry, UpdateActivity } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { stravaRepository } from '../../repository/strava.repository.ts';
@@ -69,7 +68,9 @@ export class StravaService {
       throw new NotFoundError(`Unable to retrieve a valid Strava token for user ${c2cId}`);
     }
     // retrieve last 30 outings
-    const activities: Activity[] = await stravaApi.getAthleteActivities(token);
+    const activities: Activity[] = (await stravaApi.getAthleteActivities(token)).filter(
+      ({ sport_type }) => !isExcludedActivityType('strava', sport_type),
+    );
     const geometries = (
       await Promise.allSettled(
         activities.map((activity) =>
@@ -89,11 +90,12 @@ export class StravaService {
       return undefined;
     });
 
-    const repositoryActivities = activities
+    const repositoryActivities = activities.flatMap((activity, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_activity, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((activity, i) => this.asNewRepositoryActivity(activity, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asNewRepositoryActivity(activity, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...repositoryActivities);
     return repositoryActivities.length;
   }
@@ -111,20 +113,7 @@ export class StravaService {
     await stravaApi.deauthorize(token);
 
     // clear user Strava activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'strava')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor strava`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'strava');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'strava');
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -154,7 +143,7 @@ export class StravaService {
 
   private async retrieveActivityGeometry(
     token: string,
-    activityId: number,
+    activityId: string,
     startDateLocal: string,
   ): Promise<LineString | undefined> {
     try {
@@ -277,7 +266,7 @@ export class StravaService {
         switch (event.aspect_type) {
           case 'delete':
             if (event.updates?.['authorized'] === 'false') {
-              await this.handleAthleteDeleteEvent(event.owner_id);
+              await this.handleAthleteDeleteEvent(String(event.owner_id));
             }
             break;
           default:
@@ -289,13 +278,13 @@ export class StravaService {
       case 'activity':
         switch (event.aspect_type) {
           case 'create':
-            await this.handleActivityCreateEvent(event.owner_id, event.object_id);
+            await this.handleActivityCreateEvent(String(event.owner_id), String(event.object_id));
             break;
           case 'update':
-            await this.handleActivityUpdateEvent(event.owner_id, event.object_id);
+            await this.handleActivityUpdateEvent(String(event.owner_id), String(event.object_id));
             break;
           case 'delete':
-            await this.handleActivityDeleteEvent(event.object_id);
+            await this.handleActivityDeleteEvent(String(event.object_id));
             break;
           default:
             promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'not_handled' }).inc(1);
@@ -313,7 +302,7 @@ export class StravaService {
    * On athlete delete event received, it means our app isn't authorized anymore. We should thus clean up all
    * Strava-related data from our DB.
    */
-  private async handleAthleteDeleteEvent(userStravaId: number): Promise<void> {
+  private async handleAthleteDeleteEvent(userStravaId: string): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
@@ -323,7 +312,7 @@ export class StravaService {
       return;
     }
     // clear user Strava activities
-    await activityRepository.deleteByUserAndVendor(user.c2cId, 'strava');
+    await userService.deleteActivitiesByVendor(user.c2cId, 'strava');
     // clear user Strava data
     const { strava, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -334,7 +323,7 @@ export class StravaService {
    * On activity creation, retrieve data, then add activity to user's activity (sorting and triaging is handled through
    * user service).
    */
-  private async handleActivityCreateEvent(userStravaId: number, activityId: number): Promise<void> {
+  private async handleActivityCreateEvent(userStravaId: string, activityId: string): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
@@ -355,6 +344,9 @@ export class StravaService {
     let geojson: LineString | undefined;
     try {
       activity = await stravaApi.getActivity(token, activityId);
+      if (isExcludedActivityType('strava', activity.sport_type)) {
+        return;
+      }
       geojson = await this.retrieveActivityGeometry(
         token,
         activityId,
@@ -384,7 +376,7 @@ export class StravaService {
   /*
    * On activity update, retrieve activity data and update DB.
    */
-  private async handleActivityUpdateEvent(userStravaId: number, activityId: number): Promise<void> {
+  private async handleActivityUpdateEvent(userStravaId: string, activityId: string): Promise<void> {
     // retrieve activity
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
@@ -423,9 +415,9 @@ export class StravaService {
     }
   }
 
-  private async handleActivityDeleteEvent(activityId: number): Promise<void> {
+  private async handleActivityDeleteEvent(activityId: string): Promise<void> {
     try {
-      await userService.deleteActivity('strava', activityId.toString());
+      await userService.deleteActivity('strava', activityId);
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'delete' });
     } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
@@ -438,7 +430,7 @@ export class StravaService {
   private asNewRepositoryActivity(activity: Activity, geojson: LineString): NewActivityWithGeometry {
     return {
       vendor: 'strava',
-      vendorId: activity.id.toString(),
+      vendorId: activity.id,
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
       type: activity.sport_type,
@@ -452,7 +444,7 @@ export class StravaService {
   private asUpdateRepositoryActivity(activity: Activity): UpdateActivity {
     return {
       vendor: 'strava',
-      vendorId: activity.id.toString(),
+      vendorId: activity.id,
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
       type: activity.sport_type,

@@ -32,17 +32,17 @@ describe('JWT with an extra secret', () => {
 
   it('accepts the main secret as is', async () => {
     const auth = await loadAuth(withExtra);
-    expect(await authenticate(auth, MAIN_SECRET, 123)).toEqual({ id: 123 });
+    expect(await authenticate(auth, MAIN_SECRET, 123)).toEqual({ id: 123, apiUserId: 123 });
   });
 
   it('accepts the extra secret, shifting the user id', async () => {
     const auth = await loadAuth(withExtra);
-    expect(await authenticate(auth, EXTRA_SECRET, 123)).toEqual({ id: 1_000_000_123 });
+    expect(await authenticate(auth, EXTRA_SECRET, 123)).toEqual({ id: 1_000_000_123, apiUserId: 123 });
   });
 
   it('uses the configured offset', async () => {
     const auth = await loadAuth({ ...withExtra, JWT_EXTRA_ID_OFFSET: '500000000' });
-    expect(await authenticate(auth, EXTRA_SECRET, 123)).toEqual({ id: 500_000_123 });
+    expect(await authenticate(auth, EXTRA_SECRET, 123)).toEqual({ id: 500_000_123, apiUserId: 123 });
   });
 
   it('refuses a user id of the extra API above the offset', async () => {

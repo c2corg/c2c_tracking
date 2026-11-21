@@ -10,7 +10,7 @@ import log from '../../../../src/helpers/logger.ts';
 import type { GarminActivity } from '../../../../src/server/garmin/garmin.api.ts';
 import { controller as garminController } from '../../../../src/server/garmin/garmin.controller.ts';
 import { garminService } from '../../../../src/server/garmin/garmin.service.ts';
-import { authenticated } from '../../../utils.ts';
+import { authenticated, authenticatedExtra } from '../../../utils.ts';
 
 describe('Garmin Controller', () => {
   let server: Server;
@@ -91,20 +91,66 @@ describe('Garmin Controller', () => {
   });
 
   describe('GET /garmin/exchange-token/:userId', () => {
+    it('requires an authenticated user', async () => {
+      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('requires matching authenticated user', async () => {
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' }),
+        2,
+      );
+
+      expect(response.status).toBe(403);
+    });
+
+    it('uses the pending authorization stored for the shifted id of the extra secret user', async () => {
+      await garminController['keyv'].set(
+        'garmin-pkce-1000000001',
+        { state: 'a-state-123456', codeVerifier: 'a-verifier' },
+        100,
+      );
+      vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
+
+      const response = await authenticatedExtra(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' }),
+        1,
+      );
+
+      expect(response.status).toBe(204);
+      expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledWith(
+        1_000_000_001,
+        'code',
+        'a-verifier',
+        'a-state-123456',
+      );
+    });
+
     it('requires valid input', async () => {
-      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'short' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'short' }),
+        1,
+      );
       expect(response.status).toBe(400);
     });
 
     it('acknowledges authorization denial from user', async () => {
-      const response = await request.get('/garmin/exchange-token/1').query({ error: 'access_denied' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ error: 'access_denied' }),
+        1,
+      );
 
       expect(response.status).toBe(403);
       expect(response.text).toEqual('auth-denied');
     });
 
     it('needs a pending authorization still stored in keyv', async () => {
-      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' }),
+        1,
+      );
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
@@ -114,7 +160,10 @@ describe('Garmin Controller', () => {
       await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser');
 
-      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'another-state-1' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'another-state-1' }),
+        1,
+      );
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
@@ -127,7 +176,10 @@ describe('Garmin Controller', () => {
       await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(undefined);
 
-      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' }),
+        1,
+      );
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
@@ -137,7 +189,10 @@ describe('Garmin Controller', () => {
       await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
       vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockResolvedValueOnce(undefined);
 
-      const response = await request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' });
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' }),
+        1,
+      );
 
       expect(response.status).toBe(204);
       expect(garminService.requestAccessTokenAndSetupUser).toHaveBeenCalledTimes(1);

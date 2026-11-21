@@ -7,6 +7,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
   ObjectCannedACL,
   PutObjectCommand,
   S3Client,
@@ -21,7 +22,10 @@ export abstract class Storage {
   public abstract get(key: string): Promise<Buffer>;
   public abstract put(key: string, data: Buffer): Promise<void>;
   public abstract delete(key: string): Promise<void>;
+  public abstract list(): AsyncGenerator<StoredObject>;
 }
+
+export type StoredObject = { key: string; lastModified: Date };
 
 export class LocalStorage implements Storage {
   readonly #baseDirectory: string;
@@ -58,6 +62,17 @@ export class LocalStorage implements Storage {
   public delete(key: string): Promise<void> {
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     return fsPromises.unlink(this.path(key));
+  }
+
+  public async *list(): AsyncGenerator<StoredObject> {
+    /* eslint-disable security/detect-non-literal-fs-filename */
+    for (const entry of await fsPromises.readdir(this.#baseDirectory, { withFileTypes: true })) {
+      if (entry.isFile()) {
+        const { mtime } = await fsPromises.stat(this.path(entry.name));
+        yield { key: entry.name, lastModified: mtime };
+      }
+    }
+    /* eslint-enable security/detect-non-literal-fs-filename */
   }
 }
 
@@ -112,6 +127,21 @@ export class S3Storage implements Storage {
 
   public async delete(key: string): Promise<void> {
     await this.#client.send(new DeleteObjectCommand({ Bucket: this.#bucketName, Key: key }));
+  }
+
+  public async *list(): AsyncGenerator<StoredObject> {
+    let continuationToken: string | undefined;
+    do {
+      const { Contents, NextContinuationToken } = await this.#client.send(
+        new ListObjectsV2Command({ Bucket: this.#bucketName, ContinuationToken: continuationToken }),
+      );
+      for (const { Key, LastModified } of Contents ?? []) {
+        if (Key && LastModified) {
+          yield { key: Key, lastModified: LastModified };
+        }
+      }
+      continuationToken = NextContinuationToken;
+    } while (continuationToken);
   }
 
   public get baseUrl(): string {

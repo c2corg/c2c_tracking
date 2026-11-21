@@ -1,5 +1,7 @@
 import config from '../../config.ts';
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
+import { unknownActivityType } from '../../helpers/activity-type.ts';
 import log from '../../helpers/logger.ts';
 import { expiresLater, formatWithOffset } from '../../helpers/time.ts';
 import { fitToGeoJSON } from '../../helpers/utils.ts';
@@ -8,8 +10,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { userRepository } from '../../repository/user.repository.ts';
@@ -54,24 +54,24 @@ export class SuuntoService {
     }
     // retrieve last 30 outings
     const workouts: Workouts = await suuntoApi.getWorkouts(token, this.#suuntoSubscriptionKey);
+    const payload = workouts.payload.filter(({ activityId }) => !this.isExcluded(activityId));
     const geometries = (
-      await Promise.allSettled(
-        workouts.payload.map((workout) => this.retrieveActivityGeometry(token, workout.workoutKey)),
-      )
+      await Promise.allSettled(payload.map((workout) => this.retrieveActivityGeometry(token, workout.workoutKey)))
     ).map((result, i) => {
       if (result.status === 'fulfilled') {
         return result.value;
       }
       // eslint-disable-next-line security/detect-object-injection
-      log.info(`Unable to retrieve geometry for Suunto activity ${workouts.payload[i]!.workoutId} for user ${c2cId}`);
+      log.info(`Unable to retrieve geometry for Suunto activity ${payload[i]!.workoutId} for user ${c2cId}`);
       return undefined;
     });
 
-    const activities = workouts.payload
+    const activities = payload.flatMap((activity, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_activity, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asRepositoryActivity(activity, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...activities);
     return activities.length;
   }
@@ -140,6 +140,9 @@ export class SuuntoService {
     let geojson: LineString | undefined;
     try {
       workout = await suuntoApi.getWorkoutDetails(event.workoutid, token, this.#suuntoSubscriptionKey);
+      if (this.isExcluded(workout.payload.activityId)) {
+        return;
+      }
       geojson = await this.retrieveActivityGeometry(token, workout.payload.workoutKey);
       if (!geojson) {
         return;
@@ -179,23 +182,15 @@ export class SuuntoService {
     await suuntoApi.deauthorize(token);
 
     // clear user Suunto activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'suunto')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor suunto`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'suunto');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'suunto');
     // clear user Suunto data
     const { suunto, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
+  }
+
+  private isExcluded(activityId: number): boolean {
+    // eslint-disable-next-line security/detect-object-injection
+    return isExcludedActivityType('suunto', workoutTypes[activityId]);
   }
 
   private asRepositoryActivity(workout: Workout, geojson: LineString): NewActivityWithGeometry {
@@ -203,7 +198,7 @@ export class SuuntoService {
       vendor: 'suunto',
       vendorId: workout.workoutKey,
       date: formatWithOffset(Math.floor(workout.startTime / 1000), workout.timeOffsetInMinutes),
-      type: workoutTypes[workout.activityId] || 'Unknown',
+      type: workoutTypes[workout.activityId] ?? unknownActivityType('suunto', workout.activityId),
       geojson,
       ...(workout.totalDistance && { length: Math.round(workout.totalDistance) }),
       ...(workout.totalTime && { duration: Math.round(workout.totalTime) }),

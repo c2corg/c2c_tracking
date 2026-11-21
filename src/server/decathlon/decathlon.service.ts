@@ -1,4 +1,5 @@
 import { NotFoundError } from '../../errors.ts';
+import { isExcludedActivityType } from '../../excluded-activity-types.ts';
 import log from '../../helpers/logger.ts';
 import { epochSeconds, expiresLater } from '../../helpers/time.ts';
 import {
@@ -6,8 +7,6 @@ import {
   promWebhookCounter,
   promWebhookErrorsCounter,
 } from '../../metrics/prometheus.ts';
-import { miniatureService } from '../../miniature.service.ts';
-import { activityRepository } from '../../repository/activity.repository.ts';
 import type { NewActivityWithGeometry } from '../../repository/activity.ts';
 import type { LineString } from '../../repository/geojson.ts';
 import { userRepository } from '../../repository/user.repository.ts';
@@ -53,7 +52,9 @@ export class DecathlonService {
       throw new NotFoundError(`Unable to retrieve a valid Decathlon token for user ${c2cId}`);
     }
     // retrieve last 30 outings
-    const activities = await decathlonApi.getActivities(token);
+    const activities = (await decathlonApi.getActivities(token)).filter(
+      (activity) => !isExcludedActivityType('decathlon', this.sportName(activity)),
+    );
     const geometries = (
       await Promise.allSettled(
         activities.map(async (activity) => {
@@ -69,11 +70,12 @@ export class DecathlonService {
       log.info(`Unable to retrieve geometry for Decathlon activity ${activities[i]!.id} for user ${c2cId}`);
       return undefined;
     });
-    const repositoryActivities = activities
+    const repositoryActivities = activities.flatMap((activity, i) => {
+      // index of the unfiltered list: a filter before it would pair activities with the geometry of others
       // eslint-disable-next-line security/detect-object-injection
-      .filter((_activity, i) => !!geometries?.[i])
-      // eslint-disable-next-line security/detect-object-injection
-      .map((activity, i) => this.asRepositoryActivity(activity, geometries[i]!));
+      const geometry = geometries[i];
+      return geometry ? [this.asRepositoryActivity(activity, geometry)] : [];
+    });
     await userService.addActivities(c2cId, ...repositoryActivities);
     return repositoryActivities.length;
   }
@@ -96,20 +98,7 @@ export class DecathlonService {
     // clear webhook
     await decathlonApi.deleteWebhookSubscription(user.decathlon.webhookId, token);
     // clear user Decathlon activities
-    const miniatures: string[] = [];
-    try {
-      miniatures.push(...(await activityRepository.getMiniaturesByUserAndVendor(c2cId, 'decathlon')));
-    } catch {
-      log.warn(`Failed retrieving miniatures info for user ${c2cId} and vendor decathlon`);
-    }
-    await activityRepository.deleteByUserAndVendor(c2cId, 'decathlon');
-    for (const miniature of miniatures) {
-      try {
-        await miniatureService.deleteMiniature(miniature);
-      } catch {
-        log.warn(`Failed deleting miniature ${miniature}`);
-      }
-    }
+    await userService.deleteActivitiesByVendor(c2cId, 'decathlon');
     // clear user Decathlon data
     const { decathlon, ...userWithoutData } = user;
     await userRepository.update({ ...userWithoutData });
@@ -239,8 +228,11 @@ export class DecathlonService {
       .sort(([_lng1, _lat1, _ele1, d1], [_lng2, _lat2, _ele2, d2]) => d1 - d2);
   }
 
+  private sportName(activity: Activity): string | undefined {
+    return sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10))?.translatedNames['en'];
+  }
+
   private asRepositoryActivity(activity: Activity, geojson: LineString): NewActivityWithGeometry {
-    const sport = sports.find(({ id }) => id === Number.parseInt(activity.sport.substring(11), 10));
     const coordinates = this.locationsToGeoJson(activity);
     let duration = activity.duration;
     if ((duration === undefined || duration === null) && activity.dataSummaries['24']) {
@@ -256,7 +248,7 @@ export class DecathlonService {
       vendorId: activity.id.toString(),
       date: activity.startdate,
       name: activity.name,
-      type: sport?.translatedNames?.['en'] || 'Unknown',
+      type: this.sportName(activity) || 'Unknown',
       geojson,
       ...(duration && { duration: Math.round(duration) }),
       ...(elevation && { heightDiffUp: Math.round(elevation) }),

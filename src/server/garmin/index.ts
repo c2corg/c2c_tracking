@@ -21,7 +21,13 @@ router
   .all(methodNotAllowed);
 router
   .route('/exchange-token/:userId')
-  .get(validate(exchangeToken), controller.exchangeToken.bind(controller))
+  .get(
+    ensureAuthenticated,
+    ensureUserFromParamsMatchesAuthUser,
+    userRateLimit,
+    validate(exchangeToken),
+    controller.exchangeToken.bind(controller),
+  )
   .all(methodNotAllowed);
 router
   .route('/deauthorize/:userId')
