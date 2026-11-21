@@ -81,6 +81,26 @@ describe('logger', () => {
     });
   });
 
+  it('hides the credentials in the request logs', () => {
+    const output = logged((log) =>
+      log.info(
+        {
+          req: { method: 'GET', headers: { authorization: 'Bearer jwt-value', cookie: 'session=cookie-value' } },
+          res: { statusCode: 200, headers: { 'set-cookie': 'session=set-cookie-value' } },
+        },
+        'request completed',
+      ),
+    );
+
+    for (const secret of ['jwt-value', 'cookie-value', 'set-cookie-value']) {
+      expect(output).not.toContain(secret);
+    }
+    expect(JSON.parse(output)).toMatchObject({
+      req: { method: 'GET', headers: { authorization: '[Redacted]', cookie: '[Redacted]' } },
+      res: { statusCode: 200, headers: { 'set-cookie': '[Redacted]' } },
+    });
+  });
+
   it('still logs other errors with their stack', () => {
     const output = logged((log) => log.warn(new Error('boom')));
 

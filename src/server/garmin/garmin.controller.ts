@@ -1,4 +1,4 @@
-import { createKeyv } from '@keyv/redis';
+import { createKeyv, type KeyvRedisConnect } from '@keyv/redis';
 import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 import { Keyv } from 'keyv';
@@ -19,8 +19,12 @@ class GarminController {
 
   constructor() {
     const connectionUri = config.get('keyv.connectionUri');
+    // RESP2: @redis/client 6 defaults to RESP3, whose `HELLO 3` handshake Redis < 6 rejects (prod runs Redis 5); the
+    // client then reconnects forever and every store call hangs. The cast: @keyv/redis types its options for RESP3 only,
+    // but hands them to @redis/client unchanged
+    const redisOptions = { url: connectionUri, RESP: 2 } as unknown as KeyvRedisConnect;
     this.keyv = connectionUri
-      ? createKeyv(connectionUri, { namespace: 'tracking' })
+      ? createKeyv(redisOptions, { namespace: 'tracking' })
       : new Keyv({ namespace: 'tracking' });
     // a store error must not crash the service (throwing from this listener did): the calls then return false or
     // undefined, see below. The URI is not logged, it may hold the Redis password
