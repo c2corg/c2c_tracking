@@ -594,7 +594,7 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -624,7 +624,7 @@ describe('Suunto Service', () => {
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -644,7 +644,7 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -676,7 +676,7 @@ describe('Suunto Service', () => {
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -696,7 +696,7 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -729,7 +729,7 @@ describe('Suunto Service', () => {
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -749,7 +749,7 @@ describe('Suunto Service', () => {
           expiresAt: 1,
         },
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -780,7 +780,7 @@ describe('Suunto Service', () => {
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,

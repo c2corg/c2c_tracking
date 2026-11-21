@@ -35,7 +35,7 @@ describe('User service', () => {
     it('should return user info', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
-        strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
+        strava: { id: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
         suunto: { username: 'username' },
       });
 
@@ -81,7 +81,7 @@ describe('User service', () => {
         c2cId: 1,
         decathlon: { id: '1', webhookId: 'webhookId' },
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
-        strava: { id: 1 },
+        strava: { id: '1' },
         suunto: { username: 'username' },
         polar: { id: 1n, token: 'token' },
       });
@@ -120,7 +120,7 @@ describe('User service', () => {
           expiresAt: 1,
         },
         garmin: { token: 'token', tokenSecret: 'tokenSecret' },
-        strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
+        strava: { id: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
         suunto: { username: 'username', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 3 },
         polar: { id: 1n, token: 'token' },
       });
@@ -154,7 +154,7 @@ describe('User service', () => {
         refresh_token: 'refresh_token',
         expires_at: 3,
         expires_in: 5,
-        athlete: { id: 1 },
+        athlete: { id: '1' },
       };
       await service.configureStrava(1, auth);
 
@@ -164,7 +164,7 @@ describe('User service', () => {
       expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           expiresAt: 3,
           refreshToken: 'refresh_token',
@@ -185,7 +185,7 @@ describe('User service', () => {
         refresh_token: 'refresh_token',
         expires_at: 3,
         expires_in: 5,
-        athlete: { id: 1 },
+        athlete: { id: '1' },
       };
       await service.configureStrava(1, auth);
 
@@ -195,7 +195,7 @@ describe('User service', () => {
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           expiresAt: 3,
           refreshToken: 'refresh_token',
@@ -246,7 +246,7 @@ describe('User service', () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'access_token',
           refreshToken: 'refresh_token',
           expiresAt: 1,
@@ -265,7 +265,7 @@ describe('User service', () => {
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
         strava: {
-          id: 1,
+          id: '1',
           accessToken: 'new_access_token',
           refreshToken: 'new_refresh_token',
           expiresAt: 10,
@@ -302,11 +302,11 @@ describe('User service', () => {
     it('clears tokens', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
-        strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
+        strava: { id: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
       vi.spyOn(userRepository, 'update').mockResolvedValueOnce({
         c2cId: 1,
-        strava: { id: 1 },
+        strava: { id: '1' },
       });
 
       const service = new UserService();
@@ -317,7 +317,7 @@ describe('User service', () => {
       expect(userRepository.update).toHaveBeenCalledTimes(1);
       expect(userRepository.update).toHaveBeenCalledWith({
         c2cId: 1,
-        strava: { id: 1 },
+        strava: { id: '1' },
       });
     });
   });
@@ -326,7 +326,7 @@ describe('User service', () => {
     it('retrieves user info', async () => {
       vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
         c2cId: 1,
-        strava: { id: 1, accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
+        strava: { id: '1', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 1 },
       });
 
       const service = new UserService();
@@ -334,7 +334,7 @@ describe('User service', () => {
         {
           "accessToken": "access_token",
           "expiresAt": 1,
-          "id": 1,
+          "id": "1",
           "refreshToken": "refresh_token",
         }
       `);

@@ -3,14 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { http, HttpError } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { promApiErrorsCounter } from '../../../../src/metrics/prometheus.ts';
-import type {
-  Activity,
-  StravaAuth,
-  StravaRefreshAuth,
-  StreamSet,
-  Subscription,
-} from '../../../../src/server/strava/strava.api.ts';
-import { StravaApi } from '../../../../src/server/strava/strava.api.ts';
+import type { StravaRefreshAuth, StreamSet, Subscription } from '../../../../src/server/strava/strava.api.ts';
+import { Activity, Athlete, StravaApi } from '../../../../src/server/strava/strava.api.ts';
 import { respond } from '../../../utils.ts';
 
 // the HTTP calls are mocked, not the errors
@@ -24,10 +18,32 @@ describe('Strava API', () => {
     vi.clearAllMocks();
   });
 
+  describe('Athlete', () => {
+    it('uses id_str as the canonical ID', () => {
+      expect(Athlete.parse({ id: 9007199254740992, id_str: '9007199254740993' })).toEqual({ id: '9007199254740993' });
+    });
+
+    it('falls back to id when id_str is missing and id is a safe integer', () => {
+      expect(Athlete.parse({ id: 123 })).toEqual({ id: '123' });
+    });
+
+    it('rejects a missing id_str when id is not a safe integer', () => {
+      expect(Athlete.safeParse({ id: 9007199254740992 }).success).toBe(false);
+    });
+
+    it('requires id', () => {
+      expect(Athlete.safeParse({ id_str: '123' }).success).toBe(false);
+    });
+
+    it.each(['', '0', '0123', '-1', '12a', '1.5'])('rejects id_str %j', (idStr) => {
+      expect(Athlete.safeParse({ id: 123, id_str: idStr }).success).toBe(false);
+    });
+  });
+
   describe('exchangeToken', () => {
     it('calls strava API', async () => {
-      const auth: StravaAuth = {
-        athlete: { id: 1 },
+      const auth = {
+        athlete: { id: 9007199254740992, id_str: '9007199254740993' },
         access_token: 'access_token',
         refresh_token: 'refresh_token',
         expires_at: 1,
@@ -46,7 +62,7 @@ describe('Strava API', () => {
       expect(result).toMatchObject({
         access_token: 'access_token',
         athlete: {
-          id: 1,
+          id: '9007199254740993',
         },
         expires_at: 1,
         expires_in: 1,
@@ -100,9 +116,10 @@ describe('Strava API', () => {
 
   describe('getAthleteActivities', () => {
     it('calls strava API', async () => {
-      const activities: Activity[] = [
+      const activities = [
         {
-          id: 123,
+          id: 9007199254740992,
+          id_str: '9007199254740993',
           name: 'Afternoon Run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
@@ -121,7 +138,7 @@ describe('Strava API', () => {
         {
           distance: 1.2,
           elapsed_time: 1,
-          id: 123,
+          id: '9007199254740993',
           name: 'Afternoon Run',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
@@ -138,8 +155,9 @@ describe('Strava API', () => {
 
   describe('getActivity', () => {
     it('calls strava API', async () => {
-      const activity: Activity = {
-        id: 123,
+      const activity = {
+        id: 9007199254740992,
+        id_str: '9007199254740993',
         name: 'Afternoon Run',
         sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
@@ -151,12 +169,12 @@ describe('Strava API', () => {
       vi.mocked(http).get.mockResolvedValueOnce(respond(activity));
 
       const api = new StravaApi();
-      const result = await api.getActivity('access_token', 123);
+      const result = await api.getActivity('access_token', '9007199254740993');
 
       expect(result).toMatchObject({
         distance: 1.2,
         elapsed_time: 1,
-        id: 123,
+        id: '9007199254740993',
         name: 'Afternoon Run',
         sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
@@ -164,9 +182,36 @@ describe('Strava API', () => {
         total_elevation_gain: 1.2,
       });
       expect(http.get).toHaveBeenCalledTimes(1);
-      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/123', {
+      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/9007199254740993', {
         headers: { Authorization: 'Bearer access_token' },
       });
+    });
+  });
+
+  describe('Activity', () => {
+    const activity = {
+      name: 'Afternoon Run',
+      sport_type: 'Run',
+      start_date: '2022-01-01T00:00:01Z',
+      start_date_local: '2022-01-01T00:00:01Z',
+      distance: 1.2,
+      elapsed_time: 1,
+      total_elevation_gain: 1.2,
+    };
+
+    it('uses id_str as the canonical ID', () => {
+      expect(Activity.parse({ ...activity, id: 9007199254740992, id_str: '9007199254740993' })).toEqual({
+        ...activity,
+        id: '9007199254740993',
+      });
+    });
+
+    it('falls back to id when id_str is missing and id is a safe integer', () => {
+      expect(Activity.parse({ ...activity, id: 123 }).id).toBe('123');
+    });
+
+    it('rejects a missing id_str when id is not a safe integer', () => {
+      expect(Activity.safeParse({ ...activity, id: 9007199254740992 }).success).toBe(false);
     });
   });
 
@@ -186,7 +231,7 @@ describe('Strava API', () => {
       vi.mocked(http).get.mockResolvedValueOnce(respond(streamSet));
 
       const api = new StravaApi();
-      const result = await api.getActivityStream('access_token', 1);
+      const result = await api.getActivityStream('access_token', '9007199254740993');
 
       expect(result).toMatchObject({
         latlng: {
@@ -200,7 +245,7 @@ describe('Strava API', () => {
         },
       });
       expect(http.get).toHaveBeenCalledTimes(1);
-      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/1/streams', {
+      expect(http.get).toHaveBeenCalledWith('https://www.strava.com/api/v3/activities/9007199254740993/streams', {
         headers: { Authorization: 'Bearer access_token' },
         params: { keys: 'distance,time,latlng,altitude', key_by_type: true },
       });
@@ -215,7 +260,7 @@ describe('Strava API', () => {
 
       const api = new StravaApi();
 
-      await expect(api.getActivityStream('access_token', 1)).resolves.toBeUndefined();
+      await expect(api.getActivityStream('access_token', '1')).resolves.toBeUndefined();
       expect(warn).not.toHaveBeenCalled();
       expect(errors).not.toHaveBeenCalled();
     });
@@ -228,7 +273,7 @@ describe('Strava API', () => {
 
       const api = new StravaApi();
 
-      await expect(api.getActivityStream('access_token', 1)).rejects.toThrow(
+      await expect(api.getActivityStream('access_token', '1')).rejects.toThrow(
         'Error on Strava getActivityStream request',
       );
     });

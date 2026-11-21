@@ -143,7 +143,7 @@ export class StravaService {
 
   private async retrieveActivityGeometry(
     token: string,
-    activityId: number,
+    activityId: string,
     startDateLocal: string,
   ): Promise<LineString | undefined> {
     try {
@@ -266,7 +266,7 @@ export class StravaService {
         switch (event.aspect_type) {
           case 'delete':
             if (event.updates?.['authorized'] === 'false') {
-              await this.handleAthleteDeleteEvent(event.owner_id);
+              await this.handleAthleteDeleteEvent(String(event.owner_id));
             }
             break;
           default:
@@ -278,13 +278,13 @@ export class StravaService {
       case 'activity':
         switch (event.aspect_type) {
           case 'create':
-            await this.handleActivityCreateEvent(event.owner_id, event.object_id);
+            await this.handleActivityCreateEvent(String(event.owner_id), String(event.object_id));
             break;
           case 'update':
-            await this.handleActivityUpdateEvent(event.owner_id, event.object_id);
+            await this.handleActivityUpdateEvent(String(event.owner_id), String(event.object_id));
             break;
           case 'delete':
-            await this.handleActivityDeleteEvent(event.object_id);
+            await this.handleActivityDeleteEvent(String(event.object_id));
             break;
           default:
             promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'not_handled' }).inc(1);
@@ -302,7 +302,7 @@ export class StravaService {
    * On athlete delete event received, it means our app isn't authorized anymore. We should thus clean up all
    * Strava-related data from our DB.
    */
-  private async handleAthleteDeleteEvent(userStravaId: number): Promise<void> {
+  private async handleAthleteDeleteEvent(userStravaId: string): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
@@ -323,7 +323,7 @@ export class StravaService {
    * On activity creation, retrieve data, then add activity to user's activity (sorting and triaging is handled through
    * user service).
    */
-  private async handleActivityCreateEvent(userStravaId: number, activityId: number): Promise<void> {
+  private async handleActivityCreateEvent(userStravaId: string, activityId: string): Promise<void> {
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'user_not_found' }).inc(1);
@@ -376,7 +376,7 @@ export class StravaService {
   /*
    * On activity update, retrieve activity data and update DB.
    */
-  private async handleActivityUpdateEvent(userStravaId: number, activityId: number): Promise<void> {
+  private async handleActivityUpdateEvent(userStravaId: string, activityId: string): Promise<void> {
     // retrieve activity
     const user = await userRepository.findByStravaId(userStravaId);
     if (!user) {
@@ -415,9 +415,9 @@ export class StravaService {
     }
   }
 
-  private async handleActivityDeleteEvent(activityId: number): Promise<void> {
+  private async handleActivityDeleteEvent(activityId: string): Promise<void> {
     try {
-      await userService.deleteActivity('strava', activityId.toString());
+      await userService.deleteActivity('strava', activityId);
       promWebhookCounter.labels({ vendor: 'strava', subject: 'activity', event: 'delete' });
     } catch {
       promWebhookErrorsCounter.labels({ vendor: 'strava', cause: 'processing_failed' }).inc(1);
@@ -430,7 +430,7 @@ export class StravaService {
   private asNewRepositoryActivity(activity: Activity, geojson: LineString): NewActivityWithGeometry {
     return {
       vendor: 'strava',
-      vendorId: activity.id.toString(),
+      vendorId: activity.id,
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
       type: activity.sport_type,
@@ -444,7 +444,7 @@ export class StravaService {
   private asUpdateRepositoryActivity(activity: Activity): UpdateActivity {
     return {
       vendor: 'strava',
-      vendorId: activity.id.toString(),
+      vendorId: activity.id,
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
       type: activity.sport_type,
