@@ -593,10 +593,12 @@ describe('User service', () => {
 
       const service = new UserService();
       const auth: GarminAuth = {
-        token: 'token',
-        tokenSecret: 'tokenSecret',
+        access_token: 'access_token',
+        refresh_token: 'refresh_token',
+        expires_in: 86400,
+        refresh_token_expires_in: 7776000,
       };
-      await service.configureGarmin(1, auth);
+      await service.configureGarmin(1, auth, 'garminUser');
 
       expect(userRepository.findById).toHaveBeenCalledTimes(1);
       expect(userRepository.findById).toHaveBeenCalledWith(1);
@@ -604,8 +606,64 @@ describe('User service', () => {
       expect(userRepository.insert).toHaveBeenCalledWith({
         c2cId: 1,
         garmin: {
-          token: 'token',
-          tokenSecret: 'tokenSecret',
+          userId: 'garminUser',
+          accessToken: 'access_token',
+          expiresAt: expect.any(Number) as number,
+          refreshToken: 'refresh_token',
+          refreshExpiresAt: expect.any(Number) as number,
+        },
+      });
+    });
+
+    it('drops the legacy OAuth 1 credentials when the user links again', async () => {
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'old_token_123', tokenSecret: 'old_secret_123' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      await service.configureGarmin(
+        1,
+        { access_token: 'access_token', refresh_token: 'refresh_token', expires_in: 86400 },
+        'garminUser',
+      );
+
+      expect(userRepository.update).toHaveBeenCalledWith({
+        c2cId: 1,
+        garmin: {
+          userId: 'garminUser',
+          accessToken: 'access_token',
+          expiresAt: expect.any(Number) as number,
+          refreshToken: 'refresh_token',
+        },
+      });
+    });
+
+    it('keeps the legacy OAuth 1 credentials when migrating a user', async () => {
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'old_token_123', tokenSecret: 'old_secret_123' },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      await service.configureGarmin(
+        1,
+        { access_token: 'access_token', refresh_token: 'refresh_token', expires_in: 86400 },
+        'garminUser',
+        true,
+      );
+
+      expect(userRepository.update).toHaveBeenCalledWith({
+        c2cId: 1,
+        garmin: {
+          userId: 'garminUser',
+          accessToken: 'access_token',
+          expiresAt: expect.any(Number) as number,
+          refreshToken: 'refresh_token',
+          token: 'old_token_123',
+          tokenSecret: 'old_secret_123',
         },
       });
     });
@@ -624,10 +682,11 @@ describe('User service', () => {
 
       const service = new UserService();
       const auth: GarminAuth = {
-        token: 'new_token',
-        tokenSecret: 'new_tokenSecret',
+        access_token: 'new_access_token',
+        refresh_token: 'new_refresh_token',
+        expires_in: 86400,
       };
-      await service.configureGarmin(1, auth);
+      await service.configureGarmin(1, auth, 'garminUser');
 
       expect(userRepository.findById).toHaveBeenCalledTimes(1);
       expect(userRepository.findById).toHaveBeenCalledWith(1);
@@ -641,8 +700,60 @@ describe('User service', () => {
           username: 'user1',
         },
         garmin: {
-          token: 'new_token',
-          tokenSecret: 'new_tokenSecret',
+          userId: 'garminUser',
+          accessToken: 'new_access_token',
+          expiresAt: expect.any(Number) as number,
+          refreshToken: 'new_refresh_token',
+        },
+      });
+    });
+  });
+
+  describe('updateGarminAuth', () => {
+    const auth: GarminAuth = {
+      access_token: 'new_access_token',
+      refresh_token: 'new_refresh_token',
+      expires_in: 86400,
+    };
+
+    it('throws if user does not exist', async () => {
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce(undefined);
+
+      const service = new UserService();
+      await expect(service.updateGarminAuth(1, auth)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: User 1 not found]`,
+      );
+    });
+
+    it('throws if user is not linked through OAuth 2', async () => {
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { token: 'old_token_123', tokenSecret: 'old_secret_123' },
+      });
+
+      const service = new UserService();
+      await expect(service.updateGarminAuth(1, auth)).rejects.toThrowErrorMatchingInlineSnapshot(
+        `[Error: User 1 not configured for Garmin OAuth 2]`,
+      );
+    });
+
+    it('updates tokens and keeps the Garmin user id', async () => {
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({
+        c2cId: 1,
+        garmin: { userId: 'garminUser', accessToken: 'access_token', refreshToken: 'refresh_token', expiresAt: 5 },
+      });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      const service = new UserService();
+      await service.updateGarminAuth(1, auth);
+
+      expect(userRepository.update).toHaveBeenCalledWith({
+        c2cId: 1,
+        garmin: {
+          userId: 'garminUser',
+          accessToken: 'new_access_token',
+          expiresAt: expect.any(Number) as number,
+          refreshToken: 'new_refresh_token',
         },
       });
     });
