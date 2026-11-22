@@ -75,6 +75,16 @@ const encodeBody = (body: Body, headers: Headers): RequestInit['body'] => {
     }
     return body;
   }
+  if (headers.get('Content-Type')?.startsWith('application/x-www-form-urlencoded') && !Array.isArray(body)) {
+    // a form asked for an object: axios encoded it as form fields, the vendors (Coros, Polar) reject JSON there
+    const form = new URLSearchParams();
+    for (const [key, value] of Object.entries(body)) {
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        form.append(key, String(value));
+      }
+    }
+    return form;
+  }
   if (!headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
