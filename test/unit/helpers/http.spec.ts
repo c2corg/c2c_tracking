@@ -70,6 +70,17 @@ describe('http', () => {
     expect(second.data.body).toBe('grant_type=refresh_token');
   });
 
+  it('posts objects as forms when the form content type is set, as axios did', async () => {
+    const { data } = await http.post<Echo>(
+      `${base}/a`,
+      { client_id: 'id', code: 'a b', skipped: undefined },
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+    );
+
+    expect(data.headers['content-type']).toBe('application/x-www-form-urlencoded');
+    expect(data.body).toBe('client_id=id&code=a+b');
+  });
+
   it('posts without body', async () => {
     const { data } = await http.post<Echo>(`${base}/a`, null, { params: { code: 'c' } });
 
