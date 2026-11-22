@@ -32,7 +32,8 @@ export const Activity = z.object({
       z.object({
         latitude: z.number(),
         longitude: z.number(),
-        elevation: z.number(),
+        // null for some points (seen in prod, 2026-11-22)
+        elevation: z.number().nullable(),
       }),
     )
     .optional(),

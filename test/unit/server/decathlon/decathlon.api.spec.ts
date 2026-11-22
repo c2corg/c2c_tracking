@@ -130,6 +130,22 @@ describe('Decathlon API', () => {
   });
 
   describe('getActivity', () => {
+    it('accepts points without elevation', async () => {
+      vi.mocked(http).get.mockResolvedValueOnce(
+        respond({
+          id: '12345',
+          sport: '/v2/sports/381',
+          startdate: '2022-01-01T00:00:01Z',
+          dataSummaries: {},
+          locations: { '1': { longitude: 1.0, latitude: 1.0, elevation: null } },
+        }),
+      );
+
+      const result = await new DecathlonApi().getActivity('access_token', '12345');
+
+      expect(result.locations?.['1']?.elevation).toBeNull();
+    });
+
     it('calls decathlon API', async () => {
       const activity: Activity = {
         id: '12345',
