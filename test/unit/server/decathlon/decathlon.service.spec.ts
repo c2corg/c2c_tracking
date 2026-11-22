@@ -769,6 +769,63 @@ describe('Decathlon Service', () => {
         });
         expect(log.warn).not.toHaveBeenCalled();
       });
+
+      it.each([
+        {
+          case: 'fills missing elevations from the nearest known one',
+          elevations: [null, 10, null, 20, null],
+          coordinates: [
+            [0, 0, 10, 1],
+            [1, 1, 10, 2],
+            [2, 2, 10, 3],
+            [3, 3, 20, 4],
+            [4, 4, 20, 5],
+          ],
+        },
+        {
+          case: 'drops the elevation when no point has one',
+          elevations: [null, null],
+          coordinates: [
+            [0, 0, 1],
+            [1, 1, 2],
+          ],
+        },
+      ])('$case', async ({ elevations, coordinates }) => {
+        vi.spyOn(userRepository, 'findByDecathlonId').mockResolvedValueOnce({
+          c2cId: 1,
+          decathlon: {
+            id: 'userId',
+            accessToken: 'access_token',
+            expiresAt: 999999999999,
+            refreshToken: 'refresh_token',
+            webhookId: 'webhookId',
+          },
+        });
+        vi.spyOn(decathlonApi, 'getActivity').mockResolvedValueOnce({
+          id: 'activityId',
+          name: 'name',
+          sport: '/v2/sports/381',
+          startdate: '1970-01-01T00:00:01Z',
+          dataSummaries: {},
+          // keys in reverse order: the points are sorted by time
+          locations: Object.fromEntries(
+            elevations.map((elevation, i) => [String(i), { latitude: i, longitude: i, elevation }] as const).reverse(),
+          ),
+        });
+        vi.spyOn(userService, 'addActivities').mockResolvedValueOnce(undefined);
+
+        const service = new DecathlonService();
+        await service.handleWebhookEvent({
+          user_id: 'userId',
+          event: { name: 'activity_create', ressource_id: 'activityId', event_time: 1 },
+        });
+
+        expect(userService.addActivities).toHaveBeenCalledWith(
+          1,
+          expect.objectContaining({ geojson: { type: 'LineString', coordinates } }),
+        );
+        expect(log.warn).not.toHaveBeenCalled();
+      });
     });
 
     describe('activity delete event', () => {

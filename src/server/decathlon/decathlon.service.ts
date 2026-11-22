@@ -220,12 +220,23 @@ export class DecathlonService {
       return [];
     }
     const start = epochSeconds(activity.startdate);
-    return Object.entries(activity.locations)
-      .map(([seconds, value]): [number, number, number, number] => {
-        const date = start + Number.parseInt(seconds, 10);
-        return [value.longitude, value.latitude, value.elevation, date];
-      })
-      .sort(([_lng1, _lat1, _ele1, d1], [_lng2, _lat2, _ele2, d2]) => d1 - d2);
+    const points = Object.entries(activity.locations)
+      .map(([seconds, { longitude, latitude, elevation }]) => ({
+        longitude,
+        latitude,
+        elevation,
+        date: start + Number.parseInt(seconds, 10),
+      }))
+      .sort((a, b) => a.date - b.date);
+    if (points.every(({ elevation }) => elevation === null)) {
+      return points.map(({ longitude, latitude, date }) => [longitude, latitude, date]);
+    }
+    // a point without elevation takes the previous known one, or the next one at the start of the track
+    let known = points.find(({ elevation }) => elevation !== null)?.elevation ?? 0;
+    return points.map(({ longitude, latitude, elevation, date }) => {
+      known = elevation ?? known;
+      return [longitude, latitude, known, date];
+    });
   }
 
   private sportName(activity: Activity): string | undefined {
