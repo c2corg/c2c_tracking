@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { http } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
-import { GarminApi } from '../../../../src/server/garmin/garmin.api.ts';
+import { GarminActivity, GarminApi } from '../../../../src/server/garmin/garmin.api.ts';
 import { respond } from '../../../utils.ts';
 
 // the HTTP calls are mocked, not the errors
@@ -29,6 +29,22 @@ describe('Garmin API', () => {
     });
     vi.spyOn(log, 'warn').mockImplementation(() => {
       /* do nothing */
+    });
+  });
+
+  describe('activity details', () => {
+    it('parses a device name in the activity summary', () => {
+      const activity = GarminActivity.parse({
+        activityId: 1,
+        summary: {
+          activityType: 'RUNNING',
+          deviceName: 'Garmin fenix 8',
+          startTimeInSeconds: 1,
+          startTimeOffsetInSeconds: 0,
+        },
+      });
+
+      expect(activity.summary.deviceName).toBe('Garmin fenix 8');
     });
   });
 

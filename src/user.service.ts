@@ -504,6 +504,7 @@ export class UserService {
         ...(activity.date && { date: activity.date }),
         ...(activity.type && { type: activity.type }),
         ...(activity.name && { name: activity.name }),
+        ...(activity.deviceName && { deviceName: activity.deviceName }),
         ...(activity.length && { length: activity.length }),
         ...(activity.heightDiffUp && { heightDiffUp: activity.heightDiffUp }),
         ...(activity.duration && { duration: activity.duration }),

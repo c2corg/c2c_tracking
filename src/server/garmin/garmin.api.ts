@@ -183,6 +183,7 @@ export type GarminActivityType = z.infer<typeof GarminActivityType>;
 
 export const GarminActivitySummary = z.object({
   activityType: GarminActivityType,
+  deviceName: z.string().min(1).optional(),
   startTimeInSeconds: z.number().int().positive(),
   startTimeOffsetInSeconds: z.number().int(),
   durationInSeconds: z.number().int().nonnegative().optional(), // integer

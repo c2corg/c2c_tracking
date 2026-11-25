@@ -276,6 +276,7 @@ const Exercise = z.object({
     message: 'String must be an ISO-8601 date',
   }),
   start_time_utc_offset: z.number().int(),
+  device: z.string().min(1).optional(),
   duration: z.string().optional().refine(isISO8601Duration, {
     message: 'String must be an ISO-8601 duration',
   }),

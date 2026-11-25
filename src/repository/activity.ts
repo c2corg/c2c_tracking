@@ -12,6 +12,7 @@ export const Activity = z.object({
   userId: z.number().int().positive(),
   vendor: Vendor,
   vendorId: z.string().min(1),
+  deviceName: z.string().min(1).optional(),
   date: z.string().refine(validator.isISO8601, {
     message: 'String must be an ISO-8601 date',
   }),
@@ -33,6 +34,9 @@ export type NewActivityWithGeometry = SetRequired<NewActivity, 'geojson'>;
 export const hasGeometry = (activity: NewActivity): activity is NewActivityWithGeometry => !!activity.geojson;
 
 export type UpdateActivity = SetOptional<
-  Pick<Activity, 'vendor' | 'vendorId' | 'date' | 'type' | 'name' | 'length' | 'heightDiffUp' | 'duration' | 'geojson'>,
-  'date' | 'type' | 'name' | 'length' | 'heightDiffUp' | 'duration' | 'geojson'
+  Pick<
+    Activity,
+    'vendor' | 'vendorId' | 'date' | 'type' | 'name' | 'deviceName' | 'length' | 'heightDiffUp' | 'duration' | 'geojson'
+  >,
+  'date' | 'type' | 'name' | 'deviceName' | 'length' | 'heightDiffUp' | 'duration' | 'geojson'
 >;

@@ -146,6 +146,7 @@ describe('Coros API', () => {
             endTime: 1516097362,
             startTimezone: 32,
             endTimezone: 32,
+            deviceName: 'COROS PACE',
             fitUrl: 'https://oss.coros.com/fit/407419767966679040/418173292602490880.fit',
           },
         ],
@@ -165,6 +166,7 @@ describe('Coros API', () => {
         {
           "data": [
             {
+              "deviceName": "COROS PACE",
               "endTime": 1516097362,
               "endTimezone": 32,
               "fitUrl": "https://oss.coros.com/fit/407419767966679040/418173292602490880.fit",

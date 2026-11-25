@@ -47,6 +47,7 @@ describe('Strava Service', () => {
         {
           id: '1',
           name: 'Morning run',
+          device_name: 'Garmin Forerunner 965',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
           start_date_local: '2022-01-01T01:00:01Z',
@@ -88,6 +89,7 @@ describe('Strava Service', () => {
       expect(userService.addActivities).toHaveBeenCalledWith(1, {
         vendor: 'strava',
         vendorId: '1',
+        deviceName: 'Garmin Forerunner 965',
         name: 'Morning run',
         type: 'Run',
         date: '2022-01-01T01:00:01+01:00',

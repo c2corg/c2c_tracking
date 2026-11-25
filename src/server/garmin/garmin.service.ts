@@ -233,6 +233,7 @@ export class GarminService {
       vendorId: activity.activityId.toString(),
       date: formatWithOffset(activity.summary.startTimeInSeconds, activity.summary.startTimeOffsetInSeconds / 60),
       type: activity.summary.activityType,
+      ...(activity.summary.deviceName && { deviceName: activity.summary.deviceName }),
       ...(activity.summary.distanceInMeters && { length: Math.round(activity.summary.distanceInMeters) }),
       ...(activity.summary.durationInSeconds && { duration: activity.summary.durationInSeconds }),
       ...(activity.summary.totalElevationGainInMeters && {

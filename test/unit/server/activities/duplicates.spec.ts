@@ -31,6 +31,7 @@ const strava: Activity = {
   date: '2026-10-31T13:47:32+01:00',
   type: 'MountainBikeRide',
   name: "Sortie VTT dans l'après-midi",
+  deviceName: 'Garmin Forerunner 965',
   length: 38800,
   duration: 12346,
   heightDiffUp: 1051,
@@ -136,7 +137,7 @@ describe('groupDuplicates', () => {
       name: "Sortie VTT dans l'après-midi",
       miniature: 'jhzx7v3zaf4adlqjme216ad0.png',
       sources: [
-        { id: 2, vendor: 'strava', vendorId: '20806619230' },
+        { id: 2, vendor: 'strava', vendorId: '20806619230', deviceName: 'Garmin Forerunner 965' },
         { id: 1, vendor: 'garmin', vendorId: '24919339767' },
       ],
     });
