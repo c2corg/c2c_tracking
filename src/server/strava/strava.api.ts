@@ -112,6 +112,7 @@ export const Activity = z
   .object({
     ...StravaIdFields,
     name: z.string(),
+    device_name: z.string().min(1).nullable().optional(),
     sport_type: SportType,
     start_date: z.string().refine(validator.isISO8601, {
       message: 'String must be an ISO-8601 date',

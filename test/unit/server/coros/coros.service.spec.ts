@@ -53,6 +53,7 @@ describe('Coros Service', () => {
             endTimezone: 32,
             duration: 1,
             distance: 1,
+            deviceName: 'COROS PACE',
             fitUrl: 'https://oss.coros.com/fit/407419767966679040/418173292602490880.fit',
           },
         ],
@@ -86,6 +87,7 @@ describe('Coros Service', () => {
         date: '2018-01-16T18:01:09+08:00',
         length: 1,
         duration: 1,
+        deviceName: 'COROS PACE',
         geojson: {
           coordinates: [
             [5.825548013672233, 44.972592014819384, 1503, 1670140122],

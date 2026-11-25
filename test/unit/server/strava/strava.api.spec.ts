@@ -121,6 +121,7 @@ describe('Strava API', () => {
           id: 9007199254740992,
           id_str: '9007199254740993',
           name: 'Afternoon Run',
+          device_name: 'Garmin Forerunner 965',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
           start_date_local: '2022-01-01T01:00:01Z',
@@ -140,6 +141,7 @@ describe('Strava API', () => {
           elapsed_time: 1,
           id: '9007199254740993',
           name: 'Afternoon Run',
+          device_name: 'Garmin Forerunner 965',
           sport_type: 'Run',
           start_date: '2022-01-01T00:00:01Z',
           start_date_local: '2022-01-01T01:00:01Z',
@@ -159,6 +161,7 @@ describe('Strava API', () => {
         id: 9007199254740992,
         id_str: '9007199254740993',
         name: 'Afternoon Run',
+        device_name: 'Garmin Forerunner 965',
         sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
         start_date_local: '2022-01-01T00:00:01Z',
@@ -176,6 +179,7 @@ describe('Strava API', () => {
         elapsed_time: 1,
         id: '9007199254740993',
         name: 'Afternoon Run',
+        device_name: 'Garmin Forerunner 965',
         sport_type: 'Run',
         start_date: '2022-01-01T00:00:01Z',
         start_date_local: '2022-01-01T00:00:01Z',
@@ -212,6 +216,10 @@ describe('Strava API', () => {
 
     it('rejects a missing id_str when id is not a safe integer', () => {
       expect(Activity.safeParse({ ...activity, id: 9007199254740992 }).success).toBe(false);
+    });
+
+    it('accepts a null device name', () => {
+      expect(Activity.parse({ ...activity, id: 123, device_name: null }).device_name).toBeNull();
     });
   });
 

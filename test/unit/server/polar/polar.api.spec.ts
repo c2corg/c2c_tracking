@@ -135,6 +135,7 @@ describe('Polar API', () => {
         sport: 'RUN',
         start_time: '1970-01-01T00:00:01',
         start_time_utc_offset: 0,
+        device: 'Polar M400',
         distance: 1,
         duration: 'PT1S',
       };
@@ -149,6 +150,7 @@ describe('Polar API', () => {
       });
       expect(result).toMatchInlineSnapshot(`
         {
+          "device": "Polar M400",
           "distance": 1,
           "duration": "PT1S",
           "id": "exerciseId",

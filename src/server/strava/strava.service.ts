@@ -431,6 +431,7 @@ export class StravaService {
     return {
       vendor: 'strava',
       vendorId: activity.id,
+      ...(activity.device_name && { deviceName: activity.device_name }),
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
       type: activity.sport_type,
@@ -445,6 +446,7 @@ export class StravaService {
     return {
       vendor: 'strava',
       vendorId: activity.id,
+      ...(activity.device_name && { deviceName: activity.device_name }),
       date: this.localDate(activity.start_date, activity.start_date_local),
       name: activity.name,
       type: activity.sport_type,

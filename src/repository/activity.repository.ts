@@ -12,6 +12,7 @@ type ActivityRow = {
   user_id: number;
   vendor: Vendor;
   vendor_id: string;
+  device_name: string | undefined | null;
   date: string;
   name: string | undefined | null;
   type: string;
@@ -199,6 +200,7 @@ export class ActivityRepository {
       userId: row.user_id,
       vendor: row.vendor,
       vendorId: row.vendor_id,
+      ...(row.device_name && { deviceName: row.device_name }),
       date: row.date,
       type: row.type,
       ...(row.name && { name: row.name }),
@@ -216,6 +218,7 @@ export class ActivityRepository {
       user_id: activity.userId,
       vendor: activity.vendor,
       vendor_id: activity.vendorId,
+      device_name: activity.deviceName,
       date: activity.date,
       name: activity.name,
       geojson: activity.geojson,

@@ -543,6 +543,7 @@ describe('Polar Service', () => {
         id: 'id',
         start_time: '1970-01-01T00:00:01',
         start_time_utc_offset: 165,
+        device: 'Polar M400',
         duration: 'PT1S',
         distance: 1,
         sport: 'RUNNING',
@@ -560,6 +561,7 @@ describe('Polar Service', () => {
       expect(userService.addActivities).toHaveBeenCalledTimes(1);
       expect(userService.addActivities).toHaveBeenCalledWith(1, {
         date: '1970-01-01T00:00:01+02:45',
+        deviceName: 'Polar M400',
         duration: 1,
         geojson: {
           coordinates: [[0, 0, 220]],

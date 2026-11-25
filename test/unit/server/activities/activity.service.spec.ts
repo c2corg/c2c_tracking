@@ -22,6 +22,7 @@ describe('Activity Service', () => {
           userId: 1,
           vendor: 'strava',
           vendorId: '1',
+          deviceName: 'Garmin Forerunner 965',
           date: '2022-01-01T00:00:01Z',
           type: 'RUN',
           name: 'name',
@@ -45,10 +46,12 @@ describe('Activity Service', () => {
           {
             "c2cActivities": [],
             "date": "2022-01-01T00:00:01Z",
+            "deviceName": "Garmin Forerunner 965",
             "id": 1,
             "name": "name",
             "sources": [
               {
+                "deviceName": "Garmin Forerunner 965",
                 "id": 1,
                 "vendor": "strava",
                 "vendorId": "1",

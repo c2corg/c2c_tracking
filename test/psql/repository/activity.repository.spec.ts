@@ -16,6 +16,7 @@ describe('Activity Repository', () => {
     const activity1 = await repository.insert({
       vendor: 'strava',
       vendorId: 'strava1',
+      deviceName: 'Garmin Forerunner',
       date: '1970-01-01T00:00:01Z',
       type: 'Run',
       userId: 1,
@@ -27,6 +28,7 @@ describe('Activity Repository', () => {
       id: expect.any(Number),
       vendor: 'strava',
       vendorId: 'strava1',
+      deviceName: 'Garmin Forerunner',
       date: '1970-01-01T00:00:01Z',
       type: 'Run',
       userId: 1,

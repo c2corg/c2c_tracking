@@ -392,7 +392,12 @@ describe('Garmin service', () => {
           userId: '1',
           userAccessToken: 'user1Token',
           activityId: 1,
-          summary: { activityType: 'RUNNING', startTimeInSeconds: 1, startTimeOffsetInSeconds: 0 },
+          summary: {
+            activityType: 'RUNNING',
+            deviceName: 'Garmin fenix 8',
+            startTimeInSeconds: 1,
+            startTimeOffsetInSeconds: 0,
+          },
           samples: [
             { latitudeInDegree: 1.0, longitudeInDegree: 1.0, startTimeInSeconds: 1 },
             { latitudeInDegree: 2.0, longitudeInDegree: 2.0, startTimeInSeconds: 2 },
@@ -420,6 +425,7 @@ describe('Garmin service', () => {
       expect(userService.addActivities).toHaveBeenCalledTimes(2);
       expect(userService.addActivities).toHaveBeenNthCalledWith(1, 1, {
         date: '1970-01-01T00:00:01Z',
+        deviceName: 'Garmin fenix 8',
         geojson: {
           coordinates: [
             [1, 1, 0],

@@ -17,7 +17,7 @@ const minLengthGapMeters = 200;
 // a point's last value is its time when it is an epoch (seconds), never an altitude
 const minEpochSeconds = 1_000_000_000;
 
-export type ActivitySource = Pick<Activity, 'id' | 'vendor' | 'vendorId'>;
+export type ActivitySource = Pick<Activity, 'id' | 'vendor' | 'vendorId' | 'deviceName'>;
 
 // typeVendor: the vendor whose type the entry shows, to map it to c2c activities
 export type GroupedActivity = Activity & { typeVendor: Vendor; sources: ActivitySource[] };
@@ -81,7 +81,12 @@ const merge = (group: Activity[]): GroupedActivity => {
     ...(duration && { duration }),
     ...(heightDiffUp && { heightDiffUp }),
     ...(miniature && { miniature }),
-    sources: all.map(({ id, vendor, vendorId }) => ({ id, vendor, vendorId })),
+    sources: all.map(({ id, vendor, vendorId, deviceName }) => ({
+      id,
+      vendor,
+      vendorId,
+      ...(deviceName && { deviceName }),
+    })),
   };
 };
 

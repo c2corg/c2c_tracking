@@ -166,6 +166,7 @@ export class PolarService {
       date: this.localDate(exercise),
       type,
       geojson,
+      ...(exercise.device && { deviceName: exercise.device }),
       ...(exercise.distance && { length: Math.round(exercise.distance) }), // float in Polar API, integer in DB
       ...(exercise.duration && { duration: this.duration(exercise.duration) }), // ISO8601 duration in Polar API
     };

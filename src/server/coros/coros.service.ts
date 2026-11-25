@@ -229,6 +229,7 @@ export class CorosService {
       type: corosApi.getSport(workout.mode, workout.subMode),
       duration: workout.duration,
       geojson,
+      ...(workout.deviceName && { deviceName: workout.deviceName }),
       ...(workout.distance && { length: Math.round(workout.distance) }), // float in Coros API, integer in DB
     };
   }

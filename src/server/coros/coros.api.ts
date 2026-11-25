@@ -25,6 +25,7 @@ export const Workout = z.object({
   endTime: z.number().int().positive(),
   startTimezone: z.number().int().positive().max(96),
   endTimezone: z.number().int().positive().max(96),
+  deviceName: z.string().min(1).optional(),
   fitUrl: z.url().optional(),
   triathlonItemList: z
     .array(
