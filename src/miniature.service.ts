@@ -50,7 +50,7 @@ export class MiniatureService {
   private mapboxUrl(geometry: LineString): string {
     const encodedPolyline = polyline.encode(this.simplifiedCoordinates(geometry).map(([lng, lat]) => [lat!, lng!]));
     const uriEncodedPolyline = encodeURIComponent(encodedPolyline);
-    return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v11/static/path-2+f00(${uriEncodedPolyline})/auto/${miniatureSize}x${miniatureSize}?access_token=${mapboxToken}&attribution=false&logo=false&padding=20`;
+    return `https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/static/path-2+f00(${uriEncodedPolyline})/auto/${miniatureSize}x${miniatureSize}?access_token=${mapboxToken}&attribution=false&logo=false&padding=20`;
   }
 
   private simplifiedCoordinates(geometry: LineString): number[][] {
