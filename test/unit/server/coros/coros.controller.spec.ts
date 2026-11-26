@@ -5,6 +5,7 @@ import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app.ts';
+import { AlreadyLinkedError } from '../../../../src/errors.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { WebhookEvent } from '../../../../src/server/coros/coros.api.ts';
 import { corosService } from '../../../../src/server/coros/coros.service.ts';
@@ -66,6 +67,15 @@ describe('Coros Controller', () => {
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
+    });
+
+    it('answers 409 if the account is already linked to another user', async () => {
+      vi.spyOn(corosService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(new AlreadyLinkedError());
+
+      const response = await authenticated(request.get('/coros/exchange-token/1').query({ code: 'longenoughcode' }), 1);
+
+      expect(response.status).toBe(409);
+      expect(response.text).toEqual('already-linked');
     });
 
     it('setups user', async () => {

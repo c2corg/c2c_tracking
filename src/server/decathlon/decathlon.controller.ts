@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
 import { authenticatedUserId } from '../../auth/user.ts';
+import { AlreadyLinkedError } from '../../errors.ts';
 
 import type { WebhookEvent } from './decathlon.api.ts';
 import { decathlonService as service } from './decathlon.service.ts';
@@ -18,7 +19,10 @@ class DecathlonController {
     try {
       await service.requestShortLivedAccessTokenAndSetupUser(c2cId, authorizationCode);
       res.sendStatus(204);
-    } catch {
+    } catch (error: unknown) {
+      if (error instanceof AlreadyLinkedError) {
+        throw error;
+      }
       throw createHttpError(502, 'setup-failed');
     }
   }

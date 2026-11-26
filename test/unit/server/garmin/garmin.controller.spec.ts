@@ -5,6 +5,7 @@ import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app.ts';
+import { AlreadyLinkedError } from '../../../../src/errors.ts';
 import { HttpError } from '../../../../src/helpers/http.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { GarminActivity } from '../../../../src/server/garmin/garmin.api.ts';
@@ -183,6 +184,19 @@ describe('Garmin Controller', () => {
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
+    });
+
+    it('answers 409 if the account is already linked to another user', async () => {
+      await garminController['keyv'].set('garmin-pkce-1', { state: 'a-state-123456', codeVerifier: 'a-verifier' }, 100);
+      vi.spyOn(garminService, 'requestAccessTokenAndSetupUser').mockRejectedValueOnce(new AlreadyLinkedError());
+
+      const response = await authenticated(
+        request.get('/garmin/exchange-token/1').query({ code: 'code', state: 'a-state-123456' }),
+        1,
+      );
+
+      expect(response.status).toBe(409);
+      expect(response.text).toEqual('already-linked');
     });
 
     it('setups user and consumes the pending authorization', async () => {

@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import createHttpError from 'http-errors';
 
 import { authenticatedUserId } from '../../auth/user.ts';
+import { AlreadyLinkedError } from '../../errors.ts';
 
 import type { WebhookEvent, WebhookSubscription } from './strava.api.ts';
 import { stravaService as service } from './strava.service.ts';
@@ -27,6 +28,9 @@ class StravaController {
       res.sendStatus(204);
     } catch (error: unknown) {
       req.log.info(error);
+      if (error instanceof AlreadyLinkedError) {
+        throw error;
+      }
       throw createHttpError(502, 'setup-failed');
     }
   }

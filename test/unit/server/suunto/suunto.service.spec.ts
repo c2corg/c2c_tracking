@@ -3,6 +3,7 @@ import { resolve } from 'path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AlreadyLinkedError } from '../../../../src/errors.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { miniatureService } from '../../../../src/miniature.service.ts';
 import { activityRepository } from '../../../../src/repository/activity.repository.ts';
@@ -38,11 +39,13 @@ describe('Suunto Service', () => {
         expires_in: 1,
         user: 'user',
       });
-      vi.spyOn(userService, 'configureSuunto').mockRejectedValueOnce(undefined);
+      vi.spyOn(userService, 'configureSuunto').mockRejectedValueOnce(new AlreadyLinkedError());
       vi.spyOn(suuntoApi, 'getWorkouts');
 
       const service = new SuuntoService();
-      await service.requestShortLivedAccessTokenAndSetupUser(1, 'code');
+      await expect(service.requestShortLivedAccessTokenAndSetupUser(1, 'code')).rejects.toBeInstanceOf(
+        AlreadyLinkedError,
+      );
 
       expect(userService.configureSuunto).toHaveBeenCalledTimes(1);
       expect(userService.configureSuunto).toHaveBeenCalledWith(1, {
@@ -53,7 +56,6 @@ describe('Suunto Service', () => {
         user: 'user',
       });
       expect(suuntoApi.getWorkouts).not.toHaveBeenCalled();
-      expect(log.warn).toHaveBeenCalledTimes(1);
     });
 
     it('handles activities retrieval failure', async () => {
@@ -82,7 +84,7 @@ describe('Suunto Service', () => {
       expect(suuntoApi.getWorkouts).toHaveBeenCalledTimes(1);
       expect(suuntoApi.getWorkouts).toHaveBeenCalledWith('access_token', expect.any(String));
       expect(userService.addActivities).not.toHaveBeenCalled();
-      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('Unable to retrieve Suunto workouts for user 1');
     });
 
     it('handles activities retrieval failure (2)', async () => {
@@ -145,7 +147,7 @@ describe('Suunto Service', () => {
         heightDiffUp: 1,
         length: 1,
       });
-      expect(log.warn).toHaveBeenCalledTimes(1);
+      expect(log.info).toHaveBeenCalledWith('Unable to retrieve Suunto workouts for user 1');
     });
 
     it('filters out activities never a c2c outing, without retrieving their geometry', async () => {

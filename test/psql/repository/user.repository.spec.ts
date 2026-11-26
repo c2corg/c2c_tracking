@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { database as db } from '../../../src/db/index.ts';
+import { AlreadyLinkedError } from '../../../src/errors.ts';
 import { UserRepository } from '../../../src/repository/user.repository.ts';
 import type { User } from '../../../src/repository/user.ts';
 
@@ -58,6 +59,17 @@ describe('User Repository', () => {
     await expect(repository.findByPolarId(99n)).resolves.toBeUndefined();
     await expect(repository.findByCorosId('1')).resolves.toEqual(user1);
     await expect(repository.findByCorosId('2')).resolves.toBeUndefined();
+  });
+
+  it('refuses to link a vendor account already linked to another user', async () => {
+    const repository = new UserRepository();
+
+    const strava = { id: 'strava-14', accessToken: 'access', refreshToken: 'refresh', expiresAt: 1 };
+    await repository.insert({ c2cId: 14, strava });
+    await expect(repository.insert({ c2cId: 15, strava })).rejects.toBeInstanceOf(AlreadyLinkedError);
+    await repository.insert({ c2cId: 15 });
+    await expect(repository.update({ c2cId: 15, strava })).rejects.toBeInstanceOf(AlreadyLinkedError);
+    await expect(repository.findByStravaId('strava-14')).resolves.toMatchObject({ c2cId: 14 });
   });
 
   it('stores Garmin OAuth 2 tokens longer than 1024 characters once encrypted', async () => {

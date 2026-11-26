@@ -1,10 +1,16 @@
 import config from '../config.ts';
 import { database as db } from '../db/index.ts';
-import { IOError } from '../errors.ts';
+import { AlreadyLinkedError, IOError } from '../errors.ts';
 import { epochSeconds } from '../helpers/time.ts';
 import { decrypt, encrypt } from '../helpers/utils.ts';
 
 import type { User } from './user.ts';
+
+// PostgreSQL unique violation: the vendor account is already linked to another user (e.g. two concurrent links)
+const alreadyLinkedOr = (error: unknown, c2cId: number): unknown =>
+  error instanceof Error && 'code' in error && error.code === '23505'
+    ? new AlreadyLinkedError(`User ${c2cId} tried to link a vendor account already linked to another user`, error)
+    : error;
 
 type AbstractUserRow = {
   c2c_id: number;
@@ -228,7 +234,11 @@ export class UserRepository {
       throw new IOError('No connection to database');
     }
 
-    await conn(this.#TABLE).insert(this.userToRecord(user));
+    try {
+      await conn(this.#TABLE).insert(this.userToRecord(user));
+    } catch (error: unknown) {
+      throw alreadyLinkedOr(error, user.c2cId);
+    }
     return user;
   }
 
@@ -237,7 +247,11 @@ export class UserRepository {
     if (!conn) {
       throw new IOError('No connection to database');
     }
-    await conn(this.#TABLE).where({ c2c_id: user.c2cId }).update<UserInputRow>(this.userToRecord(user));
+    try {
+      await conn(this.#TABLE).where({ c2c_id: user.c2cId }).update<UserInputRow>(this.userToRecord(user));
+    } catch (error: unknown) {
+      throw alreadyLinkedOr(error, user.c2cId);
+    }
     return user;
   }
 

@@ -5,6 +5,7 @@ import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app.ts';
+import { AlreadyLinkedError } from '../../../../src/errors.ts';
 import log from '../../../../src/helpers/logger.ts';
 import { suuntoService } from '../../../../src/server/suunto/suunto.service.ts';
 import { authenticated } from '../../../utils.ts';
@@ -74,6 +75,20 @@ describe('Suunto Controller', () => {
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
+    });
+
+    it('answers 409 if the account is already linked to another user', async () => {
+      vi.spyOn(suuntoService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(
+        new AlreadyLinkedError(),
+      );
+
+      const response = await authenticated(
+        request.get('/suunto/exchange-token/1').query({ code: 'longenoughcode' }),
+        1,
+      );
+
+      expect(response.status).toBe(409);
+      expect(response.text).toEqual('already-linked');
     });
 
     it('setups user', async () => {

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { NotFoundError } from '../../src/errors.ts';
+import { AlreadyLinkedError, NotFoundError } from '../../src/errors.ts';
 import log from '../../src/helpers/logger.ts';
 import { miniatureService } from '../../src/miniature.service.ts';
 import { activityRepository } from '../../src/repository/activity.repository.ts';
@@ -1258,6 +1258,84 @@ describe('User service', () => {
         c2cId: 1,
         coros: { id: '1' },
       });
+    });
+  });
+
+  describe('linking an account already linked to another user', () => {
+    const strava: StravaAuth = {
+      access_token: 'access_token',
+      refresh_token: 'refresh_token',
+      expires_at: 3,
+      expires_in: 5,
+      athlete: { id: '1' },
+    };
+    const suunto: SuuntoAuth = {
+      access_token: 'access_token',
+      token_type: 'bearer',
+      refresh_token: 'refresh_token',
+      expires_in: 5,
+      user: 'user1',
+    };
+    const garmin: GarminAuth = { access_token: 'access_token', refresh_token: 'refresh_token', expires_in: 86400 };
+    const decathlon: DecathlonAuth = {
+      access_token: 'access_token',
+      token_type: 'bearer',
+      refresh_token: 'refresh_token',
+      expires_in: 5,
+    };
+    const polar: PolarAuth = { x_user_id: 1n, access_token: 'access_token', token_type: 'bearer' };
+    const coros: CorosAuth = { access_token: 'access_token', refresh_token: 'refresh_token', openId: '1' };
+
+    const cases = [
+      {
+        vendor: 'strava',
+        finder: 'findByStravaId',
+        configure: (service: UserService): Promise<void> => service.configureStrava(1, strava),
+      },
+      {
+        vendor: 'suunto',
+        finder: 'findBySuuntoUsername',
+        configure: (service: UserService): Promise<void> => service.configureSuunto(1, suunto),
+      },
+      {
+        vendor: 'garmin',
+        finder: 'findByGarminUserId',
+        configure: (service: UserService): Promise<void> => service.configureGarmin(1, garmin, 'garminUser'),
+      },
+      {
+        vendor: 'decathlon',
+        finder: 'findByDecathlonId',
+        configure: (service: UserService): Promise<void> => service.configureDecathlon(1, decathlon, '1', 'webhookId'),
+      },
+      {
+        vendor: 'polar',
+        finder: 'findByPolarId',
+        configure: (service: UserService): Promise<void> => service.configurePolar(1, polar),
+      },
+      {
+        vendor: 'coros',
+        finder: 'findByCorosId',
+        configure: (service: UserService): Promise<void> => service.configureCoros(1, coros),
+      },
+    ] as const;
+
+    it.each(cases)('refuses a $vendor account linked to another user', async ({ finder, configure }) => {
+      vi.spyOn(userRepository, finder).mockResolvedValueOnce({ c2cId: 2 });
+      vi.spyOn(userRepository, 'insert');
+      vi.spyOn(userRepository, 'update');
+
+      await expect(configure(new UserService())).rejects.toBeInstanceOf(AlreadyLinkedError);
+      expect(userRepository.insert).not.toHaveBeenCalled();
+      expect(userRepository.update).not.toHaveBeenCalled();
+    });
+
+    it.each(cases)('relinks a $vendor account to the same user', async ({ finder, configure }) => {
+      vi.spyOn(userRepository, finder).mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'findById').mockResolvedValueOnce({ c2cId: 1 });
+      vi.spyOn(userRepository, 'update').mockImplementationOnce((user) => Promise.resolve(user));
+
+      await configure(new UserService());
+      expect(userRepository.update).toHaveBeenCalledTimes(1);
     });
   });
 
