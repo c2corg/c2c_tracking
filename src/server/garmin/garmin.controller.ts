@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { authenticatedUserId } from '../../auth/user.ts';
 import config from '../../config.ts';
+import { AlreadyLinkedError } from '../../errors.ts';
 import log from '../../helpers/logger.ts';
 
 import type { GarminActivity } from './garmin.api.ts';
@@ -77,6 +78,9 @@ class GarminController {
       res.sendStatus(204);
     } catch (error: unknown) {
       req.log.info({ err: error }, 'Garmin token request failed');
+      if (error instanceof AlreadyLinkedError) {
+        throw error;
+      }
       throw createHttpError(502, 'setup-failed');
     }
   }

@@ -1,5 +1,5 @@
 import config from './config.ts';
-import { NotFoundError } from './errors.ts';
+import { AlreadyLinkedError, NotFoundError } from './errors.ts';
 import { isExcludedActivityType } from './excluded-activity-types.ts';
 import log from './helpers/logger.ts';
 import { epochSeconds, nowSeconds } from './helpers/time.ts';
@@ -63,6 +63,7 @@ export class UserService {
   }
 
   public async configureStrava(c2cId: number, auth: StravaAuth): Promise<void> {
+    this.#assertNotLinkedElsewhere(c2cId, 'strava', await userRepository.findByStravaId(auth.athlete.id));
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -128,6 +129,7 @@ export class UserService {
   }
 
   public async configureSuunto(c2cId: number, auth: SuuntoAuth): Promise<void> {
+    this.#assertNotLinkedElsewhere(c2cId, 'suunto', await userRepository.findBySuuntoUsername(auth.user));
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -202,6 +204,7 @@ export class UserService {
     garminUserId: string,
     keepLegacy = false,
   ): Promise<void> {
+    this.#assertNotLinkedElsewhere(c2cId, 'garmin', await userRepository.findByGarminUserId(garminUserId));
     let user: User | undefined = await userRepository.findById(c2cId);
     const garmin: GarminInfo = {
       userId: garminUserId,
@@ -249,6 +252,7 @@ export class UserService {
     userId: string,
     webhookId: string,
   ): Promise<void> {
+    this.#assertNotLinkedElsewhere(c2cId, 'decathlon', await userRepository.findByDecathlonId(userId));
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -317,6 +321,7 @@ export class UserService {
   }
 
   public async configurePolar(c2cId: number, auth: PolarAuth): Promise<void> {
+    this.#assertNotLinkedElsewhere(c2cId, 'polar', await userRepository.findByPolarId(auth.x_user_id));
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -340,6 +345,7 @@ export class UserService {
   }
 
   public async configureCoros(c2cId: number, auth: CorosAuth): Promise<void> {
+    this.#assertNotLinkedElsewhere(c2cId, 'coros', await userRepository.findByCorosId(auth.openId));
     let user: User | undefined = await userRepository.findById(c2cId);
     if (user) {
       user = {
@@ -561,6 +567,16 @@ export class UserService {
       } catch {
         log.warn(`Failed deleting miniature ${miniature}`);
       }
+    }
+  }
+
+  // A vendor account can only be linked to one c2c user (unique columns in the users table): linking it to a second
+  // user is refused with an explicit error, instead of failing on the database constraint
+  #assertNotLinkedElsewhere(c2cId: number, vendor: Vendor, owner: User | undefined): void {
+    if (owner && owner.c2cId !== c2cId) {
+      throw new AlreadyLinkedError(
+        `User ${c2cId} tried to link a ${vendor} account already linked to user ${owner.c2cId}`,
+      );
     }
   }
 

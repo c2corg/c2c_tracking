@@ -24,6 +24,13 @@ export class NotFoundError extends AppError {
   }
 }
 
+// The vendor account is already linked to another c2c user: a vendor account can only be linked to one user
+export class AlreadyLinkedError extends AppError {
+  constructor(message?: string, cause?: Error) {
+    super(409, message, cause, 'already-linked');
+  }
+}
+
 export class IOError extends AppError {
   constructor(message: string, cause?: Error, body?: string) {
     super(500, message, cause, body);

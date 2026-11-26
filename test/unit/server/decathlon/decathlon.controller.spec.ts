@@ -5,6 +5,7 @@ import type TestAgent from 'supertest/lib/agent.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../../../src/app.ts';
+import { AlreadyLinkedError } from '../../../../src/errors.ts';
 import log from '../../../../src/helpers/logger.ts';
 import type { WebhookEvent } from '../../../../src/server/decathlon/decathlon.api.ts';
 import { decathlonService } from '../../../../src/server/decathlon/decathlon.service.ts';
@@ -78,6 +79,20 @@ describe('Decathlon Controller', () => {
 
       expect(response.status).toBe(502);
       expect(response.text).toEqual('setup-failed');
+    });
+
+    it('answers 409 if the account is already linked to another user', async () => {
+      vi.spyOn(decathlonService, 'requestShortLivedAccessTokenAndSetupUser').mockRejectedValueOnce(
+        new AlreadyLinkedError(),
+      );
+
+      const response = await authenticated(
+        request.get('/decathlon/exchange-token/1').query({ code: 'longenoughcode', state: '', scope: '' }),
+        1,
+      );
+
+      expect(response.status).toBe(409);
+      expect(response.text).toEqual('already-linked');
     });
 
     it('setups user', async () => {

@@ -33,11 +33,13 @@ export class SuuntoService {
   }
 
   private async setupUser(c2cId: number, auth: SuuntoAuth): Promise<void> {
+    await userService.configureSuunto(c2cId, auth);
+
     try {
-      await userService.configureSuunto(c2cId, auth);
       await this.resyncActivities(c2cId, auth.access_token);
-    } catch (err: unknown) {
-      log.warn(err);
+    } catch {
+      // failing to retrieve workouts should not break the registration process
+      log.info(`Unable to retrieve Suunto workouts for user ${c2cId}`);
     }
   }
 
