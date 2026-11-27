@@ -3,7 +3,7 @@
 # is created by the tests (test/environment/s3-global-setup.ts).
 services:
   s3:
-    image: ghcr.io/scality/cloudserver:9.5.7@sha256:c9807719bb38bcd4a6a15ac9d55d657942a5356f96028ef9286304e806132796
+    image: ghcr.io/scality/cloudserver:9.6.0@sha256:9ea32dba7987ecb21dbba062a40ad446143000dd8cb8fb54a82b4f988102b123
     environment:
       S3BACKEND: mem
       REMOTE_MANAGEMENT_DISABLE: '1'
