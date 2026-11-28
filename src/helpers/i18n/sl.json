@@ -1992,19 +1992,19 @@
     "string": "Mixed training"
   },
   "mountainbike": {
-    "string": "Mountain bike"
+    "string": "Gorsko kolesarjenje"
   },
   "multipitch": {
-    "string": "Multi-pitch climbing"
+    "string": "Večraztežajno plezanje"
   },
   "offshorefishing": {
     "string": "Offshore fishing"
   },
   "outdoorclimb": {
-    "string": "Outdoor climb"
+    "string": "Smer v skali"
   },
   "outdoorclimbing": {
-    "string": "Outdoor climbing"
+    "string": "Plezanje v skali"
   },
   "shorefishing": {
     "string": "Shore fishing"
@@ -2037,7 +2037,7 @@
     "string": "Hand cycling"
   },
   "meditation": {
-    "string": "Meditation"
+    "string": "Meditacija"
   },
   "mermaiding": {
     "string": "Mermaiding"
@@ -2061,10 +2061,10 @@
     "string": "Vertical running"
   },
   "wheelchairsport": {
-    "string": "Wheelchair sport"
+    "string": "Športi na invalidskih vozičkih"
   },
   "dance": {
-    "string": "Dance"
+    "string": "Ples"
   },
   "physicaltherapy": {
     "string": "Physical therapy"
@@ -2103,10 +2103,10 @@
     "string": "Para water skiing"
   },
   "parasportswheelchairbasketball": {
-    "string": "Wheelchair basketball"
+    "string": "Košarka na vozičkih"
   },
   "parasportswheelchairtennis": {
-    "string": "Wheelchair tennis"
+    "string": "Tenis na vozičkih"
   },
   "ringette": {
     "string": "Ringette"
@@ -2181,7 +2181,7 @@
     "string": "Paddling"
   },
   "parasports": {
-    "string": "Para sports"
+    "string": "Parašporti"
   },
   "platformtennis": {
     "string": "Platform tennis"
